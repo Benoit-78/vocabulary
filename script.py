@@ -12,11 +12,17 @@ EXTENSION = '.csv'
 
 
 def get_os_kind():
+    """
+    Get operating system kind: Windows or UNIX-based.
+    """
     os_kind=None
     return os_kind
 
 
 def get_os_sep(os_kind):
+    """
+    Get separator specific to operating system: / or \
+    """
     if os_kind == 'windows':
         os_sep = '\\'
     elif os_kind == 'linux':
@@ -27,6 +33,9 @@ def get_os_sep(os_kind):
 
 
 def check_test_kind(argv):
+    """
+    Check the kind of check, version or theme.
+    """
     if argv not in ['version', 'theme']:
         raise Exception
     else:
@@ -35,6 +44,9 @@ def check_test_kind(argv):
 
 
 def load_data(os_sep, test_kind):
+    """
+    Load different dataframes necessary for the app functionning properly.
+    """
     voc_path = os_sep.join([r'.', 'data',
                          test_kind + '_voc' + EXTENSION])
     perf_path = os_sep.join([r'.', 'log',
@@ -57,15 +69,25 @@ def load_data(os_sep, test_kind):
 
 
 def get_random_step(voc_df):
+    """
+    Get random step, the jump from one word to another.
+    """
     step = None
     return step
 
 
 def get_row(copy_df, index):
+    """
+    Get the row of the word to be asked.
+    The word must not have been asked already.
+    """
     row = None
     return row
 
-
 def get_next_index(current_index, copy_df):
+    """
+    Get the index of the wordd to be asked.
+    The word must not have been asked already.
+    """
     index = None
     return index
