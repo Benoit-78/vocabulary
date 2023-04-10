@@ -1,0 +1,10 @@
+q5b5B4bqp3ad4KT
+
+=====================
+Interesting topics
+=====================
+Python to natural language -> class docstring, module docstring
+Explain code -> class docstring, module docstring
+Write a Python docstring -> function docstring
+Python bug fixer
+Translate programming languages
