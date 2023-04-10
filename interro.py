@@ -164,8 +164,7 @@ if __name__ == '__main__':
     paths = get_data_paths(os_sep, test_type)
     data = get_data(paths)
     # Prepare interro
-    voc_df = data['voc']
-    voc_df = data_processing(voc_df)
+    voc_df = data_processing(data['voc'])
     print("# DEBUG voc_df['Taux'].dtype:", voc_df['Taux'].dtype)
     print("# DEBUG voc_df.columns:", voc_df.columns)
     step = create_random_step(voc_df)
