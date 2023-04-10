@@ -1,0 +1,30 @@
+============================================================
+ Améliorations du programme d'interrogation
+============================================================
+
+==============================
+ Améliorations fonctionnelles
+==============================
+
+1) Pouvoir arrêter le test à tout moment.
+
+2) Ne pas retomber sur le même mot lors du même test.
+
+3) Automatiser toutes les opérations manuelles :
+	- Corrections des erreurs;
+	- Nombre de corrections syntaxiques;
+	- Transfert des mots au-delà d'une certaine note;
+	- Enregistrement du nuage de points.
+
+4) Créer une application cloud
+
+5) La mettre à disposition
+- version gratuite
+- version commerciale
+
+==============================
+ Améliorations de méthode
+==============================
+
+ - Créer une CI
+ - Créer une CD
