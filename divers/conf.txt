@@ -1,0 +1,5 @@
+/etc/profile
+~/.bashrc
+~/anaconda3/etc/profile.d/conda.sh
+/etc/gdm/custom.conf
+/etc/environment

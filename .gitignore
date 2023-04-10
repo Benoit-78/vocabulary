@@ -1,1 +1,16 @@
+# Folders
+
+.pytest_cache/*
+
+__ptcache__/*
+
+conf/token.txt
+
+divers/*
+
+htmlcov/*
+
+spec/*
+
+.coverage
 token.txt

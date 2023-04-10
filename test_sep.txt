@@ -1,0 +1,12 @@
+    def test_get_os_separator(self):
+        """Separator should be OS-specific"""
+        # Happy paths
+        windows_case = interro.get_os_separator('Windows')
+        self.assertEqual(windows_case, '\\')
+        linux_case = interro.get_os_separator('Linux')
+        self.assertEqual(linux_case, '/')
+        # Sad paths
+        with self.assertRaises(OSError):
+            interro.get_os_separator('Delorme OS')
+        with self.assertRaises(TypeError):
+            interro.get_os_separator(Exception)
