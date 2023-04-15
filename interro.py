@@ -12,6 +12,7 @@ import sys
 from tkinter import messagebox
 import pandas as pd
 import seaborn as sns
+import argparse
 
 
 EXTENSION = '.csv'
@@ -19,19 +20,16 @@ EXTENSION = '.csv'
 
 def check_test_type(argv):
     """Check the kind of check, version or theme"""
-    if len(argv) == 1:
-        print('# ERROR please give a test type: either version or theme')
-        raise ValueError
-    if not isinstance(argv[1], str):
+    if not isinstance(argv, str):
         print('# ERROR please give a string as a test type')
         raise TypeError
-    if len(argv[1]) == 0:
+    if len(argv) == 0:
         print('# ERROR please give a test type: either version or theme')
         raise ValueError
-    if argv[1] not in ['version', 'theme']:
+    if argv not in ['version', 'theme']:
         print('# ERROR test kind must be \'version\' or \'theme\'')
         raise NameError
-    return argv[1]
+    return argv
 
 
 def get_os_type():
@@ -158,6 +156,8 @@ def plot_nuage_de_point(voc_df):
 
 if __name__ == '__main__':
     # Load data
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--type", type=str)
     test_type = check_test_type(sys.argv)
     os_type = get_os_type()
     os_sep = get_os_separator(os_type)
