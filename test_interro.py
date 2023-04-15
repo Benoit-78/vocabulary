@@ -10,7 +10,6 @@ Main purpose: test script for interro.py, main script of vocabulary application
 import unittest
 import numpy as np
 import pandas as pd
-import sys
 
 import interro
 
@@ -32,24 +31,24 @@ class TestInterro(unittest.TestCase):
     def tearDown(self):
         """Runs once after each test case."""
 
-    # def test_check_test_type(self):
-    #     """The given test kind should be either version or theme"""
-    #     # Happy paths
-    #     version_case = interro.check_test_type('version')
-    #     self.assertEqual(version_case, 'version')
-    #     theme_case= interro.check_test_type('theme')
-    #     self.assertEqual(theme_case, 'theme')
-    #     # Sad paths
-    #     with self.assertRaises(TypeError):
-    #         interro.check_test_type(['interro.py', np.nan])
-    #     with self.assertRaises(TypeError):
-    #         interro.check_test_type(['interro.py', None])
-    #     with self.assertRaises(ValueError):
-    #         interro.check_test_type(['interro.py', ''])
-    #     with self.assertRaises(TypeError):
-    #         interro.check_test_type(['interro.py', 7])
-    #     with self.assertRaises(NameError):
-    #         interro.check_test_type(['interro.py', 'versio'])
+    def test_check_test_type(self):
+        """The given test kind should be either version or theme"""
+        # Happy paths
+        version_case = interro.check_test_type('version')
+        self.assertEqual(version_case, 'version')
+        theme_case= interro.check_test_type('theme')
+        self.assertEqual(theme_case, 'theme')
+        # Sad paths
+        with self.assertRaises(TypeError):
+            interro.check_test_type(['interro.py', np.nan])
+        with self.assertRaises(TypeError):
+            interro.check_test_type(['interro.py', None])
+        with self.assertRaises(ValueError):
+            interro.check_test_type(['interro.py', ''])
+        with self.assertRaises(TypeError):
+            interro.check_test_type(['interro.py', 7])
+        with self.assertRaises(NameError):
+            interro.check_test_type(['interro.py', 'versio'])
 
     def test_get_os_type(self):
         """Operating system should be either Windows or Linux"""
@@ -180,22 +179,22 @@ class TestInterro(unittest.TestCase):
                 self.assertIsInstance(row[2], float)
         # Sad paths
 
-    # def test_guess_word(self):
-    #     """The result should be either True or False"""
-    #     # Happy paths
-    #     operating_system = interro.get_os_type()
-    #     os_sep = interro.get_os_separator(operating_system)
-    #     test_kinds = ['theme', 'version']
-    #     for test_kind in test_kinds:
-    #         paths = interro.get_data_paths(os_sep, test_kind)
-    #         data = interro.get_data(paths)
-    #         voc_df = data['voc']
-    #         voc_df = interro.data_processing(voc_df)
-    #         step = interro.create_random_step(voc_df)
-    #         index = step
-    #         for i in range(1, 101):
-    #             next_index = interro.get_next_index(index, step, voc_df)
-    #             word_guessed = interro.guess_word(voc_df, next_index, i)
-    #             self.assertIsInstance(word_guessed, bool)
-    #     # Sad paths
+    def test_guess_word(self):
+        """The result should be either True or False"""
+        # Happy paths
+        operating_system = interro.get_os_type()
+        os_sep = interro.get_os_separator(operating_system)
+        test_kinds = ['theme', 'version']
+        for test_kind in test_kinds:
+            paths = interro.get_data_paths(os_sep, test_kind)
+            data = interro.get_data(paths)
+            voc_df = data['voc']
+            voc_df = interro.data_processing(voc_df)
+            step = interro.create_random_step(voc_df)
+            index = step
+            for i in range(1, 101):
+                next_index = interro.get_next_index(index, step, voc_df)
+                word_guessed = interro.guess_word(voc_df, next_index, i)
+                self.assertIsInstance(word_guessed, bool)
+        # Sad paths
 
