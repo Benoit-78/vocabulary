@@ -2,7 +2,7 @@
 
 .pytest_cache/*
 
-__ptcache__/*
+__pycache__/*
 
 conf/token.txt
 
@@ -14,3 +14,5 @@ spec/*
 
 .coverage
 token.txt
+
+*.pyc
