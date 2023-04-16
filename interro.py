@@ -98,9 +98,11 @@ def get_next_index(current_index, step, voc_df):
     """Get the next index. The word must not have been asked already."""
     next_index = (current_index + step) % voc_df.shape[0]
     already_asked = (voc_df['Query'].loc[next_index] == 1)
-    title_row = (next_index == 0) 
+    title_row = (next_index == 0)
     while already_asked or title_row:
         next_index = (next_index + step) % voc_df.shape[0]
+        already_asked = (voc_df['Query'].loc[next_index] == 1)
+        title_row = (next_index == 0)
     return next_index
 
 
