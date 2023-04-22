@@ -10,7 +10,7 @@ divers/*
 
 htmlcov/*
 
-spec/*
+doc/*
 
 .coverage
 token.txt
