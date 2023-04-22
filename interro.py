@@ -98,6 +98,7 @@ class Interro():
         self.word_cnt_df = word_cnt_df
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
+        self.perf = list()
 
     def get_row(self):
         """Get the row of the word to be asked"""
@@ -124,8 +125,8 @@ class Interro():
             raise Exception
         return word_guessed
 
-    def save_performances(self, total, rattrap_1_faults):
-        """Save performances for further analysis."""
+    def get_performances(self, total, rattrap_1_faults):
+        """Compute performances FOR THE TWO TESTS"""
         faults_total = self.faults_df.shape[0]
         today_date = date.today()
         # Test
@@ -138,9 +139,12 @@ class Interro():
             rattrap_perf = int(100 * (1 - (rattrap_1_faults / faults_total)))
         elif faults_total == 0:
             rattrap_perf = 100
-        row = [today_date, test_perf, rattrap_perf]
-        self.perf_df.loc[self.perf_df.shape[0]] = row
-        # self.perf_df.to_csv(self.paths['perf'], index=False, sep=';')
+        self.perf = [today_date, test_perf, rattrap_perf]
+
+    def save_performances(self, perf_paths):
+        """Save performances for further analysis."""
+        self.perf_df.loc[self.perf_df.shape[0]] = self.perf
+        self.perf_df.to_csv(perf_paths, index=False, sep=';')
 
 
 
@@ -208,7 +212,7 @@ class Test(Interro):
         self.words_df = self.words_df[self.words_df['Taux'] < self.words_df['image']]
         return self.words_df
 
-    def save_words_count(self):
+    def save_words_count(self, count_log_path):
         """Save the length of vocabulary list in a file"""
         word_counts = self.words_df.shape[0]
         count_before = self.word_cnt_df.shape[0]
@@ -216,10 +220,7 @@ class Test(Interro):
         self.word_cnt_df.loc[count_before] = [today_date, word_counts]
         count_after = self.word_cnt_df.shape[0]
         if count_after == count_before + 1:
-            # Code ci-dessous à mettre dans Chargeur ?
-            # log_file_name = test_type + '_words_count.csv'
-            # log_file_path = os_sep.join(['.', 'log', log_file_name])
-            # self.word_cnt_df.to_csv(log_file_path, index=False, sep=';')
+            self.word_cnt_df.to_csv(count_log_path, index=False, sep=';')
             message = "# INFO    | Words count saved successfully."
         else:
             message = "# ERROR   | Words count not saved."
@@ -274,8 +275,10 @@ if __name__ == '__main__':
     rattrap_2.run()
     print('# INFO interro finished.')
     # Save results
-    test.save_performances(TOTAL, rattrap_1.faults_df.shape[0])
+    test.get_performances(TOTAL, rattrap_1.faults_df.shape[0])
+    test.save_performances(loader.paths['perf'])
     test.remove_known_words()
-    test.save_words_count()
+    test.save_words_count(loader.paths['word_cnt'])
+    #
     test.words_df = test.words_df.drop('Query', axis=1)
     test.words_df.to_csv('voc_df.csv', index=False, sep=';')
