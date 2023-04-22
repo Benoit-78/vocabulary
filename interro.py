@@ -9,261 +9,276 @@ Main purpose: main script of vocabulary application
 import platform
 import random
 from tkinter import messagebox
-import pandas as pd
-import seaborn as sns
+# import seaborn as sns
 import argparse
 from datetime import date
+import pandas as pd
 
 
 EXTENSION = '.csv'
+TOTAL = 100
 
 
-def check_test_type(test_type):
-    """Check the kind of check, version or theme"""
-    if not isinstance(test_type, str):
-        print('# ERROR please give a string as a test type')
-        raise TypeError
-    if len(test_type) == 0:
-        print('# ERROR please give a test type: either version or theme')
-        raise ValueError
-    if test_type not in ['version', 'theme']:
-        print('# ERROR test kind must be \'version\' or \'theme\'')
-        raise NameError
-    return test_type
+
+class Chargeur():
+    """Controller (in the MVC pattern). Should be used by the user"""
+    def __init__(self, args):
+        """Must be done in the same session than the interroooo is launched"""
+        self.test_type = args.type
+        self.os_type = None
+        self.os_sep = None
+        self.paths = {}
+        self.data = {}
+
+    def check_test_type(self):
+        """Check the kind of check, version or theme"""
+        if not isinstance(self.test_type, str):
+            print('# ERROR please give a string as a test type')
+            raise TypeError
+        if len(self.test_type) == 0:
+            print('# ERROR please give a test type: either version or theme')
+            raise ValueError
+        if self.test_type not in ['version', 'theme']:
+            print('# ERROR test kind must be \'version\' or \'theme\'')
+            raise NameError
+
+    def get_os_type(self):
+        """Get operating system kind: Windows or Linux"""
+        operating_system = platform.platform()
+        operating_system = operating_system.split('-')[0]
+        if operating_system.lower() not in ['windows', 'linux', 'mac', 'android']:
+            print('# ERROR operating system cannot be identified')
+            raise OSError
+        self.os_type = operating_system
+
+    def set_os_separator(self):
+        """Get separator specific to operating system: / or \\ """
+        self.get_os_type()
+        if not isinstance(self.os_type, str):
+            raise TypeError
+        if self.os_type == 'Windows':
+            self.os_sep = '\\'
+        elif self.os_type in ['Linux', 'Mac', 'Android']:
+            self.os_sep = '/'
+        else:
+            print('# ERROR wrong input for operating system')
+            raise NameError
+
+    def set_data_paths(self):
+        """List paths to differente dataframes"""
+        self.set_os_separator()
+        self.check_test_type()
+        self.paths['voc'] = self.os_sep.join([r'.', 'data', self.test_type + '_voc' + EXTENSION])
+        self.paths['perf'] = self.os_sep.join([r'.', 'log', self.test_type + '_perf' + EXTENSION])
+        self.paths['word_cnt'] = self.os_sep.join([r'.', 'log',
+                                                   self.test_type + '_words_count' + EXTENSION])
+
+    def get_data(self):
+        """Load different dataframes necessary to the app"""
+        self.set_data_paths()
+        self.data['voc'] = pd.read_csv(self.paths['voc'], sep=';', encoding='latin1')
+        self.data['perf'] = pd.read_csv(self.paths['perf'], sep=';', encoding='latin1')
+        self.data['word_cnt'] = pd.read_csv(self.paths['word_cnt'], sep=';', encoding='latin1')
+
+    def data_extraction(self):
+        """Return the data necessary for the interro to run"""
+        self.get_data()
+        self.data['voc']['Query'] = [0] * self.data['voc'].shape[0]
+        self.data['voc'] = self.data['voc'].sort_values(by='Date', ascending=True)
+        self.data['voc']= self.data['voc'].replace(r',', r'.', regex=True)
+        self.data['voc']['Taux'] = self.data['voc']['Taux'].astype(float)
 
 
-def get_os_type():
-    """Get operating system kind: Windows or Linux"""
-    operating_system = platform.platform()
-    operating_system = operating_system.split('-')[0]
-    if operating_system.lower() not in ['windows', 'linux', 'mac', 'android']:
-        print('# ERROR operating system cannot be identified')
-        raise OSError
-    return operating_system
+
+class Interro():
+    """Model (in the MVC pattern). Should be launched by the user"""
+    def __init__(self, words_df, perf_df=None, word_cnt_df=None):
+        self.words_df = words_df
+        self.perf_df = perf_df
+        self.word_cnt_df = word_cnt_df
+        self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
+        self.index = 1
+        self.perf = list()
+
+    def get_row(self):
+        """Get the row of the word to be asked"""
+        mot_etranger = self.words_df[self.words_df.columns[0]].loc[self.index]
+        mot_natal = self.words_df[self.words_df.columns[1]].loc[self.index]
+        row = [mot_etranger, mot_natal]
+        return row
+
+    def guess_word(self, row, i, total):
+        """Given an index, ask a word to the user, and return a boolean."""
+        mot_etranger = row[0]
+        title = f'Word {i}/{total}'
+        text = f'{mot_etranger} \nDo you get it?'
+        user_answer = messagebox.showinfo(title=title, message=text)
+        if user_answer is False:
+            print("# ERROR interruption by user")
+            raise Exception
+        mot_natal = row[1]
+        title = f'Word {i}/{total}'
+        text = f'Translation is \'{mot_natal}\'. \nWere you right?'
+        word_guessed = messagebox.askyesnocancel(title=title, message=text)
+        if word_guessed is None:
+            print("# ERROR interruption by user")
+            raise Exception
+        return word_guessed
+
+    def get_performances(self, total, rattrap_1_faults):
+        """Compute performances FOR THE TWO TESTS"""
+        faults_total = self.faults_df.shape[0]
+        today_date = date.today()
+        # Test
+        if total != 0:
+            test_perf = int(100 * (1 - (faults_total / total)))
+        elif total == 0:
+            test_perf = 100
+        # Rattrap n.1
+        if faults_total != 0:
+            rattrap_perf = int(100 * (1 - (rattrap_1_faults / faults_total)))
+        elif faults_total == 0:
+            rattrap_perf = 100
+        self.perf = [today_date, test_perf, rattrap_perf]
+
+    def save_performances(self, perf_paths):
+        """Save performances for further analysis."""
+        self.perf_df.loc[self.perf_df.shape[0]] = self.perf
+        self.perf_df.to_csv(perf_paths, index=False, sep=';')
 
 
-def get_os_separator(os_type):
-    """Get separator specific to operating system: / or \\ """
-    if not isinstance(os_type, str):
-        raise TypeError
-    if os_type == 'Windows':
-        os_sep = '\\'
-    elif os_type in ['Linux', 'Mac', 'Android']:
-        os_sep = '/'
-    else:
-        print('# ERROR wrong input for operating system')
-        raise NameError
-    return os_sep
+
+class Test(Interro):
+    """First round"""
+    def create_random_step(self):
+        """Get random step, the jump from one word to another"""
+        self.step = random.randint(1, self.words_df.shape[0])
+
+    def run(self, total):
+        """Launch the vocabulary interoooooo !!!!"""
+        self.create_random_step()
+        self.index = self.step
+        for i in range(1, total + 1):
+            self.index = self.get_next_index(self.index)
+            row = self.get_row()
+            word_guessed = self.guess_word(row, i, total)
+            self.update_voc_df(word_guessed)
+            if not word_guessed:
+                faults = self.faults_df.shape[0]
+                self.faults_df.loc[faults] = [row[0], row[1]]
+
+    def get_next_index(self, current_index):
+        """Get the next index. The word must not have been asked already."""
+        next_index = (current_index + self.step) % self.words_df.shape[0]
+        already_asked = self.words_df['Query'].loc[next_index] == 1
+        title_row = next_index == 0
+        while already_asked or title_row:
+            next_index = (next_index + self.step) % self.words_df.shape[0]
+            already_asked = self.words_df['Query'].loc[next_index] == 1
+            title_row = next_index == 0
+        return next_index
+
+    def update_voc_df(self, word_guessed):
+        """Update the vocabulary dataframe"""
+        # Update Nb
+        self.words_df['Nb'].loc[self.index] += 1
+        # Update Score
+        if word_guessed:
+            self.words_df['Score'].loc[self.index] += 1
+        else:
+            self.words_df['Score'].loc[self.index] -= 1
+        # Update Taux
+        nombre = self.words_df['Nb'].loc[self.index]
+        score = self.words_df['Score'].loc[self.index]
+        taux = round(score / nombre, 2)
+        self.words_df['Taux'].loc[self.index] = taux
+        # Update Query
+        self.words_df['Query'].loc[self.index] += 1
+
+    def update_fault_df(self, word_guessed, row):
+        """Save the faulty answers for the second test."""
+        if word_guessed is False:
+            self.faults_df.loc[self.faults_df.shape[0]] = [row[0], row[1]]
+
+    def remove_known_words(self):
+        """Remove words that have been guessed sufficiently enough.
+        This \'sufficiently\' criteria is totally arbitrary, and can be changed
+        only under the author's dictatorial will."""
+        steep = -1.25
+        ordinate = 112.5
+        self.words_df['image'] = ordinate + steep * self.words_df['Nb']
+        outliers_df = self.words_df[100 * self.words_df['Taux'] > self.words_df['image']]
+        print("# DEBUG number of points to be removed:", outliers_df.shape[0])
+        self.words_df = self.words_df[self.words_df['Taux'] < self.words_df['image']]
+        return self.words_df
+
+    def save_words_count(self, count_log_path):
+        """Save the length of vocabulary list in a file"""
+        word_counts = self.words_df.shape[0]
+        count_before = self.word_cnt_df.shape[0]
+        today_date = date.today()
+        self.word_cnt_df.loc[count_before] = [today_date, word_counts]
+        count_after = self.word_cnt_df.shape[0]
+        if count_after == count_before + 1:
+            self.word_cnt_df.to_csv(count_log_path, index=False, sep=';')
+            message = "# INFO    | Words count saved successfully."
+        else:
+            message = "# ERROR   | Words count not saved."
+        print(message)
 
 
-def get_data_paths(os_sep, test_kind):
-    """List paths to differente dataframes"""
-    paths = {}
-    paths['voc'] = os_sep.join([r'.', 'data',
-                                test_kind + '_voc' + EXTENSION])
-    paths['perf'] = os_sep.join([r'.', 'log',
-                                 test_kind + '_perf' + EXTENSION])
-    paths['word_cnt'] = os_sep.join([r'.', 'log',
-                                     test_kind + '_word_count' + EXTENSION])
-    return paths
+
+class Rattrap(Test):
+    """Rattrapage !!!"""
+    def run(self):
+        """Launch the second test"""
+        total = self.words_df.shape[0]
+        for j in range(0, total):
+            row = self.get_row()
+            word_guessed = self.guess_word(row, j+1, total)
+            if not word_guessed:
+                faults = self.faults_df.shape[0]
+                self.faults_df.loc[faults]([row[0], row[1]])
 
 
-def get_data(paths):
-    """Load different dataframes necessary to the app"""
-    data = {}
-    data['voc'] = pd.read_csv(paths['voc'],
-                              sep=';', encoding='latin1')
-    data['perf'] = pd.read_csv(paths['perf'],
-                               sep=';', encoding='latin1')
-    data['word_cnt'] = pd.read_csv(paths['word_cnt'],
-                                   sep=';', encoding='latin1')
-    return data
 
+class Graphiques():
+    """Viewer (in the MVC pattern). Should be used by the user."""
+    def plot_nuage_de_point(self):
+        """Scatterplot of words, abscisses number of guesses, ordinates rate of
+        success """
+        # sns.scatterplot(words_df[['Nb', 'Taux']])
+        return None
 
-def data_preprocessing(voc_df):
-    voc_df['Query'] = [0] * voc_df.shape[0]
-    voc_df = voc_df.sort_values(by='Date', ascending=True)
-    voc_df = voc_df.replace(r',', r'.', regex=True)
-    voc_df['Taux'] = voc_df['Taux'].astype(float)
-    return voc_df
+    def save_nuage_de_points(self):
+        """Save the graph, so that analysis can be made on series of graphs"""
 
-
-def create_random_step(voc_df):
-    """Get random step, the jump from one word to another"""
-    step = random.randint(1, voc_df.shape[0])
-    return step
-
-
-def get_next_index(current_index, step, voc_df):
-    """Get the next index. The word must not have been asked already."""
-    next_index = (current_index + step) % voc_df.shape[0]
-    already_asked = (voc_df['Query'].loc[next_index] == 1)
-    title_row = (next_index == 0)
-    while already_asked or title_row:
-        next_index = (next_index + step) % voc_df.shape[0]
-        already_asked = (voc_df['Query'].loc[next_index] == 1)
-        title_row = (next_index == 0)
-    return next_index
-
-
-def get_row(voc_df, index):
-    """Get the row of the word to be asked"""
-    mot_etranger = voc_df[voc_df.columns[0]].loc[index]
-    mot_natal = voc_df[voc_df.columns[1]].loc[index]
-    row = [mot_etranger, mot_natal]
-    return row
-
-
-def guess_word(row, i, total):
-    """Given an index, ask a word to the user, and return a boolean."""
-    mot_etranger = row[0]
-    msgbox_title = f'Word {i}/{total}'
-    msgbox_text = f'{mot_etranger} \nDo you get it?'
-    user_answer = messagebox.showinfo(title=msgbox_title,
-                                      message=msgbox_text)
-    if user_answer is False:
-        print("# ERROR interruption by user")
-        raise Exception
-    mot_natal = row[1]
-    msgbox_title = f'Word {i}/{total}'
-    msgbox_text = f'Translation is \'{mot_natal}\'. \nWere you right?'
-    word_guessed = messagebox.askyesnocancel(title=msgbox_title,
-                                             message=msgbox_text)
-    if word_guessed is None:
-        print("# ERROR interruption by user")
-        raise Exception
-    return word_guessed
-
-
-def update_fault_df(fault_df, word_guessed, row):
-    """Save the faulty answers for the second test."""
-    if word_guessed is False:
-        fault_df.loc[fault_df.shape[0]] = [row[0], row[1]]
-    return fault_df
-
-
-def update_voc_df(voc_df, index, word_guessed):
-    """Update the vocabulary dataframe"""
-    # Update Nb
-    voc_df['Nb'].loc[index] += 1
-    # Update Score
-    if word_guessed:
-        voc_df['Score'].loc[index] += 1
-    else:
-        voc_df['Score'].loc[index] -= 1
-    # Update Taux
-    nombre = voc_df['Nb'].loc[index]
-    score = voc_df['Score'].loc[index]
-    taux = round(score / nombre, 2)
-    voc_df['Taux'].loc[index] = taux
-    # Update Query
-    voc_df['Query'].loc[index] += 1
-    return voc_df
-
-
-def save_performances(data, total, faults_total, double_faults_total, paths):
-    """Save performances for further analysis."""
-    perf_df = data['perf']
-    today_date = date.today()
-    if total != 0:
-        test_perf = int(100 * (1 - (faults_total / total)))
-    elif total ==0:
-        test_perf = 100
-    if faults_total != 0:
-        rattrap_perf = int(100 * (1 - (double_faults_total / faults_total)))
-    elif faults_total == 0:
-        rattrap_perf = 100
-    row = [today_date, test_perf, rattrap_perf]
-    perf_df.loc[perf_df.shape[0]] = row
-    perf_df.to_csv(paths['perf'], index=False, sep=';')
-    return None
-
-
-def remove_known_words(voc_df):
-    """Remove words that have been guessed sufficiently enough.
-    This \'sufficiently\' criteria is totally arbitrary, and can be changed only
-    under the author's dictatorial will.
-    """
-    steep = -1.25
-    ordinate = 112.5
-    voc_df['image'] = ordinate + steep * voc_df['Nb']
-    print(voc_df['image'])
-    outliers_df = voc_df[100 * voc_df['Taux'] > voc_df['image']]
-    print("# DEBUG number of points to be removed:", outliers_df.shape[0])
-    voc_df = voc_df[voc_df['Taux'] < voc_df['image']]
-    return voc_df
-
-
-def save_words_count(voc_df, test_type, os_sep):
-    """Save the length of vocabulary list in a file"""
-    word_counts = voc_df.shape[0]
-    log_file_name = test_type + '_words_count.csv'
-    log_file_path = os_sep.join(['.', 'log', log_file_name])
-    count_df = pd.read_csv(log_file_path, sep=';', encoding='latin1')
-    count_before = count_df.shape[0]
-    today_date = date.today()
-    count_df.loc[count_before] = [today_date, word_counts]
-    count_after = count_df.shape[0]
-    count_df.to_csv(log_file_path, index=False, sep=';')
-    if count_after == count_before + 1:
-        message = "# INFO    | Words count saved successfully."
-    else:
-        message = "# ERROR   | Words count not saved."
-    print(message)
-
-
-def save_nuage_de_point(voc_df):
-    """Scatterplot of words, abscisses number of guesses, ordinates rate of
-    success """
-    sns.scatterplot(voc_df[['Nb', 'Taux']])
-    return None
 
 
 if __name__ == '__main__':
-    # Load data
+    # Get user inputs
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--type", type=str)
     args = parser.parse_args()
-    test_type = check_test_type(args.type)
-    os_type = get_os_type()
-    os_sep = get_os_separator(os_type)
-    paths = get_data_paths(os_sep, test_type)
-    data = get_data(paths)
+    # Load data
+    loader = Chargeur(args)
+    loader.data_extraction()
     print('# INFO data loaded.')
-    # Prepare interro
-    voc_df = data_preprocessing(data['voc'])
-    step = create_random_step(voc_df)
-    index = step
-    print('# INFO interro prepared.')
     # WeuuuuAaaaaInterrooo !!!
-    faults = list()
-    total = 100
-    for i in range(1, total + 1):
-        index = get_next_index(index, step, voc_df)
-        row = get_row(voc_df, index)
-        word_guessed = guess_word(row, i, total)
-        voc_df = update_voc_df(voc_df, index, word_guessed)
-        if not word_guessed:
-            faults.append([row[0], row[1]])
+    test = Test(loader.data['voc'], loader.data['perf'], loader.data['word_cnt'])
+    test.run(TOTAL)
     # Eeeeencore une Interrrooooo !!!!
-    double_faults = []
-    faults_total = len(faults)
-    for j in range(0, faults_total):
-        row = faults[j]
-        word_guessed = guess_word(row, j+1, faults_total)
-        if not word_guessed:
-            double_faults.append([row[0], row[1]])
+    rattrap_1 = Rattrap(test.faults_df)
+    rattrap_1.run()
     # Eeeet eeeeeencore une Interrroooo !!!!
-    double_faults_total = len(double_faults)
-    for k in range(0, double_faults_total):
-        row = double_faults[k]
-        word_guessed = guess_word(row, k+1, double_faults_total)
+    rattrap_2 = Rattrap(rattrap_1.faults_df)
+    rattrap_2.run()
     print('# INFO interro finished.')
     # Save results
-    save_performances(data, total, faults_total, double_faults_total, paths)
-    remove_known_words(voc_df)
-    save_words_count(voc_df, test_type)
-    save_nuage_de_point(voc_df)
-    # plot_nuage_de_point(voc_df)
-    voc_df = voc_df.drop('Query', axis=1)
-    voc_df.to_csv('voc_df.csv', index=False, sep=';')
+    test.get_performances(TOTAL, rattrap_1.faults_df.shape[0])
+    test.save_performances(loader.paths['perf'])
+    test.remove_known_words()
+    test.save_words_count(loader.paths['word_cnt'])
+    #
+    test.words_df = test.words_df.drop('Query', axis=1)
+    test.words_df.to_csv('voc_df.csv', index=False, sep=';')

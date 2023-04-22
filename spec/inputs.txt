@@ -1,4 +1,0 @@
-Vocabulary
-- Utiliser Qt pour l'interface graphique (portable)
-- Ajouter Qt au path de Linux
-- utiliser nosetest
