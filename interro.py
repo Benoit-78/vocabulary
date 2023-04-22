@@ -194,6 +194,24 @@ def remove_known_words(voc_df):
     return voc_df
 
 
+def save_words_count(voc_df, test_type, os_sep):
+    """Save the length of vocabulary list in a file"""
+    word_counts = voc_df.shape[0]
+    log_file_name = test_type + '_words_count.csv'
+    log_file_path = os_sep.join(['.', 'log', log_file_name])
+    count_df = pd.read_csv(log_file_path, sep=';', encoding='latin1')
+    count_before = count_df.shape[0]
+    today_date = date.today()
+    count_df.loc[count_before] = [today_date, word_counts]
+    count_after = count_df.shape[0]
+    count_df.to_csv(log_file_path, index=False, sep=';')
+    if count_after == count_before + 1:
+        message = "# INFO    | Words count saved successfully."
+    else:
+        message = "# ERROR   | Words count not saved."
+    print(message)
+
+
 def save_nuage_de_point(voc_df):
     """Scatterplot of words, abscisses number of guesses, ordinates rate of
     success """
@@ -244,7 +262,7 @@ if __name__ == '__main__':
     # Save results
     save_performances(data, total, faults_total, double_faults_total, paths)
     remove_known_words(voc_df)
-    save_word_counts()
+    save_words_count(voc_df, test_type)
     save_nuage_de_point(voc_df)
     # plot_nuage_de_point(voc_df)
     voc_df = voc_df.drop('Query', axis=1)
