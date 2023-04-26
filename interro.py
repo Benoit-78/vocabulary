@@ -15,7 +15,7 @@ from datetime import date
 import pandas as pd
 
 
-EXTENSION = '.csv'
+EXT = '.csv'
 TOTAL = 100
 
 
@@ -68,10 +68,9 @@ class Chargeur():
         """List paths to differente dataframes"""
         self.set_os_separator()
         self.check_test_type()
-        self.paths['voc'] = self.os_sep.join([r'.', 'data', self.test_type + '_voc' + EXTENSION])
-        self.paths['perf'] = self.os_sep.join([r'.', 'log', self.test_type + '_perf' + EXTENSION])
-        self.paths['word_cnt'] = self.os_sep.join([r'.', 'log',
-                                                   self.test_type + '_words_count' + EXTENSION])
+        self.paths['voc'] = self.os_sep.join([r'.', 'data', self.test_type + '_voc' + EXT])
+        self.paths['perf'] = self.os_sep.join([r'.', 'log', self.test_type + '_perf' + EXT])
+        self.paths['word_cnt'] = self.os_sep.join([r'.', 'log', self.test_type + '_words_count' + EXT])
 
     def get_data(self):
         """Load different dataframes necessary to the app"""
