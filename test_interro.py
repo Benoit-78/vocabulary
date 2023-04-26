@@ -15,22 +15,8 @@ import interro
 
 
 
-class TestInterro(unittest.TestCase):
-    """Interro script tests."""
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
-
-    @classmethod
-    def tearDownClass(cls):
-        """Runs once before test suite."""
-
-    def setUp(self):
-        """Runs before each test."""
-
-    def tearDown(self):
-        """Runs once after each test case."""
-
+class TestChargeur(unittest.TestCase):
+    """Tests on Chargeur class methods."""
     def test_check_test_type(self):
         """The given test kind should be either version or theme"""
         # Happy paths
@@ -53,14 +39,13 @@ class TestInterro(unittest.TestCase):
     def test_get_os_type(self):
         """Operating system should be either Windows or Linux"""
         # Happy paths
-        # global operating_system
         operating_system = interro.get_os_type()
         self.assertIn(operating_system, ['Windows', 'Linux', 'Mac', 'Android'])
         # Sad paths
         with self.assertRaises(AssertionError):
             self.assertEqual(operating_system, 'Ubuntu')
 
-    def test_get_os_separator(self):
+    def test_set_os_separator(self):
         """Separator should be OS-specific"""
         # Happy paths
         windows_case = interro.get_os_separator('Windows')
@@ -75,7 +60,7 @@ class TestInterro(unittest.TestCase):
         with self.assertRaises(NameError):
             interro.get_os_separator('Delorme OS')
 
-    def test_get_data_paths(self):
+    def test_set_data_paths(self):
         """Data paths should exist"""
         operating_system = interro.get_os_type()
         os_sep = interro.get_os_separator(operating_system)
@@ -105,7 +90,7 @@ class TestInterro(unittest.TestCase):
                 self.assertIsInstance(data, type(pd.DataFrame()))
             # Sad paths
 
-    def test_data_preprocessing(self):
+    def test_data_extraction(self):
         """Input should be a dataframe, and it should be added a query column"""
         operating_system = interro.get_os_type()
         os_sep = interro.get_os_separator(operating_system)
@@ -123,43 +108,27 @@ class TestInterro(unittest.TestCase):
             self.assertEqual(voc_df['Taux'].dtype, np.float64)
             self.assertGreater(voc_df.shape[0], 1)
             # Sad paths
- 
-    def test_create_random_step(self):
-        """The step should be a random integer"""
-        operating_system = interro.get_os_type()
-        os_sep = interro.get_os_separator(operating_system)
-        test_kinds = ['theme', 'version']
-        for test_kind in test_kinds:
-            paths = interro.get_data_paths(os_sep, test_kind)
-            data = interro.get_data(paths)
-            voc_df = data['voc']
-            # Happy paths            
-            self.assertGreater(voc_df.shape[0], 0)
-            step = interro.create_random_step(voc_df)
-            self.assertIsInstance(step, int)
-            self.assertGreater(step, 0)
-            # Sad paths
 
-    def test_get_next_index(self):
-        """Next index should point to a word that was not already asked"""
-        operating_system = interro.get_os_type()
-        os_sep = interro.get_os_separator(operating_system)
-        test_kinds = ['theme', 'version']
-        for test_kind in test_kinds:
-            paths = interro.get_data_paths(os_sep, test_kind)
-            data = interro.get_data(paths)
-            voc_df = data['voc']
-            voc_df = interro.data_preprocessing(voc_df)
-            step = interro.create_random_step(voc_df)
-            index = step
-            for i in range(1, 101):
-                # Happy paths
-                next_index = interro.get_next_index(index, step, voc_df)
-                self.assertIsInstance(next_index, int)
-                self.assertGreater(next_index, 1)
-                self.assertLess(next_index, voc_df.shape[0])
-                self.assertEqual(voc_df['Query'].loc[next_index], 0)
-                # Sad paths
+
+
+class TestInterro(unittest.TestCase):
+    """Tests on Interro abstract class methods."""
+    @classmethod
+    def setUpClass(cls):
+        """Run once before all tests."""
+
+    @classmethod
+    def tearDownClass(cls):
+        """Runs once before test suite."""
+
+    def setUp(self):
+        """Runs before each test."""
+
+    def tearDown(self):
+        """Runs once after each test case."""
+ 
+    def test_run(self):
+        """"""
 
     def test_get_row(self):
         """The returned row should enable the user to guess the word"""
@@ -209,3 +178,51 @@ class TestInterro(unittest.TestCase):
         """voc_df should be updated according to user's guess"""
         
         
+
+class TestTest(unittest.TestCase):
+    """Tests on Test class methods."""
+    def test_create_random_step(self):
+        """The step should be a random integer"""
+        operating_system = interro.get_os_type()
+        os_sep = interro.get_os_separator(operating_system)
+        test_kinds = ['theme', 'version']
+        for test_kind in test_kinds:
+            paths = interro.get_data_paths(os_sep, test_kind)
+            data = interro.get_data(paths)
+            voc_df = data['voc']
+            # Happy paths            
+            self.assertGreater(voc_df.shape[0], 0)
+            step = interro.create_random_step(voc_df)
+            self.assertIsInstance(step, int)
+            self.assertGreater(step, 0)
+            # Sad paths
+
+    def test_get_next_index(self):
+        """Next index should point to a word that was not already asked"""
+        operating_system = interro.get_os_type()
+        os_sep = interro.get_os_separator(operating_system)
+        test_kinds = ['theme', 'version']
+        for test_kind in test_kinds:
+            paths = interro.get_data_paths(os_sep, test_kind)
+            data = interro.get_data(paths)
+            voc_df = data['voc']
+            voc_df = interro.data_preprocessing(voc_df)
+            step = interro.create_random_step(voc_df)
+            index = step
+            for i in range(1, 101):
+                # Happy paths
+                next_index = interro.get_next_index(index, step, voc_df)
+                self.assertIsInstance(next_index, int)
+                self.assertGreater(next_index, 1)
+                self.assertLess(next_index, voc_df.shape[0])
+                self.assertEqual(voc_df['Query'].loc[next_index], 0)
+                # Sad paths
+
+
+class TestRattrap(unittest.TestCase):
+    """Tests on Rattrap class methods."""
+
+
+
+class TestGraphiques(unittest.TestCase):
+    """Tests on Rattrap class methods."""
