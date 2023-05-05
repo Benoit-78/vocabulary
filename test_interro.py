@@ -1,40 +1,57 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Creator: B.Delorme
-Mail: delormebenoit211@gmail.com
-Creation date: 11th March 2023
-Main purpose: test script for interro.py, main script of vocabulary application
+    Creator: B.Delorme1
+    Mail: delormebenoit211@gmail.com
+    Creation date: 11th March 2023
+    Main purpose: test script for interro.py, main script of vocabulary application
 """
 
 import unittest
 import numpy as np
 import pandas as pd
+import argparse
 
 import interro
 
 
 
+class TestParser(unittest.TestCase):
+    """Tests on arguments parser."""
+    def test_parse_args(self):
+        """The argument should exist, and should be a string"""
+        for test_kind in ['version', 'theme']:
+            # Happy paths
+            parser = interro.parse_args(['-t', test_kind])
+            self.assertTrue(parser.type)
+            self.assertIsInstance(parser.type, str)
+            # Sad paths
+            with self.assertRaises(ValueError):
+                self.assertEqual(parser.type, None)
+            with self.assertRaises(TypeError):
+                self.assertEqual(parser.type, 8)
+    
+    def test_check_args(self):
+        """The argument should be either version or theme"""
+        for test_kind in ['version', 'theme']:
+            parser = interro.parse_args(['-t', test_kind])
+            # Happy paths
+            self.assertIn(parser.type, ['version', 'theme'])
+            # Sad paths
+            with self.assertRaises(ValueError):
+                self.assertEqual(parser.type, '')
+            with self.assertRaises(NameError):
+                self.assertEqual(parser.type, 'qessdefg')
+
+
+
 class TestChargeur(unittest.TestCase):
     """Tests on Chargeur class methods."""
-    def test_check_test_type(self):
-        """The given test kind should be either version or theme"""
-        # Happy paths
-        version_case = interro.check_test_type('version')
-        self.assertEqual(version_case, 'version')
-        theme_case= interro.check_test_type('theme')
-        self.assertEqual(theme_case, 'theme')
-        # Sad paths
-        with self.assertRaises(TypeError):
-            interro.check_test_type(np.nan)
-        with self.assertRaises(TypeError):
-            interro.check_test_type(None)
-        with self.assertRaises(ValueError):
-            interro.check_test_type('')
-        with self.assertRaises(TypeError):
-            interro.check_test_type(7)
-        with self.assertRaises(NameError):
-            interro.check_test_type('versio')
+    def setUp(self):
+        parser_version = interro.parse_args(['-t', 'version'])
+        parser_theme = interro.parse_args(['-t', 'theme'])
+        self.chargeurs = [interro.Chargeur(parser_version),
+                          interro.Chargeur(parser_theme)]
 
     def test_get_os_type(self):
         """Operating system should be either Windows or Linux"""

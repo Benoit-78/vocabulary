@@ -9,14 +9,40 @@ Main purpose: main script of vocabulary application
 import platform
 import random
 from tkinter import messagebox
-# import seaborn as sns
 import argparse
 from datetime import date
 import pandas as pd
+from abc import ABC
+import sys
 
 
 EXT = '.csv'
 TOTAL = 100
+
+
+def parse_args(args):
+    """Parse command line argument"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--type", type=str)
+    args = parser.parse_args(args)
+    if not args.type:
+        print('# ERROR please give a test type')
+        raise ValueError
+    if not isinstance(args.type, str):
+        print('# ERROR please give a string as a test type')
+        raise TypeError
+    return args
+
+
+def check_args(args):
+    """Check the kind of interro, version or theme"""
+    if len(args.type) == 0:
+        print('# ERROR please give a test type: either version or theme')
+        raise ValueError
+    if args.type not in ['version', 'theme']:
+        print('# ERROR test kind must be \'version\' or \'theme\'')
+        raise NameError
+    return args
 
 
 
@@ -29,18 +55,6 @@ class Chargeur():
         self.os_sep = None
         self.paths = {}
         self.data = {}
-
-    def check_test_type(self):
-        """Check the kind of check, version or theme"""
-        if not isinstance(self.test_type, str):
-            print('# ERROR please give a string as a test type')
-            raise TypeError
-        if len(self.test_type) == 0:
-            print('# ERROR please give a test type: either version or theme')
-            raise ValueError
-        if self.test_type not in ['version', 'theme']:
-            print('# ERROR test kind must be \'version\' or \'theme\'')
-            raise NameError
 
     def get_os_type(self):
         """Get operating system kind: Windows or Linux"""
@@ -89,7 +103,7 @@ class Chargeur():
 
 
 
-class Interro():
+class Interro(ABC):
     """Model (in the MVC pattern). Should be launched by the user"""
     def __init__(self, words_df, perf_df=None, word_cnt_df=None):
         self.words_df = words_df
@@ -256,11 +270,10 @@ class Graphiques():
 
 if __name__ == '__main__':
     # Get user inputs
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--type", type=str)
-    args = parser.parse_args()
+    parser = parse_args(sys.argv[1:])
+    parser = check_args(parser)
     # Load data
-    loader = Chargeur(args)
+    loader = Chargeur(parser)
     loader.data_extraction()
     print('# INFO data loaded.')
     # WeuuuuAaaaaInterrooo !!!
