@@ -11,9 +11,10 @@ import random
 from tkinter import messagebox
 import argparse
 from datetime import date
-import pandas as pd
 from abc import ABC
 import sys
+import pandas as pd
+
 
 
 EXT = '.csv'
@@ -22,15 +23,15 @@ TOTAL = 100
 
 def parse_args(args):
     """Parse command line argument"""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--type", type=str)
-    args = parser.parse_args(args)
+    another_parser = argparse.ArgumentParser()
+    another_parser.add_argument("-t", "--type", type=str)
+    args = another_parser.parse_args(args)
     if not args.type:
         print('# ERROR   | Please give a test type')
-        raise ValueError
+        raise SystemExit
     if not isinstance(args.type, str):
         print('# ERROR   | Please give a string as a test type')
-        raise TypeError
+        raise SystemExit
     return args
 
 
@@ -104,13 +105,13 @@ class Chargeur():
 
 class Interro(ABC):
     """Model (in the MVC pattern). Should be launched by the user"""
-    def __init__(self, chargeur):
-        self.words_df = chargeur.data['voc']
-        self.perf_df = chargeur.data['perf']
-        self.word_cnt_df = chargeur.data['word_cnt']
+    def __init__(self, un_chargeur):
+        self.words_df = un_chargeur.data['voc']
+        self.perf_df = un_chargeur.data['perf']
+        self.word_cnt_df = un_chargeur.data['word_cnt']
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
-        self.perf = list()
+        self.perf = []
 
     def get_row(self):
         """Get the row of the word to be asked"""
@@ -162,6 +163,9 @@ class Interro(ABC):
 
 class Test(Interro):
     """First round"""
+    # def __init__(self):
+    #     self.step = 1
+
     def create_random_step(self):
         """Get random step, the jump from one word to another"""
         self.step = random.randint(1, self.words_df.shape[0])
@@ -171,7 +175,7 @@ class Test(Interro):
         self.create_random_step()
         self.index = self.step
         for i in range(1, total + 1):
-            self.index = self.get_next_index(self.index)
+            self.index = self.get_next_index()
             row = self.get_row()
             word_guessed = self.guess_word(row, i, total)
             self.update_voc_df(word_guessed)
@@ -179,9 +183,9 @@ class Test(Interro):
                 faults = self.faults_df.shape[0]
                 self.faults_df.loc[faults] = [row[0], row[1]]
 
-    def get_next_index(self, current_index):
-        """Get the next index. The word must not have been asked already."""
-        next_index = (current_index + self.step) % self.words_df.shape[0]
+    def get_next_index(self):
+        """Get the next index. The word must not have been already asked."""
+        next_index = (self.index + self.step) % self.words_df.shape[0]
         already_asked = self.words_df['Query'].loc[next_index] == 1
         title_row = next_index == 0
         while already_asked or title_row:
@@ -242,7 +246,7 @@ class Test(Interro):
 
 class Rattrap(Test):
     """Rattrapage !!!"""
-    def run(self):
+    def run(self, total):
         """Launch the second test"""
         total = self.words_df.shape[0]
         for j in range(0, total):
@@ -272,11 +276,11 @@ if __name__ == '__main__':
     parser = parse_args(sys.argv[1:])
     parser = check_args(parser)
     # Load data
-    loader = Chargeur(parser)
-    loader.data_extraction()
+    chargeur = Chargeur(parser)
+    chargeur.data_extraction()
     print('# INFO data loaded.')
     # WeuuuuAaaaaInterrooo !!!
-    test = Test(loader.data['voc'], loader.data['perf'], loader.data['word_cnt'])
+    test = Test(chargeur)
     test.run(TOTAL)
     # Eeeeencore une Interrrooooo !!!!
     rattrap_1 = Rattrap(test.faults_df)
@@ -287,9 +291,9 @@ if __name__ == '__main__':
     print('# INFO interro finished.')
     # Save results
     test.get_performances(TOTAL, rattrap_1.faults_df.shape[0])
-    test.save_performances(loader.paths['perf'])
+    test.save_performances(chargeur.paths['perf'])
     test.remove_known_words()
-    test.save_words_count(loader.paths['word_cnt'])
+    test.save_words_count(chargeur.paths['word_cnt'])
     #
     test.words_df = test.words_df.drop('Query', axis=1)
     test.words_df.to_csv('voc_df.csv', index=False, sep=';')
