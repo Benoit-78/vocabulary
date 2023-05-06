@@ -26,10 +26,10 @@ def parse_args(args):
     parser.add_argument("-t", "--type", type=str)
     args = parser.parse_args(args)
     if not args.type:
-        print('# ERROR please give a test type')
+        print('# ERROR   | Please give a test type')
         raise ValueError
     if not isinstance(args.type, str):
-        print('# ERROR please give a string as a test type')
+        print('# ERROR   | Please give a string as a test type')
         raise TypeError
     return args
 
@@ -37,10 +37,10 @@ def parse_args(args):
 def check_args(args):
     """Check the kind of interro, version or theme"""
     if len(args.type) == 0:
-        print('# ERROR please give a test type: either version or theme')
+        print('# ERROR   | Please give a test type: either version or theme')
         raise ValueError
     if args.type not in ['version', 'theme']:
-        print('# ERROR test kind must be \'version\' or \'theme\'')
+        print('# ERROR   | Test type must be either version or theme')
         raise NameError
     return args
 
@@ -81,7 +81,6 @@ class Chargeur():
     def set_data_paths(self):
         """List paths to differente dataframes"""
         self.set_os_separator()
-        self.check_test_type()
         self.paths['voc'] = self.os_sep.join([r'.', 'data', self.test_type + '_voc' + EXT])
         self.paths['perf'] = self.os_sep.join([r'.', 'log', self.test_type + '_perf' + EXT])
         self.paths['word_cnt'] = self.os_sep.join([r'.', 'log', self.test_type + '_words_count' + EXT])
@@ -105,10 +104,10 @@ class Chargeur():
 
 class Interro(ABC):
     """Model (in the MVC pattern). Should be launched by the user"""
-    def __init__(self, words_df, perf_df=None, word_cnt_df=None):
-        self.words_df = words_df
-        self.perf_df = perf_df
-        self.word_cnt_df = word_cnt_df
+    def __init__(self, chargeur):
+        self.words_df = chargeur.data['voc']
+        self.perf_df = chargeur.data['perf']
+        self.word_cnt_df = chargeur.data['word_cnt']
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
         self.perf = list()
