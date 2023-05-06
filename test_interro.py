@@ -8,8 +8,10 @@
 """
 
 import unittest
+import pytest
 import numpy as np
 import pandas as pd
+import random
 import argparse
 
 import interro
@@ -25,11 +27,12 @@ class TestParser(unittest.TestCase):
             parser = interro.parse_args(['-t', test_kind])
             self.assertTrue(parser.type)
             self.assertIsInstance(parser.type, str)
-            # Sad paths
-            # with self.assertRaises(ValueError):
-            #     self.assertEqual(parser.type, None)
-            # with self.assertRaises(TypeError):
-            #     self.assertEqual(parser.type, 8)
+            # Sad paths (ChatGPT)
+            with pytest.raises(SystemExit):
+                interro.parse_args([])
+            args = ["--type"]
+            with self.assertRaises(SystemExit):
+                interro.parse_args(args)
 
     def test_check_args(self):
         """The argument should be either version or theme"""
@@ -119,7 +122,7 @@ class TestInterro(unittest.TestCase):
         parser_version = interro.parse_args(['-t', 'version'])
         parser_theme = interro.parse_args(['-t', 'theme'])
         cls.chargeurs = [interro.Chargeur(parser_version),
-                          interro.Chargeur(parser_theme)]
+                         interro.Chargeur(parser_theme)]
 
     @classmethod
     def tearDownClass(cls):
@@ -139,82 +142,68 @@ class TestInterro(unittest.TestCase):
         for chargeur in self.chargeurs:
             chargeur.data_extraction()
             my_interro = interro.Interro(chargeur)
-            step = my_interro.create_random_step()
-            index = step
-            for i in range(1, 101):
-                next_index = interro.get_next_index(index, step, voc_df)
-                row = interro.get_row(voc_df, next_index)
-                # Happy paths
-                self.assertIsInstance(row, list)
-                self.assertEqual(len(row), 3)
-                self.assertIsInstance(row[0], str)
-                self.assertIsInstance(row[1], str)
-                self.assertIsInstance(row[2], float)
-                # Sad paths
+            self.index = random.randint(1, my_interro.words_df.shape[0])
+            row = my_interro.get_row()
+            # Happy paths
+            self.assertIsInstance(row, list)
+            self.assertEqual(len(row), 2)
+            self.assertIsInstance(row[0], str)
+            self.assertIsInstance(row[1], str)
+            # Sad paths
 
     def test_guess_word(self):
         """The result should be either True or False"""
-        operating_system = interro.get_os_type()
-        os_sep = interro.get_os_separator(operating_system)
-        test_kinds = ['theme', 'version']
-        for test_kind in test_kinds:
-            paths = interro.get_data_paths(os_sep, test_kind)
-            data = interro.get_data(paths)
-            voc_df = data['voc']
-            voc_df = interro.data_preprocessing(voc_df)
-            step = interro.create_random_step(voc_df)
-            index = step
-            for i in range(1, 101):
-                print("# DEBUG i", i)
-                print("# DEBUG index", index)
-                next_index = interro.get_next_index(index, step, voc_df)
-                word_guessed = interro.guess_word(voc_df, next_index, i)
-                # Happy paths
-                self.assertIsInstance(word_guessed, bool)
-                # Sad paths
+        for chargeur in self.chargeurs:
+            chargeur.data_extraction()
+            my_interro = interro.Interro(chargeur)
+            self.index = random.randint(1, my_interro.words_df.shape[0])
+            row = my_interro.get_row()    
+            word_guessed = my_interro.guess_word(row, 1, 100)
+            # Happy paths
+            self.assertIsInstance(word_guessed, bool)
+            # Sad paths
 
     def test_update_voc_df(self):
         """voc_df should be updated according to user's guess"""
-        
-        
+
+
 
 class TestTest(unittest.TestCase):
     """Tests on Test class methods."""
+    @classmethod
+    def setUpClass(cls):
+        """Run once before all tests."""
+        parser_version = interro.parse_args(['-t', 'version'])
+        parser_theme = interro.parse_args(['-t', 'theme'])
+        cls.chargeurs = [interro.Chargeur(parser_version),
+                         interro.Chargeur(parser_theme)]
+
     def test_create_random_step(self):
         """The step should be a random integer"""
-        operating_system = interro.get_os_type()
-        os_sep = interro.get_os_separator(operating_system)
-        test_kinds = ['theme', 'version']
-        for test_kind in test_kinds:
-            paths = interro.get_data_paths(os_sep, test_kind)
-            data = interro.get_data(paths)
-            voc_df = data['voc']
-            # Happy paths            
-            self.assertGreater(voc_df.shape[0], 0)
-            step = interro.create_random_step(voc_df)
-            self.assertIsInstance(step, int)
-            self.assertGreater(step, 0)
+        for chargeur in self.chargeurs:
+            chargeur.data_extraction()
+            my_test = interro.Test(chargeur)
+            # Happy paths
+            my_test.create_random_step()
+            self.assertIsInstance(my_test.step, int)
+            self.assertGreater(my_test.step, 0)
+            self.assertLess(my_test.step, my_test.words_df.shape[0])
             # Sad paths
 
     def test_get_next_index(self):
         """Next index should point to a word that was not already asked"""
-        operating_system = interro.get_os_type()
-        os_sep = interro.get_os_separator(operating_system)
-        test_kinds = ['theme', 'version']
-        for test_kind in test_kinds:
-            paths = interro.get_data_paths(os_sep, test_kind)
-            data = interro.get_data(paths)
-            voc_df = data['voc']
-            voc_df = interro.data_preprocessing(voc_df)
-            step = interro.create_random_step(voc_df)
+        for chargeur in self.chargeurs:
+            chargeur.data_extraction()
+            my_test = interro.Test(chargeur)
+            step = my_test.create_random_step()
             index = step
             for i in range(1, 101):
                 # Happy paths
-                next_index = interro.get_next_index(index, step, voc_df)
+                next_index = my_test.get_next_index()
                 self.assertIsInstance(next_index, int)
                 self.assertGreater(next_index, 1)
-                self.assertLess(next_index, voc_df.shape[0])
-                self.assertEqual(voc_df['Query'].loc[next_index], 0)
+                self.assertLess(next_index, (my_test.words_df.shape[0]))
+                self.assertEqual(my_test.words_df['Query'].loc[next_index], 0)
                 # Sad paths
 
 
