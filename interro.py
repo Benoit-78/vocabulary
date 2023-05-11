@@ -21,28 +21,26 @@ EXT = '.csv'
 TOTAL = 100
 
 
-def parse_args(args):
+def parse_arguments(args):
     """Parse command line argument"""
     another_parser = argparse.ArgumentParser()
     another_parser.add_argument("-t", "--type", type=str)
     args = another_parser.parse_args(args)
-    if not args.type:
-        print('# ERROR   | Please give a test type')
-        raise SystemExit
-    if not isinstance(args.type, str):
-        print('# ERROR   | Please give a string as a test type')
-        raise SystemExit
     return args
 
 
 def check_args(args):
     """Check the kind of interro, version or theme"""
-    if len(args.type) == 0:
-        print('# ERROR   | Please give a test type: either version or theme')
-        raise ValueError
+    print("# DEBUG   | args.type", args.type)
+    if not args.type:
+        print("# ERROR   | Please give a test type")
+        raise SystemExit
+    if args.type == '':
+        print("# ERROR   | Please give a test type: either version or theme")
+        raise SystemExit
     if args.type not in ['version', 'theme']:
-        print('# ERROR   | Test type must be either version or theme')
-        raise NameError
+        print("# ERROR   | Test type must be either version or theme")
+        raise SystemExit
     return args
 
 
@@ -62,7 +60,7 @@ class Chargeur():
         operating_system = platform.platform()
         operating_system = operating_system.split('-')[0]
         if operating_system.lower() not in ['windows', 'linux', 'mac', 'android']:
-            print('# ERROR operating system cannot be identified')
+            print("# ERROR operating system cannot be identified")
             raise OSError
         self.os_type = operating_system
 
@@ -76,7 +74,7 @@ class Chargeur():
         elif self.os_type in ['Linux', 'Mac', 'Android']:
             self.os_sep = '/'
         else:
-            print('# ERROR wrong input for operating system')
+            print("# ERROR wrong input for operating system")
             raise NameError
 
     def set_data_paths(self):
@@ -273,7 +271,7 @@ class Graphiques():
 
 if __name__ == '__main__':
     # Get user inputs
-    parser = parse_args(sys.argv[1:])
+    parser = parse_arguments(sys.argv[1:])
     parser = check_args(parser)
     # Load data
     chargeur = Chargeur(parser)
