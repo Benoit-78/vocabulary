@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import random
 import argparse
+from io import StringIO
 
 import interro
 
@@ -20,27 +21,38 @@ import interro
 
 class TestParser(unittest.TestCase):
     """Tests on arguments parser."""
-    def test_parse_args(self):
-        """The argument should exist, and should be a string"""
-        for test_kind in ['version', 'theme']:
-            # Happy paths
-            parser = interro.parse_args(['-t', test_kind])
-            self.assertTrue(parser.type)
-            self.assertIsInstance(parser.type, str)
-            # Sad paths (ChatGPT)
-            with pytest.raises(SystemExit):
-                interro.parse_args([])
-            args = ["--type"]
-            with self.assertRaises(SystemExit):
-                interro.parse_args(args)
+    def test_parse_arguments(self):
+        # Happy paths
+        args = ["--type", "unit"]
+        result = interro.parse_arguments(args)
+        assert result == argparse.Namespace(type="unit")
+        # Sad paths
+        args = []
+        result = interro.parse_arguments(args)
+        assert result == argparse.Namespace(type=None)
+        args = ["--invalid"]
+        with pytest.raises(SystemExit):
+            interro.parse_arguments(args)
 
     def test_check_args(self):
-        """The argument should be either version or theme"""
+        # Happy paths
         for test_kind in ['version', 'theme']:
-            parser = interro.parse_args(['-t', test_kind])
-            # Happy paths
-            self.assertIn(parser.type, ['version', 'theme'])
-            # Sad paths
+            args = argparse.Namespace(type=test_kind)
+            result = interro.check_args(args)
+            assert result == args
+        # Sad paths
+        args = argparse.Namespace(type=None)
+        with pytest.raises(SystemExit):
+            interro.check_args(args)
+        args = argparse.Namespace(type='')
+        with pytest.raises(SystemExit):
+            expected_output = "# ERROR   | Please give a test type: either version or theme"
+            with StringIO() as output:
+                interro.check_args(args)
+                self.assertEqual(output.getvalue(), expected_output)
+        args = argparse.Namespace(type="invalid")
+        with pytest.raises(SystemExit):
+            interro.check_args(args)
 
 
 
@@ -49,8 +61,8 @@ class TestChargeur(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
-        parser_version = interro.parse_args(['-t', 'version'])
-        parser_theme = interro.parse_args(['-t', 'theme'])
+        parser_version = interro.parse_arguments(['-t', 'version'])
+        parser_theme = interro.parse_arguments(['-t', 'theme'])
         cls.chargeurs = [interro.Chargeur(parser_version),
                           interro.Chargeur(parser_theme)]
 
@@ -119,8 +131,8 @@ class TestInterro(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
-        parser_version = interro.parse_args(['-t', 'version'])
-        parser_theme = interro.parse_args(['-t', 'theme'])
+        parser_version = interro.parse_arguments(['-t', 'version'])
+        parser_theme = interro.parse_arguments(['-t', 'theme'])
         cls.chargeurs = [interro.Chargeur(parser_version),
                          interro.Chargeur(parser_theme)]
 
@@ -173,8 +185,8 @@ class TestTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
-        parser_version = interro.parse_args(['-t', 'version'])
-        parser_theme = interro.parse_args(['-t', 'theme'])
+        parser_version = interro.parse_arguments(['-t', 'version'])
+        parser_theme = interro.parse_arguments(['-t', 'theme'])
         cls.chargeurs = [interro.Chargeur(parser_version),
                          interro.Chargeur(parser_theme)]
 
