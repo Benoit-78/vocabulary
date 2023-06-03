@@ -22,99 +22,108 @@ import interro
 class TestParser(unittest.TestCase):
     """Tests on arguments parser."""
     def test_parse_arguments(self):
-        # Happy paths
-        args = ["--type", "unit"]
+        ### Happy paths
+        # Test case 1: Valid arguments provided
+        args = ['--type', 'version',
+                '--words', '100',
+                '--rattraps', '1']
         result = interro.parse_arguments(args)
-        assert result == argparse.Namespace(type="unit")
-        # Sad paths
-        args = []
+        assert isinstance(result, argparse.Namespace)
+        assert result.type == 'version'
+        assert result.rattraps == 1
+        # Test case 2: Only required argument provided
+        args = ['-t', 'theme']
         result = interro.parse_arguments(args)
-        assert result == argparse.Namespace(type=None)
-        args = ["--invalid"]
-        with pytest.raises(SystemExit):
-            interro.parse_arguments(args)
+        assert isinstance(result, argparse.Namespace)
+        assert result.type == 'theme'
+        assert result.rattraps is None
+        ### Sad paths
 
     def test_check_args(self):
-        # Happy paths
+        ### Happy paths
+        # Test case 1
         for test_kind in ['version', 'theme']:
-            args = argparse.Namespace(type=test_kind)
+            args = argparse.Namespace(type=test_kind, words=100, rattraps=1)
             result = interro.check_args(args)
             assert result == args
-        # Sad paths
-        args = argparse.Namespace(type=None)
+        ### Sad paths
+        # Test case 2
+        args = argparse.Namespace(type=None, words=10, rattraps=10)
         with pytest.raises(SystemExit):
             interro.check_args(args)
-        args = argparse.Namespace(type='')
+        # Test case 3
+        args = argparse.Namespace(type='', words=10, rattraps=1)
         with pytest.raises(SystemExit):
             expected_output = "# ERROR   | Please give a test type: either version or theme"
             with StringIO() as output:
                 interro.check_args(args)
                 self.assertEqual(output.getvalue(), expected_output)
-        args = argparse.Namespace(type="invalid")
+        # Test case 4
+        args = argparse.Namespace(type="invalid", words=10, rattraps=1)
         with pytest.raises(SystemExit):
             interro.check_args(args)
 
 
 
-class TestChargeur(unittest.TestCase):
-    """Tests on Chargeur class methods."""
+class TestLoader(unittest.TestCase):
+    """Tests on Loader class methods."""
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
         parser_version = interro.parse_arguments(['-t', 'version'])
         parser_theme = interro.parse_arguments(['-t', 'theme'])
-        cls.chargeurs = [interro.Chargeur(parser_version),
-                          interro.Chargeur(parser_theme)]
+        cls.loaders = [interro.Loader(parser_version),
+                       interro.Loader(parser_theme)]
 
     def test_get_os_type(self):
         """Operating system should be either Windows or Linux"""
-        for chargeur in self.chargeurs:
+        for loader in self.loaders:
             # Happy paths
-            chargeur.get_os_type()
-            self.assertIn(chargeur.os_type, ['Windows', 'Linux', 'Mac', 'Android'])
+            loader.get_os_type()
+            self.assertIn(loader.os_type, ['Windows', 'Linux', 'Mac', 'Android'])
             # Sad paths
             with self.assertRaises(AssertionError):
-                self.assertEqual(chargeur.os_type, 'Ubuntu')
+                self.assertEqual(loader.os_type, 'Ubuntu')
 
     def test_set_os_separator(self):
         """Separator should be OS-specific"""
-        for chargeur in self.chargeurs:
+        for loader in self.loaders:
             # Happy paths
-            chargeur.set_os_separator()
-            if chargeur.os_type == 'Windows':
-                self.assertEqual(chargeur.os_sep, '\\')
-            elif chargeur.os_type in ['Linux', 'Android', 'Mac']:
-                self.assertEqual(chargeur.os_sep, '/')
+            loader.set_os_separator()
+            if loader.os_type == 'Windows':
+                self.assertEqual(loader.os_sep, '\\')
+            elif loader.os_type in ['Linux', 'Android', 'Mac']:
+                self.assertEqual(loader.os_sep, '/')
             # Sad paths
 
     def test_set_data_paths(self):
         """Data paths should exist"""
-        for chargeur in self.chargeurs:
+        for loader in self.loaders:
             # Happy paths
-            chargeur.set_data_paths()
-            self.assertIsInstance(chargeur.paths, dict)
-            self.assertEqual(len(chargeur.paths), 3)
-            for _, path in chargeur.paths.items():
+            loader.set_data_paths()
+            self.assertIsInstance(loader.paths, dict)
+            self.assertEqual(len(loader.paths), 3)
+            for _, path in loader.paths.items():
                 self.assertIsInstance(path, str)
             # Sad paths
 
     def test_get_data(self):
         """Data should be correctly loaded"""
-        for chargeur in self.chargeurs:
-            chargeur.get_data()
+        for loader in self.loaders:
+            loader.get_data()
             # Happy paths
-            self.assertIsInstance(chargeur.data, dict)
-            self.assertEqual(len(chargeur.data), 3)
-            for df_name, dataframe in chargeur.data.items():
+            self.assertIsInstance(loader.data, dict)
+            self.assertEqual(len(loader.data), 3)
+            for df_name, dataframe in loader.data.items():
                 self.assertIn(df_name, ['voc', 'perf', 'word_cnt'])
                 self.assertIsInstance(dataframe, type(pd.DataFrame()))
             # Sad paths
 
     def test_data_extraction(self):
         """Input should be a dataframe, and it should be added a query column"""
-        for chargeur in self.chargeurs:
-            chargeur.data_extraction()
-            voc_df = chargeur.data['voc']
+        for loader in self.loaders:
+            loader.data_extraction()
+            voc_df = loader.data['voc']
             # Happy paths
             self.assertIn('Date', list(voc_df.columns))
             self.assertIn('Query', list(voc_df.columns))
@@ -133,8 +142,8 @@ class TestInterro(unittest.TestCase):
         """Run once before all tests."""
         parser_version = interro.parse_arguments(['-t', 'version'])
         parser_theme = interro.parse_arguments(['-t', 'theme'])
-        cls.chargeurs = [interro.Chargeur(parser_version),
-                         interro.Chargeur(parser_theme)]
+        cls.loaders = [interro.Loader(parser_version),
+                       interro.Loader(parser_theme)]
 
     @classmethod
     def tearDownClass(cls):
@@ -149,11 +158,25 @@ class TestInterro(unittest.TestCase):
     def test_run(self):
         """"""
 
+
+
+class TestTest(unittest.TestCase):
+    """Tests on Test class methods."""
+    @classmethod
+    def setUpClass(cls):
+        """Run once before all tests."""
+        parser_version = interro.parse_arguments(['-t', 'version'])
+        parser_theme = interro.parse_arguments(['-t', 'theme'])
+        cls.loaders = [interro.Loader(parser_version),
+                       interro.Loader(parser_theme)]
+
     def test_get_row(self):
         """The returned row should enable the user to guess the word"""
-        for chargeur in self.chargeurs:
-            chargeur.data_extraction()
-            my_interro = interro.Interro(chargeur)
+        for loader in self.loaders:
+            loader.data_extraction()
+            my_interro = interro.Test(loader.data['voc'],
+                                      loader.data['perf'],
+                                      loader.data['word_cnt'])
             self.index = random.randint(1, my_interro.words_df.shape[0])
             row = my_interro.get_row()
             # Happy paths
@@ -165,12 +188,14 @@ class TestInterro(unittest.TestCase):
 
     def test_guess_word(self):
         """The result should be either True or False"""
-        for chargeur in self.chargeurs:
-            chargeur.data_extraction()
-            my_interro = interro.Interro(chargeur)
+        for loader in self.loaders:
+            loader.data_extraction()
+            my_interro = interro.Test(loader.data['voc'],
+                                      loader.data['perf'],
+                                      loader.data['word_cnt'])
             self.index = random.randint(1, my_interro.words_df.shape[0])
-            row = my_interro.get_row()    
-            word_guessed = my_interro.guess_word(row, 1, 100)
+            row = my_interro.get_row()
+            word_guessed = my_interro.guess_word(row, 1)
             # Happy paths
             self.assertIsInstance(word_guessed, bool)
             # Sad paths
@@ -178,23 +203,16 @@ class TestInterro(unittest.TestCase):
     def test_update_voc_df(self):
         """voc_df should be updated according to user's guess"""
 
-
-
-class TestTest(unittest.TestCase):
-    """Tests on Test class methods."""
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
-        parser_version = interro.parse_arguments(['-t', 'version'])
-        parser_theme = interro.parse_arguments(['-t', 'theme'])
-        cls.chargeurs = [interro.Chargeur(parser_version),
-                         interro.Chargeur(parser_theme)]
+    def test_ask_total_to_the_user(self):
+        """The user should be asked a total as an input"""
 
     def test_create_random_step(self):
         """The step should be a random integer"""
-        for chargeur in self.chargeurs:
-            chargeur.data_extraction()
-            my_test = interro.Test(chargeur)
+        for loader in self.loaders:
+            loader.data_extraction()
+            my_test = interro.Test(loader.data['voc'],
+                                   loader.data['perf'],
+                                   loader.data['word_cnt'])
             # Happy paths
             my_test.create_random_step()
             self.assertIsInstance(my_test.step, int)
@@ -204,9 +222,11 @@ class TestTest(unittest.TestCase):
 
     def test_get_next_index(self):
         """Next index should point to a word that was not already asked"""
-        for chargeur in self.chargeurs:
-            chargeur.data_extraction()
-            my_test = interro.Test(chargeur)
+        for loader in self.loaders:
+            loader.data_extraction()
+            my_test = interro.Test(loader.data['voc'],
+                                   loader.data['perf'],
+                                   loader.data['word_cnt'])
             step = my_test.create_random_step()
             index = step
             for i in range(1, 101):

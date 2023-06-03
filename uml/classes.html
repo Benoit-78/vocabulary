@@ -1,0 +1,94 @@
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+      <div class="mermaid">
+    
+        classDiagram
+          class Chargeur {
+            data : dict
+            number_of_rattraps
+            os_sep : str, NoneType
+            os_type : NoneType
+            paths : dict
+            test_type
+            data_extraction()
+            get_data()
+            get_os_type()
+            set_data_paths()
+            set_os_separator()
+          }
+          class Graphiques {
+            plot_nuage_de_point()
+            save_nuage_de_points()*
+          }
+          class Interro {
+            faults_df : DataFrame
+            index : int
+            perf : int, list
+            perf_df : NoneType
+            total : int
+            word_cnt_df : NoneType
+            words_df
+            compute_success_rate()
+            get_row()
+            guess_word(row, i)
+            run()*
+            update_faults_df(word_guessed, row)
+          }
+          class Rattrap {
+            total
+            run()
+          }
+          class Test {
+            index
+            step
+            total
+            words_df
+            ask_total_to_the_user()
+            create_random_step()
+            get_next_index()
+            remove_known_words()
+            run()
+            save_performances(perf_paths)
+            save_words_count(count_log_path)
+            update_voc_df(word_guessed)
+          }
+          class TestChargeur {
+            setUpClass()
+            test_data_extraction()
+            test_get_data()
+            test_get_os_type()
+            test_set_data_paths()
+            test_set_os_separator()
+          }
+          class TestGraphiques {
+          }
+          class TestInterro {
+            index
+            setUp()*
+            setUpClass()
+            tearDown()*
+            tearDownClass()*
+            test_get_row()
+            test_guess_word()
+            test_run()*
+            test_update_voc_df()*
+          }
+          class TestParser {
+            test_check_args()
+            test_parse_arguments()
+          }
+          class TestRattrap {
+          }
+          class TestTest {
+            setUpClass()
+            test_ask_total_to_the_user()*
+            test_create_random_step()
+            test_get_next_index()
+          }
+          Rattrap --|> Interro
+          Test --|> Interro
+  
+       </div>
+  </body>
+</html>

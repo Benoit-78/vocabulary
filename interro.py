@@ -1,39 +1,38 @@
 # -*- coding: utf-8 -*-
 """
-Author: B.Delorme
-Mail: delormebenoit211@gmail.com
-Creation date: 2nd March 2023
-Main purpose: main script of vocabulary application
+    Author: B.Delorme
+    Mail: delormebenoit211@gmail.com
+    Creation date: 2nd March 2023
+    Main purpose: main script of vocabulary application
 """
 
 import platform
 import random
-from tkinter import messagebox
+import tkinter as tk
+from tkinter import messagebox, simpledialog
 import argparse
 from datetime import date
-from abc import ABC
+from abc import ABC, abstractmethod
 import sys
 import pandas as pd
 
-
-
 EXT = '.csv'
-TOTAL = 100
 
 
 def parse_arguments(args):
     """Parse command line argument"""
     another_parser = argparse.ArgumentParser()
     another_parser.add_argument("-t", "--type", type=str)
+    another_parser.add_argument("-w", "--words", type=int)
+    another_parser.add_argument("-r", "--rattraps", type=int)
     args = another_parser.parse_args(args)
     return args
 
 
 def check_args(args):
     """Check the kind of interro, version or theme"""
-    print("# DEBUG   | args.type", args.type)
-    if not args.type:
-        print("# ERROR   | Please give a test type")
+    if not args.type or not args.words or not args.rattraps :
+        print("# ERROR   | Please give a -t <test type>, -w <number of words> and -r <number of rattraps>")
         raise SystemExit
     if args.type == '':
         print("# ERROR   | Please give a test type: either version or theme")
@@ -41,15 +40,23 @@ def check_args(args):
     if args.type not in ['version', 'theme']:
         print("# ERROR   | Test type must be either version or theme")
         raise SystemExit
+    if args.rattraps < 1:
+        print("# ERROR   | Number of rattraps must be greater than 0.")
+        raise SystemExit
+    if args.words < 1:
+        print("# ERROR   | Number of words must be greater than 0.")
+        raise SystemExit
     return args
 
 
 
-class Chargeur():
-    """Controller (in the MVC pattern). Should be used by the user"""
+class Loader():
+    """Data loader"""
     def __init__(self, args):
         """Must be done in the same session than the interroooo is launched"""
         self.test_type = args.type
+        self.number_of_rattraps = args.rattraps
+        self.total = args.words
         self.os_type = None
         self.os_sep = None
         self.paths = {}
@@ -98,18 +105,24 @@ class Chargeur():
         self.data['voc'] = self.data['voc'].sort_values(by='Date', ascending=True)
         self.data['voc']= self.data['voc'].replace(r',', r'.', regex=True)
         self.data['voc']['Taux'] = self.data['voc']['Taux'].astype(float)
+        print('# INFO    | data loaded.')
 
 
 
 class Interro(ABC):
     """Model (in the MVC pattern). Should be launched by the user"""
-    def __init__(self, un_chargeur):
-        self.words_df = un_chargeur.data['voc']
-        self.perf_df = un_chargeur.data['perf']
-        self.word_cnt_df = un_chargeur.data['word_cnt']
+    def __init__(self, words_df, perf_df=None, words_cnt_df=None):
+        self.words_df = words_df
+        self.perf_df = perf_df
+        self.word_cnt_df = words_cnt_df
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
         self.perf = []
+        self.total = 0
+
+    @abstractmethod
+    def run(self):
+        pass
 
     def get_row(self):
         """Get the row of the word to be asked"""
@@ -118,68 +131,49 @@ class Interro(ABC):
         row = [mot_etranger, mot_natal]
         return row
 
-    def guess_word(self, row, i, total):
+    def guess_word(self, row, i):
         """Given an index, ask a word to the user, and return a boolean."""
-        mot_etranger = row[0]
-        title = f'Word {i}/{total}'
-        text = f'{mot_etranger} \nDo you get it?'
-        user_answer = messagebox.showinfo(title=title, message=text)
-        if user_answer is False:
-            print("# ERROR interruption by user")
-            raise Exception
-        mot_natal = row[1]
-        title = f'Word {i}/{total}'
-        text = f'Translation is \'{mot_natal}\'. \nWere you right?'
-        word_guessed = messagebox.askyesnocancel(title=title, message=text)
-        if word_guessed is None:
-            print("# ERROR interruption by user")
-            raise Exception
+        title = f'Word {i}/{self.total}'
+        question = ViewQuestion()
+        print("# DEBUG   | Viewer object instantiated")
+        question.ask_word(title, row)
+        word_guessed = question.check_word(title, row)
         return word_guessed
 
-    def get_performances(self, total, rattrap_1_faults):
-        """Compute performances FOR THE TWO TESTS"""
-        faults_total = self.faults_df.shape[0]
-        today_date = date.today()
-        # Test
-        if total != 0:
-            test_perf = int(100 * (1 - (faults_total / total)))
-        elif total == 0:
-            test_perf = 100
-        # Rattrap n.1
-        if faults_total != 0:
-            rattrap_perf = int(100 * (1 - (rattrap_1_faults / faults_total)))
-        elif faults_total == 0:
-            rattrap_perf = 100
-        self.perf = [today_date, test_perf, rattrap_perf]
+    def update_faults_df(self, word_guessed, row):
+        """Save the faulty answers for the second test."""
+        if word_guessed is False:
+            self.faults_df.loc[self.faults_df.shape[0]] = [row[0], row[1]]
 
-    def save_performances(self, perf_paths):
-        """Save performances for further analysis."""
-        self.perf_df.loc[self.perf_df.shape[0]] = self.perf
-        self.perf_df.to_csv(perf_paths, index=False, sep=';')
+    def compute_success_rate(self):
+        """Compute success rate."""
+        faults_total = self.faults_df.shape[0]
+        if self.total != 0:
+            success_rate = int(100 * (1 - (faults_total / self.total)))
+        elif self.total == 0:
+            success_rate = 100
+        self.perf = success_rate
 
 
 
 class Test(Interro):
     """First round"""
-    # def __init__(self):
-    #     self.step = 1
+
+    def run(self):
+        """Launch the vocabulary interoooooo !!!!"""
+        self.create_random_step()
+        self.index = self.step
+        print("# DEBUG  | Random step created")
+        for i in range(1, self.total + 1):
+            self.index = self.get_next_index()
+            row = self.get_row()
+            word_guessed = self.guess_word(row, i)
+            self.update_voc_df(word_guessed)
+            self.update_faults_df(word_guessed, row)
 
     def create_random_step(self):
         """Get random step, the jump from one word to another"""
         self.step = random.randint(1, self.words_df.shape[0])
-
-    def run(self, total):
-        """Launch the vocabulary interoooooo !!!!"""
-        self.create_random_step()
-        self.index = self.step
-        for i in range(1, total + 1):
-            self.index = self.get_next_index()
-            row = self.get_row()
-            word_guessed = self.guess_word(row, i, total)
-            self.update_voc_df(word_guessed)
-            if not word_guessed:
-                faults = self.faults_df.shape[0]
-                self.faults_df.loc[faults] = [row[0], row[1]]
 
     def get_next_index(self):
         """Get the next index. The word must not have been already asked."""
@@ -209,11 +203,6 @@ class Test(Interro):
         # Update Query
         self.words_df['Query'].loc[self.index] += 1
 
-    def update_fault_df(self, word_guessed, row):
-        """Save the faulty answers for the second test."""
-        if word_guessed is False:
-            self.faults_df.loc[self.faults_df.shape[0]] = [row[0], row[1]]
-
     def remove_known_words(self):
         """Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
@@ -240,24 +229,46 @@ class Test(Interro):
             message = "# ERROR   | Words count not saved."
         print(message)
 
+    def save_performances(self, perf_paths):
+        """Save performances for further analysis."""
+        self.perf_df.loc[self.perf_df.shape[0]] = self.perf
+        self.perf_df.to_csv(perf_paths, index=False, sep=';')
 
 
-class Rattrap(Test):
+
+class Rattrap(Interro):
     """Rattrapage !!!"""
-    def run(self, total):
+
+    def run(self):
         """Launch the second test"""
-        total = self.words_df.shape[0]
-        for j in range(0, total):
+        self.total = self.words_df.shape[0]
+        for j in range(0, self.total):
             row = self.get_row()
-            word_guessed = self.guess_word(row, j+1, total)
-            if not word_guessed:
-                faults = self.faults_df.shape[0]
-                self.faults_df.loc[faults]([row[0], row[1]])
+            word_guessed = self.guess_word(row, j+1)
+            self.update_faults_df(word_guessed, row)
 
 
 
-class Graphiques():
-    """Viewer (in the MVC pattern). Should be used by the user."""
+class ViewQuestion():
+    """View in MVC pattern."""
+    def ask_word(self, title, row):
+        mot_etranger = row[0]
+        text_1 = f'Quelle traduction donnez-vous pour : {mot_etranger}?'
+        user_answer = messagebox.showinfo(title=title, message=text_1)
+        if user_answer is False:
+            print("# ERROR interruption by user")
+            raise SystemExit
+
+    def check_word(self, title, row):
+        """Ask the user to decide if the answer was correct or not."""
+        mot_natal = row[1]
+        text_2 = f'Voici la traduction correcte : \'{mot_natal}\'. \nAviez-vous la bonne réponse ?'
+        word_guessed = messagebox.askyesnocancel(title=title, message=text_2)
+        if word_guessed is None:
+            print("# ERROR interruption by user")
+            raise SystemExit
+        return word_guessed
+
     def plot_nuage_de_point(self):
         """Scatterplot of words, abscisses number of guesses, ordinates rate of
         success """
@@ -268,30 +279,39 @@ class Graphiques():
         """Save the graph, so that analysis can be made on series of graphs"""
 
 
-
 if __name__ == '__main__':
     # Get user inputs
-    parser = parse_arguments(sys.argv[1:])
-    parser = check_args(parser)
+    args = parse_arguments(sys.argv[1:])
+    args = check_args(args)
     # Load data
-    chargeur = Chargeur(parser)
+    chargeur = Loader(args)
     chargeur.data_extraction()
-    print('# INFO data loaded.')
+    words_df = chargeur.data['voc']
+    perf_df = chargeur.data['perf']
+    word_cnt_df = chargeur.data['word_cnt']
     # WeuuuuAaaaaInterrooo !!!
-    test = Test(chargeur)
-    test.run(TOTAL)
-    # Eeeeencore une Interrrooooo !!!!
-    rattrap_1 = Rattrap(test.faults_df)
-    rattrap_1.run()
-    # Eeeet eeeeeencore une Interrroooo !!!!
-    rattrap_2 = Rattrap(rattrap_1.faults_df)
-    rattrap_2.run()
-    print('# INFO interro finished.')
+    test_1 = Test(words_df, perf_df, word_cnt_df)
+    test_1.run()
+    test_1.compute_success_rate()
+    faults_df = test_1.faults_df
+    # C'est les rattraaaaaaapssss !!!!
+    if test_1.total == -1:
+        while faults_df.shape[0] > 0:
+            rattrap = Rattrap(faults_df)
+            rattrap.run()
+            faults_df = rattrap.faults_df
+            rattrap.compute_success_rate()
+    else:
+        for i in range(test_1.total):
+            rattrap = Rattrap(faults_df)
+            rattrap.run()
+            faults_df = rattrap.faults_df
+            rattrap.compute_success_rate()
+    print('# INFO    | Interrooo fiiiiiiiiinished!')
     # Save results
-    test.get_performances(TOTAL, rattrap_1.faults_df.shape[0])
-    test.save_performances(chargeur.paths['perf'])
-    test.remove_known_words()
-    test.save_words_count(chargeur.paths['word_cnt'])
+    test_1.save_performances(chargeur.paths['perf'])
+    test_1.remove_known_words()
+    test_1.save_words_count(chargeur.paths['word_cnt'])
     #
-    test.words_df = test.words_df.drop('Query', axis=1)
-    test.words_df.to_csv('voc_df.csv', index=False, sep=';')
+    test_1.words_df = test_1.words_df.drop('Query', axis=1)
+    test_1.words_df.to_csv('voc_df.csv', index=False, sep=';')
