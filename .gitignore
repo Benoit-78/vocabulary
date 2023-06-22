@@ -17,4 +17,5 @@ env/*
 .coverage
 token.txt
 
+*.exe
 *.pyc
