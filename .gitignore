@@ -12,6 +12,8 @@ htmlcov/*
 
 doc/*
 
+env/*
+
 .coverage
 token.txt
 
