@@ -3,7 +3,7 @@
     Author: B.Delorme
     Mail: delormebenoit211@gmail.com
     Creation date: 2nd March 2023
-    Main purpose: main script of vocabulary application
+    Main purpose: main script of vocabulary application.
 """
 
 import platform
@@ -25,7 +25,7 @@ def parse_arguments(args):
     another_parser.add_argument("-w", "--words", type=int)
     another_parser.add_argument("-r", "--rattraps", type=int)
     if args == []:
-        args = ['-t', 'version', '-w', '100', '-r', '2']
+        args = ['-t', 'version', '-w', '10', '-r', '2']
     args = another_parser.parse_args(args)
     return args
 
@@ -94,9 +94,9 @@ class Loader():
     def get_data(self):
         """Load different dataframes necessary to the app"""
         self.set_data_paths()
-        self.data['voc'] = pd.read_csv(self.paths['voc'], sep=';', encoding='latin1')
-        self.data['perf'] = pd.read_csv(self.paths['perf'], sep=';', encoding='latin1')
-        self.data['word_cnt'] = pd.read_csv(self.paths['word_cnt'], sep=';', encoding='latin1')
+        self.data['voc'] = pd.read_csv(self.paths['voc'], sep=';', encoding='utf-8')
+        self.data['perf'] = pd.read_csv(self.paths['perf'], sep=';', encoding='utf-8')
+        self.data['word_cnt'] = pd.read_csv(self.paths['word_cnt'], sep=';', encoding='utf-8')
 
     def data_extraction(self):
         """Return the data necessary for the interro to run"""
@@ -227,7 +227,7 @@ class Test(Interro):
     def save_performances(self, perf_paths):
         """Save performances for further analysis."""
         self.perf_df.loc[self.perf_df.shape[0]] = self.perf
-        self.perf_df.to_csv(perf_paths, index=False, sep=';')
+        self.perf_df.to_csv(perf_paths, index=False, sep=';', encoding='utf-8')
 
 
 
