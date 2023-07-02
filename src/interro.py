@@ -39,8 +39,9 @@ def parse_arguments(arg: List[str]) -> argparse.Namespace:
     return args
 
 
-def check_args(args: argparse.Namespace) -> argparse.Namespace:
+def get_arguments() -> argparse.Namespace:
     """Check the kind of interro, version or theme"""
+    args = parse_arguments(sys.argv[1:])
     if not args.type or not args.words or not args.rattraps :
         print("# ERROR   | Please give a -t <test type>, -w <number of words> and -r <number of rattraps>")
         raise SystemExit
@@ -62,10 +63,10 @@ def check_args(args: argparse.Namespace) -> argparse.Namespace:
 
 class Loader():
     """Data loader"""
-    def __init__(self, test_type: str, rattraps: int):
+    def __init__(self, arguments_: argparse.Namespace):
         """Must be done in the same session than the interroooo is launched"""
-        self.test_type = test_type
-        self.rattraps = rattraps
+        self.test_type = arguments_.type
+        self.rattraps = arguments_.rattraps
         self.os_type = None
         self.os_sep = None
         self.paths = {}
@@ -173,7 +174,7 @@ class Interro(ABC):
         """Identify the words that have been sufficiently guessed."""
         self.words_df['image'] = self.ordinate + self.steep * self.words_df['Nb']
         self.well_known_words = self.words_df[self.words_df['Taux'] >= self.words_df['image']]
-        print("# DEBUG   | well known words", list(well_known_words[self.words_df.columns[0]]))
+        print("# DEBUG   | well known words", list(self.well_known_words[self.words_df.columns[0]]))
 
 
 
@@ -226,6 +227,23 @@ class Test(Interro):
 
 class Rattrap(Interro):
     """Rattrapage !!!"""
+    def __init__(self, faults_df_: pd.DataFrame, rattraps: int):
+        super().__init__(faults_df_)
+        self.faults_df = faults_df_
+        self.rattraps = rattraps
+
+    def start_loop(self):
+        """Start rattrapages loop."""
+        if self.rattraps == -1:
+            while self.faults_df.shape[0] > 0:
+                self.run()
+                self.compute_success_rate()
+        else:
+            for _ in range(chargeur.rattraps):
+                if self.faults_df.shape[0] > 0:
+                    self.run()
+                    self.compute_success_rate()
+
     def run(self):
         """Launch the second test"""
         self.words = self.words_df.shape[0]
@@ -347,10 +365,9 @@ class ViewQuestion():
 
 if __name__ == '__main__':
     # Get user inputs
-    arguments = parse_arguments(sys.argv[1:])
-    arguments = check_args(arguments)
+    arguments = get_arguments()
     # Load data
-    chargeur = Loader(arguments.type, arguments.rattraps)
+    chargeur = Loader(arguments)
     chargeur.data_extraction()
     words_df = chargeur.data['voc']
     perf_df = chargeur.data['perf']
@@ -359,23 +376,9 @@ if __name__ == '__main__':
     test_1 = Test(words_df, arguments, perf_df, word_cnt_df)
     test_1.run()
     test_1.compute_success_rate()
-    faults_df = test_1.faults_df
-    # C'est les rattraaaaaaapssss !!!!
-    if chargeur.rattraps == -1:
-        print("# DEBUG   | chargeur.rattraps:", test_1.words)
-        while faults_df.shape[0] > 0:
-            rattrap = Rattrap(faults_df)
-            rattrap.run()
-            faults_df = rattrap.faults_df
-            rattrap.compute_success_rate()
-    else:
-        print("# DEBUG   | chargeur.rattraps:", test_1.words)
-        for _ in range(chargeur.rattraps):
-            if faults_df.shape[0] > 0:
-                rattrap = Rattrap(faults_df)
-                rattrap.run()
-                faults_df = rattrap.faults_df
-                rattrap.compute_success_rate()
-    # Save results
+    # Rattraaaaaaap's !!!!
+    rattrap = Rattrap(test_1.faults_df, chargeur.rattraps)
+    rattrap.start_loop()
+    # Save the results
     updater = Updater(chargeur, test_1)
     updater.update_tables()
