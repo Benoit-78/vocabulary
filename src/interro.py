@@ -16,7 +16,6 @@ import sys
 from typing import List
 import pandas as pd
 
-
 EXT = '.csv'
 
 
@@ -51,8 +50,8 @@ def get_arguments() -> argparse.Namespace:
     if args.type not in ['version', 'theme']:
         print("# ERROR   | Test type must be either version or theme")
         raise SystemExit
-    if args.rattraps < 1:
-        print("# ERROR   | Number of rattraps must be greater than 0.")
+    if args.rattraps < -1:
+        print("# ERROR   | Number of rattraps must be greater than -1.")
         raise SystemExit
     if args.words < 1:
         print("# ERROR   | Number of words must be greater than 0.")
@@ -122,23 +121,12 @@ class Interro(ABC):
     """Abstract class for interrooooo!!!! !!! !"""
     def __init__(self,
                  words_df_: pd.DataFrame,
-                 args: argparse.Namespace=None,
-                 perf_df_: pd.DataFrame=None,
-                 words_cnt_df: pd.DataFrame=None):
+                 args: argparse.Namespace):
         self.words_df = words_df_
-        if args:
-            self.words = args.words
-        else:
-            self.words = None
-        self.perf_df = perf_df_
-        self.word_cnt_df = words_cnt_df
+        self.words = args.words
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
-        self.perf = []
-        self.steep = -1.25
-        self.ordinate = 112.5
-        self.output_df = pd.DataFrame()
-        self.well_known_words = pd.DataFrame()
+
 
     @abstractmethod
     def run(self):
@@ -164,22 +152,25 @@ class Interro(ABC):
         if word_guessed is False:
             self.faults_df.loc[self.faults_df.shape[0]] = [row[0], row[1]]
 
-    def compute_success_rate(self):
-        """Compute success rate."""
-        faults_total = self.faults_df.shape[0]
-        success_rate = int(100 * (1 - (faults_total / self.words)))
-        self.perf = success_rate
-
-    def get_known_words(self) -> pd.DataFrame:
-        """Identify the words that have been sufficiently guessed."""
-        self.words_df['image'] = self.ordinate + self.steep * self.words_df['Nb']
-        self.well_known_words = self.words_df[self.words_df['Taux'] >= self.words_df['image']]
-        print("# DEBUG   | well known words", list(self.well_known_words[self.words_df.columns[0]]))
-
 
 
 class Test(Interro):
     """First round"""
+    def __init__(self,
+                 words_df_,
+                 args: argparse.Namespace,
+                 perf_df_: pd.DataFrame=None,
+                 words_cnt_df: pd.DataFrame=None):
+        super().__init__(words_df_, args)
+        self.perf_df = perf_df_
+        self.word_cnt_df = words_cnt_df
+        self.perf = []
+        self.steep = -1.25
+        self.ordinate = 112.5
+        self.output_df = pd.DataFrame()
+        self.well_known_words = pd.DataFrame()
+        self.step = 0
+
     def run(self):
         """Launch the vocabulary interoooooo !!!!"""
         self.create_random_step()
@@ -223,35 +214,47 @@ class Test(Interro):
         # Update Query
         self.words_df.loc[self.index, 'Query'] += 1
 
+    def compute_success_rate(self):
+        """Compute success rate."""
+        faults_total = self.faults_df.shape[0]
+        success_rate = int(100 * (1 - (faults_total / self.words)))
+        self.perf = success_rate
+
+    def get_known_words(self) -> pd.DataFrame:
+        """Identify the words that have been sufficiently guessed."""
+        self.words_df['image'] = self.ordinate + self.steep * self.words_df['Nb']
+        self.well_known_words = self.words_df[self.words_df['Taux'] >= self.words_df['image']]
+        print("# DEBUG   | well known words", list(self.well_known_words[self.words_df.columns[0]]))
+
 
 
 class Rattrap(Interro):
     """Rattrapage !!!"""
-    def __init__(self, faults_df_: pd.DataFrame, rattraps: int):
-        super().__init__(faults_df_)
-        self.faults_df = faults_df_
-        self.rattraps = rattraps
-
-    def start_loop(self):
-        """Start rattrapages loop."""
-        if self.rattraps == -1:
-            while self.faults_df.shape[0] > 0:
-                self.run()
-                self.compute_success_rate()
-        else:
-            for _ in range(chargeur.rattraps):
-                if self.faults_df.shape[0] > 0:
-                    self.run()
-                    self.compute_success_rate()
+    def __init__(self, faults_df_: pd.DataFrame, arguments_: argparse.Namespace):
+        super().__init__(faults_df_, arguments_)
+        self.words_df = faults_df_.copy()
+        self.rattraps = arguments_.rattraps
 
     def run(self):
-        """Launch the second test"""
+        """Launch a rattrapage"""
         self.words = self.words_df.shape[0]
-        for j in range(0, self.words):
+        for j in range(0, self.words_df.shape[0]):
             self.index = j
             row = self.get_row()
             word_guessed = self.guess_word(row, j+1)
             self.update_faults_df(word_guessed, row)
+        self.words_df = self.faults_df.copy()
+        self.faults_df.drop(self.faults_df.index, inplace=True)
+
+    def start_loop(self):
+        """Start rattrapages loop."""
+        if self.rattraps == -1:
+            while self.words_df.shape[0] > 0:
+                self.run()
+        else:
+            for _ in range(chargeur.rattraps):
+                if self.words_df.shape[0] > 0:
+                    self.run()
 
 
 
@@ -369,15 +372,15 @@ if __name__ == '__main__':
     # Load data
     chargeur = Loader(arguments)
     chargeur.data_extraction()
-    words_df = chargeur.data['voc']
-    perf_df = chargeur.data['perf']
-    word_cnt_df = chargeur.data['word_cnt']
-    # WeuuuuAaaaaInterrooo !!!
-    test_1 = Test(words_df, arguments, perf_df, word_cnt_df)
+    # WeuuAaaInterrooo !!!
+    test_1 = Test(chargeur.data['voc'],
+                  arguments,
+                  chargeur.data['perf'],
+                  chargeur.data['word_cnt'])
     test_1.run()
     test_1.compute_success_rate()
     # Rattraaaaaaap's !!!!
-    rattrap = Rattrap(test_1.faults_df, chargeur.rattraps)
+    rattrap = Rattrap(test_1.faults_df, arguments)
     rattrap.start_loop()
     # Save the results
     updater = Updater(chargeur, test_1)
