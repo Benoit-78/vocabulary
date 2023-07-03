@@ -227,8 +227,7 @@ class TestTest(unittest.TestCase):
             my_test = interro.Test(loader.data['voc'],
                                    loader.data['perf'],
                                    loader.data['word_cnt'])
-            step = my_test.create_random_step()
-            index = step
+            my_test.create_random_step()
             for i in range(1, 101):
                 # Happy paths
                 next_index = my_test.get_next_index()
