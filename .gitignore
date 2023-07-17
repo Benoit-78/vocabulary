@@ -16,6 +16,7 @@ env/*
 
 .coverage
 token.txt
+nltk_tries_out.py
 
 *.exe
 *.pyc
