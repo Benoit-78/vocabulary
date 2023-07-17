@@ -21,7 +21,7 @@ EXT = '.csv'
 STEEP_GOOD = -1.25
 ORDINATE_GOOD = 112.5
 STEEP_BAD = 2.5
-ORDINATE_BAD = - 125
+ORDINATE_BAD = -125
 
 
 def parse_arguments(arg: List[str]) -> argparse.Namespace:
@@ -320,7 +320,7 @@ class Updater():
         """Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
         only under the author's dictatorial will."""
-        self.interro.words_df['image'] = ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['Nb']
+        self.interro.words_df['image'] = (ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['Nb']) / 100
         self.interro.words_df = self.interro.words_df[
             self.interro.words_df['Taux'] < self.interro.words_df['image']
         ]
@@ -328,7 +328,7 @@ class Updater():
 
     def flag_bad_words(self):
         """Apply special flag to difficult words, i.e. words that are rarely guessed by the user."""
-        self.interro.words_df['image'] = ORDINATE_BAD + STEEP_BAD * self.interro.words_df['Nb']
+        self.interro.words_df['image'] = (ORDINATE_BAD + STEEP_BAD * self.interro.words_df['Nb']) / 100
         self.interro.words_df['bad_word'] = np.where(
             self.interro.words_df['Taux'] < self.interro.words_df['image'],
             1,
