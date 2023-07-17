@@ -5,6 +5,7 @@
 __pycache__/*
 
 conf/token.txt
+conf/cred.json
 
 divers/*
 
@@ -16,6 +17,7 @@ env/*
 
 .coverage
 token.txt
+nltk_tries_out.py
 
 *.exe
 *.pyc
