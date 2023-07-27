@@ -6,7 +6,6 @@
     Main purpose: main script of vocabulary application.
 """
 
-import platform
 import random
 from tkinter import messagebox
 import argparse
@@ -14,10 +13,14 @@ from datetime import date
 from abc import ABC, abstractmethod
 import sys
 from typing import List
+
 import pandas as pd
 import numpy as np
 
-EXT = '.csv'
+import utils
+from data import csv_handler
+
+global os_sep
 STEEP_GOOD = -1.25
 ORDINATE_GOOD = 112.5
 STEEP_BAD = 2.5
@@ -71,62 +74,19 @@ class Loader():
         """Must be done in the same session than the interroooo is launched"""
         self.test_type = arguments_.type
         self.rattraps = arguments_.rattraps
-        self.os_type = None
-        self.os_sep = None
-        self.paths = {}
-        self.data = {}
+        self.paths = []
+        self.tables = {}
 
-    def get_os_type(self):
-        """Get operating system kind: Windows or Linux"""
-        operating_system = platform.platform()
-        operating_system = operating_system.split('-')[0]
-        if operating_system.lower() not in ['windows', 'linux', 'mac', 'android']:
-            print("# ERROR operating system cannot be identified")
-            raise OSError
-        self.os_type = operating_system
-
-    def set_os_separator(self):
-        """Get separator specific to operating system: / or \\ """
-        self.get_os_type()
-        if not isinstance(self.os_type, str):
-            raise TypeError
-        if self.os_type == 'Windows':
-            self.os_sep = '\\'
-        elif self.os_type in ['Linux', 'Mac', 'Android']:
-            self.os_sep = '/'
-        else:
-            print("# ERROR wrong input for operating system")
-            raise NameError
-
-    def set_data_paths(self):
-        """List paths to differente dataframes"""
-        self.set_os_separator()
-        self.paths['voc'] = self.os_sep.join(
-            [r'.', 'data', self.test_type + '_voc' + EXT]
-        )
-        self.paths['perf'] = self.os_sep.join(
-            [r'.', 'log', self.test_type + '_perf' + EXT]
-        )
-        self.paths['word_cnt'] = self.os_sep.join(
-            [r'.', 'log', self.test_type + '_words_count' + EXT]
-        )
-
-    def get_raw_data(self):
-        """Load different dataframes necessary to the app"""
-        self.set_data_paths()
-        self.data['voc'] = pd.read_csv(self.paths['voc'], sep=';', encoding='utf-8')
-        self.data['perf'] = pd.read_csv(self.paths['perf'], sep=';', encoding='utf-8')
-        self.data['word_cnt'] = pd.read_csv(self.paths['word_cnt'], sep=';', encoding='utf-8')
-
-    def extract_data(self):
-        """Return the data necessary for the interro to run"""
-        self.get_raw_data()
-        self.data['voc']['Query'] = [0] * self.data['voc'].shape[0]
-        self.data['voc'] = self.data['voc'].sort_values(by='Date', ascending=True)
-        self.data['voc'] = self.data['voc'].replace(r',', r'.', regex=True)
-        self.data['voc']['Taux'] = self.data['voc']['Taux'].astype(float)
-        if 'bad_word' not in self.data['voc'].columns:
-            self.data['voc']['bad_word'] = [0] * self.data['voc'].shape[0]
+    def load_tables(self):
+        """Return the tables necessary for the interro to run"""
+        self.paths = csv_handler.set_paths(os_sep, self.test_type)
+        self.tables = csv_handler.get_tables(os_sep, self.test_type)
+        self.tables['voc']['Query'] = [0] * self.tables['voc'].shape[0]
+        self.tables['voc'] = self.tables['voc'].sort_values(by='Date', ascending=True)
+        self.tables['voc'] = self.tables['voc'].replace(r',', r'.', regex=True)
+        self.tables['voc']['Taux'] = self.tables['voc']['Taux'].astype(float)
+        if 'bad_word' not in self.tables['voc'].columns:
+            self.tables['voc']['bad_word'] = [0] * self.tables['voc'].shape[0]
 
 
 
@@ -172,12 +132,13 @@ class Test(Interro):
                  words_df_,
                  args: argparse.Namespace,
                  perf_df_: pd.DataFrame=None,
-                 words_cnt_df: pd.DataFrame=None):
+                 words_cnt_df: pd.DataFrame=None,
+                 output_df: pd.DataFrame=None,):
         super().__init__(words_df_, args)
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
+        self.output_df = output_df
         self.perf = []
-        self.output_df = pd.DataFrame()
         self.well_known_words = pd.DataFrame()
         self.step = 0
 
@@ -247,9 +208,8 @@ class Test(Interro):
 
     def get_known_words(self) -> pd.DataFrame:
         """Identify the words that have been sufficiently guessed."""
-        self.words_df['image'] = ORDINATE_GOOD + STEEP_GOOD * self.words_df['Nb']
-        self.well_known_words = self.words_df[self.words_df['Taux'] >= self.words_df['image']]
-        print("# DEBUG: well known words", list(self.well_known_words[self.words_df.columns[0]]))
+        self.words_df['image_good'] = (ORDINATE_GOOD + STEEP_GOOD * self.words_df['Nb']) / 100
+        self.well_known_words = self.words_df[self.words_df['Taux'] >= self.words_df['image_good']]
 
 
 
@@ -277,7 +237,7 @@ class Rattrap(Interro):
             while self.words_df.shape[0] > 0:
                 self.run()
         else:
-            for _ in range(chargeur.rattraps):
+            for _ in range(self.rattraps):
                 if self.words_df.shape[0] > 0:
                     self.run()
 
@@ -288,66 +248,72 @@ class Updater():
     def __init__(self, loader: Loader, interro: Interro):
         self.loader = loader
         self.interro = interro
-        self.output_table_path = ''
-        self.output_df = pd.DataFrame()
-
-    def set_output_table_path(self):
-        """Determine the output tables according to the test type"""
-        if self.loader.test_type == 'version':
-            self.output_table_path = self.loader.os_sep.join(['.', 'data', 'theme_voc.csv'])
-        elif self.loader.test_type == 'theme':
-            self.output_table_path = self.loader.os_sep.join(['.', 'data', 'archives.csv'])
-        else:
-            print("# ERROR: Wrong test_type argument in Updater class.")
-            raise SystemExit
 
     def copy_well_known_words(self):
         """Copy the well-known words in the next step table"""
-        self.output_df = pd.read_csv(self.output_table_path, sep=';', encoding='utf-8')
-        missing_columns = set(self.output_df.columns).difference(set(self.interro.well_known_words))
+        self.interro.get_known_words()
+        output_col = self.loader.tables['output'].columns
+        well_known_words_col = self.interro.well_known_words.columns
+        missing_columns = set(output_col).difference(set(well_known_words_col))
         for column in missing_columns:
             self.interro.well_known_words[column] = [0] * self.interro.well_known_words.shape[0]
-        self.output_df = pd.concat(self.output_df,
-                                   self.interro.well_known_words)
+        self.loader.tables['output'] = pd.concat(
+            [
+                self.loader.tables['output'],
+                self.interro.well_known_words
+            ]
+        )
 
     def transfer_well_known_words(self):
         """Transfer the well-known words in an ouput table, and save this."""
-        self.set_output_table_path()
         self.copy_well_known_words()
-        self.output_df.to_csv(self.output_table_path, index=False, sep=';')
+        csv_handler.save_table(
+            self.loader.test_type,
+            os_sep,
+            'output',
+            self.loader.tables['output'],
+        )
 
     def delete_known_words(self) -> pd.DataFrame:
         """Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
         only under the author's dictatorial will."""
-        self.interro.words_df['image'] = (ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['Nb']) / 100
+        self.interro.words_df['image_good'] = (ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['Nb']) / 100
         self.interro.words_df = self.interro.words_df[
-            self.interro.words_df['Taux'] < self.interro.words_df['image']
+            self.interro.words_df['Taux'] < self.interro.words_df['image_good']
         ]
-        self.interro.words_df.drop('image', axis=1, inplace=True)
+        self.interro.words_df.drop('image_good', axis=1, inplace=True)
 
     def flag_bad_words(self):
         """Apply special flag to difficult words, i.e. words that are rarely guessed by the user."""
-        self.interro.words_df['image'] = (ORDINATE_BAD + STEEP_BAD * self.interro.words_df['Nb']) / 100
+        if 'image_bad' in self.interro.words_df.columns:
+            self.interro.words_df.drop('image_bad', axis=1, inplace=True)
+        self.interro.words_df['image_bad'] = (ORDINATE_BAD + STEEP_BAD * self.interro.words_df['Nb']) / 100
         self.interro.words_df['bad_word'] = np.where(
-            self.interro.words_df['Taux'] < self.interro.words_df['image'],
+            self.interro.words_df['Taux'] < self.interro.words_df['image_bad'],
             1,
             0
         )
-        self.interro.words_df.drop('image', axis=1, inplace=True)
+        self.interro.words_df.drop('image_bad', axis=1, inplace=True)
 
     def save_words(self):
         """Prepare the words table for saving, and save it."""
-        if 'Query' in self.interro.words_df.columns:
-            self.interro.words_df.drop('Query', axis=1, inplace=True)
-        path = self.loader.os_sep.join([r'.', 'data', self.loader.test_type + '_voc' + EXT])
-        self.interro.words_df.to_csv(path, index=False, sep=';')
+        csv_handler.save_table(
+            self.loader.test_type,
+            os_sep,
+            'voc',
+            self.interro.words_df
+        )
 
     def save_performances(self):
         """Save performances for further analysis."""
         self.interro.perf_df.loc[self.interro.perf_df.shape[0]] = self.interro.perf
-        self.interro.perf_df.to_csv(self.loader.paths['perf'],
-                                    index=False, sep=';', encoding='utf-8')
+        csv_handler.save_table(
+            self.loader.test_type,
+            os_sep,
+            'perf',
+            self.interro.perf_df
+        )
 
     def save_words_count(self):
         """Save the length of vocabulary list in a file"""
@@ -357,14 +323,18 @@ class Updater():
         self.interro.word_cnt_df.loc[count_before] = [today_date, word_counts]
         count_after = self.interro.word_cnt_df.shape[0]
         if count_after == count_before + 1:
-            self.interro.word_cnt_df.to_csv(self.loader.paths['word_cnt'],
-                                            index=False, sep=';')
+            csv_handler.save_table(
+                self.loader.test_type,
+                os_sep,
+                'word_cnt',
+                self.interro.word_cnt_df
+            )
         else:
             print("# ERROR: Words count not saved.")
 
-    def update_tables(self):
+    def update_data(self):
         """Main method of Updater class"""
-        # self.transfer_well_known_words()
+        self.transfer_well_known_words()
         self.delete_known_words()
         self.flag_bad_words()
         self.save_words()
@@ -404,18 +374,30 @@ class ViewQuestion():
 
 
 
-if __name__ == '__main__':
+# @profile
+def main():
+    """Highest level of abstraction for interro!!! program."""
+    os_sep = utils.get_os_separator()
     # Get user inputs
     arguments = get_arguments()
     # Load data
-    chargeur = Loader(arguments)
-    chargeur.extract_data()
+    loader = Loader(arguments)
+    loader.load_tables()
     # WeuuAaaInterrooo !!!
-    test_1 = Test(chargeur.data['voc'], arguments, chargeur.data['perf'], chargeur.data['word_cnt'])
-    test_1.run()
+    test = Test(
+        loader.tables['voc'],
+        arguments,
+        loader.tables['perf'],
+        loader.tables['word_cnt']
+    )
+    test.run()
     # Rattraaaaaaap's !!!!
-    rattrap = Rattrap(test_1.faults_df, arguments)
+    rattrap = Rattrap(test.faults_df, arguments)
     rattrap.start_loop()
     # Save the results
-    updater = Updater(chargeur, test_1)
-    updater.update_tables()
+    updater = Updater(loader, test)
+    updater.update_data()
+
+
+if __name__ == '__main__':
+    main()
