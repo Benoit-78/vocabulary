@@ -18,9 +18,8 @@ import pandas as pd
 import numpy as np
 
 import utils
-from data import csv_handler
+from data import database_handler
 
-global os_sep
 STEEP_GOOD = -1.25
 ORDINATE_GOOD = 112.5
 STEEP_BAD = 2.5
@@ -70,17 +69,19 @@ def get_arguments() -> argparse.Namespace:
 
 class Loader():
     """Data loader"""
-    def __init__(self, arguments_: argparse.Namespace):
+    def __init__(self, arguments_: argparse.Namespace, os_sep):
         """Must be done in the same session than the interroooo is launched"""
         self.test_type = arguments_.type
         self.rattraps = arguments_.rattraps
+        self.os_sep = os_sep
         self.paths = []
         self.tables = {}
+        self.data_handler = database_handler.CsvHandler(self.test_type, os_sep) ##########################################
 
     def load_tables(self):
         """Return the tables necessary for the interro to run"""
-        self.paths = csv_handler.set_paths(os_sep, self.test_type)
-        self.tables = csv_handler.get_tables(os_sep, self.test_type)
+        self.paths = self.data_handler.get_paths()
+        self.tables = self.data_handler.get_tables()
         self.tables['voc']['Query'] = [0] * self.tables['voc'].shape[0]
         self.tables['voc'] = self.tables['voc'].sort_values(by='Date', ascending=True)
         self.tables['voc'] = self.tables['voc'].replace(r',', r'.', regex=True)
@@ -245,9 +246,10 @@ class Rattrap(Interro):
 
 class Updater():
     """Update the tables of words (version and theme), counts, and archives."""
-    def __init__(self, loader: Loader, interro: Interro):
+    def __init__(self, loader: Loader, interro: Interro, os_sep):
         self.loader = loader
         self.interro = interro
+        self.os_sep = os_sep
 
     def copy_well_known_words(self):
         """Copy the well-known words in the next step table"""
@@ -267,9 +269,7 @@ class Updater():
     def transfer_well_known_words(self):
         """Transfer the well-known words in an ouput table, and save this."""
         self.copy_well_known_words()
-        csv_handler.save_table(
-            self.loader.test_type,
-            os_sep,
+        self.loader.data_handler.save_table(
             'output',
             self.loader.tables['output'],
         )
@@ -298,9 +298,7 @@ class Updater():
 
     def save_words(self):
         """Prepare the words table for saving, and save it."""
-        csv_handler.save_table(
-            self.loader.test_type,
-            os_sep,
+        self.loader.data_handler.save_table(
             'voc',
             self.interro.words_df
         )
@@ -308,9 +306,7 @@ class Updater():
     def save_performances(self):
         """Save performances for further analysis."""
         self.interro.perf_df.loc[self.interro.perf_df.shape[0]] = self.interro.perf
-        csv_handler.save_table(
-            self.loader.test_type,
-            os_sep,
+        self.loader.data_handler.save_table(
             'perf',
             self.interro.perf_df
         )
@@ -323,9 +319,7 @@ class Updater():
         self.interro.word_cnt_df.loc[count_before] = [today_date, word_counts]
         count_after = self.interro.word_cnt_df.shape[0]
         if count_after == count_before + 1:
-            csv_handler.save_table(
-                self.loader.test_type,
-                os_sep,
+            self.loader.data_handler.save_table(
                 'word_cnt',
                 self.interro.word_cnt_df
             )
@@ -381,7 +375,7 @@ def main():
     # Get user inputs
     arguments = get_arguments()
     # Load data
-    loader = Loader(arguments)
+    loader = Loader(arguments, os_sep)
     loader.load_tables()
     # WeuuAaaInterrooo !!!
     test = Test(
@@ -395,7 +389,7 @@ def main():
     rattrap = Rattrap(test.faults_df, arguments)
     rattrap.start_loop()
     # Save the results
-    updater = Updater(loader, test)
+    updater = Updater(loader, test, os_sep)
     updater.update_data()
 
 
