@@ -10,11 +10,11 @@ walk-in (adj.);assez large pour y marcher;01/03/2021;22;15;0.68;0;0
 a sticker;un autocollant;01/03/2022;17;15;0.88;0;0
 skimming (common name);la fraude fiscale;01/03/2022;17;-5;-0.29;0;0
 gooey (adj.);gluant;01/03/2022;21;5;0.24;0;0
-lye (common name);la lessive;01/04/2022;18;4;0.22;0;0
-thrush (common name);du muguet / une grive / la mycose vaginale;01/04/2022;24;-6;-0.25;0;0
+bleach (common name);l'eau de javel;01/04/2022;21;15;0.71;0;0
 a grove;un bosquet. un jardin;01/04/2022;19;-15;-0.79;1;0
 a subpoena;une assignation à comparaître;01/04/2022;12;0;0.0;0;0
-bleach (common name);l'eau de javel;01/04/2022;21;15;0.71;0;0
+lye (common name);la lessive;01/04/2022;18;4;0.22;0;0
+thrush (common name);du muguet / une grive / la mycose vaginale;01/04/2022;24;-6;-0.25;0;0
 an uptake;une absorption;01/05/2022;16;-14;-0.88;1;0
 a reek;une puanteur;01/05/2023;5;-1;-0.2;0;0
 bogey (common name);crotte de nez;01/06/2023;2;2;1.0;0;0
@@ -27,12 +27,12 @@ a thumbnail;un ongle de pouce / une vignette;01/09/2021;22;17;0.77;0;0
 grudge (common name);la rancune;01/09/2022;12;-8;-0.67;0;0
 a shoe tree;un embauchoir;01/09/2022;18;16;0.89;0;0
 a crib;un lit de bébé / une cage;01/09/2022;16;12;0.75;0;0
-a warp;une distorsion / une chaîne;01/11/2018;23;-2;-0.09;0;0
-hubris (common name);une confiance en soi excessive;01/11/2018;26;8;0.31;0;0
 feral;sauvage;01/11/2018;24;19;0.79;0;0
+hubris (common name);une confiance en soi excessive;01/11/2018;26;8;0.31;0;0
+a warp;une distorsion / une chaîne;01/11/2018;23;-2;-0.09;0;0
 the marrow;la moelle. l'essence;01/11/2018;23;-19;-0.83;1;0
-a flurry;une rafale;01/11/2018;22;14;0.64;0;0
 the quill;la penne (plume);01/11/2018;22;-2;-0.09;0;0
+a flurry;une rafale;01/11/2018;22;14;0.64;0;0
 heirs;les héritiers;01/11/2019;27;21;0.78;0;0
 a timeout;un temps mort / une pause;01/11/2022;12;4;0.33;0;0
 a toll plaza;un péage;01/11/2022;10;8;0.8;0;0
@@ -58,24 +58,24 @@ to kibosh (coll.);bousiller;02/04/2022;9;1;0.11;0;0
 to rant;divaguer / parler avec emphase;02/04/2022;12;-6;-0.5;0;0
 to botch;bousiller. saboter / rafistoler;02/04/2022;8;-2;-0.25;0;0
 a hyphen;un trait-d'union;02/06/2020;23;17;0.74;0;0
-overworked;surmené;02/06/2020;28;15;0.54;0;0
+outwardly;extérieurement;02/06/2020;29;5;0.17;0;0
 a housework;un ménage;02/06/2020;15;9;0.6;0;0
-ditto;idem;02/06/2020;28;14;0.5;0;1
-hackneyed;rebattu;02/06/2020;18;-7;-0.39;0;0
 yeast (common name);de la levure;02/06/2020;36;9;0.25;0;0
+hackneyed;rebattu;02/06/2020;18;-7;-0.39;0;0
+ditto;idem;02/06/2020;28;14;0.5;0;0
 a plight;une situation critique;02/06/2020;38;5;0.13;0;0
-outwardly;extérieurement;02/06/2020;28;4;0.14;0;0
+overworked;surmené;02/06/2020;28;15;0.54;0;0
 downright;carrément;02/06/2020;25;20;0.8;0;0
 a comittal;un engagement;02/06/2020;22;12;0.55;0;0
 a breakwater;une digue;02/06/2020;23;19;0.83;0;0
 the fortitude;le courage;02/06/2020;32;20;0.62;0;0
-perfunctory (adj.);sommaire;02/06/2020;24;-5;-0.21;0;0
-adamant (adj.);catégorique;02/06/2020;25;-5;-0.2;0;0
-threadbare;râpé;02/06/2020;26;18;0.69;0;0
-a pointer;une aiguille;02/06/2020;34;20;0.59;0;0
-a prank;une farce;02/06/2020;17;13;0.76;0;0
-clumsy;maladroit;02/06/2020;25;-3;-0.12;0;0
 a triteness;une banalité;02/06/2020;33;23;0.7;0;0
+adamant (adj.);catégorique;02/06/2020;25;-5;-0.2;0;0
+a prank;une farce;02/06/2020;17;13;0.76;0;0
+a pointer;une aiguille;02/06/2020;34;20;0.59;0;0
+threadbare;râpé;02/06/2020;26;18;0.69;0;0
+clumsy;maladroit;02/06/2020;25;-3;-0.12;0;0
+perfunctory (adj.);sommaire;02/06/2020;24;-5;-0.21;0;0
 a flock;un troupeau;02/06/2020;31;14;0.45;0;0
 per-say (expr.);en fait;02/06/2021;21;-13;-0.62;0;0
 a knicker;une culotte;02/06/2022;19;9;0.47;0;0
@@ -110,51 +110,51 @@ a spitoon;un crachoir;02/11/2018;30;22;0.73;0;0
 to set-off;déclencher;02/11/2019;29;10;0.34;0;0
 twirls;des tourbillons;02/11/2019;20;16;0.8;0;0
 the mortgage balance;le solde hypothécaire;02/11/2019;29;19;0.66;0;0
-sentient;sensible;02/11/2019;23;-2;-0.09;0;0
-incisors;les incisives;02/11/2019;23;13;0.57;0;0
+an outstanding payment;un impayé;02/11/2019;20;14;0.7;0;0
+nipped;pincé;02/11/2019;27;12;0.44;0;0
 to take the leap;faire le grand saut;02/11/2019;30;22;0.73;0;0
-power of attorney;la procuration;02/11/2019;21;14;0.67;0;0
-a beaver;un castor;02/11/2019;23;18;0.78;0;0
-bespoke (adj.);sur mesure;02/11/2019;19;-11;-0.58;0;0
-to vest;déléguer;02/11/2019;30;20;0.67;0;0
-slender (adj.);mince;02/11/2019;26;10;0.38;0;0
-a conch;une conque (coquillage);02/11/2019;25;16;0.64;0;0
 a venture loan;un prêt à risque;02/11/2019;27;19;0.7;0;0
+power of attorney;la procuration;02/11/2019;21;14;0.67;0;0
+to vest;déléguer;02/11/2019;30;20;0.67;0;0
+sentient;sensible;02/11/2019;23;-2;-0.09;0;0
+a conch;une conque (coquillage);02/11/2019;25;16;0.64;0;0
+incisors;les incisives;02/11/2019;23;13;0.57;0;0
 a slope;une pente;02/11/2019;23;15;0.65;0;0
-a headaway;une avance;02/11/2019;31;10;0.32;0;0
-a vacuum;un aspirateur;02/11/2019;29;15;0.52;0;0
+hassle (common name);un tracas;02/11/2019;26;6;0.23;0;0
+slender (adj.);mince;02/11/2019;26;10;0.38;0;0
+a bereavement;un deuil;02/11/2019;22;1;0.05;0;0
 custard (cooking);de la crème pâtissière;02/11/2019;26;19;0.73;0;0
 paramount;primordial;02/11/2019;38;23;0.61;0;0
 a shamrock;un trèfle;02/11/2019;33;23;0.7;0;0
-to tout;vendre. racoler;02/11/2019;35;22;0.63;0;0
-a bereavement;un deuil;02/11/2019;22;1;0.05;0;0
+a beaver;un castor;02/11/2019;23;18;0.78;0;0
+bespoke (adj.);sur mesure;02/11/2019;19;-11;-0.58;0;0
 a squid;un calamar;02/11/2019;27;14;0.52;0;0
-the immediate next of kin;le parent le plus proche;02/11/2019;21;18;0.86;0;0
-an outstanding payment;un impayé;02/11/2019;20;14;0.7;0;0
-nipped;pincé;02/11/2019;27;12;0.44;0;0
-a dwelling;une habitation;02/11/2019;24;17;0.71;0;0
-hassle (common name);un tracas;02/11/2019;26;6;0.23;0;0
-a quarry;une carrière (sens propre);02/11/2019;28;21;0.75;0;0
+a headaway;une avance;02/11/2019;31;10;0.32;0;0
 pegged;attaché;02/11/2019;20;-13;-0.65;0;0
+a dwelling;une habitation;02/11/2019;24;17;0.71;0;0
+the immediate next of kin;le parent le plus proche;02/11/2019;21;18;0.86;0;0
+a quarry;une carrière (sens propre);02/11/2019;28;21;0.75;0;0
+to tout;vendre. racoler;02/11/2019;35;22;0.63;0;0
+a vacuum;un aspirateur;02/11/2019;29;15;0.52;0;0
 barnyard (common name);la basse-cour;02/12/2021;13;-1;-0.08;0;0
 amenable;accomodant. souple;02/12/2021;17;3;0.18;0;0
-a morass;un marécage. un bourbier;03/01/2022;12;-8;-0.67;0;0
-a conundrum;une énigme;03/01/2022;18;14;0.78;0;0
 in droves;en masse;03/01/2022;16;8;0.5;0;0
-a bramble;un roncier;03/01/2022;22;2;0.09;0;0
-to slog;bosser. donner un grand coup;03/01/2022;11;-11;-1.0;1;0
-to litter;disperser / joncher. couvrir de …;03/01/2022;12;-2;-0.17;0;0
-a drove of cattle;un troupeau de bétail;03/01/2022;12;10;0.83;0;0
-germane (adj.);allié / convenable;03/01/2022;14;-8;-0.57;0;0
-to hark;écouter;03/01/2022;15;3;0.2;0;0
 to bemoan;déplorer. pleurer;03/01/2022;23;3;0.13;0;0
+to hark;écouter;03/01/2022;15;3;0.2;0;0
+a drove of cattle;un troupeau de bétail;03/01/2022;12;10;0.83;0;0
+a conundrum;une énigme;03/01/2022;18;14;0.78;0;0
+to litter;disperser / joncher. couvrir de …;03/01/2022;12;-2;-0.17;0;0
 an acorn;un gland;03/01/2022;20;8;0.4;0;0
+germane (adj.);allié / convenable;03/01/2022;14;-8;-0.57;0;0
 to blather;bavarder. débiter des bêtises;03/01/2022;15;9;0.6;0;0
 covertly;secrètement;03/01/2022;14;10;0.71;0;0
-clamshell (adj.);à clapet;03/02/2022;14;4;0.29;0;0
-to simmer;mijoter. frémir;03/02/2022;21;-17;-0.81;1;0
+a morass;un marécage. un bourbier;03/01/2022;12;-8;-0.67;0;0
+to slog;bosser. donner un grand coup;03/01/2022;11;-11;-1.0;1;0
+a bramble;un roncier;03/01/2022;22;2;0.09;0;0
 to deface;rendre illisible. effacer;03/02/2022;16;12;0.75;0;0
 a foothold;un ancrage;03/02/2022;20;2;0.1;0;0
+clamshell (adj.);à clapet;03/02/2022;14;4;0.29;0;0
+to simmer;mijoter. frémir;03/02/2022;21;-17;-0.81;1;0
 a closeup;un gros plan;03/02/2022;23;1;0.04;0;0
 to refurbish;remettre à neuf;03/03/2021;26;17;0.65;0;0
 an umpire;un arbitre / un juge de chaise;03/03/2022;19;11;0.58;0;0
@@ -176,18 +176,18 @@ a dash;une course. un élan;03/11/2019;30;17;0.57;0;0
 to vaunt;se vanter;03/11/2019;26;16;0.62;0;0
 to whiz;fuser;03/11/2019;31;22;0.71;0;0
 a contingency;un imprévu;03/11/2019;26;3;0.12;0;0
-giveaways;des cadeaux;03/12/2019;27;13;0.48;0;0
+tool wear (common name);l'usure des outils;03/12/2019;20;14;0.7;0;0
 pertaining;se rapportant;03/12/2019;21;17;0.81;0;0
 with respect to;par rapport à;03/12/2019;21;16;0.76;0;0
-tool wear (common name);l'usure des outils;03/12/2019;20;14;0.7;0;0
+giveaways;des cadeaux;03/12/2019;27;13;0.48;0;0
 a goodness of fit;une qualité d'ajustement;03/12/2019;20;12;0.6;0;0
 to grit;grincer;03/12/2019;25;17;0.68;0;0
-a nudge;un coup de coude;03/12/2019;23;-16;-0.7;1;0
 an expendiency;une opportunité;03/12/2019;22;-12;-0.55;0;0
+a nudge;un coup de coude;03/12/2019;23;-16;-0.7;1;0
 to elicit;obtenir / provoquer;03/12/2021;30;-20;-0.67;1;0
 a roadblock;un barrage routier;04/02/2022;20;8;0.4;0;0
 to slink;se glisser. sortir furtivement;04/02/2022;19;7;0.37;0;0
-to hobble;entraver;04/02/2022;16;-12;-0.75;0;0
+to hobble;entraver;04/02/2022;17;-11;-0.65;0;0
 haywire (adj.);détraqué;04/02/2023;6;-6;-1.0;0;0
 to douse;éteindre / tremper;04/03/2022;22;0;0.0;0;0
 a bog;un marais. une tourbière;04/03/2023;7;1;0.14;0;0
@@ -205,53 +205,53 @@ to sway;se balancer;04/08/2021;16;-6;-0.38;0;0
 to cinch;sangler;04/09/2021;21;11;0.52;0;0
 fluffy;duveteux;04/09/2021;18;0;0.0;0;0
 a kettle;une bouilloire;04/09/2021;18;4;0.22;0;0
-shaky;précaire. instable;04/10/2018;28;21;0.75;0;0
-wryly;ironiquement;04/10/2018;23;-5;-0.22;0;0
-merriment (common name);la gaieté;04/10/2018;34;19;0.56;0;0
-pithy (adj.);concis / vigoureux;04/10/2018;31;2;0.06;0;0
-plainly;clairement. simplement;04/10/2018;25;4;0.16;0;0
-inducement (common name);l'incitation. l'encouragement;04/10/2018;32;8;0.25;0;0
 tinned;en conserve;04/10/2018;28;18;0.64;0;0
-rollpicking (adj.);joyeux. bruyant;04/11/2018;31;19;0.61;0;0
-unswering;inébranlable. indéfectible;04/11/2018;21;-16;-0.76;1;0
+wryly;ironiquement;04/10/2018;23;-5;-0.22;0;0
+pithy (adj.);concis / vigoureux;04/10/2018;31;2;0.06;0;0
+inducement (common name);l'incitation. l'encouragement;04/10/2018;32;8;0.25;0;0
+plainly;clairement. simplement;04/10/2018;25;4;0.16;0;0
+shaky;précaire. instable;04/10/2018;28;21;0.75;0;0
+merriment (common name);la gaieté;04/10/2018;34;19;0.56;0;0
 gruelling / grueling;épuisant. éreintant;04/11/2018;26;-10;-0.38;0;0
+unswering;inébranlable. indéfectible;04/11/2018;21;-16;-0.76;1;0
 to depart;partir. quitter / mourir / s'écarter de;04/11/2018;25;-14;-0.56;0;0
-a closed shop;un milieu professionnel où l'adhésion à un syndicat est la condition pour être employé;04/11/2018;25;17;0.68;0;0
+a closed shop;un milieu professionnel où l'adhésion à un syndicat est la condition pour être employé;04/11/2018;26;18;0.69;0;0
+rollpicking (adj.);joyeux. bruyant;04/11/2018;31;19;0.61;0;0
 nettle (common name);une ortie;04/11/2018;22;4;0.18;0;0
 corny;banal;04/11/2018;32;19;0.59;0;0
 to coerce;contraindre. forcer;04/11/2018;28;16;0.57;0;0
+overweening;démesuré. outrecuidant;04/11/2018;26;2;0.08;0;0
 squeamish;facilement dégoûté. qui a la nausée;04/11/2018;27;0;0.0;0;0
 to waylay;intercepter;04/11/2018;20;4;0.2;0;0
 bullying (common name);le harcèlement;04/11/2018;28;-7;-0.25;0;0
-overweening;démesuré. outrecuidant;04/11/2018;26;2;0.08;0;0
 pungent;mordant. acerbe;04/11/2018;27;20;0.74;0;0
 menial (adj.);subalterne. (tâche) domestique;04/11/2022;13;3;0.23;0;0
-a loophole;un échappatoire / une lacune;04/12/2018;21;10;0.48;0;0
-to hanker;avoir envie de;04/12/2018;33;14;0.42;0;0
-to thwart;contrecarrer. contrarier;04/12/2018;39;24;0.62;0;0
 a mish mash;un méli-mélo;04/12/2018;30;22;0.73;0;0
-far-flung;lointain / vaste;04/12/2018;13;-11;-0.85;0;0
-the guise;l'apparence / les habits;04/12/2018;26;15;0.58;0;0
-the squalor;la misère noire;04/12/2018;29;21;0.72;0;0
-blithely;allègrement;04/12/2018;32;11;0.34;0;0
-the exertion;l'effort / la fatigue;04/12/2018;32;-14;-0.44;0;0
-a blueprint;un plan. un projet;04/12/2018;16;14;0.88;0;0
-the dread;la crainte;04/12/2018;29;21;0.72;0;0
-a knave;un fripon. un coquin;04/12/2018;37;10;0.27;0;0
-forsaken;abandonné. délaissé;04/12/2018;35;18;0.51;0;0
 a dais;une estrade;04/12/2018;22;12;0.55;0;0
-to fudge;truquer / esquiver. tergiverser;04/12/2018;20;12;0.6;0;0
-woven;tissé. tricoté;04/12/2018;22;15;0.68;0;0
-to treble;tripler;04/12/2018;24;19;0.79;0;0
-to peg;pitonner / bloquer;04/12/2018;28;-6;-0.21;0;0
-to rend;déchirer;04/12/2018;34;14;0.41;0;0
+the guise;l'apparence / les habits;04/12/2018;26;15;0.58;0;0
 a vilification;une diffamation. une calomnie;04/12/2018;24;10;0.42;0;0
-a shootout;une fusillade. un règlement de compte;04/12/2021;21;11;0.52;0;0
+a loophole;un échappatoire / une lacune;04/12/2018;21;10;0.48;0;0
+to thwart;contrecarrer. contrarier;04/12/2018;39;24;0.62;0;0
+forsaken;abandonné. délaissé;04/12/2018;35;18;0.51;0;0
+far-flung;lointain / vaste;04/12/2018;13;-11;-0.85;0;0
+to fudge;truquer / esquiver. tergiverser;04/12/2018;20;12;0.6;0;0
+a blueprint;un plan. un projet;04/12/2018;16;14;0.88;0;0
+to peg;pitonner / bloquer;04/12/2018;28;-6;-0.21;0;0
+a knave;un fripon. un coquin;04/12/2018;37;10;0.27;0;0
+to hanker;avoir envie de;04/12/2018;33;14;0.42;0;0
+to treble;tripler;04/12/2018;24;19;0.79;0;0
+blithely;allègrement;04/12/2018;32;11;0.34;0;0
+to rend;déchirer;04/12/2018;34;14;0.41;0;0
+the dread;la crainte;04/12/2018;29;21;0.72;0;0
+the squalor;la misère noire;04/12/2018;29;21;0.72;0;0
+woven;tissé. tricoté;04/12/2018;22;15;0.68;0;0
+the exertion;l'effort / la fatigue;04/12/2018;32;-14;-0.44;0;0
 full-fledged;à part entière;04/12/2021;20;-2;-0.1;0;0
+a shootout;une fusillade. un règlement de compte;04/12/2021;21;11;0.52;0;0
 to pay off;"""payer"". être rentable …";04/12/2021;20;12;0.6;0;0
 a decoy;un leurre;04/12/2021;14;-10;-0.71;0;0
-a fledge;un envol;04/12/2021;18;-6;-0.33;0;0
 a hummingbird;un colibri;04/12/2021;19;13;0.68;0;0
+a fledge;un envol;04/12/2021;18;-6;-0.33;0;0
 back to the kennel;de retour à la niche;04/12/2022;3;3;1.0;0;0
 to browse;feuilleter / brouter;04/12/2022;11;9;0.82;0;0
 the selvage;la lisière;05/01/2021;25;9;0.36;0;0
@@ -267,67 +267,67 @@ a tug;un remorqueur;05/02/2023;4;-2;-0.5;0;0
 humdrum (adj.);monotone;05/02/2023;9;-9;-1.0;0;0
 fallow (common name);la jachère;05/02/2023;12;6;0.5;0;0
 a beachhead;une tête de pont;05/02/2023;10;4;0.4;0;0
-forcible;puissant. efficace;05/03/2020;25;5;0.2;0;0
-colloquial;familier;05/03/2020;23;16;0.7;0;0
 caulking (common name);le calfeutrage;05/03/2020;23;7;0.3;0;0
 a cogwheel;une roue dentée;05/03/2020;27;15;0.56;0;0
 a bane;un fléau;05/03/2020;21;9;0.43;0;0
-a portcullis;une herse;05/03/2020;21;14;0.67;0;0
-a rim;une jante;05/03/2020;29;21;0.72;0;0
-a hitch;un attelage;05/03/2020;32;18;0.56;0;0
+forcible;puissant. efficace;05/03/2020;26;6;0.23;0;0
+colloquial;familier;05/03/2020;23;16;0.7;0;0
 a blunder;une gaffe;05/03/2020;21;-14;-0.67;0;0
 cumbersome;lourd;05/03/2020;21;17;0.81;0;0
+a portcullis;une herse;05/03/2020;21;14;0.67;0;0
+a rim;une jante;05/03/2020;30;22;0.73;0;0
+a hitch;un attelage;05/03/2020;32;18;0.56;0;0
 aft (adv.);à l'arrière (d'un navire);05/03/2022;25;17;0.68;0;0
-bald;chauve;05/03/2023;6;4;0.67;0;0
-pent up (adj.);refoulé;05/03/2023;4;-4;-1.0;0;0
-a tapel;une bande;05/03/2023;8;-2;-0.25;0;0
-to scuttle;saborder;05/03/2023;3;-3;-1.0;0;0
-to cower;se recroqueviller;05/03/2023;8;-2;-0.25;0;0
 Give me a leg-up.;Fais-moi la courte-échelle.;05/03/2023;3;3;1.0;0;0
 to undergird;sous-tendre;05/03/2023;6;-2;-0.33;0;0
+a tapel;une bande;05/03/2023;8;-2;-0.25;0;0
+bald;chauve;05/03/2023;6;4;0.67;0;0
+to cower;se recroqueviller;05/03/2023;8;-2;-0.25;0;0
+pent up (adj.);refoulé;05/03/2023;4;-4;-1.0;0;0
+to scuttle;saborder;05/03/2023;3;-3;-1.0;0;0
 splits (common name);le grand écart;05/04/2022;17;-15;-0.88;1;0
 the tummy (coll.);le ventre (fam.);05/04/2022;14;12;0.86;0;0
 a pageants;un concours (de beauté. …);05/06/2022;22;6;0.27;0;0
 a paw;une patte;05/06/2022;10;4;0.4;0;0
 a subsidiary;une filiale;05/08/2018;36;22;0.61;0;0
-a telescope;une longue-vue;05/08/2019;28;20;0.71;0;0
-wearied;fatigué;05/08/2019;33;-22;-0.67;1;0
 hurdling (common name);le saut de haie;05/08/2019;22;10;0.45;0;0
-punched;poinçonné;05/08/2019;21;8;0.38;0;0
+a telescope;une longue-vue;05/08/2019;28;20;0.71;0;0
 a spark plug;une bougie d'allumage;05/08/2019;22;14;0.64;0;0
+punched;poinçonné;05/08/2019;21;8;0.38;0;0
+wearied;fatigué;05/08/2019;33;-22;-0.67;1;0
 a pigeonhole;un casier;05/08/2019;18;12;0.67;0;0
+a balance sheet;un bilan comptable;05/08/2019;22;17;0.77;0;0
+a compass;une boussole;05/08/2019;23;16;0.7;0;0
 a blanket;une couverture;05/08/2019;32;18;0.56;0;0
 to confound;donner tort;05/08/2019;26;14;0.54;0;0
-a compass;une boussole;05/08/2019;23;16;0.7;0;0
-a balance sheet;un bilan comptable;05/08/2019;21;16;0.76;0;0
-to relieve;soulager. apaiser;05/09/2013;25;14;0.56;0;0
-to sting;piquer;05/09/2013;29;22;0.76;0;0
-a sore throat;un mal de gorge;05/09/2013;24;17;0.71;0;0
-spare parts;les pièces de rechange. les pièces détachées;05/09/2013;26;17;0.65;0;0
-an alloy;un alliage;05/09/2013;29;20;0.69;0;0
-an ointment;une pommade;05/09/2013;15;2;0.13;0;0
-brass (common name);le laiton;05/09/2013;26;20;0.77;0;0
-the rib cage;la cage thoracique;05/09/2013;24;18;0.75;0;0
-a twinge;un élancement;05/09/2013;27;14;0.52;0;0
-clay (common name);de l'argile;05/09/2013;32;20;0.62;0;0
-a sprain;une foulure;05/09/2013;34;23;0.68;0;0
 sound (adj.);sain;05/09/2013;23;16;0.7;0;0
-a sheet;une feuille. une plaque. une tôle;05/09/2013;24;18;0.75;0;0
-dubious;douteux. suspect;05/09/2013;34;22;0.65;0;0
-a framework;une charpente;05/09/2013;22;16;0.73;0;0
-a midwife;une sage-femme;05/09/2013;26;7;0.27;0;0
-a stitch;un point de suture;05/09/2013;34;23;0.68;0;0
-scaffolding (common name);les échafaudages;05/09/2013;25;16;0.64;0;0
-a chemist;une pharmacie;05/09/2013;29;13;0.45;0;0
-to sneeze;éternuer;05/09/2013;32;21;0.66;0;0
-stamina (common name);l'endurance;05/09/2013;33;22;0.67;0;0
-the waist;la taille (physiol.);05/09/2013;31;15;0.48;0;0
-to maim;estropier. mutiler;05/09/2013;32;22;0.69;0;0
-a hip;une hanche;05/09/2013;16;8;0.5;0;0
-a hacksaw;une scie à métaux;05/09/2013;31;17;0.55;0;0
-a hunchback;un bossu;05/09/2013;34;15;0.44;0;0
-to weave;tisser;05/09/2013;28;10;0.36;0;0
+a sprain;une foulure;05/09/2013;34;23;0.68;0;0
+clay (common name);de l'argile;05/09/2013;32;20;0.62;0;0
+a twinge;un élancement;05/09/2013;27;14;0.52;0;0
+brass (common name);le laiton;05/09/2013;26;20;0.77;0;0
+a sore throat;un mal de gorge;05/09/2013;24;17;0.71;0;0
+an alloy;un alliage;05/09/2013;29;20;0.69;0;0
+to sting;piquer;05/09/2013;29;22;0.76;0;0
+to relieve;soulager. apaiser;05/09/2013;25;14;0.56;0;0
 a flu (influenza);une grippe;05/09/2013;14;7;0.5;0;0
+an ointment;une pommade;05/09/2013;15;2;0.13;0;0
+the rib cage;la cage thoracique;05/09/2013;24;18;0.75;0;0
+a sheet;une feuille. une plaque. une tôle;05/09/2013;24;18;0.75;0;0
+a chemist;une pharmacie;05/09/2013;29;13;0.45;0;0
+a framework;une charpente;05/09/2013;22;16;0.73;0;0
+stamina (common name);l'endurance;05/09/2013;33;22;0.67;0;0
+to weave;tisser;05/09/2013;28;10;0.36;0;0
+a hunchback;un bossu;05/09/2013;34;15;0.44;0;0
+a hacksaw;une scie à métaux;05/09/2013;31;17;0.55;0;0
+the waist;la taille (physiol.);05/09/2013;31;15;0.48;0;0
+a hip;une hanche;05/09/2013;16;8;0.5;0;0
+to sneeze;éternuer;05/09/2013;32;21;0.66;0;0
+scaffolding (common name);les échafaudages;05/09/2013;25;16;0.64;0;0
+a stitch;un point de suture;05/09/2013;34;23;0.68;0;0
+a midwife;une sage-femme;05/09/2013;26;7;0.27;0;0
+dubious;douteux. suspect;05/09/2013;34;22;0.65;0;0
+to maim;estropier. mutiler;05/09/2013;32;22;0.69;0;0
+spare parts;les pièces de rechange. les pièces détachées;05/09/2013;26;17;0.65;0;0
 over-the-counter;en vente libre;05/09/2013;25;14;0.56;0;0
 to ream;fraiser / presser (techn.);05/09/2021;21;-15;-0.71;0;0
 a bulwark;un rempart. des fortifications;05/10/2018;27;16;0.59;0;0
@@ -344,7 +344,7 @@ bantering (adj.);goguenard;06/03/2022;12;-10;-0.83;0;0
 to cringe;grimacer;06/03/2022;17;-7;-0.41;0;0
 to recant;se rétracter;06/03/2022;17;5;0.29;0;0
 no brainer (coll.);sans prise de tête;06/04/2022;10;8;0.8;0;0
-bonafide (adj.);authentique;06/04/2022;15;-3;-0.2;0;0
+bonafide (adj.);authentique;06/04/2022;16;-2;-0.12;0;0
 to handcuff;passer les menottes;06/04/2023;5;3;0.6;0;0
 a linchpin;un pivot;06/06/2022;12;0;0.0;0;0
 an obfuscation;un obscurcissement;06/08/2021;27;17;0.63;0;0
@@ -364,51 +364,51 @@ to hand back;rendre;06/11/2019;28;21;0.75;0;0
 turf (common name);le gazon / le domaine;06/11/2021;22;6;0.27;0;0
 gangly (adj.);déguingandé;06/12/2021;22;-8;-0.36;0;0
 sturdy;solide;07/01/2019;24;-9;-0.38;0;0
-brash (adj.);impétueux;07/01/2019;29;22;0.76;0;0
+to clamp down;réprimer;07/01/2019;29;21;0.72;0;0
 the lore (plur.);les traditions;07/01/2019;21;17;0.81;0;0
 cramped;à l'étroit;07/01/2019;21;13;0.62;0;0
 studded;clouté;07/01/2019;39;-13;-0.33;1;0
 embroidered;brodé;07/01/2019;27;21;0.78;0;0
 a shoal;un banc (de poisson. de sable);07/01/2019;27;18;0.67;0;0
 a fart;un pet;07/01/2019;22;17;0.77;0;0
-the nutmeg;la noix de muscade;07/01/2019;27;19;0.7;0;0
 a nonius;un vernier;07/01/2019;20;13;0.65;0;0
-the fang;les crocs;07/01/2019;22;15;0.68;0;1
+the casket / the coffin;le cercueil;07/01/2019;29;20;0.69;0;0
+the fang;les crocs;07/01/2019;22;15;0.68;0;0
 to bale;paqueter;07/01/2019;25;-7;-0.28;0;0
-spurious;faux ;07/01/2019;26;-12;-0.46;0;0
+spurious;faux ;07/01/2019;27;-11;-0.41;0;0
 rash (adj.);téméraire;07/01/2019;29;2;0.07;0;0
 an eon;un temps. une période;07/01/2019;21;17;0.81;0;0
 to shroud;envelopper;07/01/2019;25;14;0.56;0;0
-the casket / the coffin;le cercueil;07/01/2019;29;20;0.69;0;0
-to clamp down;réprimer;07/01/2019;29;21;0.72;0;0
+the nutmeg;la noix de muscade;07/01/2019;27;19;0.7;0;0
+brash (adj.);impétueux;07/01/2019;29;22;0.76;0;0
 to chisel;buriner. ciseler;07/01/2022;15;11;0.73;0;0
-distressing;pénible. inquiétant. bouleversant;07/01/2023;7;1;0.14;0;0
 a ward;un quartier;07/01/2023;9;-3;-0.33;0;0
-a thankless work;un travail ingrat;07/03/2021;23;16;0.7;0;0
-a rare steak;un steak saignant;07/03/2021;35;16;0.46;0;0
-a sheath;une gaine;07/03/2021;30;21;0.7;0;0
-a stew;un ragoût. un civet;07/03/2021;28;19;0.68;0;0
-the bowels;les intestins;07/03/2021;20;16;0.8;0;0
-a lollipop;une sucette;07/03/2021;20;16;0.8;0;0
-to graft;greffer;07/03/2021;27;14;0.52;0;0
-to gasp;haleter;07/03/2021;29;13;0.45;0;0
-a lobster;un homard;07/03/2021;25;19;0.76;0;0
-rusty;rouillé;07/03/2021;33;19;0.58;0;0
+distressing;pénible. inquiétant. bouleversant;07/01/2023;7;1;0.14;0;0
 plain water;de l'eau claire;07/03/2021;31;16;0.52;0;0
 the windpipe;la trachée;07/03/2021;28;21;0.75;0;0
-a relapse (medic.);une rechute;07/03/2021;25;19;0.76;0;0
-a ladder;une échelle;07/03/2021;26;18;0.69;0;0
-glutted;saturé;07/03/2021;26;-13;-0.5;0;0
 temping (verb);travailler en intérim;07/03/2021;40;-3;-0.08;0;0
+to gasp;haleter;07/03/2021;29;13;0.45;0;0
+a relapse (medic.);une rechute;07/03/2021;25;19;0.76;0;0
+a sheath;une gaine;07/03/2021;30;21;0.7;0;0
+a lobster;un homard;07/03/2021;25;19;0.76;0;0
+the bowels;les intestins;07/03/2021;20;16;0.8;0;0
+to graft;greffer;07/03/2021;27;14;0.52;0;0
+a lollipop;une sucette;07/03/2021;20;16;0.8;0;0
 stale (adj.);vicié. rassis. éventé;07/03/2021;27;14;0.52;0;0
-a jug;une cruche;07/03/2021;33;-4;-0.12;0;0
+rusty;rouillé;07/03/2021;33;19;0.58;0;0
+a stew;un ragoût. un civet;07/03/2021;28;19;0.68;0;0
+glutted;saturé;07/03/2021;26;-13;-0.5;0;0
+a ladder;une échelle;07/03/2021;26;18;0.69;0;0
 a saucer;une soucoupe;07/03/2021;14;5;0.36;0;0
-scrawny;maigre;07/03/2021;19;-12;-0.63;0;0
-to cough;tousser;07/03/2021;21;17;0.81;0;0
+a jug;une cruche;07/03/2021;33;-4;-0.12;0;0
 to chop;hacher;07/03/2021;31;19;0.61;0;0
-a crane;une grue (de chantier);07/03/2021;25;17;0.68;0;0
-heady (adj.);capiteux;07/03/2021;21;11;0.52;0;0
+scrawny;maigre;07/03/2021;19;-12;-0.63;0;0
 to be out of sorts (expr.);être de bonne humeur;07/03/2021;24;12;0.5;0;0
+to cough;tousser;07/03/2021;21;17;0.81;0;0
+a thankless work;un travail ingrat;07/03/2021;23;16;0.7;0;0
+a crane;une grue (de chantier);07/03/2021;25;17;0.68;0;0
+a rare steak;un steak saignant;07/03/2021;35;16;0.46;0;0
+heady (adj.);capiteux;07/03/2021;21;11;0.52;0;0
 an uptick;une hausse;07/03/2022;9;-3;-0.33;0;0
 to latch on;s'accrocher;07/03/2022;11;7;0.64;0;0
 baloney (common name);des balivernes;07/03/2023;8;2;0.25;0;0
@@ -424,48 +424,48 @@ to lop off;couper. tronquer;07/09/2022;8;-2;-0.25;0;0
 uncough (adj.);grossier. incongru;07/09/2022;12;-6;-0.5;0;0
 musings (common name);des rêveries / des réflexions;07/09/2022;10;-10;-1.0;0;0
 eulogising (common name);un éloge;07/11/2019;31;17;0.55;0;0
-deceptively;trompeusement;07/11/2019;29;21;0.72;0;0
 meager;maigre;07/11/2019;23;19;0.83;0;0
-buckled;voilé;07/11/2019;27;-2;-0.07;0;0
-a splurge;une folie (dépensière);07/11/2019;28;9;0.32;0;0
-patchy;inégal;07/11/2019;31;10;0.32;0;0
-to usher;inaugurer;07/11/2019;24;8;0.33;0;0
-to soak;tremper;07/11/2019;34;19;0.56;0;0
+the silt;le limon. la vase;07/11/2019;33;15;0.45;0;0
 a pumice;une pierre ponce;07/11/2019;26;6;0.23;0;0
+to soak;tremper;07/11/2019;34;19;0.56;0;0
 a pebble;un galet;07/11/2019;32;21;0.66;0;0
-limestone (common name);le calcaire;07/11/2019;26;13;0.5;0;0
 weathered;patiné;07/11/2019;26;-3;-0.12;0;0
+a splurge;une folie (dépensière);07/11/2019;28;9;0.32;0;0
+buckled;voilé;07/11/2019;27;-2;-0.07;0;0
+the rollout;la sortie. le dévoilement;07/11/2019;25;13;0.52;0;0
+limestone (common name);le calcaire;07/11/2019;26;13;0.5;0;0
+a slab;une dalle;07/11/2019;30;13;0.43;0;0
 blanketed;couvert;07/11/2019;20;2;0.1;0;0
 a thug;un voyou;07/11/2019;27;20;0.74;0;0
-to grabble;attraper;07/11/2019;29;3;0.1;0;0
-a cobblestone;un pavé;07/11/2019;18;1;0.06;0;0
-a hamlet;un hameau;07/11/2019;18;15;0.83;0;0
-a slab;une dalle;07/11/2019;29;14;0.48;0;0
-the rollout;la sortie. le dévoilement;07/11/2019;25;13;0.52;0;0
-primeval;primitif;07/11/2019;27;17;0.63;0;0
+to usher;inaugurer;07/11/2019;24;8;0.33;0;0
 to fallout;tomber;07/11/2019;26;11;0.42;0;0
+primeval;primitif;07/11/2019;27;17;0.63;0;0
+deceptively;trompeusement;07/11/2019;29;21;0.72;0;0
+to grabble;attraper;07/11/2019;29;3;0.1;0;0
+a hamlet;un hameau;07/11/2019;18;15;0.83;0;0
+a cobblestone;un pavé;07/11/2019;18;1;0.06;0;0
+patchy;inégal;07/11/2019;31;10;0.32;0;0
 nefarious;infâme;07/11/2019;28;21;0.75;0;0
-the silt;le limon. la vase;07/11/2019;33;15;0.45;0;0
 a stanza;une strophe. un couplet;07/12/2021;20;14;0.7;0;0
 dubbed as …;surnommé … / doublé;07/12/2021;22;12;0.55;0;0
+a hardcover;une couverture rigide;08/02/2021;31;21;0.68;0;0
 a payout;un paiement;08/02/2021;31;19;0.61;0;0
-an excerpt;un extrait;08/02/2021;30;18;0.6;0;0
+an excerpt;un extrait;08/02/2021;31;17;0.55;0;0
 a furlough;un congé. une permission;08/02/2021;20;14;0.7;0;0
 a smattering;une poignée;08/02/2021;27;5;0.19;0;0
-a hardcover;une couverture rigide;08/02/2021;31;21;0.68;0;0
+paperback (adj.);broché (pour un livre);08/02/2021;27;0;0.0;0;0
 to get hold;se tenir;08/02/2021;24;-11;-0.46;0;0
+a stroll;une promenade;08/02/2021;27;20;0.74;0;0
 a churn;une baratte / une résiliation;08/02/2021;29;19;0.66;0;0
 a caterer;un traiteur;08/02/2021;25;18;0.72;0;0
-a stroll;une promenade;08/02/2021;27;20;0.74;0;0
-paperback (adj.);broché (pour un livre);08/02/2021;27;0;0.0;0;0
 a groundhog;une marmotte;08/02/2022;12;0;0.0;0;0
 a hog;un cochon. un porc;08/02/2022;22;10;0.45;0;0
 to wiggle;remuer;08/03/2022;20;-4;-0.2;0;0
 Just you try!;Essaie un peu pour voir !;08/04/2019;17;11;0.65;0;0
+a doppelganger;un sosie;08/04/2022;19;-1;-0.05;0;0
 a flicker;un vacillement / une lueur;08/04/2022;13;-9;-0.69;0;0
 to saunter;flâner. se balader;08/04/2022;15;-15;-1.0;1;0
 foregone (adj.);prédéterminé. couru d'avance ;08/04/2022;19;3;0.16;0;0
-a doppelganger;un sosie;08/04/2022;19;-1;-0.05;0;0
 Odds are that …;Il est très probable que …;08/04/2022;11;-5;-0.45;0;0
 fodder (common name);du fourrage. du foin;08/05/2022;14;-2;-0.14;0;0
 every once in a while;de temps en temps;08/05/2023;5;5;1.0;0;0
@@ -474,24 +474,23 @@ caning (common name);la bastonnade (châtiment);08/06/2022;18;6;0.33;0;0
 a calf;un veau;08/06/2023;1;-1;-1.0;0;0
 to shove;pousser. enfoncer;08/07/2021;18;6;0.33;0;0
 an ankle;une cheville;08/07/2023;2;2;1.0;0;0
-aptly;pertinemment. avec justesse. à propos;08/09/2021;18;16;0.89;0;0
 to scramble;brouiller / se ruer;08/09/2021;31;-15;-0.48;1;0
 a pitchfork;une fourche à foin;08/09/2021;17;14;0.82;0;0
 to no avail / with no avail;en vain;08/11/2021;21;-3;-0.14;0;0
 to gobble;engouffrer;09/01/2023;6;-2;-0.33;0;0
 shill (adj.);complice;09/01/2023;7;-3;-0.43;0;0
 blabber (commmon name);des bavardages;09/01/2023;7;5;0.71;0;0
-an armchair;un fauteuil;09/03/2011;25;18;0.72;0;0
-merely;seulement;09/03/2011;27;16;0.59;0;0
-to harness;exploiter;09/03/2011;26;9;0.35;0;0
-to rumble;gronder (tonnerre. …);09/03/2011;16;7;0.44;0;0
-to upset;bouleverser. renverser. désorganiser;09/03/2011;17;-2;-0.12;0;0
-the forehead;le front;09/03/2011;17;13;0.76;0;0
-the turmoil;le tumulte. l'agitation;09/03/2011;32;2;0.06;0;0
-ongoing;progressif. continu;09/03/2011;23;8;0.35;0;0
 an outbreak;une éruption. une explosion;09/03/2011;30;22;0.73;0;0
 a venture;un risque;09/03/2011;26;20;0.77;0;0
 the hability; la capacité;09/03/2011;26;19;0.73;0;0
+an armchair;un fauteuil;09/03/2011;25;18;0.72;0;0
+stead;ferme. solide;09/03/2011;25;16;0.64;0;0
+merely;seulement;09/03/2011;27;16;0.59;0;0
+to pit sthg to sthg;opposer qc à qc;09/03/2011;20;9;0.45;0;0
+to harness;exploiter;09/03/2011;26;9;0.35;0;0
+to spurt;gicler. jaillir;09/03/2011;17;2;0.12;0;0
+to upset;bouleverser. renverser. désorganiser;09/03/2011;17;-2;-0.12;0;0
+the turmoil;le tumulte. l'agitation;09/03/2011;32;2;0.06;0;0
 a windmill;une éolienne;09/03/2011;18;0;0.0;0;0
 hazy;vague;09/03/2011;26;17;0.65;0;0
 a soar;un essort;09/03/2011;28;10;0.36;0;0
@@ -503,24 +502,24 @@ a general practitioner;un médecin généraliste;09/03/2011;31;20;0.65;0;0
 a solicitor (UK);un avocat (UK);09/03/2011;27;18;0.67;0;0
 a dismay;une consternation. un effarement;09/03/2011;32;8;0.25;0;0
 to thrive;bien se porter / prospérer;09/03/2011;24;12;0.5;0;0
-to prompt;suggérer;09/03/2011;30;18;0.6;0;0
+to prompt;suggérer;09/03/2011;31;19;0.61;0;0
 to wane;décroître. décliner;09/03/2011;30;6;0.2;0;0
-to pick out;faire le tri;09/03/2011;25;2;0.08;0;0
-well-to-do;aisé. riche;09/03/2011;21;16;0.76;0;0
-commodious;spacieux;09/03/2011;29;8;0.28;0;0
-brisk;vif;09/03/2011;27;18;0.67;0;0
-a yield;une production. un rendement;09/03/2011;33;20;0.61;0;0
-to deter from;détourner de;09/03/2011;35;21;0.6;0;0
-to trigger;déclencher;09/03/2011;25;16;0.64;0;0
-potent;efficace;09/03/2011;21;9;0.43;0;0
-lavish;prodigue. somptueux;09/03/2011;19;11;0.58;0;0
-to sweep;balayer;09/03/2011;32;22;0.69;0;0
-to rasp;grincer / racler;09/03/2011;36;11;0.31;0;0
-a devolution;une délocalisation;09/03/2011;24;11;0.46;0;0
-to enact;décréter (une loi. …);09/03/2011;24;15;0.62;0;0
-an overhaul;une révision (dans tous les sens);09/03/2011;32;16;0.5;0;0
-concrete (common name);le béton;09/03/2011;17;11;0.65;0;0
 sheer (adj.);véritable;09/03/2011;13;9;0.69;0;0
+well-to-do;aisé. riche;09/03/2011;21;16;0.76;0;0
+a yield;une production. un rendement;09/03/2011;33;20;0.61;0;0
+potent;efficace;09/03/2011;21;9;0.43;0;0
+to rasp;grincer / racler;09/03/2011;36;11;0.31;0;0
+brisk;vif;09/03/2011;27;18;0.67;0;0
+to trigger;déclencher;09/03/2011;25;16;0.64;0;0
+to sweep;balayer;09/03/2011;32;22;0.69;0;0
+the forehead;le front;09/03/2011;17;13;0.76;0;0
+commodious;spacieux;09/03/2011;29;8;0.28;0;0
+to deter from;détourner de;09/03/2011;35;21;0.6;0;0
+a devolution;une délocalisation;09/03/2011;24;11;0.46;0;0
+to rumble;gronder (tonnerre. …);09/03/2011;16;7;0.44;0;0
+blinkered;borné;09/03/2011;23;2;0.09;0;0
+concrete (common name);le béton;09/03/2011;17;11;0.65;0;0
+an overhaul;une révision (dans tous les sens);09/03/2011;32;16;0.5;0;0
 owing to;en raison de;09/03/2011;26;15;0.58;0;0
 a hall;un couloir;09/03/2011;30;16;0.53;0;0
 complacent;content de soi;09/03/2011;33;22;0.67;0;0
@@ -529,10 +528,10 @@ to tell off;réprimander;09/03/2011;23;17;0.74;0;0
 incipient (adj.);naissant;09/03/2011;23;15;0.65;0;0
 to showe;pousser. faire marcher;09/03/2011;26;-6;-0.23;0;0
 Be that as it may. …;Ceci étant. …;09/03/2011;28;16;0.57;0;0
-blinkered;borné;09/03/2011;23;2;0.09;0;0
-to spurt;gicler. jaillir;09/03/2011;17;2;0.12;0;0
-a staunch;une valeur sûre;09/03/2011;34;14;0.41;0;0
-to evade;éviter;09/03/2011;32;23;0.72;0;0
+to pick out;faire le tri;09/03/2011;25;2;0.08;0;0
+thrifty;économe;09/03/2011;42;20;0.48;0;0
+ongoing;progressif. continu;09/03/2011;23;8;0.35;0;0
+a prejudice;un préjugé;09/03/2011;15;9;0.6;0;0
 to deceive;tromper;09/03/2011;22;15;0.68;0;0
 fatuous;imbécile. idiot;09/03/2011;25;-6;-0.24;0;0
 electrical appliances;les appareils électro-ménagers;09/03/2011;22;16;0.73;0;0
@@ -545,51 +544,51 @@ a blast;un jet / une rafale;09/03/2011;28;16;0.57;0;0
 allegedly;prétendument;09/03/2011;25;20;0.8;0;0
 a slump;une baisse. un effondrement;09/03/2011;40;16;0.4;0;0
 a haul;un voyage. un trajet;09/03/2011;14;-2;-0.14;0;0
+to harvest;récupérer;09/03/2011;27;14;0.52;0;0
+neat;pur. ordonné;09/03/2011;18;12;0.67;0;0
+intoxicated;ivre;09/03/2011;16;10;0.63;0;0
+a staunch;une valeur sûre;09/03/2011;34;14;0.41;0;0
+a thrust;une poussée;09/03/2011;23;16;0.7;0;0
+lavish;prodigue. somptueux;09/03/2011;19;11;0.58;0;0
+the layout;la disposition. l'arrangement;09/03/2011;24;15;0.63;0;0
+to wrench;tordre;09/03/2011;25;18;0.72;0;0
 a brace;un lien. une attache;09/03/2011;24;-3;-0.13;0;0
 to bail out;tirer d'affaire;09/03/2011;24;-1;-0.04;0;0
 to lecture somebody;faire la leçon à quelqu'un;09/03/2011;14;9;0.64;0;0
-scant (adj.);insuffisant. peu abondant;09/03/2011;32;15;0.47;0;0
-to harvest;récupérer;09/03/2011;27;14;0.52;0;0
-a crack-down;des mesures de répression;09/03/2011;14;8;0.57;0;0
-neat;pur. ordonné;09/03/2011;18;12;0.67;0;0
-intoxicated;ivre;09/03/2011;16;10;0.63;0;0
-a thrust;une poussée;09/03/2011;23;16;0.7;0;0
-the layout;la disposition. l'arrangement;09/03/2011;24;15;0.63;0;0
-to wrench;tordre;09/03/2011;25;18;0.72;0;0
 stately (adj.);majestueux. imposant;09/03/2011;31;8;0.26;0;0
-thrifty;économe;09/03/2011;42;20;0.48;0;0
+to enact;décréter (une loi. …);09/03/2011;24;15;0.62;0;0
 an overflow;un débordement. des inondations;09/03/2011;23;16;0.7;0;0
 the underdog;l'opprimé. le perdant;09/03/2011;24;0;0.0;0;0
 altogether;aussitôt;09/03/2011;33;18;0.55;0;0
 to make for;se diriger vers. aller à;09/03/2011;18;14;0.78;0;0
+a bluster;un fracas;09/03/2011;25;-2;-0.08;0;0
 to loathe;détester. exécrer;09/03/2011;16;4;0.25;0;0
 nimble (adj.);agile. leste;09/03/2011;39;9;0.23;0;0
 to compound;composer. combiner;09/03/2011;21;5;0.24;0;0
-havoc (common name);un ravage. un dégat;09/03/2011;20;16;0.8;0;0
 as it were;pour ainsi dire;09/03/2011;23;15;0.65;0;0
-a prejudice;un préjugé;09/03/2011;15;9;0.6;0;0
-to get a tan;bronzer;09/03/2011;24;16;0.67;0;0
 a pit;une fosse;09/03/2011;29;20;0.69;0;0
-a bluster;un fracas;09/03/2011;25;-2;-0.08;0;0
+to get a tan;bronzer;09/03/2011;24;16;0.67;0;0
+to evade;éviter;09/03/2011;32;23;0.72;0;0
+havoc (common name);un ravage. un dégat;09/03/2011;20;16;0.8;0;0
 to bloat;gonfler;09/03/2011;29;6;0.21;0;0
-seldom (adv.);rarement;09/03/2011;32;17;0.53;0;0
-the circulation;le tirage;09/03/2011;29;-2;-0.07;0;0
-stead;ferme. solide;09/03/2011;25;16;0.64;0;0
-backward (adj.) / a backward;tardif / un retard;09/03/2011;27;-4;-0.15;0;0
-lust (common name);la convoitise;09/03/2011;23;13;0.57;0;0
 to recede;s'éloigner. se retirer;09/03/2011;24;18;0.75;0;0
-to pit sthg to sthg;opposer qc à qc;09/03/2011;20;9;0.45;0;0
-nasty;méchant. mauvais;09/03/2011;20;8;0.4;0;0
+a crack-down;des mesures de répression;09/03/2011;14;8;0.57;0;0
 a crackdown;une répression;09/03/2011;26;19;0.73;0;0
+the circulation;le tirage;09/03/2011;29;-2;-0.07;0;0
+lust (common name);la convoitise;09/03/2011;23;13;0.57;0;0
 versatile;polyvalent;09/03/2011;24;18;0.75;0;0
+scant (adj.);insuffisant. peu abondant;09/03/2011;32;15;0.47;0;0
+seldom (adv.);rarement;09/03/2011;32;17;0.53;0;0
+backward (adj.) / a backward;tardif / un retard;09/03/2011;27;-4;-0.15;0;0
+nasty;méchant. mauvais;09/03/2011;20;8;0.4;0;0
 scot-free (adj.);acquitté;09/03/2022;14;-2;-0.14;0;0
 to hunch;se voûter. se pencher;09/04/2023;4;0;0.0;0;0
 handily;facilement;09/05/2022;14;8;0.57;0;0
 a rake;un râteau;09/07/2018;28;21;0.75;0;0
-a spring;un ressort;09/07/2022;12;10;0.83;0;0
 at the behest of;à la demande de;09/07/2022;7;-3;-0.43;0;0
-a timing belt (tech.);une courroie crantée;09/07/2022;9;9;1.0;0;0
 a tapping (tech.);un taraudage;09/07/2022;12;-2;-0.17;0;0
+a timing belt (tech.);une courroie crantée;09/07/2022;9;9;1.0;0;0
+a spring;un ressort;09/07/2022;12;10;0.83;0;0
 a hump;une bosse;09/07/2023;0;0;0.0;0;0
 restless;agité. inquiet;09/09/2021;14;0;0.0;0;0
 a yard sale;un vide-grenier;09/09/2022;9;5;0.56;0;0
@@ -597,35 +596,35 @@ a shirker;un tir-au-flanc;09/10/2018;28;12;0.43;0;0
 claret (common name);du (vin de) bordeaux;09/10/2018;22;17;0.77;0;0
 to sour;s'aigrir;09/10/2018;20;-1;-0.05;0;0
 a glower;un regard noir;09/10/2018;22;14;0.64;0;0
-distraught (adj.);éperdu;09/10/2022;15;3;0.2;0;1
+distraught (adj.);éperdu;09/10/2022;15;3;0.2;0;0
 a sprig;un brin. une branchette;09/11/2021;19;15;0.79;0;0
-a derelict;un délaissement / une épave;09/12/2022;6;-6;-1.0;0;0
+a derelict;un délaissement / une épave;09/12/2022;7;-5;-0.71;0;0
 a pane;une vitre. un carreau / une plaque;09/12/2022;6;0;0.0;0;0
 a wisp;un brin. une mèche;10/01/2022;20;12;0.6;0;0
-an abacus;un boulier;10/02/2022;18;10;0.56;0;0
 to sulk;bouder;10/02/2022;17;-13;-0.76;0;0
+an abacus;un boulier;10/02/2022;18;10;0.56;0;0
 to go toe to toe;commencer à discuter âprement avec quelqu'un;10/02/2022;21;13;0.62;0;0
 a furrow;un sillon;10/02/2022;17;9;0.53;0;0
 to whelm;déferler;10/02/2023;8;6;0.75;0;0
-a loan word;un mot d'emprunt;10/03/2020;26;20;0.77;0;0
-to pour;verser;10/03/2020;27;16;0.59;0;0
-a beet;une betterave;10/03/2020;25;17;0.68;0;0
+a peddler;un colporteur;10/03/2020;29;17;0.59;0;0
 to stray;égarer;10/03/2020;45;17;0.38;0;0
-a cleat;un tasseau;10/03/2020;22;18;0.82;0;0
-a sliver;un ruban;10/03/2020;31;3;0.1;0;0
+a scatter;une dispersion;10/03/2020;21;14;0.67;0;0
 the whereabouts;où;10/03/2020;35;23;0.66;0;0
+a sliver;un ruban;10/03/2020;31;3;0.1;0;0
 downtrodden;opprimé;10/03/2020;26;14;0.54;0;0
 a hearth;un foyer;10/03/2020;26;2;0.08;0;0
 to swell;gonfler;10/03/2020;24;17;0.71;0;0
-to dwindle;diminuer;10/03/2020;41;8;0.2;0;0
-a lid;un couvercle;10/03/2020;27;20;0.74;0;0
-a knob;un bouton / une poignée;10/03/2020;21;15;0.71;0;0
 budding;bourgeonnant;10/03/2020;27;19;0.7;0;0
-a scatter;une dispersion;10/03/2020;21;14;0.67;0;0
 an offtake;un prélèvement;10/03/2020;20;6;0.3;0;0
-a peddler;un colporteur;10/03/2020;29;17;0.59;0;0
 a twig;une brindille;10/03/2020;28;17;0.61;0;0
 a beam;une poutre / un faisceau;10/03/2020;23;13;0.57;0;0
+a cleat;un tasseau;10/03/2020;22;18;0.82;0;0
+a lid;un couvercle;10/03/2020;27;20;0.74;0;0
+a beet;une betterave;10/03/2020;25;17;0.68;0;0
+a loan word;un mot d'emprunt;10/03/2020;26;20;0.77;0;0
+a knob;un bouton / une poignée;10/03/2020;21;15;0.71;0;0
+to dwindle;diminuer;10/03/2020;41;8;0.2;0;0
+to pour;verser;10/03/2020;27;16;0.59;0;0
 a heatsink;un dissipateur de chaleur;10/03/2022;14;10;0.71;0;0
 rawhide (common name);du cuir brut;10/04/2023;3;1;0.33;0;0
 a warren;un terrier. une garenne / un dédale;10/05/2022;13;7;0.54;0;0
@@ -635,218 +634,217 @@ a yoke;un joug. un attelage;10/06/2021;25;7;0.28;0;0
 a first;une mention très bien;10/07/2018;23;15;0.65;0;0
 forcefully;vigoureusement;10/07/2021;27;2;0.07;0;0
 a broom;un balai;10/07/2023;0;0;0.0;0;0
-imbued;imprégné;10/08/2020;31;6;0.19;0;0
-to stock;alimenter. entretenir;10/08/2020;25;8;0.32;0;0
-clerical work (common name);un travail de bureau;10/08/2020;25;13;0.52;0;0
 lint (common name);de la poussière. une peluche;10/08/2020;31;8;0.26;0;0
+clerical work (common name);un travail de bureau;10/08/2020;25;13;0.52;0;0
+to stock;alimenter. entretenir;10/08/2020;25;8;0.32;0;0
+imbued;imprégné;10/08/2020;31;6;0.19;0;0
 a typo;une faute de frappe;10/08/2021;26;18;0.69;0;0
-a fire hydrant;une bouche d'incendie;10/08/2022;15;13;0.87;0;0
 to swelter;étouffer de chaleur;10/08/2022;12;-10;-0.83;0;0
+a fire hydrant;une bouche d'incendie;10/08/2022;15;13;0.87;0;0
 humongous (adj.);énorme;10/09/2022;10;4;0.4;0;0
 board games (common name);les jeux de société;10/09/2022;7;5;0.71;0;0
 a truce;une trêve;10/10/2018;26;8;0.31;0;0
-boisterous;bruyant. tapageur. tumultueux;10/10/2018;21;2;0.1;0;0
-avowedly;de son propre aveu;10/10/2018;34;10;0.29;0;0
-a foray;une incursion. une razzia;10/10/2018;27;20;0.74;0;0
-barbed;barbelé. acéré;10/10/2018;28;20;0.71;0;0
 the brawn;la force des muscles;10/10/2018;25;16;0.64;0;0
+barbed;barbelé. acéré;10/10/2018;28;20;0.71;0;0
+a foray;une incursion. une razzia;10/10/2018;27;20;0.74;0;0
+avowedly;de son propre aveu;10/10/2018;34;10;0.29;0;0
+boisterous;bruyant. tapageur. tumultueux;10/10/2018;21;2;0.1;0;0
 to toss;jeter. lancer;10/11/2021;15;-1;-0.07;0;0
-dire;terrible;10/12/2018;34;18;0.53;0;0
-gruesome;horrible. macabre;10/12/2018;32;14;0.44;0;0
-to reel;chanceler. vaciller. tituber;10/12/2018;16;-10;-0.62;0;1
-to hone;aiguiser / avoir envie de / maigrir;10/12/2018;31;7;0.23;0;0
 a wabbling;un vacillement;10/12/2018;18;11;0.61;0;0
-a contraption;un bidule. un machin;10/12/2018;28;16;0.57;0;0
-paltry (adj.);dérisoire. misérable;10/12/2018;22;-13;-0.59;0;0
-shabby;minable;10/12/2018;27;11;0.41;0;0
+gruesome;horrible. macabre;10/12/2018;32;14;0.44;0;0
+to bequeath;transmettre. léguer;10/12/2018;36;21;0.58;0;0
+to reel;chanceler. vaciller. tituber;10/12/2018;16;-10;-0.62;0;0
+to fend;se débrouiller;10/12/2018;32;-24;-0.75;1;0
 to skitter;glisser / s'enfuir;10/12/2018;31;17;0.55;0;0
-dusty;poussiéreux;10/12/2018;27;18;0.67;0;0
-to skulk;rôder en se cachant. entrer furtivement;10/12/2018;16;4;0.25;0;0
+bustling (adj.);animé. actif. énergique;10/12/2018;23;1;0.04;0;0
 a rim;une jante;10/12/2018;33;22;0.67;0;0
 blight (common name);la rouille / la corruption / la brûlure;10/12/2018;25;18;0.72;0;0
-bustling (adj.);animé. actif. énergique;10/12/2018;23;1;0.04;0;0
 the asbestos;l'amiante;10/12/2018;25;19;0.76;0;0
-a mongrel;un bâtard / un métis;10/12/2018;25;16;0.64;0;0
+paltry (adj.);dérisoire. misérable;10/12/2018;22;-13;-0.59;0;0
+dusty;poussiéreux;10/12/2018;27;18;0.67;0;0
+shabby;minable;10/12/2018;27;11;0.41;0;0
+to skulk;rôder en se cachant. entrer furtivement;10/12/2018;16;4;0.25;0;0
 snide (adj.);sarcastique. narquois / mesquin;10/12/2018;33;18;0.55;0;0
-tin (common name);l'étain / une boîte de conserve;10/12/2018;20;12;0.6;0;0
-a boar;un sanglier;10/12/2018;27;13;0.48;0;0
-cumbersome;lourd. encombrant;10/12/2018;31;17;0.55;0;0
-to fend;se débrouiller;10/12/2018;32;-24;-0.75;1;0
-a tenet;un principe. une doctrine. un dogme;10/12/2018;20;-1;-0.05;0;0
-to bequeath;transmettre. léguer;10/12/2018;36;21;0.58;0;0
-to propitiate;se concilier;10/12/2018;26;14;0.54;0;0
-profligacy;la débauche. le libertinage;10/12/2018;31;18;0.58;0;0
+a mongrel;un bâtard / un métis;10/12/2018;25;16;0.64;0;0
 an overkill;une exagération. une surestimation;10/12/2018;21;16;0.76;0;0
-an upstart;un parvenu. un arriviste;10/12/2018;24;15;0.62;0;0
-a whelp;un petit (animal);10/12/2018;22;17;0.77;0;0
+tin (common name);l'étain / une boîte de conserve;10/12/2018;20;12;0.6;0;0
+cumbersome;lourd. encombrant;10/12/2018;31;17;0.55;0;0
+to hone;aiguiser / avoir envie de / maigrir;10/12/2018;31;7;0.23;0;0
+to propitiate;se concilier;10/12/2018;26;14;0.54;0;0
+a tenet;un principe. une doctrine. un dogme;10/12/2018;20;-1;-0.05;0;0
+a contraption;un bidule. un machin;10/12/2018;28;16;0.57;0;0
+a boar;un sanglier;10/12/2018;27;13;0.48;0;0
+a cranny;une fente;10/12/2018;15;-1;-0.07;0;0
+dire;terrible;10/12/2018;34;18;0.53;0;0
 a slinter;un éclat;10/12/2018;13;-7;-0.54;0;0
 hapless;malchanceux. infortuné;10/12/2018;30;-2;-0.07;0;0
+profligacy;la débauche. le libertinage;10/12/2018;31;18;0.58;0;0
+a whelp;un petit (animal);10/12/2018;22;17;0.77;0;0
 far cry (expr.);en être loin;10/12/2018;23;17;0.74;0;0
-duly;dûment. comme prévu. comme il faut;10/12/2018;25;20;0.8;0;0
-a cranny;une fente;10/12/2018;15;-1;-0.07;0;0
+an upstart;un parvenu. un arriviste;10/12/2018;24;15;0.62;0;0
 kudos (common name);la gloire. les lauriers;10/12/2021;14;8;0.57;0;0
 cladding (common name);le revêtement;10/12/2022;17;5;0.29;0;0
 slime (common name);la vase. le limon;11/01/2022;21;15;0.71;0;0
 slurry (common name);du lisier. de la gadoue;11/01/2022;20;-4;-0.2;0;0
 tithe (common name);la dîme;11/01/2022;22;18;0.82;0;0
-to straddle;enjamber;11/02/2020;26;15;0.58;0;0
+to screen out;filtrer;11/02/2020;22;16;0.73;0;0
 hitherto;jusqu'ici;11/02/2020;24;17;0.71;0;0
 to huddle;se blottir;11/02/2020;27;12;0.44;0;0
-to teeter;vaciller. chanceler;11/02/2020;24;-15;-0.63;0;0
+to straddle;enjamber;11/02/2020;26;15;0.58;0;0
 a contrivance;un stratagème;11/02/2020;32;-4;-0.12;0;0
 a hose;un tuyau;11/02/2020;30;-1;-0.03;0;0
 downstream;en aval;11/02/2020;25;14;0.56;0;0
-to screen out;filtrer;11/02/2020;22;16;0.73;0;0
 an enclosure;une enceinte;11/02/2020;29;5;0.17;0;0
-a pellet;une pastille;11/02/2020;33;6;0.18;0;0
+to teeter;vaciller. chanceler;11/02/2020;24;-15;-0.63;0;0
 a hilt;une poignée;11/02/2020;30;-7;-0.23;0;0
-to tromp;marcher sur un terrain difficile;11/02/2020;24;14;0.58;0;0
+a pellet;une pastille;11/02/2020;33;6;0.18;0;0
+strapping (common name);le cerclage;11/02/2020;31;22;0.71;0;0
+a belt (techn.);une courroie;11/02/2020;28;18;0.64;0;0
+whence;d'où;11/02/2020;24;17;0.71;0;0
 sputtering (common name);la pulvérisation;11/02/2020;24;-7;-0.29;0;0
 an ingot;un lingot;11/02/2020;28;19;0.68;0;0
-a belt (techn.);une courroie;11/02/2020;28;18;0.64;0;0
-strapping (common name);le cerclage;11/02/2020;31;22;0.71;0;0
-whence;d'où;11/02/2020;24;17;0.71;0;0
+to tromp;marcher sur un terrain difficile;11/02/2020;24;14;0.58;0;0
 an eggplant;une aubergine;11/02/2022;21;13;0.62;0;0
 to pry into sthg;fouiller dans qc;11/02/2022;9;-1;-0.11;0;0
 a guestbook;un livre d'or;11/04/2022;10;6;0.6;0;0
 to bash;frapper. cogner;11/04/2023;2;2;1.0;0;0
-poultry (common name);la volaille;11/05/2020;26;18;0.69;0;0
+smelting (common name);la fonte;11/05/2020;27;17;0.63;0;0
 to kindle;allumer. déclencher;11/05/2020;27;6;0.22;0;0
 to scatter;disperser;11/05/2020;28;20;0.71;0;0
 a hatch;une trappe;11/05/2020;35;2;0.06;0;0
-a lump;une bosse;11/05/2020;24;-8;-0.33;0;0
-a vat;une cuve;11/05/2020;24;7;0.29;0;0
+a vat;une cuve;11/05/2020;25;6;0.24;0;0
+a lathe;un tour (machine-outil);11/05/2020;21;10;0.48;0;0
 a whip;un fouet;11/05/2020;22;16;0.73;0;0
 to read out;lire à haute voix;11/05/2020;29;21;0.72;0;0
 a cookbook;un livre de recettes;11/05/2020;32;22;0.69;0;0
-a lathe;un tour (machine-outil);11/05/2020;21;10;0.48;0;0
-smelting (common name);la fonte;11/05/2020;27;17;0.63;0;0
+poultry (common name);la volaille;11/05/2020;26;18;0.69;0;0
+a lump;une bosse;11/05/2020;24;-8;-0.33;0;0
 a peephole;un judas;11/05/2022;4;4;1.0;0;0
 a blob;une goutte;11/06/2021;31;13;0.42;0;0
 a key fob;un porte-clés;11/06/2022;7;1;0.14;0;0
 to cram;entasser / fourrer;11/06/2023;3;-1;-0.33;0;0
 a locker;un casier. un coffre. un placard;11/11/2018;24;-3;-0.13;0;0
 a heckling;un chahut / une interpellation;11/11/2018;27;-22;-0.81;1;0
-shambolic;chaotique. désorganisé. mal organisé;11/11/2018;27;20;0.74;0;0
-a gravedigger;un fossoyeur;11/11/2018;29;21;0.72;0;0
 a barnacle;une bernacle (crustacée) / un crampon;11/11/2018;18;12;0.67;0;0
 a tumble;une chute. une culbute;11/11/2018;23;11;0.48;0;0
-canny;prudent. malin;11/11/2018;21;16;0.76;0;0
-a bedfellow;un associé. un collègue;11/11/2018;19;9;0.47;0;0
-the unflappability;l'impuissance;11/11/2018;25;19;0.76;0;0
 to vie;lutter;11/11/2018;25;14;0.56;0;0
 the upshot;le résultat. la conséquence;11/11/2018;28;13;0.46;0;0
-a stump;une souche / un moignon / un mégot;11/12/2021;16;6;0.38;0;0
+a bedfellow;un associé. un collègue;11/11/2018;19;9;0.47;0;0
+the unflappability;l'impuissance;11/11/2018;25;19;0.76;0;0
+a gravedigger;un fossoyeur;11/11/2018;29;21;0.72;0;0
+canny;prudent. malin;11/11/2018;21;16;0.76;0;0
+shambolic;chaotique. désorganisé. mal organisé;11/11/2018;27;20;0.74;0;0
 to stump;laisser perplexe / mettre hors jeu;11/12/2021;16;-2;-0.13;0;0
+a stump;une souche / un moignon / un mégot;11/12/2021;16;6;0.38;0;0
 whopping (adj.);énorme. géant;11/12/2022;7;-3;-0.43;0;0
 a misgiving;une crainte / un doute;12/01/2019;29;-18;-0.62;1;0
-I'm yet to find …;Je n'ai pas encore trouvé …;12/01/2022;20;10;0.5;0;0
 to spoil;abîmer;12/01/2022;14;0;0.0;0;0
+I'm yet to find …;Je n'ai pas encore trouvé …;12/01/2022;20;10;0.5;0;0
 frill (adj.);volant;12/02/2019;33;1;0.03;0;0
 to scavenge;récupérer / faire les poubelles;12/02/2022;9;-5;-0.56;0;0
-to slather;badigeonner;12/02/2023;8;-4;-0.5;0;0
-to jot;prendre des notes;12/02/2023;6;-2;-0.33;0;0
-befuddled;confus;12/02/2023;8;-4;-0.5;0;0
-a caveman;un homme des cavernes;12/02/2023;10;6;0.6;0;0
+a pantry;un garde-manger;12/02/2023;7;5;0.71;0;0
 to handpick;trier;12/02/2023;7;3;0.43;0;0
-a pantry;un garde-manger;12/02/2023;6;4;0.67;0;0
+a caveman;un homme des cavernes;12/02/2023;10;6;0.6;0;0
+to jot;prendre des notes;12/02/2023;6;-2;-0.33;0;0
+to slather;badigeonner;12/02/2023;8;-4;-0.5;0;0
+befuddled;confus;12/02/2023;8;-4;-0.5;0;0
 shenanigans (common name);des maniganceries;12/03/2022;8;-2;-0.25;0;0
 a wine waiter;un sommelier;12/03/2023;8;8;1.0;0;0
-to strut;se pavaner;12/04/2021;19;4;0.21;0;0
-to scram;filer. déguerpir;12/04/2021;25;-17;-0.68;1;0
-snuff (common name);du tabac à priser;12/04/2021;23;15;0.65;0;0
 to quiver;trembler;12/04/2021;31;9;0.29;0;0
 brawler (adj.);bagarreur;12/04/2021;16;-5;-0.31;0;0
+snuff (common name);du tabac à priser;12/04/2021;23;15;0.65;0;0
+to strut;se pavaner;12/04/2021;19;4;0.21;0;0
+to scram;filer. déguerpir;12/04/2021;25;-17;-0.68;1;0
 a puppy;un chiot. un petit chien;12/05/2022;12;4;0.33;0;0
 a hive;une ruche;12/05/2023;4;4;1.0;0;0
 a slew of;une flopée de;12/05/2023;3;1;0.33;0;0
 under your sway;sous ton emprise;12/05/2023;3;-1;-0.33;0;0
 a mermaid;une sirène;12/06/2022;15;13;0.87;0;0
 a yaw;une embardée;12/06/2023;2;-2;-1.0;0;0
-a rut;une ornière / une routine;12/08/2019;27;4;0.15;0;0
-a backlog;un arriéré;12/08/2019;28;18;0.64;0;0
-to beseech;supplier;12/08/2019;17;13;0.76;0;0
-to parse;analyser;12/08/2019;24;19;0.79;0;0
-aliasing (common name. techn.);l'erreur dans estimation de la fréquence d'un signal. générant une autre erreur;12/08/2019;17;4;0.24;0;0
-a yarn;un fil;12/08/2019;29;9;0.31;0;0
-to topple;renverser;12/08/2019;30;20;0.67;0;0
-overdone;exagéré;12/08/2019;30;22;0.73;0;0
-a flare;une fusée éclairante;12/08/2019;28;10;0.36;0;0
-a mils;un millième;12/08/2019;20;9;0.45;0;0
-to juggle;jongler;12/08/2019;21;0;0.0;0;0
-the modicum;le minimum;12/08/2019;29;6;0.21;0;0
-an excursus;une discussion détaillée sur un point particulier d'un livre. habituellement sous la forme d'une annexe;12/08/2019;24;8;0.33;0;0
 dizzy;étourdi;12/08/2019;17;-1;-0.06;0;0
-debtful;endetté;12/08/2019;17;9;0.53;0;0
-to contrive;trouver un moyen pour faire;12/08/2019;27;-14;-0.52;0;0
-despondence (common name);le découragement;12/08/2019;30;-19;-0.63;1;0
-to paddle;pagayer;12/08/2019;22;14;0.64;0;0
+a backlog;un arriéré;12/08/2019;28;18;0.64;0;0
+aliasing (common name. techn.);l'erreur dans estimation de la fréquence d'un signal. générant une autre erreur;12/08/2019;17;4;0.24;0;0
+to parse;analyser;12/08/2019;24;19;0.79;0;0
+a yarn;un fil;12/08/2019;29;9;0.31;0;0
+a rut;une ornière / une routine;12/08/2019;27;4;0.15;0;0
+to topple;renverser;12/08/2019;30;20;0.67;0;0
 inching (expr.);pas à pas;12/08/2019;26;19;0.73;0;0
-a hopper;une trémie;12/08/2019;28;11;0.39;0;0
+a flare;une fusée éclairante;12/08/2019;28;10;0.36;0;0
+to juggle;jongler;12/08/2019;21;0;0.0;0;0
+a mils;un millième;12/08/2019;21;10;0.48;0;0
+overdone;exagéré;12/08/2019;30;22;0.73;0;0
+the modicum;le minimum;12/08/2019;29;6;0.21;0;0
+despondence (common name);le découragement;12/08/2019;30;-19;-0.63;1;0
 a workaround;une solution de contournement;12/08/2019;26;18;0.69;0;0
+to beseech;supplier;12/08/2019;17;13;0.76;0;0
+to contrive;trouver un moyen pour faire;12/08/2019;27;-14;-0.52;0;0
+an excursus;une discussion détaillée sur un point particulier d'un livre. habituellement sous la forme d'une annexe;12/08/2019;24;8;0.33;0;0
+to paddle;pagayer;12/08/2019;22;14;0.64;0;0
+debtful;endetté;12/08/2019;17;9;0.53;0;0
+a hopper;une trémie;12/08/2019;28;11;0.39;0;0
 to flout;mépriser;12/09/2018;29;-24;-0.83;1;0
 petty;petit. insignifiant. simple;12/09/2018;21;16;0.76;0;0
 a retort;une réplique. une riposte;12/09/2018;27;21;0.78;0;0
 to bicker;se chamailler;12/09/2021;32;3;0.09;0;0
-an affidavit;une déclaration écrite sous serment;12/11/2022;10;2;0.2;0;0
 a wench;une jeune fille;12/11/2022;8;-4;-0.5;0;0
+an affidavit;une déclaration écrite sous serment;12/11/2022;10;2;0.2;0;0
 a moniker;un sobriquet;12/11/2022;12;-4;-0.33;0;0
 lush;luxuriant;13/01/2019;17;14;0.82;0;0
-a faucet;un robinet;13/02/2022;16;6;0.38;0;0
 to segue;enchaîner;13/02/2022;11;-7;-0.64;0;0
 darned (colloquial);fichu;13/02/2022;16;12;0.75;0;0
+a faucet;un robinet;13/02/2022;16;6;0.38;0;0
 a showdown;une épreuve de force. une confrontation;13/03/2022;16;-10;-0.63;0;0
 a tipoff;une dénonciation;13/03/2022;15;-7;-0.47;0;0
-crufty (adj.);cruel;13/03/2022;20;-14;-0.7;0;0
 litmus paper;le papier pH;13/03/2022;13;11;0.85;0;0
+crufty (adj.);cruel;13/03/2022;20;-14;-0.7;0;0
 tacky;moche / poisseux. collant;13/03/2022;13;5;0.38;0;0
-flippant (adj.);désinvolte;13/03/2022;8;-6;-0.75;0;0
+dregs (common name);la lie (du vin. …);13/03/2022;14;6;0.43;0;0
 a bevy;une bande;13/03/2022;11;-5;-0.45;0;0
 a brood;une couvée;13/03/2022;10;4;0.4;0;0
 a girder;une poutre. un longeron;13/03/2022;18;-14;-0.78;0;0
-dregs (common name);la lie (du vin. …);13/03/2022;14;6;0.43;0;0
 a mace;une massue;13/03/2022;13;-1;-0.08;0;0
+flippant (adj.);désinvolte;13/03/2022;8;-6;-0.75;0;0
 level-headed;pondéré;13/03/2023;12;2;0.17;0;0
 aloof (adj.);distant;13/03/2023;2;-2;-1.0;0;0
 a nightgown;une chemise de nuit;13/04/2020;26;20;0.77;0;0
 to tinker;bricoler;13/04/2020;41;10;0.24;0;0
 a bounty;une prime;13/04/2020;29;16;0.55;0;0
 a vagrant;un vagabond;13/04/2020;29;19;0.66;0;0
+implied;implicite;13/04/2021;25;12;0.48;0;0
+bracing (adj.);tonifiant. fortifiant;13/04/2021;34;18;0.53;0;0
+cramped;à l'étroit;13/04/2021;30;16;0.53;0;0
+an outing;une sortie. une excursion;13/04/2021;31;16;0.52;0;0
+watertight;étanche;13/04/2021;29;22;0.76;0;0
+to stutter;bégayer;13/04/2021;23;19;0.83;0;0
 garrulous;bavard;13/04/2021;27;-16;-0.59;1;0
 sandstone (common name);le grès;13/04/2021;25;20;0.8;0;0
 a level crossing;un passage à niveau;13/04/2021;23;15;0.65;0;0
-implied;implicite;13/04/2021;25;12;0.48;0;0
 to squat;s'accroupir;13/04/2021;25;-1;-0.04;0;0
 to stow away;s'embarquer clandestinement;13/04/2021;22;-7;-0.32;0;0
-cramped;à l'étroit;13/04/2021;30;16;0.53;0;0
 a tow truck;une dépanneuse;13/04/2021;29;22;0.76;0;0
-watertight;étanche;13/04/2021;29;22;0.76;0;0
+curt (adj.);sec. brusque;13/04/2021;24;14;0.58;0;0
 a groan;un gémissement;13/04/2021;24;3;0.13;0;0
-a grunt;un grognement;13/04/2021;29;17;0.59;0;0
-to stutter;bégayer;13/04/2021;23;19;0.83;0;0
-wholesome (adj.);sain. salubre;13/04/2021;26;3;0.12;0;0
-an outing;une sortie. une excursion;13/04/2021;31;16;0.52;0;0
-bracing (adj.);tonifiant. fortifiant;13/04/2021;34;18;0.53;0;0
-a porthole;un hublot;13/04/2021;31;17;0.55;0;0
 to rebuke;réprimander;13/04/2021;26;-7;-0.27;0;0
 outspoken;franc;13/04/2021;19;-12;-0.63;0;0
-to splutter;bafouiller;13/04/2021;27;8;0.3;0;0
-curt (adj.);sec. brusque;13/04/2021;24;14;0.58;0;0
-to giggle;pouffer de rire;13/04/2021;23;17;0.74;0;0
-a clutch (techn.);un embrayage;13/04/2021;31;14;0.45;0;0
+wholesome (adj.);sain. salubre;13/04/2021;26;3;0.12;0;0
+a porthole;un hublot;13/04/2021;31;17;0.55;0;0
+to sprawl;s'étaler;13/04/2021;20;0;0.0;0;0
+a grunt;un grognement;13/04/2021;29;17;0.59;0;0
 grumpy;grincheux;13/04/2021;16;10;0.63;0;0
+a clutch (techn.);un embrayage;13/04/2021;31;14;0.45;0;0
+to giggle;pouffer de rire;13/04/2021;23;17;0.74;0;0
+to splutter;bafouiller;13/04/2021;27;8;0.3;0;0
 to fit out;équiper;13/04/2021;27;15;0.56;0;0
-to sprawl;s'étaler;13/04/2021;19;-1;-0.05;0;0
 letdown (common name);la déception / la fatigue;13/04/2022;13;-3;-0.23;0;0
-tiles / diamonds;carreau (couleur de carte);13/05/2023;3;3;1.0;0;0
 clovers / clubs;trèfle (couleur de carte);13/05/2023;5;5;1.0;0;0
+tiles / diamonds;carreau (couleur de carte);13/05/2023;3;3;1.0;0;0
 pikes / spades;pique (couleur de carte);13/05/2023;2;0;0.0;0;0
-generally speaking;en principe;13/08/2018;26;20;0.77;0;0
 I'll be moving in.;Je serai en train d'emménager.;13/08/2018;31;20;0.65;0;0
+generally speaking;en principe;13/08/2018;26;20;0.77;0;0
 awry (adj.);de travers. courbé;13/09/2021;11;-11;-1.0;1;0
 tongs (common name);des pinces de cuisine;13/09/2022;12;-2;-0.17;0;0
-undercover (adj.);secret / à l'abri;13/10/2021;22;14;0.64;0;0
 stateless;apatride;13/10/2021;12;2;0.17;0;0
+undercover (adj.);secret / à l'abri;13/10/2021;22;14;0.64;0;0
 intractable;intraitable. indocile / insoluble;13/11/2018;22;13;0.59;0;0
 curdling (common name);la coagulation;13/11/2018;26;-6;-0.23;0;0
 to shatter;briser. fracasser. éclater;13/11/2018;37;11;0.3;0;0
@@ -859,35 +857,35 @@ convenient;commode. pratique;13/12/2013;27;15;0.56;0;0
 to perform;accomplir. exécuter. remplir (obligation. contrat);13/12/2013;20;12;0.6;0;0
 to figure out;arriver à comprendre;13/12/2013;29;17;0.59;0;0
 a civil servant;un fonctionnaire;13/12/2013;20;17;0.85;0;0
-a shipyard;un chantier naval;13/12/2013;19;10;0.53;0;0
-a bond;un lien / un titre. une obligation (fin.);13/12/2013;30;22;0.73;0;0
 a charge (forensic);une inculpation. un chef d’inculpation;13/12/2013;30;21;0.7;0;0
+the payroll;les effectifs. la paie globale;13/12/2013;24;14;0.58;0;0
+a shipyard;un chantier naval;13/12/2013;19;10;0.53;0;0
 a downturn;une baisse. un repli. une récession;13/12/2013;37;1;0.03;0;0
 a tag;une étiquette;13/12/2013;23;16;0.7;0;0
 to expand;se développer. s’accroître;13/12/2013;24;15;0.62;0;0
 a checkbook;un chéquier;13/12/2013;19;15;0.79;0;0
-to downsize;réduire les effectifs;13/12/2013;25;12;0.48;0;0
-a revival;une remise en vigueur;13/12/2013;28;17;0.61;0;0
-a trunk (USA);un coffre de voiture;13/12/2013;15;7;0.47;0;0
-a redundancy;une redondance / un licenciement;13/12/2013;34;13;0.38;0;0
-to curb;freiner;13/12/2013;25;13;0.52;0;0
-a desk clerk;un réceptionniste;13/12/2013;32;-11;-0.34;0;0
+the ceiling;le plafond;13/12/2013;27;15;0.56;0;0
+overdue;arriéré. en retard;13/12/2013;27;15;0.56;0;0
+to curb;freiner;13/12/2013;26;14;0.54;0;0
 a libel;une diffamation. une calomnie;13/12/2013;21;15;0.71;0;0
 to rent;louer;13/12/2013;35;20;0.57;0;0
 a tariff;un tarif douanier;13/12/2013;25;14;0.56;0;0
 an outflow;une sortie / une évasion (fisc.);13/12/2013;22;17;0.77;0;0
 a hard currency;une devise forte;13/12/2013;23;18;0.78;0;0
-overdue;arriéré. en retard;13/12/2013;27;15;0.56;0;0
-to undergo;subir;13/12/2013;26;15;0.58;0;0
-to gear;adapter. ajuster;13/12/2013;20;-9;-0.45;0;0
+a trunk (USA);un coffre de voiture;13/12/2013;15;7;0.47;0;0
+prospective (adj.);futur. éventuel. possible;13/12/2013;24;4;0.17;0;0
+to carry out;accomplir. exercer. remplir;13/12/2013;20;8;0.4;0;0
 to respond;réagir;13/12/2013;31;18;0.58;0;0
 a cargo;une cargaison;13/12/2013;25;13;0.52;0;0
 retraining (common name);le recyclage;13/12/2013;32;14;0.44;0;0
-prospective (adj.);futur. éventuel. possible;13/12/2013;24;4;0.17;0;0
-to carry out;accomplir. exercer. remplir;13/12/2013;20;8;0.4;0;0
+to downsize;réduire les effectifs;13/12/2013;25;12;0.48;0;0
+a bond;un lien / un titre. une obligation (fin.);13/12/2013;30;22;0.73;0;0
+a redundancy;une redondance / un licenciement;13/12/2013;34;13;0.38;0;0
+a revival;une remise en vigueur;13/12/2013;28;17;0.61;0;0
+a desk clerk;un réceptionniste;13/12/2013;32;-11;-0.34;0;0
 to bypass;éviter;13/12/2013;18;10;0.56;0;0
-the ceiling;le plafond;13/12/2013;27;15;0.56;0;0
-a bumper;un pare-chocs;13/12/2013;22;-2;-0.09;0;0
+to come through;s’en tirer;13/12/2013;25;9;0.36;0;0
+networking;l'établissement d’un réseau de relations;13/12/2013;27;21;0.78;0;0
 disabled;handicapé;13/12/2013;24;14;0.58;0;0
 to draft;rédiger;13/12/2013;23;15;0.65;0;0
 to waive;renoncer à. abandonner;13/12/2013;42;14;0.33;0;0
@@ -896,24 +894,24 @@ a bail;une liberté sous caution / une caution;13/12/2013;20;-8;-0.4;0;0
 an attendant;un domestique. un gardien;13/12/2013;25;-2;-0.08;0;0
 an editor;un rédacteur;13/12/2013;21;9;0.43;0;0
 to blackmail somebody;faire chanter quelqu'un;13/12/2013;28;17;0.61;0;0
-affordable;abordable;13/12/2013;31;22;0.71;0;0
-a demerger;un éclatement. une scission;13/12/2013;23;12;0.52;0;0
-bookkeeping (common name);la comptabilité;13/12/2013;22;13;0.59;0;0
-off-peak;en heures creuses;13/12/2013;21;15;0.71;0;0
+off-peak;en heures creuses;13/12/2013;22;16;0.73;0;0
 to surge;monter soudainement;13/12/2013;42;22;0.52;0;0
 to feature;être doté de. être équipé de;13/12/2013;25;14;0.56;0;0
 to dismiss;licencier / abandonner / rejeter;13/12/2013;19;8;0.42;0;0
+affordable;abordable;13/12/2013;31;22;0.71;0;0
 to look out;faire attention. prendre garde;13/12/2013;15;3;0.2;0;0
+a bumper;un pare-chocs;13/12/2013;22;-2;-0.09;0;0
+a contest;un concours;13/12/2013;29;16;0.55;0;0
 the proceeds;les recettes. le produit;13/12/2013;33;19;0.58;0;0
 a patron;un client régulier;13/12/2013;28;15;0.54;0;0
-cattle (common name);le bétail. les bovins;13/12/2013;24;14;0.58;0;0
-the payroll;les effectifs. la paie globale;13/12/2013;24;14;0.58;0;0
-to level off;se stabiliser après une hausse;13/12/2013;19;9;0.47;0;0
+to gear;adapter. ajuster;13/12/2013;20;-9;-0.45;0;0
+to undergo;subir;13/12/2013;26;15;0.58;0;0
+to level off;se stabiliser après une hausse;13/12/2013;20;10;0.5;0;0
 to be wary of;se méfier de. être prudent vis-à-vis de;13/12/2013;31;16;0.52;0;0
 an array;un déploiement. un étalage / un éventail;13/12/2013;20;10;0.5;0;0
 long-range;à long terme;13/12/2013;28;20;0.71;0;0
-regulatory;réglementaire;13/12/2013;25;20;0.8;0;0
-to cash;encaisser;13/12/2013;21;16;0.76;0;0
+an advance notice;un préavis;13/12/2013;27;17;0.63;0;0
+a wage-earner;un salarié;13/12/2013;19;6;0.32;0;0
 to call sbdy in;passer voir quelqu'un / faire entrer quelqu'un;13/12/2013;32;12;0.38;0;0
 personable;qui présente bien;13/12/2013;29;14;0.48;0;0
 to entail;entraîner;13/12/2013;22;10;0.45;0;0
@@ -921,17 +919,17 @@ complimentary;à titre gracieux;13/12/2013;25;19;0.76;0;0
 a trade-in;une reprise (comm.);13/12/2013;24;12;0.5;0;0
 to streamline;rationaliser. dégraisser. moderniser;13/12/2013;30;13;0.43;0;0
 to compel;obliger;13/12/2013;33;23;0.7;0;0
-a stance;une attitude. une position;13/12/2013;24;10;0.42;0;0
-a contest;un concours;13/12/2013;29;16;0.55;0;0
-a classified advertisement;une petite annonce;13/12/2013;29;21;0.72;0;0
-to look to;faire attention à;13/12/2013;25;14;0.56;0;0
+a leaflet;un prospectus;13/12/2013;23;18;0.78;0;0
+a hazard;un risque. un danger;13/12/2013;15;-1;-0.07;0;0
+stocks & shares;les valeurs. les titres. les actions;13/12/2013;27;19;0.7;0;0
+a shelf;un rayon (d’une étagère. …);13/12/2013;27;21;0.78;0;0
 a household;un ménage (écon.);13/12/2013;20;16;0.8;0;0
 to overcome;surmonter;13/12/2013;26;20;0.77;0;0
 an allowance;une allocation. une indemnité / une réduction. un rabais;13/12/2013;23;-1;-0.04;0;0
 matter-of-fact (adj.);neutre. qui se limite aux faits;13/12/2013;29;20;0.69;0;0
 to endorse;appuyer. approuver. promouvoir;13/12/2013;35;0;0.0;0;0
-a load;un poids. une charge. une pression;13/12/2013;20;15;0.75;0;0
-amenities;l'aménagement. l'équipement;13/12/2013;35;-4;-0.11;0;0
+health care;l'assurance maladie;13/12/2013;22;17;0.77;0;0
+regulatory;réglementaire;13/12/2013;25;20;0.8;0;0
 a downtown;un centre-ville. un centre commerçant;13/12/2013;29;21;0.72;0;0
 a nuisance;un fléau;13/12/2013;25;-6;-0.24;0;0
 a cash point;un distributeur de billet;13/12/2013;29;21;0.72;0;0
@@ -940,70 +938,70 @@ a scope;une portée. une étendue. un champ d’action. un domaine;13/12/2013;30
 the acumen;la perspicacité. la finesse. le sens;13/12/2013;25;19;0.76;0;0
 customs duty;les droits de douane;13/12/2013;29;21;0.72;0;0
 to comply with;être conforme à. respecter;13/12/2013;29;21;0.72;0;0
-health care;l'assurance maladie;13/12/2013;22;17;0.77;0;0
-a desktop;un ordinateur de bureau;13/12/2013;30;22;0.73;0;0
+a load;un poids. une charge. une pression;13/12/2013;20;15;0.75;0;0
+a shop steward;un délégué syndical;13/12/2013;23;17;0.74;0;0
 a billboard;un panneau d’affichage;13/12/2013;28;21;0.75;0;0
 a caption;une légende. un sous-titre;13/12/2013;23;17;0.74;0;0
 to take up;se mettre à (un sport. …);13/12/2013;28;-12;-0.43;0;0
 waste disposal;l'élimination des déchets;13/12/2013;19;16;0.84;0;0
 to fund;financer;13/12/2013;27;21;0.78;0;0
 to be entitled to;avoir droit à;13/12/2013;30;0;0.0;0;0
-a counter;un comptoir. un guichet;13/12/2013;31;22;0.71;0;0
+a counter;un comptoir. un guichet;13/12/2013;32;21;0.66;0;0
 a casualty;un accident. un sinistre / une perte humaine;13/12/2013;27;19;0.7;0;0
-an accountant;un comptable;13/12/2013;22;16;0.73;0;0
+an incorporation;une fusion;13/12/2013;33;19;0.58;0;0
 to back up;soutenir;13/12/2013;23;2;0.09;0;0
-to catch on;prendre. devenir populaire;13/12/2013;21;-3;-0.14;0;0
-a shop steward;un délégué syndical;13/12/2013;23;17;0.74;0;0
 to forward;expédier. envoyer / transférer;13/12/2013;28;20;0.71;0;0
 the inception;le commencement. le début;13/12/2013;22;16;0.73;0;0
-an incorporation;une fusion;13/12/2013;33;19;0.58;0;0
-a shelf;un rayon (d’une étagère. …);13/12/2013;27;21;0.78;0;0
-stocks & shares;les valeurs. les titres. les actions;13/12/2013;27;19;0.7;0;0
+a desktop;un ordinateur de bureau;13/12/2013;30;22;0.73;0;0
+to catch on;prendre. devenir populaire;13/12/2013;21;-3;-0.14;0;0
+an accountant;un comptable;13/12/2013;22;16;0.73;0;0
+to cash;encaisser;13/12/2013;21;16;0.76;0;0
+cattle (common name);le bétail. les bovins;13/12/2013;24;14;0.58;0;0
 a bid;une offre. une enchère;13/12/2013;29;12;0.41;0;0
-a contractor;un entrepreneur;13/12/2013;26;10;0.38;0;0
-a hazard;un risque. un danger;13/12/2013;15;-1;-0.07;0;0
-networking;l'établissement d’un réseau de relations;13/12/2013;27;21;0.78;0;0
-to put on;organiser;13/12/2013;29;-9;-0.31;0;0
-to devise;concevoir;13/12/2013;29;21;0.72;0;0
-to cope with;faire face à;13/12/2013;28;12;0.43;0;0
-stock option;un droit (préférentiel) de souscription;13/12/2013;17;10;0.59;0;0
-to leave off;s’arrêter. cesser / oublier / exclure;13/12/2013;27;-8;-0.3;0;0
 a warranty;une garantie;13/12/2013;26;20;0.77;0;0
-chain stores;les grands magasins à succursales;13/12/2013;26;18;0.69;0;0
-headphones;un casque. des écouteurs;13/12/2013;17;10;0.59;0;0
-a meter (techn.);un compteur (EDF. taxi. …);13/12/2013;26;20;0.77;0;0
-a leaflet;un prospectus;13/12/2013;23;18;0.78;0;0
 previous / prior (adj.);antécédent. antérieur;13/12/2013;28;20;0.71;0;0
-to withstand;résister;13/12/2013;33;23;0.7;0;0
+a spread;un écart;13/12/2013;28;-3;-0.11;0;0
+a meter (techn.);un compteur (EDF. taxi. …);13/12/2013;26;20;0.77;0;0
+headphones;un casque. des écouteurs;13/12/2013;17;10;0.59;0;0
+amenities;l'aménagement. l'équipement;13/12/2013;35;-4;-0.11;0;0
+to cope with;faire face à;13/12/2013;28;12;0.43;0;0
 a pool;une piscine / un billard américain;13/12/2013;26;20;0.77;0;0
+chain stores;les grands magasins à succursales;13/12/2013;26;18;0.69;0;0
+to look to;faire attention à;13/12/2013;25;14;0.56;0;0
+to devise;concevoir;13/12/2013;29;21;0.72;0;0
+to put on;organiser;13/12/2013;29;-9;-0.31;0;0
+to prime;mettre au courant;13/12/2013;31;15;0.48;0;0
+a beverage;une boisson. un breuvage;13/12/2013;23;18;0.78;0;0
+stock option;un droit (préférentiel) de souscription;13/12/2013;17;10;0.59;0;0
+a classified advertisement;une petite annonce;13/12/2013;29;21;0.72;0;0
 capital gain (common name);la plus-value;13/12/2013;24;4;0.17;0;0
+toll (common name);un péage;13/12/2013;29;11;0.38;0;0
+a publisher;un éditeur;13/12/2013;26;20;0.77;0;0
 cordless;sans fil;13/12/2013;24;17;0.71;0;0
+to heighten;augmenter;13/12/2013;21;15;0.71;0;0
 a commodity;une denrée de base. une matière première / une marchandise;13/12/2013;26;-10;-0.38;0;0
 to post;annoncer;13/12/2013;24;19;0.79;0;0
 a lobby;un vestibule / un groupe représentants d'intérêts;13/12/2013;32;18;0.56;0;0
+a paycheck;un salaire;13/12/2013;31;13;0.42;0;0
 a labourer;un manœuvre;13/12/2013;30;21;0.7;0;0
-tremendous;immense. énorme;13/12/2013;25;11;0.44;0;0
-a beverage;une boisson. un breuvage;13/12/2013;23;18;0.78;0;0
-to heighten;augmenter;13/12/2013;21;15;0.71;0;0
-a spread;un écart;13/12/2013;28;-3;-0.11;0;0
+to leave off;s’arrêter. cesser / oublier / exclure;13/12/2013;27;-8;-0.3;0;0
+to withstand;résister;13/12/2013;33;23;0.7;0;0
+a contractor;un entrepreneur;13/12/2013;26;10;0.38;0;0
 to work out;élaborer;13/12/2013;30;3;0.1;0;0
 to put off;retarder. repousser. différer;13/12/2013;25;-6;-0.24;0;0
 junk (common name);un déchet. un article mis au rebut;13/12/2013;30;22;0.73;0;0
-toll (common name);un péage;13/12/2013;29;11;0.38;0;0
-a paycheck;un salaire;13/12/2013;31;13;0.42;0;0
-a publisher;un éditeur;13/12/2013;26;20;0.77;0;0
-to prime;mettre au courant;13/12/2013;31;15;0.48;0;0
-an advance notice;un préavis;13/12/2013;27;17;0.63;0;0
-an order form;un bon de commande;13/12/2013;32;14;0.44;0;0
-billing (common name);la facturation;13/12/2013;27;18;0.67;0;0
+tremendous;immense. énorme;13/12/2013;25;11;0.44;0;0
+to come by;obtenir. se procurer;13/12/2013;27;-16;-0.59;1;0
+a stance;une attitude. une position;13/12/2013;24;10;0.42;0;0
+to charge;facturer / accuser;13/12/2013;29;19;0.66;0;0
+in bulk;en gros;13/12/2013;17;14;0.82;0;0
+a suit;un costume / un procès;13/12/2013;28;17;0.61;0;0
+arrangements;les mesures. les dispositions. les préparatifs;13/12/2013;28;16;0.57;0;0
 the coverage;la couverture (sociale ou médiatique);13/12/2013;28;21;0.75;0;0
 household appliances;les appareils ménagers;13/12/2013;28;21;0.75;0;0
 a broker;un courtier en bourse;13/12/2013;29;22;0.76;0;0
-to come by;obtenir. se procurer;13/12/2013;27;-16;-0.59;1;0
-a wage-earner;un salarié;13/12/2013;19;6;0.32;0;0
-to come through;s’en tirer;13/12/2013;25;9;0.36;0;0
-a suit;un costume / un procès;13/12/2013;28;17;0.61;0;0
-arrangements;les mesures. les dispositions. les préparatifs;13/12/2013;28;16;0.57;0;1
+workmanship;l'habileté professionnelle / la main-d’œuvre;13/12/2013;24;9;0.38;0;0
+a wholesaler;un grossiste;13/12/2013;35;23;0.66;0;0
 to break down;tomber en panne;13/12/2013;27;-5;-0.19;0;0
 a stage;une étape. un stade (d’un processus. …) / une scène de théâtre;13/12/2013;29;22;0.76;0;0
 a misdemeanour;une infraction. un délit mineur;13/12/2013;29;18;0.62;0;0
@@ -1013,7 +1011,7 @@ the inflow;l'afflux;13/12/2013;21;17;0.81;0;0
 to call for;demander. exiger / nécessiter;13/12/2013;25;16;0.64;0;0
 a teller;un caissier;13/12/2013;22;-11;-0.5;0;0
 on the spot;sur-le-champ /  sur place;13/12/2013;25;14;0.56;0;0
-barter (common name);du troc;13/12/2013;31;11;0.35;0;0
+an order form;un bon de commande;13/12/2013;32;14;0.44;0;0
 to go ahead with;aller de l’avant avec. mettre à exécution;13/12/2013;27;14;0.52;0;0
 to come on;faire des progrès. avancer;13/12/2013;33;11;0.33;0;0
 to trespass;transgresser. violer;13/12/2013;23;12;0.52;0;0
@@ -1022,87 +1020,87 @@ itemization (common name);l'énumération. le fait de lister;13/12/2013;20;15;0.
 a mileage;un kilométrage;13/12/2013;23;17;0.74;0;0
 to alter;modifier;13/12/2013;30;20;0.67;0;0
 a dole;une indemnité de chômage;13/12/2013;22;-13;-0.59;0;0
-an estate;une propriété. un patrimoine;13/12/2013;21;18;0.86;0;0
+bookkeeping (common name);la comptabilité;13/12/2013;22;13;0.59;0;0
 noxious;nuisible;13/12/2013;20;4;0.2;0;0
 upscale (adj.);haut-de-gamme;13/12/2013;33;9;0.27;0;0
 economical;bon marché;13/12/2013;23;15;0.65;0;0
 a fair;une foire d’exposition. un salon;13/12/2013;25;20;0.8;0;0
-a dispenser;un distributeur;13/12/2013;32;12;0.38;0;0
-eventually;finalement;13/12/2013;34;23;0.68;0;0
-a wholesaler;un grossiste;13/12/2013;35;23;0.66;0;0
-in bulk;en gros;13/12/2013;17;14;0.82;0;0
+a meter reader;un releveur de compteur;13/12/2013;21;14;0.67;0;0
+a demerger;un éclatement. une scission;13/12/2013;23;12;0.52;0;0
+a savings bank;une caisse d’épargne;13/12/2013;28;19;0.68;0;0
+to back out of;se retirer de. ne pas donner suite à;13/12/2013;34;22;0.65;0;0
 an assembly line;une chaîne de montage;13/12/2013;25;19;0.76;0;0
-a taxpayer;un contribuable;13/12/2013;27;18;0.67;0;0
+a balance-sheet;un bilan;13/12/2013;30;22;0.73;0;0
 to subside;s’affaisser. baisser. décroître;13/12/2013;38;11;0.29;0;0
 a backlash;un contrecoup. un effet boomerang;13/12/2013;25;3;0.12;0;0
 to accommodate;loger. recevoir;13/12/2013;22;11;0.5;0;0
-a supervisor;un agent de maîtrise. un chef d’atelier;13/12/2013;22;18;0.82;0;0
+a quotation;une proposition de prix;13/12/2013;24;12;0.5;0;0
 a buyout;un rachat;13/12/2013;25;19;0.76;0;0
-perks;les avantages divers;13/12/2013;21;17;0.81;0;0
-liable;responsable;13/12/2013;18;12;0.67;0;0
+a concern;une entreprise;13/12/2013;35;22;0.63;0;0
+a dispenser;un distributeur;13/12/2013;32;12;0.38;0;0
 to escalate;s’intensifier. monter en flèche / remonter un problème;13/12/2013;25;17;0.68;0;0
 no-frills;minimum. réduit à l’essentiel;13/12/2013;25;16;0.64;0;0
 manpower (common name);la main d’œuvre;13/12/2013;27;20;0.74;0;0
 a subscription;un abonnement;13/12/2013;28;18;0.64;0;0
 interplay (adj.);réciproque;13/12/2013;27;7;0.26;0;0
 a route;un itinéraire;13/12/2013;31;21;0.68;0;0
-a quotation;une proposition de prix;13/12/2013;24;12;0.5;0;0
-a balance-sheet;un bilan;13/12/2013;30;22;0.73;0;0
-to bring down;faire baisser;13/12/2013;27;5;0.19;0;0
-to shut off;se couper. s’arrêter;13/12/2013;30;9;0.3;0;0
+a supervisor;un agent de maîtrise. un chef d’atelier;13/12/2013;23;19;0.83;0;0
+a split;une coupure. une cassure;13/12/2013;25;5;0.2;0;0
+a break up;un démantèlement;13/12/2013;33;8;0.24;0;0
+readily;facilement. aisément;13/12/2013;28;7;0.25;0;0
+an estimate (business);un devis;13/12/2013;29;6;0.21;0;0
+to shut off;se couper. s’arrêter;13/12/2013;31;10;0.32;0;0
+perks;les avantages divers;13/12/2013;21;17;0.81;0;0
+liable;responsable;13/12/2013;18;12;0.67;0;0
+a taxpayer;un contribuable;13/12/2013;27;18;0.67;0;0
+a blueprint;un plan. un projet. un schéma directeur;13/12/2013;29;20;0.69;0;0
+a wording;les termes. la formulation. le libellé;13/12/2013;32;20;0.63;0;0
+to assess;évaluer;13/12/2013;22;10;0.45;0;0
 money supply (common name);la masse monétaire;13/12/2013;25;19;0.76;0;0
 a malpractice;une faute professionnelle / une négligence;13/12/2013;37;13;0.35;0;0
-a blueprint;un plan. un projet. un schéma directeur;13/12/2013;29;20;0.69;0;0
-to assess;évaluer;13/12/2013;22;10;0.45;0;0
-to take on;prendre. accepter. se charger de / embaucher / s’attaquer à;13/12/2013;39;10;0.26;0;0
-a meter reader;un releveur de compteur;13/12/2013;21;14;0.67;0;0
-a break up;un démantèlement;13/12/2013;33;8;0.24;0;0
-a split;une coupure. une cassure;13/12/2013;25;5;0.2;0;0
+to bring down;faire baisser;13/12/2013;27;5;0.19;0;0
 a proficiency;une grande compétence;13/12/2013;24;16;0.67;0;0
 a memorandum;une note de service;13/12/2013;22;4;0.18;0;0
 exhaust fumes;les gaz d’échappement;13/12/2013;23;15;0.65;0;0
-readily;facilement. aisément;13/12/2013;28;7;0.25;0;0
-a wording;les termes. la formulation. le libellé;13/12/2013;32;20;0.63;0;0
-an estimate (business);un devis;13/12/2013;29;6;0.21;0;0
-a concern;une entreprise;13/12/2013;35;22;0.63;0;0
-workmanship;l'habileté professionnelle / la main-d’œuvre;13/12/2013;24;9;0.38;0;0
-a branch (firm);une succursale. une agence;13/12/2013;24;19;0.79;0;0
-a representative;un représentant de commerce / un sénateur (U.S.A.);13/12/2013;30;21;0.7;0;0
-change (common name);de la monnaie (pièces. billets);13/12/2013;32;20;0.62;0;0
-to back out of;se retirer de. ne pas donner suite à;13/12/2013;34;22;0.65;0;0
-a closet;une armoire. un placard. une penderie;13/12/2013;34;21;0.62;0;0
-a discount;une réduction. un rabais;13/12/2013;29;22;0.76;0;0
-a commercial;une publicité (radio / télévision);13/12/2013;23;14;0.61;0;0
-to gamble;jouer de l’argent / prendre des risques;13/12/2013;28;16;0.57;0;0
-a serial;un feuilleton;13/12/2013;27;17;0.63;0;0
-mandatory;obligatoire;13/12/2013;29;20;0.69;0;1
-controls (common name);les boutons de commande;13/12/2013;21;17;0.81;0;0
-besides (adv.);d’ailleurs. du reste. en outre;13/12/2013;23;16;0.7;0;0
-a drag;un boulet. une entrave. une résistance;13/12/2013;24;2;0.08;0;0
-a savings bank;une caisse d’épargne;13/12/2013;28;19;0.68;0;0
+to take on;prendre. accepter. se charger de / embaucher / s’attaquer à;13/12/2013;39;10;0.26;0;0
+billing (common name);la facturation;13/12/2013;27;18;0.67;0;0
+an estate;une propriété. un patrimoine;13/12/2013;21;18;0.86;0;0
+an agenda;un ordre du jour. un programme;13/12/2013;28;19;0.68;0;0
 an outage;une interruption de service. une coupure de courant;13/12/2013;19;13;0.68;0;0
-upcoming;imminent. prochain;13/12/2013;25;20;0.8;0;0
+to attend;assister à. aller à;13/12/2013;24;18;0.75;0;0
+a drag;un boulet. une entrave. une résistance;13/12/2013;24;2;0.08;0;0
+besides (adv.);d’ailleurs. du reste. en outre;13/12/2013;23;16;0.7;0;0
+a service (mechanics);une révision (mécanique. …);13/12/2013;28;15;0.54;0;0
+a commercial;une publicité (radio / télévision);13/12/2013;23;14;0.61;0;0
 a parcel;un paquet. un colis;13/12/2013;33;12;0.36;0;0
+a background;un fond. un arrière-plan;13/12/2013;24;15;0.62;0;0
+to issue;publier. faire paraître. émettre;13/12/2013;21;16;0.76;0;0
+a discount;une réduction. un rabais;13/12/2013;29;22;0.76;0;0
+a closet;une armoire. un placard. une penderie;13/12/2013;34;21;0.62;0;0
+an expense;une dépense;13/12/2013;24;19;0.79;0;0
+change (common name);de la monnaie (pièces. billets);13/12/2013;32;20;0.62;0;0
+to gamble;jouer de l’argent / prendre des risques;13/12/2013;28;16;0.57;0;0
+controls (common name);les boutons de commande;13/12/2013;21;17;0.81;0;0
 the directions;les indications. les instructions;13/12/2013;22;15;0.68;0;0
-to drop off;déposer. laisser;13/12/2013;21;16;0.76;0;0
-a directory;un dossier / un annuaire. les renseignements;13/12/2013;22;18;0.82;0;0
-an appreciation;une plus-value;13/12/2013;26;2;0.08;0;0
 to turn away sbdy;chasser. envoyer promener. rejeter qn;13/12/2013;37;11;0.3;0;0
 a welfare system;un système de protection sociale;13/12/2013;33;22;0.67;0;0
 a haulage;un transport routier;13/12/2013;18;5;0.28;0;0
 thorough;complet. détaillé;13/12/2013;20;16;0.8;0;0
-a security (fin.);une caution (fin.). une garantie;13/12/2013;28;9;0.32;0;0
-to attend;assister à. aller à;13/12/2013;24;18;0.75;0;0
-an expense;une dépense;13/12/2013;24;19;0.79;0;0
-to charge;facturer / accuser;13/12/2013;29;19;0.66;0;0
+a security (fin.);une caution (fin.). une garantie;13/12/2013;29;10;0.34;0;0
+upcoming;imminent. prochain;13/12/2013;25;20;0.8;0;0
+a serial;un feuilleton;13/12/2013;27;17;0.63;0;0
+mandatory;obligatoire;13/12/2013;29;20;0.69;0;0
 to check out;régler sa note / jeter un œil à;13/12/2013;19;6;0.32;0;0
 a junk mail;un courrier publicitaire;13/12/2013;26;20;0.77;0;0
-a stalemate;un marasme (écon.) / une impasse;13/12/2013;29;18;0.62;0;0
+a stalemate;un marasme (écon.) / une impasse;13/12/2013;30;19;0.63;0;0
 to trade;échanger;13/12/2013;23;14;0.61;0;0
 an industrial park;une zone industrielle;13/12/2013;27;18;0.67;0;0
+to drop off;déposer. laisser;13/12/2013;21;16;0.76;0;0
+a directory;un dossier / un annuaire. les renseignements;13/12/2013;22;18;0.82;0;0
+an appreciation;une plus-value;13/12/2013;26;2;0.08;0;0
 to stand out;ressortir. se détacher / trancher;13/12/2013;30;20;0.67;0;0
-a background;un fond. un arrière-plan;13/12/2013;24;15;0.62;0;0
-an agenda;un ordre du jour. un programme;13/12/2013;28;19;0.68;0;0
+a representative;un représentant de commerce / un sénateur (U.S.A.);13/12/2013;30;21;0.7;0;0
+eventually;finalement;13/12/2013;34;23;0.68;0;0
 a lawsuit;une poursuite judiciaire;13/12/2013;24;16;0.67;0;0
 a pension;une pension de retraite;13/12/2013;19;15;0.79;0;0
 to plummet;baisser brusquement. dégringoler;13/12/2013;30;1;0.03;0;0
@@ -1111,31 +1109,31 @@ a cleaner;une dame de ménage / un teinturier;13/12/2013;19;13;0.68;0;0
 to arise;survenir. se présenter / se lever;13/12/2013;28;19;0.68;0;0
 a hype;une publicité tapageuse. un matraquage;13/12/2013;33;1;0.03;0;0
 to keep to;ne pas s’écarter de. respecter;13/12/2013;34;23;0.68;0;0
-to issue;publier. faire paraître. émettre;13/12/2013;21;16;0.76;0;0
+a bracket;une parenthèse / une tranche (écon.) / un support;13/12/2013;32;2;0.06;0;0
 a figure;un chiffre;13/12/2013;26;16;0.62;0;0
 to go bust;faire faillite;13/12/2013;29;9;0.31;0;0
 a factory floor;un atelier de production;13/12/2013;18;13;0.72;0;0
 fringe benefits / fringe;les avantages divers / marginal;13/12/2013;31;10;0.32;0;0
 a vocational training;une formation professionnelle;13/12/2013;22;18;0.82;0;0
-a service (mechanics);une révision (mécanique. …);13/12/2013;28;15;0.54;0;0
-a bracket;une parenthèse / une tranche (écon.) / un support;13/12/2013;32;2;0.06;0;0
+barter (common name);du troc;13/12/2013;31;11;0.35;0;0
 to keep down;restreindre. limiter. maintenir bas;13/12/2013;27;17;0.63;0;0
+a branch (firm);une succursale. une agence;13/12/2013;24;19;0.79;0;0
 a claim;une revendication / une réclamation;13/12/2013;29;19;0.66;0;0
-to caution;avertir;13/12/2013;28;2;0.07;0;0
-a hold;une prise. une étreinte;13/12/2013;24;3;0.13;0;0
-a haulier;un transporteur;13/12/2013;29;20;0.69;0;0
+word of mouth;le bouche à oreille;13/12/2013;24;16;0.67;0;0
 an incentive;une prime. une récompense;13/12/2013;24;3;0.13;0;0
 a strike;une grève;13/12/2013;31;21;0.68;0;0
+to caution;avertir;13/12/2013;28;2;0.07;0;0
+a hold;une prise. une étreinte;13/12/2013;24;3;0.13;0;0
 outsourcing;l'externalisation;13/12/2013;24;18;0.75;0;0
 to register;s’inscrire;13/12/2013;32;22;0.69;0;0
-word of mouth;le bouche à oreille;13/12/2013;24;16;0.67;0;0
+a haulier;un transporteur;13/12/2013;29;20;0.69;0;0
+domestic;national. intérieur;13/12/2013;32;22;0.69;0;0
 a watchdog;un organisme régulateur;13/12/2013;36;24;0.67;0;0
 a shed;un hangar / un abri. un cabanon;13/12/2013;30;20;0.67;0;0
 a hearing;une audience (au tribunal. …);13/12/2013;28;19;0.68;0;0
 a remainder;un reste;13/12/2013;23;19;0.83;0;0
 to get by;se débrouiller. s’en sortir;13/12/2013;22;4;0.18;0;0
 a collection;une perception. un ramassage. une collecte;13/12/2013;25;17;0.68;0;0
-domestic;national. intérieur;13/12/2013;32;22;0.69;0;0
 the chalk;la craie;14/01/2019;19;15;0.79;0;0
 dredging (common name);le dragage;14/01/2022;11;-11;-1.0;1;0
 a crease;un pli. une pliure;14/01/2022;25;1;0.04;0;0
@@ -1144,21 +1142,21 @@ a headache;un mal de tête;14/02/2021;24;16;0.67;0;0
 a hock;un jarret;14/02/2021;19;-8;-0.42;0;0
 corn (common name);le maïs;14/02/2021;28;16;0.57;0;0
 as it gets;rien de meilleur n'est possible ou disponible;14/02/2022;15;-5;-0.33;0;0
-a dale;une vallée;14/03/2021;24;17;0.71;0;0
-a muskrat;un rat musqué;14/03/2021;24;19;0.79;0;0
-overhanging;surplombant;14/03/2021;26;19;0.73;0;0
-a tributary;un affluent;14/03/2021;28;12;0.43;0;0
-a trade wind;un alizé;14/03/2021;33;21;0.64;0;0
 drizzle (common name);la bruine;14/03/2021;30;17;0.57;0;0
-sleet (common name);la neige fondue;14/03/2021;30;19;0.63;0;0
-a waterspout;une trombe;14/03/2021;39;22;0.56;0;0
-slimy;visqueux;14/03/2021;24;-8;-0.33;0;0
 a reef;un récif;14/03/2021;34;22;0.65;0;0
+a tributary;un affluent;14/03/2021;28;12;0.43;0;0
+overhanging;surplombant;14/03/2021;26;19;0.73;0;0
+slimy;visqueux;14/03/2021;24;-8;-0.33;0;0
+a dale;une vallée;14/03/2021;24;17;0.71;0;0
+a waterspout;une trombe;14/03/2021;39;22;0.56;0;0
+sleet (common name);la neige fondue;14/03/2021;30;19;0.63;0;0
+a trade wind;un alizé;14/03/2021;33;21;0.64;0;0
+a muskrat;un rat musqué;14/03/2021;24;19;0.79;0;0
 a stricture;une restriction;14/05/2023;2;0;0.0;0;0
 HVAC;Heating. ventilation. and air conditioning;14/06/2022;9;9;1.0;0;0
 a failover (IT);un basculement;14/06/2022;22;14;0.64;0;0
-whatsoever;quoi que ce soit;14/07/2018;28;18;0.64;0;0
 secretive;secret;14/07/2018;25;16;0.64;0;0
+whatsoever;quoi que ce soit;14/07/2018;28;18;0.64;0;0
 a youngling;un jeune garçon;14/07/2018;25;20;0.8;0;0
 a pail;un seau;14/07/2020;29;15;0.52;0;0
 dirt (common name);la saleté;14/07/2020;24;17;0.71;0;0
@@ -1166,52 +1164,52 @@ aching (adj.);douloureux;14/07/2020;27;20;0.74;0;0
 a carrion;une charogne;14/07/2020;26;20;0.77;0;0
 a clarion;un clairon;14/07/2020;27;8;0.3;0;0
 a glimmer;une lueur;14/07/2020;28;21;0.75;0;0
-the beak;le bec;14/07/2020;20;16;0.8;0;0
-straight off the bat;tout de suite;14/07/2020;29;15;0.52;0;0
+a weirdo;un type bizarre;14/07/2020;20;15;0.75;0;0
+a hiss;un sifflement;14/07/2020;27;15;0.56;0;0
 leotards (common name);des collants / un justaucorps;14/07/2020;25;15;0.6;0;0
 a maze;un labyrinthe;14/07/2020;23;16;0.7;0;0
 watery (adj.);aqueux;14/07/2020;21;15;0.71;0;0
 a moose;un élan;14/07/2020;26;9;0.35;0;0
 tangled up;emmêlé;14/07/2020;23;19;0.83;0;0
 to squelch;écraser;14/07/2020;22;16;0.73;0;0
-a weirdo;un type bizarre;14/07/2020;20;15;0.75;0;0
-a hiss;un sifflement;14/07/2020;27;15;0.56;0;0
+the beak;le bec;14/07/2020;20;16;0.8;0;0
+straight off the bat;tout de suite;14/07/2020;29;15;0.52;0;0
 a volley;une salve. une grêle;14/07/2020;24;12;0.5;0;0
-a gurgle;un gargouillis;14/07/2020;26;16;0.62;0;0
+yummy (adj.);délicieux;14/07/2020;21;-1;-0.05;0;0
 to lurk;se cacher;14/07/2020;26;17;0.65;0;0
 skidded;dérapé / patiné;14/07/2020;22;1;0.05;0;0
 a swip;une lampée;14/07/2020;26;-9;-0.35;0;0
 a geezer;un type;14/07/2020;23;17;0.74;0;0
 moldy;moisi;14/07/2020;27;20;0.74;0;0
 burlap (common name);la toile de jute;14/07/2020;17;-1;-0.06;0;0
-puny (adj.);chétif;14/07/2020;44;20;0.45;0;0
-yummy (adj.);délicieux;14/07/2020;21;-1;-0.05;0;0
+a roster;une liste de service;14/07/2020;16;-14;-0.88;1;0
+a gurgle;un gargouillis;14/07/2020;26;16;0.62;0;0
 to give a go. to have a go;essayer;14/07/2020;34;16;0.47;0;0
 a grasshopper;une sauterelle;14/07/2020;19;16;0.84;0;0
 smitten;frappé. touché. enchanté;14/07/2020;33;16;0.48;0;0
 endowed;doté;14/07/2020;29;9;0.31;0;0
 Whack!;Vlan !;14/07/2020;19;16;0.84;0;0
 to bootstrap / bootstraps;amorcer / des attaches de bottes;14/07/2020;27;9;0.33;0;0
-a roster;une liste de service;14/07/2020;16;-14;-0.88;1;0
+puny (adj.);chétif;14/07/2020;44;20;0.45;0;0
 a cleaver;un couperet;14/07/2020;26;-14;-0.54;0;0
 work out (common name);l'entraînement physique;14/07/2021;25;5;0.2;0;0
-to engulf;engloutir / sombrer dans;14/07/2022;16;6;0.38;0;1
+to engulf;engloutir / sombrer dans;14/07/2022;16;6;0.38;0;0
 a pall;un voile / un pallium;14/07/2022;11;7;0.64;0;0
 tamper-proof;inviolable;14/07/2022;14;2;0.14;0;0
 to balk;rechigner;14/08/2021;18;-13;-0.72;0;0
-culling (hunt.);l'abattage (réduction de population organisée);14/08/2021;26;-9;-0.35;0;0
+culling (hunt.);l'abattage (réduction de population organisée);14/08/2021;27;-8;-0.3;0;0
 a steward;un intendant;14/08/2021;26;20;0.77;0;0
 to tuck away;ranger;14/09/2021;17;-3;-0.18;0;0
 an expense report;une note de frais;14/10/2019;25;8;0.32;0;0
-to drown;se noyer;14/10/2019;21;12;0.57;0;0
+to stow;ranger;14/10/2019;26;13;0.5;0;0
 a janitor;un concierge;14/10/2019;19;8;0.42;0;0
 to plead;plaider;14/10/2019;21;15;0.71;0;0
-a latch;un loquet;14/10/2019;28;16;0.57;0;0
-to preclude;empêcher;14/10/2019;31;-11;-0.35;0;0
-a spur;un éperon;14/10/2019;30;14;0.47;0;0
 a moth;un papillon de nuit;14/10/2019;26;19;0.73;0;0
+to preclude;empêcher;14/10/2019;31;-11;-0.35;0;0
+a spur;un éperon;14/10/2019;31;15;0.48;0;0
+a latch;un loquet;14/10/2019;28;16;0.57;0;0
 a rug;une couverture;14/10/2019;28;19;0.68;0;0
-to stow;ranger;14/10/2019;26;13;0.5;0;0
+to drown;se noyer;14/10/2019;21;12;0.57;0;0
 every so often;de temps en temps;14/10/2021;17;15;0.88;0;0
 a wonk;un fou. un idiot;14/10/2021;25;-9;-0.36;0;0
 a weasel;une belette. une fouine;14/11/2018;23;16;0.7;0;0
@@ -1234,10 +1232,10 @@ a knack (colloquial);un tour de main;15/02/2022;14;-12;-0.86;0;0
 a weir;un seuil / un barrage;15/02/2022;15;-11;-0.73;0;0
 an utterance;une énonciation;15/03/2022;12;2;0.17;0;0
 a fallback;une solution de repli;15/03/2022;11;-11;-1.0;1;0
-sluggard (adj.);paresseux;15/04/2018;22;9;0.41;0;0
 a grindstone;une meule;15/04/2018;20;7;0.35;0;0
 ere (adv.);avant;15/04/2018;33;5;0.15;0;0
 knitting;le tricot. le tricotage;15/04/2018;22;17;0.77;0;0
+sluggard (adj.);paresseux;15/04/2018;22;9;0.41;0;0
 to ape;singer. imiter;15/04/2018;27;21;0.78;0;0
 to glean;glaner / découvrir;15/04/2018;25;17;0.68;0;0
 toil (common name);un labeur. un dur travail;15/04/2018;27;0;0.0;0;0
@@ -1249,11 +1247,11 @@ to straiten;rétrécir / coincer;15/04/2018;32;11;0.34;0;0
 a groat;une pièce de monnaie médiévale;15/04/2018;28;11;0.39;0;0
 a beggar;un mendiant;15/04/2018;33;21;0.64;0;0
 blasted;foudroyé. fichu;15/04/2018;32;21;0.66;0;0
+a dainty;une friandise;15/04/2018;28;19;0.68;0;0
 to rap;donner un coup sec. frapper;15/04/2018;22;15;0.68;0;0
 a sorrow;un chagrin. une douleur;15/04/2018;26;19;0.73;0;0
 a knuckle;une articulation;15/04/2018;28;9;0.32;0;0
-a dainty;une friandise;15/04/2018;28;19;0.68;0;0
-a blowback;un retour de flamme;15/04/2022;16;12;0.75;0;0
+a blowback;un retour de flamme;15/04/2022;17;13;0.76;0;0
 a moat;un fossé. les douves;15/04/2022;15;3;0.2;0;0
 a trade-off (common name);un compromis;15/05/2019;32;12;0.38;0;0
 a ledge;un rebord. une saillie;15/05/2022;21;-5;-0.24;0;0
@@ -1263,18 +1261,18 @@ a lookout;un poste d'observation. de vigie;15/07/2018;25;18;0.72;0;0
 to be on the lookout for;guetter. être à la recherche de ;15/07/2018;21;13;0.62;0;0
 I'll see you out.;Je vous raccompagne.;15/07/2018;24;9;0.38;0;0
 a trial period;une période d'essai;15/07/2018;23;18;0.78;0;0
-props (common name);des accessoires;15/07/2019;30;-4;-0.13;0;0
-to wade in;patauger dans;15/07/2019;23;7;0.3;0;0
-veneer. varnish (common name);du vernis;15/07/2019;24;19;0.79;0;0
-a justle;une bousculade;15/07/2019;26;10;0.38;0;0
-a concussion;une commotion cérébrale;15/07/2019;27;6;0.22;0;0
-a pull-back device;un dispositif de rappel;15/07/2019;23;18;0.78;0;0
-haphazard;au hasard;15/07/2019;19;15;0.79;0;0
-a hoax;un canular;15/07/2019;20;16;0.8;0;0
 sorely;grandement;15/07/2019;29;18;0.62;0;0
 a filth;une saleté;15/07/2019;32;19;0.59;0;0
-desperation (common name);le désespoir;15/07/2019;26;19;0.73;0;0
+a concussion;une commotion cérébrale;15/07/2019;27;6;0.22;0;0
 to surround;entourer;15/07/2019;17;11;0.65;0;0
+desperation (common name);le désespoir;15/07/2019;26;19;0.73;0;0
+a pull-back device;un dispositif de rappel;15/07/2019;23;18;0.78;0;0
+a justle;une bousculade;15/07/2019;26;10;0.38;0;0
+a hoax;un canular;15/07/2019;20;16;0.8;0;0
+haphazard;au hasard;15/07/2019;19;15;0.79;0;0
+veneer. varnish (common name);du vernis;15/07/2019;24;19;0.79;0;0
+to wade in;patauger dans;15/07/2019;23;7;0.3;0;0
+props (common name);des accessoires;15/07/2019;30;-4;-0.13;0;0
 an onus;un fardeau;15/10/2021;18;-12;-0.67;0;0
 rife (adj.);abondant. répandu;15/10/2021;17;-11;-0.65;0;0
 to alleviate;soulager;15/11/2021;14;6;0.43;0;0
@@ -1289,12 +1287,12 @@ mumbo jumbo (coll.);de l'enfumage;16/01/2023;7;-1;-0.14;0;0
 charcoal (common name);du charbon de bois;16/02/2022;16;10;0.63;0;0
 to lisp;parler avec un cheveu sur la langue;16/02/2022;19;11;0.58;0;0
 a slot;une fente. une rainure;16/03/2019;30;20;0.67;0;0
-the deterrence;la dissuasion;16/03/2021;21;0;0.0;0;0
+the deterrence;la dissuasion;16/03/2021;22;1;0.05;0;0
 up-market;haut de gamme;16/03/2021;17;9;0.53;0;0
 sunlit (adj.);ensoleillé;16/03/2021;24;16;0.67;0;0
 a gust of wind;un coup de vent;16/03/2021;22;18;0.82;0;0
 takings (common name);les recettes;16/03/2021;23;-11;-0.48;0;0
-to abate;diminuer;16/03/2021;24;2;0.08;0;0
+to abate;diminuer;16/03/2021;25;3;0.12;0;0
 staple goods;les produits de base;16/03/2021;29;11;0.38;0;0
 looming;imminent;16/03/2021;24;7;0.29;0;0
 a weather vane;une girouette;16/03/2021;24;14;0.58;0;0
@@ -1302,13 +1300,13 @@ cronyism (common name);le copinage;16/03/2021;29;20;0.69;0;0
 importantly;surtout;16/03/2022;13;5;0.38;0;0
 Something is amiss.;Il y a quelque chose qui ne va pas.;16/03/2023;4;4;1.0;0;0
 a beekeeper;un apiculteur;16/03/2023;6;6;1.0;0;0
-to carve;tailler;16/04/2018;27;9;0.33;0;0
 the sloth;la paresse;16/04/2018;22;-8;-0.36;0;0
+to carve;tailler;16/04/2018;27;9;0.33;0;0
 a great deal of;beaucoup de;16/04/2018;29;18;0.62;0;0
 the hinge;la charnière;16/04/2018;30;20;0.67;0;0
 a leverage;un effet de levier. une influence;16/04/2018;22;14;0.64;0;0
-to assuage;apaiser;16/04/2018;30;17;0.57;0;0
 slanted;incliné;16/04/2018;23;8;0.35;0;0
+to assuage;apaiser;16/04/2018;30;17;0.57;0;0
 to foil;déjouer / tirer au sabre;16/05/2022;12;-6;-0.5;0;0
 a binge;une frénésie. une bringue;16/09/2021;14;0;0.0;0;0
 to evict;expulser / récupérer;16/10/2022;11;7;0.64;0;0
@@ -1330,83 +1328,83 @@ obnoxious (adj.);odieux. insupportable;17/02/2022;21;-11;-0.52;0;0
 a shooting star;une étoile filante;17/02/2022;18;14;0.78;0;0
 an aisle;un rayon (de magasin). une allée;17/03/2022;22;12;0.55;0;0
 proctoring (common name);la surveillance;17/03/2022;20;4;0.2;0;0
-a dial;un cadran;17/05/2018;26;18;0.69;0;0
-a nickel;une pièce de cinq cents;17/05/2018;30;20;0.67;0;0
-a culture vulture;une personne avide de culture;17/05/2018;25;19;0.76;0;0
-The Royal Mint;L'Hôtel de la Monnaie;17/05/2018;19;16;0.84;0;0
-a poacher;un braconnier;17/05/2018;28;11;0.39;0;0
-a mechanic;un garagiste;17/05/2018;27;11;0.41;0;0
-in mint condition;comme neuf;17/05/2018;25;16;0.64;0;0
-Fancy that!;Vous m'en direz tant !;17/05/2018;20;16;0.8;0;0
-He's tight.;Il est saoûl.;17/05/2018;26;15;0.58;0;0
 a packaging;un emballage;17/05/2018;19;16;0.84;0;0
-a parochial outlook;une attitude bornée / un esprit de clocher;17/05/2018;27;19;0.7;0;0
+to peel;peler (un légume);17/05/2018;32;22;0.69;0;0
+in mint condition;comme neuf;17/05/2018;25;16;0.64;0;0
 to go under the hammer;vendre aux enchères;17/05/2018;27;16;0.59;0;0
+a parochial outlook;une attitude bornée / un esprit de clocher;17/05/2018;27;19;0.7;0;0
+a score of men;une vingtaine d'hommes;17/05/2018;27;20;0.74;0;0
+a culture vulture;une personne avide de culture;17/05/2018;25;19;0.76;0;0
+a nickel;une pièce de cinq cents;17/05/2018;30;20;0.67;0;0
 Tough luck!;Quelle malchance !;17/05/2018;24;13;0.54;0;0
+a mechanic;un garagiste;17/05/2018;27;11;0.41;0;0
+a poacher;un braconnier;17/05/2018;28;11;0.39;0;0
+a farmer;un paysan;17/05/2018;27;20;0.74;0;0
+He's tight.;Il est saoûl.;17/05/2018;26;15;0.58;0;0
+a dial;un cadran;17/05/2018;26;18;0.69;0;0
+a business slump;un marasme économique;17/05/2018;27;19;0.7;0;0
 the span;l'envergure / l'empan;17/05/2018;29;18;0.62;0;0
+nonplussed;déconfit;17/05/2018;30;15;0.5;0;0
+Fancy that!;Vous m'en direz tant !;17/05/2018;20;16;0.8;0;0
+a peasant;un péquenot (péjoratif);17/05/2018;23;19;0.83;0;0
+to fill in a form;remplir un formulaire;17/05/2018;21;13;0.62;0;0
+highways and byways (expr.);un peu partout;17/05/2018;31;9;0.29;0;0
 a bull market;un marché optimiste;17/05/2018;20;15;0.75;0;0
 a cup-tie;une série de match de foot;17/05/2018;22;16;0.73;0;0
+The Royal Mint;L'Hôtel de la Monnaie;17/05/2018;19;16;0.84;0;0
 The Queen Elizabeth;"Le paquebot ""Queen Elizabeth""";17/05/2018;30;22;0.73;0;0
 He's tight with money.;Il est radin.;17/05/2018;31;20;0.65;0;0
-a score of men;une vingtaine d'hommes;17/05/2018;27;20;0.74;0;0
-highways and byways (expr.);un peu partout;17/05/2018;30;8;0.27;0;0
-to fill in a form;remplir un formulaire;17/05/2018;21;13;0.62;0;0
-the M.O.T.;Ministry of Transport (contrôle automobile annuel);17/05/2018;25;16;0.64;0;0
-a farmer;un paysan;17/05/2018;27;20;0.74;0;0
-a business slump;un marasme économique;17/05/2018;27;19;0.7;0;0
-nonplussed;déconfit;17/05/2018;30;15;0.5;0;0
-a peasant;un péquenot (péjoratif);17/05/2018;23;19;0.83;0;0
 to point out;signaler;17/05/2018;26;19;0.73;0;0
-to peel;peler (un légume);17/05/2018;32;22;0.69;0;0
+the M.O.T.;Ministry of Transport (contrôle automobile annuel);17/05/2018;25;16;0.64;0;0
 to show around;faire visiter;17/05/2018;33;21;0.64;0;0
-We have our work cut out.;Nous avons du pain sur la planche.;17/05/2018;22;7;0.32;0;0
-He slumped in his chair.;Il s'affala dans son fauteuil.;17/05/2018;27;20;0.74;0;0
-sheepish;penaud;17/05/2018;21;0;0.0;0;0
-Don't get so upset!;Ne te fâche pas !;17/05/2018;27;20;0.74;0;0
-stodgy;lourd. indigeste. bourratif;17/05/2018;31;12;0.39;0;0
-colour-blind;daltonien;17/05/2018;26;20;0.77;0;0
-lousy;pouilleux / mauvais;17/05/2018;29;0;0.0;0;0
-leasing (common name);le crédit-bail;17/05/2018;28;18;0.64;0;0
 He has lofty ideas.;Il a des idéaux élevés.;17/05/2018;20;16;0.8;0;0
-to chatter;jacasser;17/05/2018;27;18;0.67;0;0
-to put someone out;mettre quelqu'un mal à l'aise;17/05/2018;30;20;0.67;0;0
-snuff (common name);du tabac à priser;17/05/2018;26;17;0.65;0;0
-to chat;causer. bavarder;17/05/2018;25;20;0.8;0;0
-overhead costs;les frais généraux;17/05/2018;24;15;0.62;0;0
-a bear market;un marché pessimiste;17/05/2018;19;12;0.63;0;0
-a spoof;une parodie;17/05/2018;22;3;0.14;0;0
-a quid;une livre £ (argot);17/05/2018;29;6;0.21;0;0
-a slip of the tongue;un lapsus. la langue qui fourche;17/05/2018;27;17;0.63;0;0
-bylaws (common name);les ordonnances locales (à côté des lois principales);17/05/2018;24;15;0.63;0;0
-a telling example;un exemple évocateur;17/05/2018;29;19;0.66;0;0
-Thanks. I'll make do.;Merci. je ferai avec.;17/05/2018;31;20;0.65;0;0
 a dime;une pièce de dix cents;17/05/2018;36;18;0.5;0;0
-shop-lifting;le chapardage;17/05/2018;23;17;0.74;0;0
-a gobbledegook;un charabia;17/05/2018;21;18;0.86;0;0
+to chat;causer. bavarder;17/05/2018;25;20;0.8;0;0
+to put someone out;mettre quelqu'un mal à l'aise;17/05/2018;30;20;0.67;0;0
+to chatter;jacasser;17/05/2018;27;18;0.67;0;0
 a hurdle;un écueil;17/05/2018;31;1;0.03;0;0
+He slumped in his chair.;Il s'affala dans son fauteuil.;17/05/2018;27;20;0.74;0;0
+snuff (common name);du tabac à priser;17/05/2018;26;17;0.65;0;0
+colour-blind;daltonien;17/05/2018;26;20;0.77;0;0
+stodgy;lourd. indigeste. bourratif;17/05/2018;31;12;0.39;0;0
+bylaws (common name);les ordonnances locales (à côté des lois principales);17/05/2018;24;15;0.63;0;0
+leasing (common name);le crédit-bail;17/05/2018;28;18;0.64;0;0
+sheepish;penaud;17/05/2018;21;0;0.0;0;0
+a slip of the tongue;un lapsus. la langue qui fourche;17/05/2018;27;17;0.63;0;0
+We have our work cut out.;Nous avons du pain sur la planche.;17/05/2018;22;7;0.32;0;0
 a lure;un appât;17/05/2018;18;10;0.56;0;0
 crusty;bourru. hargneux;17/05/2018;18;-8;-0.44;0;0
+Don't get so upset!;Ne te fâche pas !;17/05/2018;27;20;0.74;0;0
+a gobbledegook;un charabia;17/05/2018;21;18;0.86;0;0
+overhead costs;les frais généraux;17/05/2018;24;15;0.62;0;0
+shop-lifting;le chapardage;17/05/2018;23;17;0.74;0;0
+a telling example;un exemple évocateur;17/05/2018;29;19;0.66;0;0
+Thanks. I'll make do.;Merci. je ferai avec.;17/05/2018;31;20;0.65;0;0
+a bear market;un marché pessimiste;17/05/2018;19;12;0.63;0;0
+a spoof;une parodie;17/05/2018;22;3;0.14;0;0
+lousy;pouilleux / mauvais;17/05/2018;29;0;0.0;0;0
+a quid;une livre £ (argot);17/05/2018;29;6;0.21;0;0
 customary;habituel;17/05/2019;17;5;0.29;0;0
 to capsize;chavirer. se renverser;17/05/2022;12;-4;-0.33;0;0
 bosom (common name);le sein. la poitrine;17/05/2022;11;-3;-0.27;0;0
 a surmise;une conjecture. une hypothèse;17/05/2022;27;-5;-0.19;0;0
 the breath;l'haleine;17/06/2019;26;19;0.73;0;0
-a deliverable;un livrable;17/06/2019;21;14;0.67;0;0
-to untangle;démêler;17/06/2019;34;22;0.65;0;0
 to staunch;étancher;17/06/2019;40;4;0.1;0;0
 a blank;une rive. une berge / un flan / un blanc;17/06/2019;25;13;0.52;0;0
+a deliverable;un livrable;17/06/2019;21;14;0.67;0;0
+to untangle;démêler;17/06/2019;34;22;0.65;0;0
 a wafer;une tranche;17/06/2021;32;-3;-0.09;0;0
 to shun;éviter. fuir;17/06/2021;27;-8;-0.3;0;0
 flaky;floconneux;17/06/2021;23;14;0.61;0;0
 a knucklehead;un crétin;17/06/2023;0;0;0.0;0;0
-to dwarf;rapetisser. faire paraître petit;17/07/2018;31;22;0.71;0;0
 a chilling;un refroidissement;17/07/2018;23;17;0.74;0;0
-to hound;traquer. talonner;17/07/2018;27;16;0.59;0;0
+to dwarf;rapetisser. faire paraître petit;17/07/2018;31;22;0.71;0;0
 mobs (common name);la foule. la bande;17/07/2018;21;12;0.57;0;0
-a strain;une souche / une tension;17/07/2018;20;-2;-0.1;0;0
-a compulsion;le fait d'obliger quelqu'un à faire quelque chose;17/07/2018;25;13;0.52;0;0
-a voucher;une pièce justificative;17/07/2018;20;14;0.7;0;0
+to hound;traquer. talonner;17/07/2018;27;16;0.59;0;0
 rapturous;enthousiaste;17/07/2018;28;-9;-0.32;0;0
+a voucher;une pièce justificative;17/07/2018;20;14;0.7;0;0
+a compulsion;le fait d'obliger quelqu'un à faire quelque chose;17/07/2018;25;13;0.52;0;0
+a strain;une souche / une tension;17/07/2018;20;-2;-0.1;0;0
 a quail;une caille;17/07/2023;1;1;1.0;0;0
 to drench;tremper. mouiller;17/07/2023;1;1;1.0;0;0
 a broth;un bouillon;17/07/2023;2;2;1.0;0;0
@@ -1414,7 +1412,7 @@ shod (adj.);chaussé;17/07/2023;0;0;0.0;0;0
 the leeward side;le côté sous le vent;17/07/2023;0;0;0.0;0;0
 to loiter;flâner. traîner;17/07/2023;1;1;1.0;0;0
 running loose;(troupeau) en liberté;17/07/2023;0;0;0.0;0;0
-felt (common name);du feutre;17/07/2023;1;1;1.0;0;0
+felt (common name);du feutre;17/07/2023;2;2;1.0;0;0
 at a canter (équit.);au galop;17/07/2023;0;0;0.0;0;0
 a steeple;un clocher. une flèche;17/07/2023;0;0;0.0;0;0
 overpowering;envahissant;17/08/2018;25;17;0.68;0;0
@@ -1425,45 +1423,45 @@ a hoot;une huée / une hululement;17/08/2021;24;2;0.08;0;0
 collusive (adj.);complice;17/08/2021;21;8;0.38;0;0
 a kitten;un chaton;17/09/2021;18;14;0.78;0;0
 a hangover;une gueule de bois;17/09/2022;10;-2;-0.2;0;0
-a din;un vacarme;17/10/2018;22;-16;-0.73;1;0
 squalid (adj.);sordide. misérable;17/10/2018;23;10;0.43;0;0
-carpentry (common name);la charpenterie;17/10/2018;22;16;0.73;0;0
+a din;un vacarme;17/10/2018;22;-16;-0.73;1;0
 ruffled;ébouriffé. froissé / troublé;17/10/2018;31;21;0.68;0;0
+carpentry (common name);la charpenterie;17/10/2018;22;16;0.73;0;0
 a lair;un repaire. une tanière;17/11/2018;18;13;0.72;0;0
 ilk;ceux-là mêmes;17/11/2018;26;20;0.77;0;0
 to amok;être incontrôlable;17/11/2018;29;14;0.48;0;0
 foes (common name);les ennemis;17/11/2018;25;20;0.8;0;0
 a drivel;une imbécilité. une bêtise;17/11/2022;9;-5;-0.56;0;0
-slovenly;négligemment;17/12/2018;33;13;0.39;0;0
+a snare;un piège. un collet / une caisse claire;17/12/2018;26;9;0.35;0;0
+the abode;la demeure. la résidence;17/12/2018;27;-13;-0.48;0;0
+an auger;une tarrière;17/12/2018;37;5;0.14;0;0
 the rabble;la populace / la cohue;17/12/2018;29;-7;-0.24;0;0
 the peg;la cheville;17/12/2018;30;19;0.63;0;0
-to aver;affirmer. déclarer;17/12/2018;25;-2;-0.08;0;0
 a dud;une pièce NOK / une nippe;17/12/2018;37;22;0.59;0;0
-a snare;un piège. un collet / une caisse claire;17/12/2018;25;8;0.32;0;0
-an auger;une tarrière;17/12/2018;37;5;0.14;0;0
-the abode;la demeure. la résidence;17/12/2018;27;-13;-0.48;0;0
 a hovel;un taudis;17/12/2018;32;0;0.0;0;0
 conducive (adv.);contribuant. assistant;17/12/2018;32;-5;-0.16;0;0
+to aver;affirmer. déclarer;17/12/2018;25;-2;-0.08;0;0
 to allay;modérer. apaiser;17/12/2018;27;-18;-0.67;1;0
+slovenly;négligemment;17/12/2018;33;13;0.39;0;0
 sketchy (adj.);vague. incomplet;17/12/2022;8;2;0.25;0;0
+brimming (adj.);débordant;18/01/2020;25;-15;-0.6;0;0
+to slam;claquer;18/01/2020;30;13;0.43;0;0
+a prong;une dent;18/01/2020;19;3;0.16;0;0
+a tender;une offre / une navette;18/01/2020;27;-8;-0.3;0;0
+a jackal;un chacal;18/01/2020;16;9;0.56;0;0
 crippled;estropié;18/01/2020;25;7;0.28;0;0
 a blemish;un défaut;18/01/2020;27;8;0.3;0;0
-a prong;une dent;18/01/2020;19;3;0.16;0;0
 a wineskin;une outre;18/01/2020;24;15;0.62;0;0
-a jackal;un chacal;18/01/2020;16;9;0.56;0;0
-to slam;claquer;18/01/2020;30;13;0.43;0;0
-brimming (adj.);débordant;18/01/2020;25;-15;-0.6;0;0
-a tender;une offre / une navette;18/01/2020;27;-8;-0.3;0;0
 a tally;un pointage. un compte / une baguette / un talon;18/01/2020;29;12;0.41;0;0
 a ramble;une randonnée;18/01/2020;28;5;0.18;0;0
-to grizzle;geindre;18/01/2020;38;-9;-0.24;0;0
-betrothal (common name);les fiançailles;18/01/2020;24;13;0.54;0;0
-to deem;considérer;18/01/2020;22;11;0.5;0;0
-brackish;saumâtre;18/01/2020;30;17;0.57;0;0
 the amenities;les agréments;18/01/2020;19;-1;-0.05;0;0
-to squeeze;écraser;18/01/2020;21;15;0.71;0;0
 a rooster;un coq;18/01/2020;19;10;0.53;0;0
 a loot;un butin;18/01/2020;30;-3;-0.1;0;0
+brackish;saumâtre;18/01/2020;30;17;0.57;0;0
+to grizzle;geindre;18/01/2020;38;-9;-0.24;0;0
+to squeeze;écraser;18/01/2020;21;15;0.71;0;0
+to deem;considérer;18/01/2020;22;11;0.5;0;0
+betrothal (common name);les fiançailles;18/01/2020;24;13;0.54;0;0
 a wayland;un chemin de terre;18/01/2023;5;-3;-0.6;0;0
 a rollercoaster;une montagne russe;18/01/2023;10;8;0.8;0;0
 a slingshot;un lance-pierre;18/02/2022;15;-1;-0.07;0;0
@@ -1471,27 +1469,24 @@ a gambit;une manœuvre;18/03/2022;9;-1;-0.11;0;0
 gruff (adj.);bourru. brusque. grossier;18/03/2022;15;13;0.87;0;0
 a cubicle;une cabine. une alcôve;18/03/2023;7;-3;-0.43;0;0
 to smear;diffamer;18/04/2022;11;-11;-1.0;1;0
-vaunted;vanné;18/05/2019;32;22;0.69;0;0
 a warp;une chaîne / un voile;18/05/2019;18;8;0.44;0;0
-to spawn;frayer;18/05/2019;21;-6;-0.29;0;0
+vaunted;vanné;18/05/2019;32;22;0.69;0;0
 a hull;une coque;18/05/2019;27;19;0.7;0;0
+to spawn;frayer;18/05/2019;21;-6;-0.29;0;0
+to beget;engendrer;18/05/2020;21;-14;-0.67;0;0
+a cuff;une manchette;18/05/2020;35;21;0.6;0;0
+a clipboard;un presse-papier;18/05/2020;20;3;0.15;0;0
 a hue;une teinte;18/05/2020;24;19;0.79;0;0
 a woe;un malheur;18/05/2020;23;3;0.13;0;0
 to scrabble;gratter;18/05/2020;26;12;0.46;0;0
 jam-packed;bourré;18/05/2020;19;4;0.21;0;0
 to foster;favoriser. encourager. élever;18/05/2020;22;8;0.36;0;0
 dim;faible;18/05/2020;22;15;0.68;0;0
-an incumbent;un titulaire;18/05/2020;32;6;0.19;0;1
+an incumbent;un titulaire;18/05/2020;32;6;0.19;0;0
 beleaguered;assiégé;18/05/2020;25;12;0.48;0;0
-to beget;engendrer;18/05/2020;21;-14;-0.67;0;0
-a cuff;une manchette;18/05/2020;35;21;0.6;0;0
-a clipboard;un presse-papier;18/05/2020;20;3;0.15;0;0
 a skin rash;une démangeaison de la peau;18/05/2020;27;20;0.74;0;0
 a dice roll;un lancer de dé;18/05/2020;34;12;0.35;0;0
 a warm up;une mise en train;18/05/2020;27;14;0.52;0;0
-a tug;un remorqueur;18/05/2020;14;-9;-0.64;0;0
-a spike;une pointe;18/05/2020;31;21;0.68;0;0
-scaly;méprisable. lâche;18/05/2020;21;-7;-0.33;0;0
 a leap year;une année bissextile;18/05/2020;20;15;0.75;0;0
 a reed;un roseau;18/05/2020;27;20;0.74;0;0
 shagged;crevé;18/05/2020;17;-12;-0.71;0;0
@@ -1499,84 +1494,87 @@ sworn in;assermenté;18/05/2020;17;13;0.76;0;0
 the scaliness;l'évolutivité;18/05/2020;31;21;0.68;0;0
 devoid (adj.);dépourvu;18/05/2020;17;-5;-0.29;0;0
 a matting;une natte (tapis oriental);18/05/2020;33;8;0.24;0;0
-to flush;affleurer;18/05/2020;32;8;0.25;0;0
-to cobble;bricoler;18/05/2021;26;-13;-0.5;0;0
-a padlock;un cadenas;18/05/2021;24;14;0.58;0;0
-wistful;mélancolique;18/05/2021;17;-13;-0.76;0;0
-to bolster;renforcer. rembourrer;18/05/2021;29;20;0.69;0;0
-an anchor;une ancre;18/05/2021;20;17;0.85;0;0
-a shack;une cabane;18/05/2021;20;15;0.75;0;0
+to flush;affleurer;18/05/2020;33;9;0.27;0;0
+a tug;un remorqueur;18/05/2020;14;-9;-0.64;0;0
+a spike;une pointe;18/05/2020;32;22;0.69;0;0
+scaly;méprisable. lâche;18/05/2020;21;-7;-0.33;0;0
 to toggle;basculer;18/05/2021;26;20;0.77;0;0
+a shack;une cabane;18/05/2021;20;15;0.75;0;0
+an anchor;une ancre;18/05/2021;20;17;0.85;0;0
+to cobble;bricoler;18/05/2021;26;-13;-0.5;0;0
 to fling;jeter;18/05/2021;38;19;0.5;0;0
 out of whack;hors du coup;18/05/2021;30;14;0.47;0;0
+to bolster;renforcer. rembourrer;18/05/2021;29;20;0.69;0;0
+wistful;mélancolique;18/05/2021;17;-13;-0.76;0;0
+a padlock;un cadenas;18/05/2021;24;14;0.58;0;0
 to reave;saccager;18/06/2023;0;0;0.0;0;0
-a curd;un type de fromage blanc / un cabot. un sale chien;18/07/2021;31;5;0.16;0;0
-a salvage;un sauvetage;18/07/2021;14;-1;-0.07;0;0
-a fender;une aile (de véhicule);18/07/2021;32;9;0.28;0;0
-a backlash;un contrecoup;18/07/2021;25;-7;-0.28;0;0
-flax (common name);le lin;18/07/2021;25;10;0.4;0;0
 conspicuous;visible. évident / formidable;18/07/2021;29;3;0.1;0;0
+an ordeal;un supplice;18/07/2021;23;13;0.57;0;0
 a cloth;un chiffon;18/07/2021;19;1;0.05;0;0
 a trove;un trophée;18/07/2021;23;15;0.65;0;0
+a curd;un type de fromage blanc / un cabot. un sale chien;18/07/2021;31;5;0.16;0;0
+agonizing;angoissant;18/07/2021;24;10;0.42;0;0
 a war chest;un coffre de guerre;18/07/2021;15;11;0.73;0;0
+flax (common name);le lin;18/07/2021;25;10;0.4;0;0
+to rein in;maîtriser;18/07/2021;23;13;0.57;0;0
+a salvage;un sauvetage;18/07/2021;14;-1;-0.07;0;0
+a flutter;un battement / une agitation;18/07/2021;22;6;0.27;0;0
+on premise;sur place;18/07/2021;19;11;0.58;0;0
 a heist;un braquage;18/07/2021;19;-14;-0.74;0;0
+a backlash;un contrecoup;18/07/2021;25;-7;-0.28;0;0
+a fender;une aile (de véhicule);18/07/2021;32;9;0.28;0;0
+poised;en équilibre;18/07/2021;20;-6;-0.3;0;0
 the conceit;la vanité;18/07/2021;27;-4;-0.15;0;0
 the foresight;la prévoyance;18/07/2021;22;18;0.82;0;0
 a drudgery;une corvée;18/07/2021;17;-15;-0.88;1;0
-a flutter;un battement / une agitation;18/07/2021;22;6;0.27;0;0
-agonizing;angoissant;18/07/2021;24;10;0.42;0;0
-an ordeal;un supplice;18/07/2021;23;13;0.57;0;0
-to rein in;maîtriser;18/07/2021;23;13;0.57;0;0
-poised;en équilibre;18/07/2021;20;-6;-0.3;0;0
-on premise;sur place;18/07/2021;19;11;0.58;0;0
 to purport;se prétendre. se faire passer pour;18/09/2018;31;18;0.58;0;0
 a hammock;un hamac;18/09/2021;28;8;0.29;0;0
 a speed bump;un dos-d'âne;18/09/2021;18;14;0.78;0;0
-a bulge;un renflement. une bosse;18/10/2019;23;11;0.48;0;0
 a trough;un creux;18/10/2019;30;21;0.7;0;0
-a clam;une palourde / un bavard;18/10/2019;25;19;0.76;0;0
+a bulge;un renflement. une bosse;18/10/2019;23;11;0.48;0;0
 a snail;un escargot;18/10/2019;21;17;0.81;0;0
+a clam;une palourde / un bavard;18/10/2019;25;19;0.76;0;0
 to grapple with;lutter avec;18/10/2022;9;9;1.0;0;0
-stealthy;furtif. fait en secret;18/11/2018;31;13;0.42;0;0
+a goose;une oie;18/11/2018;23;15;0.65;0;0
+to defile;souillez. profaner. salir;18/11/2018;30;21;0.7;0;0
+a hound;un chien de chasse;18/11/2018;15;12;0.8;0;0
+drab (adj.);terne. morne;18/11/2018;30;17;0.57;0;1
+devious;sournois / détourné;18/11/2018;31;14;0.45;0;0
+a shredder;une déchiqueteuse;18/11/2018;24;19;0.79;0;0
 to heed;tenir compte de. prendre garde à;18/11/2018;39;9;0.23;0;0
 a reaper;une moissonneuse;18/11/2018;24;19;0.79;0;0
 to husk;décortiquer;18/11/2018;28;2;0.07;0;0
-a trail;un sentier. une piste;18/11/2018;23;16;0.7;0;0
-an upsurge;une recrudescence. un regain;18/11/2018;32;7;0.22;0;0
-devious;sournois / détourné;18/11/2018;31;14;0.45;0;0
-stalwart (adj.);fidèle / vigoureux;18/11/2018;25;5;0.2;0;0
-drab (adj.);terne. morne;18/11/2018;29;16;0.55;0;0
-a shredder;une déchiqueteuse;18/11/2018;24;19;0.79;0;0
-a hound;un chien de chasse;18/11/2018;15;12;0.8;0;0
-to defile;souillez. profaner. salir;18/11/2018;30;21;0.7;0;0
+stealthy;furtif. fait en secret;18/11/2018;31;13;0.42;0;0
 a mayhem;du grabuge / une destruction;18/11/2018;26;19;0.73;0;0
+the payload;la charge utile. la charge payante. l'emport;18/11/2018;16;3;0.19;0;0
+to backstab;poignarder dans le dos;18/11/2018;23;19;0.83;0;0
+an upsurge;une recrudescence. un regain;18/11/2018;32;7;0.22;0;0
+a trail;un sentier. une piste;18/11/2018;23;16;0.7;0;0
+stalwart (adj.);fidèle / vigoureux;18/11/2018;25;5;0.2;0;0
 a roaming;un errant. un vagabond;18/11/2018;28;11;0.39;0;0
 dapper (adj.);pimpant. élégant. chic;18/11/2018;21;13;0.62;0;0
-a den;une tanière;18/11/2018;29;20;0.69;0;0
-to buy off;acheter le silence de;18/11/2018;19;-6;-0.32;0;0
-asunder;en morceaux. écartés / éloignés;18/11/2018;18;15;0.83;0;0
-lurid;épouvantable. horrible;18/11/2018;30;7;0.23;0;0
-a goose;une oie;18/11/2018;23;15;0.65;0;0
-a tendril;une vrille;18/11/2018;34;8;0.24;0;0
-yonder;là-bas;18/11/2018;24;14;0.58;0;0
-the payload;la charge utile. la charge payante. l'emport;18/11/2018;16;3;0.19;0;0
 torn;déchiré;18/11/2018;30;22;0.73;0;0
-a harbinger;un présage. un signe avant-coureur;18/11/2018;31;17;0.55;0;0
+yonder;là-bas;18/11/2018;24;14;0.58;0;0
 the watershed;le moment critique. le grand tournant / le bassin versant;18/11/2018;33;8;0.24;0;0
-to backstab;poignarder dans le dos;18/11/2018;23;19;0.83;0;0
+asunder;en morceaux. écartés / éloignés;18/11/2018;18;15;0.83;0;0
+a tendril;une vrille;18/11/2018;34;8;0.24;0;0
+lurid;épouvantable. horrible;18/11/2018;30;7;0.23;0;0
+to buy off;acheter le silence de;18/11/2018;19;-6;-0.32;0;0
+a den;une tanière;18/11/2018;29;20;0.69;0;0
+a harbinger;un présage. un signe avant-coureur;18/11/2018;31;17;0.55;0;0
 a hedge-trimmer;un taille-haie;18/11/2019;21;16;0.76;0;0
-the fixturing;le montage;18/11/2019;29;-11;-0.38;0;0
-lace (common name);la dentelle;18/11/2019;18;1;0.06;0;0
-errands (common name);les courses;18/11/2019;28;14;0.5;0;0
-the soulmate;l'âme sœur;18/11/2019;21;17;0.81;0;0
-to skimp;lésiner;18/11/2019;29;19;0.66;0;0
-a windfall;une aubaine;18/11/2019;30;21;0.7;0;0
-a timeliness;une opportunité;18/11/2019;32;21;0.66;0;0
-sullen (adj.);renfrogné;18/11/2019;27;-11;-0.41;0;0
-a hanger;un cintre;18/11/2019;28;15;0.54;0;0
 detrimental;préjudiciable;18/11/2019;32;17;0.53;0;0
-on the job;sur le tas;18/11/2019;23;16;0.7;0;0
+lace (common name);la dentelle;18/11/2019;18;1;0.06;0;0
+sullen (adj.);renfrogné;18/11/2019;27;-11;-0.41;0;0
+the soulmate;l'âme sœur;18/11/2019;21;17;0.81;0;0
 a schoolboy;un écolier;18/11/2019;25;20;0.8;0;0
+to skimp;lésiner;18/11/2019;29;19;0.66;0;0
+a timeliness;une opportunité;18/11/2019;32;21;0.66;0;0
+a windfall;une aubaine;18/11/2019;30;21;0.7;0;0
+a hanger;un cintre;18/11/2019;28;15;0.54;0;0
+errands (common name);les courses;18/11/2019;28;14;0.5;0;0
+on the job;sur le tas;18/11/2019;23;16;0.7;0;0
+the fixturing;le montage;18/11/2019;29;-11;-0.38;0;0
 styrofoam (common name);le polystyrène;18/11/2022;8;6;0.75;0;0
 to weep;verser des larmes;18/12/2022;7;-1;-0.14;0;0
 timely (adj.);opportun;19/01/2022;20;16;0.8;0;0
@@ -1591,10 +1589,10 @@ a barn;une grange. une étable;19/03/2022;14;-6;-0.43;0;0
 to neigh;hennir;19/03/2022;11;-3;-0.27;0;0
 a bairn;un enfant;19/03/2022;10;-8;-0.8;0;0
 to throttle;étrangler / accélérer;19/03/2022;15;-5;-0.33;0;0
-momentous (adj.);important;19/03/2023;6;4;0.67;0;0
-to coddle;dorloter. choyer;19/03/2023;2;-2;-1.0;0;0
-to gel;gélifier / prendre tournure;19/03/2023;5;5;1.0;0;0
 brittle (adj.);friable;19/03/2023;7;1;0.14;0;0
+momentous (adj.);important;19/03/2023;6;4;0.67;0;0
+to gel;gélifier / prendre tournure;19/03/2023;5;5;1.0;0;0
+to coddle;dorloter. choyer;19/03/2023;2;-2;-1.0;0;0
 a kerfuffle;un désordre. une bagarre;19/03/2023;6;2;0.33;0;0
 to divvy up;diviser;19/03/2023;5;-1;-0.2;0;0
 to flog;fouetter. flageller;19/03/2023;7;-1;-0.14;0;0
@@ -1615,21 +1613,21 @@ to till;labourer;19/08/2021;24;-16;-0.67;1;0
 to whittle;réduire;19/08/2021;15;-14;-0.93;1;0
 tweaking piecemeal ;ajuster au coup par coup;19/08/2021;29;10;0.34;0;0
 a wake;un sillage;19/08/2021;23;15;0.65;0;0
-a saddle;une selle / un col;19/11/2018;21;15;0.71;0;0
 a placeholder;un espace réservé;19/11/2018;28;-1;-0.04;0;0
 the maw;la gueule;19/11/2018;21;12;0.57;0;0
 wanton (adj.);capricieux / injustifié;19/11/2018;29;4;0.14;0;0
 to atone;expier;19/11/2018;40;14;0.35;0;0
 the gumption;la jugeotte;19/11/2018;34;2;0.06;0;0
 to vindicate;justifier. défendre;19/11/2018;25;12;0.48;0;0
+a saddle;une selle / un col;19/11/2018;21;15;0.71;0;0
 to scour;parcourir. fouiller / récurer;19/11/2018;22;2;0.09;0;0
 freak (adj.);anormal. exceptionnel;19/11/2021;16;-2;-0.13;0;0
 to loll;se prélasser;19/11/2021;12;-10;-0.83;0;0
 a leech;une sangsue;19/11/2021;19;1;0.05;0;0
 Keep it handy.;Garde-le à portée de main.;19/11/2022;10;4;0.4;0;0
-shin (common name);le tibia;19/11/2022;8;0;0.0;0;0
+shin (common name);le tibia;19/11/2022;9;1;0.11;0;1
 hamstring (common name);le tendon;19/11/2022;11;7;0.64;0;0
-to cater;approvisionner;19/11/2022;8;4;0.5;0;0
+to cater;approvisionner;19/11/2022;9;5;0.56;0;0
 whey (common name);du petit lait;19/12/2021;15;-11;-0.73;0;0
 willy-nilly (expr.);bon gré mal gré;20/01/2022;16;14;0.88;0;0
 deceit (common name);la tromperie. le mensonge;20/01/2022;18;4;0.22;0;0
@@ -1638,59 +1636,59 @@ to shrug;hausser les épaules;20/01/2023;11;-1;-0.09;0;0
 to checkmate;faire échec et mat;20/01/2023;3;3;1.0;0;0
 a stencil;un pochoir;20/01/2023;6;-6;-1.0;0;0
 to come over the bouts;surmonter les combats;20/02/2023;5;1;0.2;0;0
-wicked (adj.);méchant. mauvais. inique;20/03/2022;16;-8;-0.5;0;0
 to snarl;gronder. grogner;20/03/2022;18;-14;-0.78;0;0
+wicked (adj.);méchant. mauvais. inique;20/03/2022;16;-8;-0.5;0;0
 to take over;prendre la succession. reprendre (un commerce). racheter / se mettre à l'abri;20/03/2022;29;12;0.41;0;0
 a tub;un bac. une baignoire;20/03/2022;8;-8;-1.0;0;0
 to rue;regretter. se repentir;20/03/2022;21;11;0.52;0;0
 outwitted;déjoué;20/03/2022;17;-11;-0.65;0;0
 to sift;tamiser. passer au crible;20/03/2022;13;1;0.08;0;0
-to snivel;pleurnicher. larmoyer;20/03/2022;9;-1;-0.11;0;0
 dotage (common name);l'âge gâteux. la seconde enfance;20/03/2022;15;7;0.47;0;0
+to snivel;pleurnicher. larmoyer;20/03/2022;9;-1;-0.11;0;0
 sundries;des articles divers;20/04/2020;28;4;0.14;0;0
 a wig;une perruque;20/04/2020;34;19;0.56;0;0
-trifling (adj.);insignifiant;20/04/2020;30;20;0.67;0;0
+trifling (adj.);insignifiant;20/04/2020;31;21;0.68;0;0
 to abridge;abréger;20/04/2020;30;19;0.63;0;0
-hollow;creux;20/05/2019;31;18;0.58;0;0
-despicable;méprisable;20/05/2019;26;19;0.73;0;0
-the vicinity;les environs. les alentours;20/05/2019;29;20;0.69;0;0
-perks;les avantages divers (salaires. notes de frais. CE. …);20/05/2019;28;17;0.61;0;0
-a dissenter;un dissident;20/05/2019;30;-10;-0.33;0;0
 an underwriting;une souscription;20/05/2019;30;21;0.7;0;0
-a boilerplate;une plaque de cuisson;20/05/2019;27;20;0.74;0;0
+a dissenter;un dissident;20/05/2019;30;-10;-0.33;0;0
+the vicinity;les environs. les alentours;20/05/2019;29;20;0.69;0;0
+to teem;pulluler;20/05/2019;20;-7;-0.35;0;0
+despicable;méprisable;20/05/2019;26;19;0.73;0;0
+hollow;creux;20/05/2019;31;18;0.58;0;0
+a boilerplate;une plaque de cuisson;20/05/2019;28;21;0.75;0;0
 a pin;une épingle;20/05/2019;22;-1;-0.05;0;0
 a heathen;un païen;20/05/2019;16;6;0.38;0;0
-stiff (adj.);rigide;20/05/2019;30;22;0.73;0;0
+the vanguard;l'avant-garde;20/05/2019;22;18;0.82;0;0
+to slacken;ralentir. se relâcher;20/05/2019;28;20;0.71;0;0
+unkempt;peu soigné;20/05/2019;25;17;0.68;0;0
+perks;les avantages divers (salaires. notes de frais. CE. …);20/05/2019;28;17;0.61;0;0
 to indwell;habiter;20/05/2019;27;19;0.7;0;0
 a dither;un tremblement;20/05/2019;30;11;0.37;0;0
+a skit;un sketch;20/05/2019;27;15;0.56;0;0
 outermost;le plus extérieur;20/05/2019;28;18;0.64;0;0
 a spree;une fête;20/05/2019;24;12;0.5;0;0
-the vanguard;l'avant-garde;20/05/2019;22;18;0.82;0;0
-a parrot;un perroquet;20/05/2019;32;23;0.72;0;0
-a skit;un sketch;20/05/2019;27;15;0.56;0;0
-a lattice;un treillis;20/05/2019;27;13;0.48;0;0
 deprecated;obsolète;20/05/2019;25;17;0.68;0;0
 to pervade;imprégner;20/05/2019;31;-3;-0.1;0;0
-unkempt;peu soigné;20/05/2019;25;17;0.68;0;0
+the gusto;l'enthousiasme;20/05/2019;28;15;0.54;0;0
 to crop;rogner / surgir / récolter;20/05/2019;28;19;0.68;0;0
-a token;un jeton;20/05/2019;32;21;0.66;0;0
-a hinge;une charnière;20/05/2019;23;10;0.43;0;0
-a fence;une clôture;20/05/2019;27;20;0.74;0;0
-sludge (common name); de la boue;20/05/2019;20;-7;-0.35;0;0
-stepping stones;un tremplin;20/05/2019;21;10;0.48;0;0
+a lattice;un treillis;20/05/2019;27;13;0.48;0;0
 stranded;échoué;20/05/2019;23;18;0.78;0;0
+stepping stones;un tremplin;20/05/2019;21;10;0.48;0;0
+stiff (adj.);rigide;20/05/2019;30;22;0.73;0;0
+a fence;une clôture;20/05/2019;27;20;0.74;0;0
+a hinge;une charnière;20/05/2019;23;10;0.43;0;0
 shards (common name);des éclats. du tesson;20/05/2019;25;15;0.6;0;0
 a bum;un clochard;20/05/2019;26;16;0.62;0;0
 lukewarm;tiède;20/05/2019;24;16;0.67;0;0
+sludge (common name); de la boue;20/05/2019;20;-7;-0.35;0;0
+a parrot;un perroquet;20/05/2019;32;23;0.72;0;0
+a token;un jeton;20/05/2019;32;21;0.66;0;0
 scruffy;débraillé;20/05/2019;25;15;0.6;0;0
 a speck;un grain;20/05/2019;23;-7;-0.3;0;0
 an uplift;un soulèvement;20/05/2019;22;12;0.55;0;0
+steep;raide;20/05/2019;28;20;0.71;0;0
 a compound;une enceinte;20/05/2019;23;6;0.26;0;0
 meek;doux;20/05/2019;22;7;0.32;0;0
-to slacken;ralentir. se relâcher;20/05/2019;28;20;0.71;0;0
-steep;raide;20/05/2019;28;20;0.71;0;0
-the gusto;l'enthousiasme;20/05/2019;28;15;0.54;0;0
-to teem;pulluler;20/05/2019;20;-7;-0.35;0;0
 peculiar;particulier;20/05/2019;24;18;0.75;0;0
 crawfish (common name);l'écrevisse;20/05/2022;14;6;0.43;0;0
 a mane;une crinière;20/05/2023;2;0;0.0;0;0
@@ -1698,13 +1696,13 @@ a headwind;un vent contraire;20/06/2022;8;4;0.5;0;0
 a simile;une comparaison;20/06/2022;11;-5;-0.45;0;0
 a dealership;une concession / une procuration;20/06/2022;8;-8;-1.0;0;0
 a primer;un apprêt / un premier livre;20/06/2022;13;-7;-0.54;0;0
-entrancing;ravissant. enchanteur;20/08/2021;21;7;0.33;0;0
+entrancing;ravissant. enchanteur;20/08/2021;22;8;0.36;0;1
 glibly;avec désinvolture;20/08/2021;11;3;0.27;0;0
 a recumbent;un gisant;20/08/2021;17;7;0.41;0;0
 a bushel;un boisseau;20/08/2022;9;1;0.11;0;0
-a ledger;un registre;20/09/2021;22;2;0.09;0;0
-tacky;collant / moche;20/09/2021;14;0;0.0;0;0
 a thumbtack;une punaise (fixation);20/09/2021;21;11;0.52;0;0
+a ledger;un registre;20/09/2021;23;3;0.13;0;0
+tacky;collant / moche;20/09/2021;14;0;0.0;0;0
 grasper (adj.);compréhensif;20/11/2018;33;22;0.67;0;0
 It's a lost and found case.;C'est évident.;20/11/2022;5;-5;-1.0;0;0
 southpaw (adj.);gaucher;20/11/2022;15;13;0.87;0;0
@@ -1712,68 +1710,68 @@ For all my brave talk. ...;Malgré tous mes discours courageux. …;20/11/2022;9
 out of fear;par peur;21/02/2021;33;23;0.7;0;0
 unadorned;sans fioriture;21/02/2022;21;-11;-0.52;0;0
 a freshman;un étudiant de première année;21/02/2022;9;1;0.11;0;0
-to lapse;abandonner;21/03/2021;22;-11;-0.5;0;0
-a fellow;un compagnon. une compagne / un camarade;21/03/2021;24;3;0.12;0;0
-a setback;un revers;21/03/2021;32;18;0.56;0;0
-lawfullness (common name);la régularité;21/03/2021;17;14;0.82;0;0
 warring (adj.);en guerre;21/03/2021;24;19;0.79;0;0
-the rubble;les décombres. les gravats;21/03/2021;30;-5;-0.17;0;0
-to hand out;distribuer;21/03/2021;27;19;0.7;0;0
 a roundup;une rafle;21/03/2021;29;13;0.45;0;0
+a fellow;un compagnon. une compagne / un camarade;21/03/2021;24;3;0.12;0;0
+lawfullness (common name);la régularité;21/03/2021;17;14;0.82;0;0
 a rout;une débâcle. une déroute;21/03/2021;19;-12;-0.63;0;0
 to havass;ravager;21/03/2021;26;15;0.58;0;0
+to hand out;distribuer;21/03/2021;27;19;0.7;0;0
 Mayday!;Au secours !;21/03/2021;23;16;0.7;0;0
+a setback;un revers;21/03/2021;33;19;0.58;0;0
+the rubble;les décombres. les gravats;21/03/2021;30;-5;-0.17;0;0
+to lapse;abandonner;21/03/2021;22;-11;-0.5;0;0
 snappy;vif. dynamique;21/03/2022;16;-14;-0.88;1;0
 Don't take this as gospel.;Ne prends pas ça pour parole d'évangile.;21/04/2023;3;3;1.0;0;0
-clogs (common name);les sabots;21/05/2022;14;-2;-0.14;0;0
-to clog;boucher. engorger;21/05/2022;15;-11;-0.73;0;0
 to rave;délirer / parler avec enthousiasme;21/05/2022;13;11;0.85;0;0
-ancillary (adj.);auxiliaire;21/05/2023;3;3;1.0;0;0
+to clog;boucher. engorger;21/05/2022;15;-11;-0.73;0;0
+clogs (common name);les sabots;21/05/2022;15;-1;-0.07;0;0
 to rile;agacer;21/05/2023;0;0;0.0;0;0
+ancillary (adj.);auxiliaire;21/05/2023;3;3;1.0;0;0
+gimp (adj.);boiteux;21/06/2022;18;-6;-0.33;0;0
 as of this recording (expr.);au moment où cette vidéo est enregistrée;21/06/2022;14;12;0.86;0;0
 offspring (common name);la progéniture / le résultat;21/06/2022;15;13;0.87;0;0
 steadfast;inébranlable / fidèle;21/06/2022;15;5;0.33;0;0
-gimp (adj.);boiteux;21/06/2022;18;-6;-0.33;0;0
 slurs (common name);des insultes;21/06/2023;0;0;0.0;0;0
 to throb;palpiter;21/07/2020;23;14;0.61;0;0
 monies (common name);de l'argent. des liquidités;21/07/2020;26;13;0.5;0;0
 a hideout;une cachette;21/07/2020;27;17;0.63;0;0
 to scrub;frotter;21/07/2020;23;-7;-0.3;0;0
 an upwelling;une montée d'eau;21/07/2020;28;1;0.04;0;0
-a throughput;un débit;21/07/2020;24;15;0.63;0;0
 sultry (adj.);étouffant;21/07/2020;17;3;0.18;0;0
+a throughput;un débit;21/07/2020;24;15;0.63;0;0
 And Bob's your uncle!;Et voilà !;21/07/2022;7;7;1.0;0;0
 iffy (adj.);douteux;21/08/2022;13;-13;-1.0;1;0
 to discard;se débarrasser de. écarter;21/09/2021;25;17;0.68;0;0
 to parse;analyser;21/10/2018;20;12;0.6;0;0
 tardiness (common name);la lenteur / le manque de ponctualité;21/10/2022;5;1;0.2;0;0
-a locust;un criquet. une sauterelle. une caroube;21/11/2018;27;20;0.74;0;0
-a prowess;une prouesse;21/11/2018;30;21;0.7;0;0
-to pespire;transpirer;21/11/2018;31;22;0.71;0;0
-overlooked;négligé. oublié;21/11/2018;27;12;0.44;0;0
 a crucible;un creuset / une épreuve;21/11/2018;29;22;0.76;0;0
+overlooked;négligé. oublié;21/11/2018;27;12;0.44;0;0
 a pawn;un pion / un gage;21/11/2018;23;18;0.78;0;0
+a prowess;une prouesse;21/11/2018;30;21;0.7;0;0
+a locust;un criquet. une sauterelle. une caroube;21/11/2018;27;20;0.74;0;0
+to pespire;transpirer;21/11/2018;31;22;0.71;0;0
+muck (common name);la boue;21/11/2021;27;19;0.7;0;0
 to hallmark;poinçonner;21/11/2021;11;-3;-0.27;0;0
 unfathomable;insondable;21/11/2021;16;8;0.5;0;0
-muck (common name);la boue;21/11/2021;27;19;0.7;0;0
 a hunk;un gros morceau;21/11/2022;10;-4;-0.4;0;0
-a cue;un signal / une queue;22/01/2022;23;11;0.48;0;0
 overtly;ouvertement;22/01/2022;15;13;0.87;0;0
+a cue;un signal / une queue;22/01/2022;23;11;0.48;0;0
 carpeting (commmon name);la moquette;22/01/2023;11;-1;-0.09;0;0
 to read the fine print;lire les astérisques d'un contrat;22/01/2023;6;6;1.0;0;0
-a litter;une litière;22/02/2021;24;19;0.79;0;0
-arraigned;interpellé;22/02/2021;25;11;0.44;0;0
 charred;carbonisé;22/02/2021;27;20;0.74;0;0
 an outlet;une sortie;22/02/2021;22;14;0.64;0;0
-a skirt / to skirt;une jupe / contourner. esquiver;22/02/2021;26;7;0.27;0;0
-to withhold;retenir;22/02/2021;26;14;0.54;0;0
 buttocks (common name);les fesses (oh !);22/02/2021;20;13;0.65;0;0
-a turnstile;un tourniquet;22/02/2021;23;12;0.52;0;0
-a butler;un majordome;22/02/2021;29;-13;-0.45;0;0
-a stationery;une papeterie;22/02/2021;28;5;0.18;0;0
-ailments (common name);des maux;22/02/2021;29;15;0.52;0;0
+a litter;une litière;22/02/2021;24;19;0.79;0;0
+arraigned;interpellé;22/02/2021;25;11;0.44;0;0
+to withhold;retenir;22/02/2021;27;15;0.56;0;1
+a skirt / to skirt;une jupe / contourner. esquiver;22/02/2021;26;7;0.27;0;0
 to turnout;s'avérer;22/02/2021;27;16;0.59;0;0
 to lease;louer;22/02/2021;30;17;0.57;0;0
+a turnstile;un tourniquet;22/02/2021;23;12;0.52;0;0
+a butler;un majordome;22/02/2021;29;-13;-0.45;0;0
+ailments (common name);des maux;22/02/2021;29;15;0.52;0;0
+a stationery;une papeterie;22/02/2021;28;5;0.18;0;0
 a daisy;une paquerette / un homme gentil;22/02/2022;11;5;0.45;0;0
 a flee;une puce;22/02/2022;9;7;0.78;0;0
 especially since …;d'autant plus que …;22/02/2022;19;9;0.47;0;0
@@ -1786,46 +1784,46 @@ a hedgedog;un hérisson;22/04/2022;14;10;0.71;0;0
 a wimp;une mauviette. une femelette;22/04/2023;4;-2;-0.5;0;0
 duress (common name);la contrainte;22/05/2022;14;-10;-0.71;0;0
 a valedictorian;un major de promotion;22/05/2022;15;11;0.73;0;0
-circuitous;détourné;22/06/2020;25;6;0.24;0;0
-a demographic;une tranche de la population;22/06/2020;19;10;0.53;0;0
-inasmuch;dans la mesure où;22/06/2020;21;13;0.62;0;0
-a woof;une trame;22/06/2020;30;12;0.4;0;0
-a grapefruit;un pamplemousse;22/06/2020;20;13;0.65;0;0
-a winding;un enroulement;22/06/2020;24;17;0.71;0;0
-the rump;la croupe;22/06/2020;34;22;0.65;0;0
-to bring up;faire monter;22/06/2020;22;7;0.32;0;0
-to hamper;entraver;22/06/2020;21;-8;-0.38;0;0
-a fad;une mode;22/06/2020;27;10;0.37;0;0
-a cheerleader;une pom-pom girl;22/06/2020;15;12;0.8;0;0
-a skein;un écheveau;22/06/2020;26;4;0.15;0;0
-a lap;un tour (de piste);22/06/2020;26;15;0.58;0;0
-to mend;réparer;22/06/2020;34;0;0.0;0;0
-off the cuff;au pied levé;22/06/2020;29;14;0.48;0;0
-seasoned;chevronné;22/06/2020;23;5;0.22;0;0
-to obviate;parer à;22/06/2020;26;-16;-0.62;1;0
 the utmost;le maximum;22/06/2020;26;18;0.69;0;0
-time and time again;maintes et maintes fois;22/06/2020;28;6;0.21;0;0
+the rump;la croupe;22/06/2020;34;22;0.65;0;0
+to hamper;entraver;22/06/2020;21;-8;-0.38;0;0
+a woof;une trame;22/06/2020;30;12;0.4;0;0
+seasoned;chevronné;22/06/2020;23;5;0.22;0;0
+a winding;un enroulement;22/06/2020;24;17;0.71;0;0
+a lap;un tour (de piste);22/06/2020;26;15;0.58;0;0
+to bring up;faire monter;22/06/2020;22;7;0.32;0;0
 a dearth;une disette;22/06/2020;24;15;0.63;0;0
-an avocation;un métier;22/06/2020;26;13;0.5;0;0
-to trim;réduire;22/06/2020;27;0;0.0;0;0
-destitution (common name);la misère;22/06/2020;25;20;0.8;0;0
-to trade off;troquer;22/06/2020;34;23;0.68;0;0
-to sprinkle;saupoudrer;22/06/2020;22;11;0.5;0;0
-stingy;avare;22/06/2020;27;-3;-0.11;0;0
-crestfallen (adj.);découragé;22/06/2020;27;-1;-0.04;0;0
-to come into being;naître;22/06/2020;32;23;0.72;0;1
-luster (common name);le lustre. l'éclat. la gloire;22/06/2020;22;8;0.36;0;0
-a leash;une laisse;22/06/2020;31;21;0.68;0;0
-to scold;réprimander;22/06/2020;35;-2;-0.06;0;0
-to take hold;s'emparer de;22/06/2020;27;11;0.41;0;0
-a brink;un bord;22/06/2020;27;20;0.74;0;0
+a skein;un écheveau;22/06/2020;26;4;0.15;0;0
+to obviate;parer à;22/06/2020;26;-16;-0.62;1;0
+a fad;une mode;22/06/2020;27;10;0.37;0;0
+inasmuch;dans la mesure où;22/06/2020;21;13;0.62;0;0
+off the cuff;au pied levé;22/06/2020;29;14;0.48;0;0
+to mend;réparer;22/06/2020;34;0;0.0;0;0
+a demographic;une tranche de la population;22/06/2020;19;10;0.53;0;0
+a cheerleader;une pom-pom girl;22/06/2020;15;12;0.8;0;0
+circuitous;détourné;22/06/2020;25;6;0.24;0;0
+time and time again;maintes et maintes fois;22/06/2020;28;6;0.21;0;0
+a grapefruit;un pamplemousse;22/06/2020;20;13;0.65;0;0
+an avocation;un métier;22/06/2020;27;14;0.52;0;0
 a sequel;une suite;22/06/2020;25;20;0.8;0;0
-"a chore (""tch"")";une corvée;22/06/2020;21;13;0.62;0;0
-twofold;double;22/06/2020;25;17;0.68;0;0
-to curtail;réduire;22/06/2020;26;-19;-0.73;1;0
-firsthand (adj.);de première main;22/06/2020;18;12;0.67;0;0
-to prop up;soutenir;22/06/2020;22;10;0.45;0;0
+crestfallen (adj.);découragé;22/06/2020;27;-1;-0.04;0;0
+luster (common name);le lustre. l'éclat. la gloire;22/06/2020;22;8;0.36;0;0
 a strait;un détroit;22/06/2020;28;21;0.75;0;0
+stingy;avare;22/06/2020;27;-3;-0.11;0;0
+to prop up;soutenir;22/06/2020;22;10;0.45;0;0
+to come into being;naître;22/06/2020;32;23;0.72;0;0
+twofold;double;22/06/2020;25;17;0.68;0;0
+to take hold;s'emparer de;22/06/2020;27;11;0.41;0;0
+to scold;réprimander;22/06/2020;35;-2;-0.06;0;0
+a leash;une laisse;22/06/2020;31;21;0.68;0;0
+"a chore (""tch"")";une corvée;22/06/2020;21;13;0.62;0;0
+to trim;réduire;22/06/2020;27;0;0.0;0;0
+a brink;un bord;22/06/2020;27;20;0.74;0;0
+to sprinkle;saupoudrer;22/06/2020;22;11;0.5;0;0
+firsthand (adj.);de première main;22/06/2020;18;12;0.67;0;0
+to curtail;réduire;22/06/2020;26;-19;-0.73;1;0
+to trade off;troquer;22/06/2020;34;23;0.68;0;0
+destitution (common name);la misère;22/06/2020;25;20;0.8;0;0
 no cigar (expr.);presque réussi. mais pas complètement;22/06/2021;20;12;0.6;0;0
 pristine;parfait / primitif. virginal;22/06/2021;25;14;0.56;0;0
 to sire;engendrer;22/06/2022;11;3;0.27;0;0
@@ -1836,16 +1834,16 @@ a trinket;un bibelot. une babiole;22/10/2022;8;-6;-0.75;0;0
 a straggler;un traînard;22/11/2018;31;7;0.23;0;0
 a cakewalk;une promenade;22/11/2021;20;16;0.8;0;0
 a warthog;un phacochère;22/12/2021;19;15;0.79;0;0
-to drool;baver. saliver;23/01/2022;20;2;0.1;0;0
-an upholstery;une tapisserie;23/01/2022;12;4;0.33;0;0
-to seep;infiltrer. suinter;23/01/2022;10;-2;-0.2;0;0
-the loo;les toilettes;23/01/2022;13;11;0.85;0;0
 a dork (coll.);un blaireau. un idiot;23/01/2022;18;14;0.78;0;0
-to hog up;s'accaparer / courber;23/01/2022;20;-2;-0.1;0;0
-to nab;épingler / pincer;23/01/2022;18;-6;-0.33;0;0
-barmy;timbré. maboul;23/01/2022;15;-13;-0.87;0;0
+the loo;les toilettes;23/01/2022;13;11;0.85;0;0
+to drool;baver. saliver;23/01/2022;20;2;0.1;0;0
+to seep;infiltrer. suinter;23/01/2022;10;-2;-0.2;0;0
+an upholstery;une tapisserie;23/01/2022;12;4;0.33;0;0
 a vial;une fiole. une bouteille;23/01/2022;17;13;0.76;0;0
+barmy;timbré. maboul;23/01/2022;16;-12;-0.75;0;1
 a treadmill;un tapis roulant / un manège;23/01/2022;22;2;0.09;0;0
+to nab;épingler / pincer;23/01/2022;18;-6;-0.33;0;0
+to hog up;s'accaparer / courber;23/01/2022;20;-2;-0.1;0;0
 shot peening (tech.);le grenaillage;23/01/2023;10;8;0.8;0;0
 a capstone;une pierre angulaire;23/02/2022;12;8;0.67;0;0
 to crumple;froisser;23/02/2022;17;-11;-0.65;0;0
@@ -1857,13 +1855,13 @@ callous (adj.);insensible. dur;23/04/2023;3;-1;-0.33;0;0
 a headstart;une avance;23/06/2022;12;-2;-0.17;0;0
 cordoned;encerclé;23/06/2022;11;-11;-1.0;1;0
 to snoop;espionner. fureter;23/09/2021;17;9;0.53;0;0
-to stoke;alimenter;23/10/2019;24;5;0.21;0;0
-crinkled;froissé;23/10/2019;26;7;0.27;0;0
-enamel (common name);l'émail;23/10/2019;15;7;0.47;0;0
-padded;rembourré;23/10/2019;31;21;0.68;0;0
-draftiness (common name);les douleurs;23/10/2019;25;-6;-0.24;0;0
-linen;le lin;23/10/2019;25;19;0.76;0;0
 a quilt;une courtepointe;23/10/2019;20;-8;-0.4;0;0
+crinkled;froissé;23/10/2019;26;7;0.27;0;0
+linen;le lin;23/10/2019;25;19;0.76;0;0
+enamel (common name);l'émail;23/10/2019;15;7;0.47;0;0
+draftiness (common name);les douleurs;23/10/2019;25;-6;-0.24;0;0
+to stoke;alimenter;23/10/2019;24;5;0.21;0;0
+padded;rembourré;23/10/2019;31;21;0.68;0;0
 a heap;un tas. un amas. un monceau;23/11/2018;26;19;0.73;0;0
 a bulkhead;une cloison;23/11/2018;34;19;0.56;0;0
 a reckoning;un calcul. un compte;23/11/2018;29;12;0.41;0;0
@@ -1896,20 +1894,20 @@ tenancy (common name);la location;24/02/2021;21;-15;-0.71;0;0
 jagged;déchiqueté;24/02/2021;27;15;0.56;0;0
 a curbside;une bordure. un trottoir;24/02/2021;24;10;0.42;0;0
 a landfill;une décharge;24/02/2021;19;12;0.63;0;0
-a wallet;un portefeuille;24/03/2019;34;5;0.15;0;0
-a necklace;un collier;24/03/2019;26;20;0.77;0;0
-We found her passed out.;On l'a retrouvée évanouie.;24/03/2019;36;24;0.67;0;0
 Give my love to Diane.;Embrasse Diane de ma part.;24/03/2019;33;22;0.67;0;0
 a punnet;une barquette;24/03/2019;20;16;0.8;0;0
 As I see it. …;Selon moi. …;24/03/2019;26;17;0.65;0;0
+a wallet;un portefeuille;24/03/2019;34;5;0.15;0;0
+a necklace;un collier;24/03/2019;27;21;0.78;0;1
+We found her passed out.;On l'a retrouvée évanouie.;24/03/2019;36;24;0.67;0;0
 She enjoys entertaining.;Elle adore recevoir du monde.;24/03/2019;32;5;0.16;0;0
 No way?!;C'est pas vrai ?!;24/03/2019;25;17;0.68;0;0
-in due course;en bref (soutenu);24/03/2019;22;-5;-0.23;0;0
-a cap;une casquette;24/03/2019;30;22;0.73;0;0
-He's really uptight.;Il est vraiment coincé / crispé.;24/03/2019;28;11;0.39;0;0
 All in good time.;Chaque chose en son temps.;24/03/2019;25;18;0.72;0;0
 I passed my exam.;J'ai réussi mon examen;24/03/2019;30;18;0.6;0;0
 She's pretty chilled.;Elle est très décontractée.;24/03/2019;33;21;0.64;0;0
+in due course;en bref (soutenu);24/03/2019;22;-5;-0.23;0;0
+a cap;une casquette;24/03/2019;31;21;0.68;0;0
+He's really uptight.;Il est vraiment coincé / crispé.;24/03/2019;28;11;0.39;0;0
 a stash;une planque. une cachette;24/03/2023;7;-1;-0.14;0;0
 to dawdle;lambiner. flâner;24/04/2022;14;-10;-0.71;0;0
 to impinge;empiéter;24/04/2023;7;5;0.71;0;0
@@ -1940,20 +1938,20 @@ to fetter;entraver. enchaîner;24/11/2018;27;-8;-0.3;0;0
 to gloat;jubiler. exulter;24/11/2018;33;23;0.7;0;0
 the nub;l'essentiel. le noyau / le bout;24/11/2018;37;22;0.59;0;0
 to backtrack;faire marche arrière;24/11/2018;22;-3;-0.14;0;0
-slew (adj.);abattu. meurtri / déporté violemment;24/11/2021;10;-8;-0.8;0;0
-to wince;grimacer. tressaillir;24/11/2021;20;10;0.5;0;0
-a swab;un écouvillon;24/11/2021;16;10;0.63;0;0
-a keel;une quille / un navire;24/11/2021;8;2;0.25;0;0
 mooring (common name);l'amarrage. le mouillage;24/11/2021;18;-6;-0.33;0;0
-gills (common name);les branchies;24/11/2021;31;11;0.35;0;0
+a keel;une quille / un navire;24/11/2021;8;2;0.25;0;0
 a tiller (navig.);la barre de gouvernail;24/11/2021;18;5;0.28;0;0
+to wince;grimacer. tressaillir;24/11/2021;20;10;0.5;0;0
+slew (adj.);abattu. meurtri / déporté violemment;24/11/2021;10;-8;-0.8;0;0
+gills (common name);les branchies;24/11/2021;31;11;0.35;0;0
+a swab;un écouvillon;24/11/2021;16;10;0.63;0;0
 a lode;un filon. une veine;24/11/2021;20;-14;-0.7;0;0
-to holler;brailler;24/11/2021;20;6;0.3;0;0
-a slit;une fente. une incision;24/11/2021;21;15;0.71;0;0
-a guile;une ruse. une astuce;24/11/2021;22;-16;-0.73;1;0
-brine (common name);l'eau salée. la saumure;24/11/2021;21;3;0.14;0;0
 to hack;pirater / tailler / tousser sans arrêt;24/11/2021;17;13;0.76;0;0
+brine (common name);l'eau salée. la saumure;24/11/2021;21;3;0.14;0;0
 a ripple;une ondulation. une ride;24/11/2021;16;12;0.75;0;0
+a slit;une fente. une incision;24/11/2021;21;15;0.71;0;0
+to holler;brailler;24/11/2021;20;6;0.3;0;0
+a guile;une ruse. une astuce;24/11/2021;22;-16;-0.73;1;0
 to smite;châtier. déchirer. tourmenter;24/11/2022;10;2;0.2;0;0
 to besmirch;ternir. entacher;24/11/2022;11;9;0.82;0;0
 to bristle;se hérisser;24/12/2021;23;-1;-0.04;0;0
@@ -1968,13 +1966,13 @@ a mongoose;une mangouste;25/03/2023;3;3;1.0;0;0
 cornucopia (common name);la corne d'abondance;25/05/2022;13;11;0.85;0;0
 sprawling (adj.);tentaculaire;25/05/2022;11;-5;-0.45;0;0
 on the go;prêt à partir / très efficace;25/05/2022;15;3;0.2;0;0
-a hoop;un cerceau;25/06/2021;24;4;0.17;0;0
 to scoff;se moquer. tourner en ridicule;25/06/2021;23;-20;-0.87;1;0
-to tingle;picoter. fourmiller;25/06/2021;19;6;0.32;0;0
+a hoop;un cerceau;25/06/2021;24;4;0.17;0;0
 to stocktake;faire l'inventaire;25/06/2021;21;13;0.62;0;0
+to tingle;picoter. fourmiller;25/06/2021;19;6;0.32;0;0
 to abet;encourager / contribuer;25/06/2023;1;-1;-1.0;0;0
 a pimple;un bouton;25/06/2023;0;0;0.0;0;0
-a jersey;un maillot;25/06/2023;0;0;0.0;0;0
+a jersey;un maillot;25/06/2023;2;2;1.0;0;1
 nosy;curieux. fouineur;25/08/2021;25;20;0.8;0;0
 pesky;embêtant;25/08/2021;20;-2;-0.1;0;0
 moron (adj.);imbécile. crétin. idiot;25/08/2021;26;14;0.54;0;0
@@ -1994,12 +1992,12 @@ a quince;un coing;25/10/2021;18;12;0.67;0;0
 huckleberry (common name);des airelles;25/10/2021;11;3;0.27;0;0
 a plum;une prune;25/10/2021;10;-8;-0.8;0;0
 redcurrant (common name);la groseille;25/10/2021;32;22;0.69;0;0
-a swoop;une rafle / une plongée. une descente en piqué;25/11/2018;36;15;0.42;0;0
 a tether;une attache;25/11/2018;26;5;0.19;0;0
-to bestow;donner / accorder;25/11/2018;29;-16;-0.55;1;0
+a swoop;une rafle / une plongée. une descente en piqué;25/11/2018;36;15;0.42;0;0
 to seethe;bouillonner;25/11/2018;34;11;0.32;0;0
+to bestow;donner / accorder;25/11/2018;29;-16;-0.55;1;0
 a rudder; un gouvernail / un palonnier;25/12/2022;9;-5;-0.56;0;0
-a gavel;un marteau de justice;26/01/2022;23;11;0.48;0;0
+a gavel;un marteau de justice;26/01/2022;24;12;0.5;0;0
 conned;escroqué;26/01/2023;12;-2;-0.17;0;0
 wheedling (adj.);câlin. enjôleur;26/01/2023;11;5;0.45;0;0
 to wail;se lamenter. gémir;26/01/2023;7;-5;-0.71;0;0
@@ -2040,28 +2038,28 @@ barren;stérile. aride / ingrat;26/11/2018;23;17;0.74;0;0
 to vaunt;se vanter;26/11/2018;38;23;0.61;0;0
 forcibly;par la force / avec force;26/11/2018;20;6;0.3;0;0
 the mettle;le courage;26/11/2018;30;18;0.6;0;0
-a propshaft;un arbre de transmission;27/01/2020;19;13;0.68;0;0
-an axle;un essieu;27/01/2020;20;14;0.7;0;0
-cornered;acculé;27/01/2020;29;6;0.21;0;0
-to entreat;supplier;27/01/2020;33;18;0.55;0;0
-a square deal;un arrangement équitable;27/01/2020;20;14;0.7;0;0
-nonsensical;absurde;27/01/2020;18;14;0.78;0;0
 a taunt;une raillerie;27/01/2020;28;6;0.21;0;0
+an axle;un essieu;27/01/2020;20;14;0.7;0;0
+to entreat;supplier;27/01/2020;34;19;0.56;0;1
+nonsensical;absurde;27/01/2020;18;14;0.78;0;0
+a square deal;un arrangement équitable;27/01/2020;20;14;0.7;0;0
+a propshaft;un arbre de transmission;27/01/2020;19;13;0.68;0;0
+cornered;acculé;27/01/2020;29;6;0.21;0;0
 an impersonator;un imitateur;27/03/2022;11;5;0.45;0;0
 to squint;loucher / plisser les yeux;27/03/2022;8;-8;-1.0;0;0
 all upfront;tout d'avance;27/03/2023;4;-2;-0.5;0;0
 to hoist;hisser. lever;27/03/2023;4;-2;-0.5;0;0
-attrition (common name);l'usure;27/05/2018;24;5;0.21;0;0
-pointedly;de façon insistante. d'une manière significative;27/05/2018;25;2;0.08;0;0
-in turn;à son tour;27/05/2018;31;20;0.65;0;0
-an upswing;un redressement. une amélioration;27/05/2018;26;5;0.19;0;0
-to stumble;trébucher / broncher / tomber sur;27/05/2018;32;19;0.59;0;0
-quaint (adj.);pittoresque. original;27/05/2018;34;-12;-0.35;0;0
-teignant (adj.);grouillant de monde. torrentiel;27/05/2018;28;-13;-0.46;0;0
 intermingled;entremêlé;27/05/2018;28;21;0.75;0;0
-relished;ravi;27/05/2018;25;19;0.76;0;0
-a scammer;un escroc;27/05/2018;29;21;0.72;0;0
+quaint (adj.);pittoresque. original;27/05/2018;34;-12;-0.35;0;0
 pertaining;se rapportant;27/05/2018;27;21;0.78;0;0
+an upswing;un redressement. une amélioration;27/05/2018;26;5;0.19;0;0
+attrition (common name);l'usure;27/05/2018;24;5;0.21;0;0
+a scammer;un escroc;27/05/2018;29;21;0.72;0;0
+teignant (adj.);grouillant de monde. torrentiel;27/05/2018;28;-13;-0.46;0;0
+to stumble;trébucher / broncher / tomber sur;27/05/2018;32;19;0.59;0;0
+in turn;à son tour;27/05/2018;31;20;0.65;0;0
+pointedly;de façon insistante. d'une manière significative;27/05/2018;25;2;0.08;0;0
+relished;ravi;27/05/2018;25;19;0.76;0;0
 partway;à mi-chemin;27/05/2022;9;7;0.78;0;0
 to start back at square one;revenir à la case départ;27/05/2022;16;14;0.88;0;0
 a ridge;une crête. une arête;27/05/2022;10;4;0.4;0;0
@@ -2069,30 +2067,30 @@ plotter (adj.);comploteur;27/05/2023;4;0;0.0;0;0
 russet (adj.);brun-roux;27/05/2023;4;0;0.0;0;0
 a lanyard;un cordon;27/05/2023;5;5;1.0;0;0
 a meadow;un pré. une prairie;27/06/2018;24;8;0.33;0;0
-approximately;environ;27/07/2019;20;13;0.65;0;0
-provision (common name);la mise à disposition;27/07/2019;25;16;0.64;0;0
-a smudge;une tache;27/07/2019;33;2;0.06;0;0
+the tack;la sellerie;27/07/2019;23;13;0.57;0;0
+to layoff;licencier;27/07/2019;30;18;0.6;0;0
+to peck;picorer;27/07/2019;26;6;0.23;0;0
+meshed;maillé;27/07/2019;32;23;0.72;0;0
+fussy;difficile;27/07/2019;29;4;0.14;0;0
+a villain;un scélérat;27/07/2019;27;14;0.52;0;0
 an appraisal;une évaluation;27/07/2019;41;23;0.56;0;0
 ripeness (common name);la matûrité;27/07/2019;35;18;0.51;0;0
 a remittance;une remise;27/07/2019;26;18;0.69;0;0
 fads (common name);des manies;27/07/2019;27;18;0.67;0;0
-the tack;la sellerie;27/07/2019;23;13;0.57;0;0
-to layoff;licencier;27/07/2019;30;18;0.6;0;0
-to peck;picorer;27/07/2019;26;6;0.23;0;0
-a villain;un scélérat;27/07/2019;27;14;0.52;0;0
-surefire (adj.);infaillible;27/07/2019;25;9;0.36;0;0
-fussy;difficile;27/07/2019;29;4;0.14;0;0
+to wag;remuer;27/07/2019;27;12;0.44;0;0
+approximately;environ;27/07/2019;20;13;0.65;0;0
 to dip;plonger / tremper;27/07/2019;36;21;0.58;0;0
-a rag;un chiffon;27/07/2019;18;-4;-0.22;0;0
-a whim;un caprice;27/07/2019;17;15;0.88;0;0
 to forestall;devancer;27/07/2019;28;11;0.39;0;0
 a slick;une nappe;27/07/2019;21;-1;-0.05;0;0
 impervious;imperméable;27/07/2019;18;12;0.67;0;0
 a lawn;une pelouse;27/07/2019;26;19;0.73;0;0
 the heel;le talon;27/07/2019;29;11;0.38;0;0
-meshed;maillé;27/07/2019;32;23;0.72;0;0
-to wag;remuer;27/07/2019;27;12;0.44;0;0
-edible;comestible;27/07/2021;19;16;0.84;0;1
+surefire (adj.);infaillible;27/07/2019;25;9;0.36;0;0
+a smudge;une tache;27/07/2019;33;2;0.06;0;0
+provision (common name);la mise à disposition;27/07/2019;25;16;0.64;0;0
+a rag;un chiffon;27/07/2019;18;-4;-0.22;0;0
+a whim;un caprice;27/07/2019;17;15;0.88;0;0
+edible;comestible;27/07/2021;19;16;0.84;0;0
 fiddling (adj.);futile. sans importance;27/08/2021;25;10;0.4;0;0
 to scrimp;se serrer la ceinture. être chiche;27/09/2018;26;-21;-0.81;1;0
 to bludgeon;matraquer;27/09/2018;27;14;0.52;0;0
@@ -2105,22 +2103,22 @@ lacklustre (adj.);morne;27/10/2018;29;9;0.31;0;0
 grim;sinistre. triste;27/10/2018;29;18;0.62;0;0
 moot (adj.);discutable. controversé;27/10/2018;28;-9;-0.32;0;0
 to gouge;escroquer;27/11/2022;8;-6;-0.75;0;0
-a sling;une élingue / une écharpe médicale;27/12/2019;36;24;0.67;0;0
+a buffer;un tampon;27/12/2019;23;14;0.61;0;0
 a bucket;un seau;27/12/2019;30;20;0.67;0;0
 a shutter;un volet / un obturateur;27/12/2019;37;11;0.3;0;0
 to encompass;englober;27/12/2019;29;21;0.72;0;0
 a cutaway;un plan de coupe (dessin technique);27/12/2019;19;16;0.84;0;0
 a fallout;une retombée (au propre et au figuré);27/12/2019;30;-6;-0.2;0;0
 fuzzy;fou;27/12/2019;19;-7;-0.37;0;0
-a buffer;un tampon;27/12/2019;23;14;0.61;0;0
+a sling;une élingue / une écharpe médicale;27/12/2019;36;24;0.67;0;0
 a bead;une perle;27/12/2019;25;17;0.68;0;0
 a ladle / ladle (adj.);une louche / prodigue;27/12/2019;27;3;0.11;0;0
 derogatory;dénigrant. dépréciant;27/12/2019;23;8;0.35;0;0
 coarse;grossier;27/12/2019;36;22;0.61;0;0
 oblivious;inconscient;27/12/2019;25;2;0.08;0;0
 the headdress;la coiffure;27/12/2019;25;20;0.8;0;0
-savvy (common name);le bon sens. la jugeote;27/12/2019;24;18;0.75;0;0
 congruent;conforme;27/12/2019;18;-4;-0.22;0;0
+savvy (common name);le bon sens. la jugeote;27/12/2019;25;17;0.68;0;1
 to divest;dépouiller. priver;27/12/2021;21;-17;-0.81;1;0
 a rug;une couverture;28/01/2019;23;15;0.65;0;0
 bromine;le brome;28/01/2019;33;22;0.67;0;0
@@ -2133,28 +2131,28 @@ a coxswain (navig.);un barreur (navigation);28/01/2022;18;-4;-0.22;0;0
 lingo (common name);le jargon. le charabia;28/02/2022;12;-10;-0.83;0;0
 antics (common name);des bouffonneries;28/02/2022;27;5;0.19;0;0
 to avert;éviter;28/02/2022;23;-5;-0.22;0;0
-to mumble;marmonner;28/03/2021;26;20;0.77;0;0
-a still life;une nature morte;28/03/2021;20;17;0.85;0;0
-garish;voyant. criard;28/03/2021;31;13;0.42;0;0
-rousing;vibrant. entraînant;28/03/2021;28;3;0.11;0;0
 terracotta (common name);une terre cuite;28/03/2021;22;17;0.77;0;0
-doodle (common name);le gribouillage;28/03/2021;19;4;0.21;0;0
-a viewfinder;un viseur;28/03/2021;17;15;0.88;0;0
 a witticism;un mot d'esprit;28/03/2021;25;18;0.72;0;0
 to rail;lutter / entourer d'une barrière;28/03/2021;33;2;0.06;0;0
-a shade;une ombre;28/03/2021;22;14;0.64;0;0
-shrill;aigu;28/03/2021;13;12;0.92;0;0
-to tone down;atténuer;28/03/2021;20;14;0.7;0;0
-an easel;un chevalet;28/03/2021;28;1;0.04;0;0
-gaudy;voyant. criard;28/03/2021;19;-11;-0.58;0;0
-a mallet;un maillet;28/03/2021;32;23;0.72;0;0
-artistry (common name);le talent artistique;28/03/2021;17;-2;-0.12;0;0
-a forgery;une falsification. une contrefaçon;28/03/2021;30;22;0.73;0;0
 a curator;un conservateur de musée;28/03/2021;26;6;0.23;0;0
-a rejoinder;une réplique. une répartie;28/03/2021;26;15;0.58;0;0
+to tone down;atténuer;28/03/2021;20;14;0.7;0;0
+to mumble;marmonner;28/03/2021;26;20;0.77;0;0
 plaster (common name);le plâtre / un pansement. un sparadrap;28/03/2021;32;18;0.56;0;0
+a shade;une ombre;28/03/2021;22;14;0.64;0;0
+a forgery;une falsification. une contrefaçon;28/03/2021;30;22;0.73;0;0
 to jeer;railler;28/03/2021;25;20;0.8;0;0
+shrill;aigu;28/03/2021;13;12;0.92;0;0
+artistry (common name);le talent artistique;28/03/2021;17;-2;-0.12;0;0
+an easel;un chevalet;28/03/2021;28;1;0.04;0;0
+a viewfinder;un viseur;28/03/2021;18;16;0.89;0;0
+rousing;vibrant. entraînant;28/03/2021;28;3;0.11;0;0
+gaudy;voyant. criard;28/03/2021;19;-11;-0.58;0;0
+doodle (common name);le gribouillage;28/03/2021;19;4;0.21;0;0
 a draughtsman;un dessinateur;28/03/2021;23;-14;-0.61;0;0
+a still life;une nature morte;28/03/2021;20;17;0.85;0;0
+a mallet;un maillet;28/03/2021;32;23;0.72;0;0
+garish;voyant. criard;28/03/2021;31;13;0.42;0;0
+a rejoinder;une réplique. une répartie;28/03/2021;26;15;0.58;0;0
 to entwine;enlacer;28/03/2022;12;-6;-0.5;0;0
 flush (adj.);abondant;28/04/2019;24;19;0.79;0;0
 goopy;gluant;28/04/2023;7;3;0.43;0;0
@@ -2162,33 +2160,33 @@ to blunt;émousser;28/04/2023;3;-3;-1.0;0;0
 a pallbearer;un porteur funéraire;28/05/2022;17;13;0.76;0;0
 a countertop;un comptoir;28/05/2022;16;8;0.5;0;0
 trappings (common name);des ornements;28/05/2023;2;0;0.0;0;0
-with a jaded eye;d'un œil blasé;28/05/2023;4;4;1.0;0;0
+with a jaded eye;d'un œil blasé;28/05/2023;5;5;1.0;0;0
 a lapel;un revers (sur un vêtement);28/08/2021;27;12;0.44;0;0
 conterminous;limitrophe;28/08/2022;9;-1;-0.11;0;0
 to peruse;lire attentivement;28/09/2021;15;-13;-0.87;0;0
-on the verge;sur le point de;28/10/2018;24;16;0.67;0;0
-to tack;clouer / se faufiler. essayer une autre tactique;28/10/2018;32;20;0.63;0;0
 stilted;guindé;28/10/2018;30;20;0.67;0;0
 mercurial;d'humeur changeante. d'humeur inégale;28/10/2018;21;12;0.57;0;0
-meandering (adj.);sinueux;28/10/2018;20;13;0.65;0;0
 strapped;à court d'argent;28/10/2018;24;-6;-0.25;0;0
+meandering (adj.);sinueux;28/10/2018;20;13;0.65;0;0
+on the verge;sur le point de;28/10/2018;24;16;0.67;0;0
+to tack;clouer / se faufiler. essayer une autre tactique;28/10/2018;32;20;0.63;0;0
 belching (common name);une éructation;28/10/2018;27;15;0.56;0;0
 a blandishment;une flatterie;28/10/2018;24;7;0.29;0;0
 soothing (adj.);apaisant. relaxant. reposant;28/10/2018;30;-1;-0.03;0;0
 ruthless;impitoyable;28/10/2018;27;9;0.33;0;0
-dull;terne. mat. ennuyeux;28/10/2018;32;23;0.72;0;0
+to extol;exalter. vanter;28/10/2018;28;14;0.5;0;0
 to spew;vomir / cracher;28/10/2018;27;12;0.44;0;0
 parlous (adj.);précaire / alarmant. périlleux;28/10/2018;32;9;0.28;0;0
-to extol;exalter. vanter;28/10/2018;28;14;0.5;0;0
+dull;terne. mat. ennuyeux;28/10/2018;32;23;0.72;0;0
 a beanstalk;une tige de haricot / un haricot magique;28/10/2021;24;18;0.75;0;0
+a bailiff;un huissier;28/10/2022;15;13;0.87;0;1
+ironclad (adj.);cuirassé;28/10/2022;11;7;0.64;0;0
 to shrivel;se ratatiner;28/10/2022;14;-2;-0.14;0;0
 a blooper;un bêtisier;28/10/2022;12;8;0.67;0;0
-ironclad (adj.);cuirassé;28/10/2022;11;7;0.64;0;0
-a bailiff;un huissier;28/10/2022;14;12;0.86;0;0
 skyline (common name);la ligne d'horizon;28/11/2022;8;8;1.0;0;0
 a rink;une patinoire;28/12/2022;9;-9;-1.0;0;0
-foolhardy (adj.);téméraire;29/01/2023;8;8;1.0;0;0
 That was uncalled for.;C'était injustifié.;29/01/2023;10;2;0.2;0;0
+foolhardy (adj.);téméraire;29/01/2023;8;8;1.0;0;0
 stonks (common name);des actions financières;29/03/2022;13;-5;-0.38;0;0
 to peeve;mettre en rogne;29/04/2019;27;-5;-0.19;0;0
 a landline;un téléphone fixe;29/04/2022;18;8;0.44;0;0
@@ -2196,69 +2194,69 @@ gassy;effervescent / bavard;29/05/2021;24;0;0.0;0;0
 a ferret;un furet;29/05/2022;14;10;0.71;0;0
 fidgety;agité;29/05/2022;7;-1;-0.14;0;0
 buoyed;soutenu;29/05/2023;3;-1;-0.33;0;0
-brazen (adj.);effronté;29/06/2021;26;11;0.42;0;0
 to cull;cueillir / sélectionner;29/06/2021;21;14;0.67;0;0
+brazen (adj.);effronté;29/06/2021;26;11;0.42;0;0
 to cavort;faire des cabrioles;29/06/2023;1;-1;-1.0;0;0
 a plier;une pince;29/06/2023;0;0;0.0;0;0
-a hindsight;la bonne connaissance d'une situation;29/08/2018;23;13;0.57;0;0
-a fledgling;un débutant / un oisillon;29/08/2018;26;20;0.77;0;0
-by and large;dans l'ensemble / en tout cas. de toute façon;29/08/2018;21;18;0.86;0;0
+to buffet;frapper / lutter;29/08/2018;29;8;0.28;0;0
 a helmsman;un timonier. un homme de barre;29/08/2018;26;18;0.69;0;0
 crisply (adj.);croustillant;29/08/2018;32;13;0.41;0;0
 lengthy;long. interminable;29/08/2018;30;22;0.73;0;0
-a crunch;un bruit d'écrasement;29/08/2018;16;10;0.62;0;0
-creed (common name);des principes. un credo;29/08/2018;24;19;0.79;0;0
-to buffet;frapper / lutter;29/08/2018;29;8;0.28;0;0
-jettisoned;largué. abandonné. délesté;29/08/2018;19;3;0.16;0;0
-a reprieve;un sursis. un répit;29/08/2018;17;-10;-0.59;0;0
-to rig // a rig (IT);gréer / truquer. manipuler // une plate-forme;29/08/2018;25;2;0.08;0;0
-a loom;un métier à tisser;29/08/2018;25;-4;-0.16;0;0
-a loophole;une lacune. un point faible / une échappatoire;29/08/2018;20;8;0.4;0;0
-to strew;semer. répandre;29/08/2018;32;12;0.38;0;0
-galore (adv.);en abondance;29/08/2018;34;21;0.62;0;0
-a squall;une bourrasque. une rafale;29/08/2018;24;-14;-0.58;0;0
-a gaol;une prison. une geôle;29/08/2018;29;21;0.72;0;0
-to trample;bafouer. fouler aux pied;29/08/2018;24;-14;-0.58;0;0
 foursquare (adj.);d'apparence solide;29/08/2018;26;16;0.62;0;0
-a lifeline;une ligne de vie;29/08/2018;20;14;0.7;0;0
-appalled;consterné. épouvanté. scandalisé;29/08/2018;24;18;0.75;0;0
 undisguisedly;indistinctement;29/08/2018;28;19;0.68;0;0
 a soulmate;une âme sœur;29/08/2018;26;19;0.73;0;0
-to sedate;mettre sous sédatif;29/08/2018;24;3;0.13;0;0
+out of the blue;tout à coup;29/08/2018;24;6;0.25;0;0
+to uphold;défendre. maintenir;29/08/2018;26;19;0.73;0;0
+a squall;une bourrasque. une rafale;29/08/2018;24;-14;-0.58;0;0
+jettisoned;largué. abandonné. délesté;29/08/2018;19;3;0.16;0;0
+a hindsight;la bonne connaissance d'une situation;29/08/2018;23;13;0.57;0;0
+a reprieve;un sursis. un répit;29/08/2018;17;-10;-0.59;0;0
+a loom;un métier à tisser;29/08/2018;25;-4;-0.16;0;0
+a crunch;un bruit d'écrasement;29/08/2018;16;10;0.62;0;0
+a loophole;une lacune. un point faible / une échappatoire;29/08/2018;20;8;0.4;0;0
+galore (adv.);en abondance;29/08/2018;35;22;0.63;0;0
+to trample;bafouer. fouler aux pied;29/08/2018;24;-14;-0.58;0;0
+by and large;dans l'ensemble / en tout cas. de toute façon;29/08/2018;21;18;0.86;0;0
+artful;astucieux;29/08/2018;24;19;0.79;0;0
+an exculpation;une disculpation;29/08/2018;21;16;0.76;0;0
+to rig // a rig (IT);gréer / truquer. manipuler // une plate-forme;29/08/2018;25;2;0.08;0;0
 a muddle;une confusion;29/08/2018;27;4;0.15;0;0
 to stymie;mettre un obstacle;29/08/2018;26;12;0.46;0;0
+a lifeline;une ligne de vie;29/08/2018;20;14;0.7;0;0
+creed (common name);des principes. un credo;29/08/2018;24;19;0.79;0;0
+a fledgling;un débutant / un oisillon;29/08/2018;26;20;0.77;0;0
+to strew;semer. répandre;29/08/2018;32;12;0.38;0;0
+to sedate;mettre sous sédatif;29/08/2018;24;3;0.13;0;0
 scathing (adj.);cinglant. acerbe;29/08/2018;30;11;0.37;0;0
-to cave in;s'effondrer. faire chuter;29/08/2018;17;-15;-0.88;1;0
-to quibble;ergoter. chicaner;29/08/2018;26;-12;-0.46;0;0
-artful;astucieux;29/08/2018;24;19;0.79;0;0
-a mischief;une malice. une espièglerie / un tort;29/08/2018;34;-23;-0.68;1;0
-exerted;exercé. déployé;29/08/2018;29;16;0.55;0;0
-to uphold;défendre. maintenir;29/08/2018;26;19;0.73;0;0
-loose;en vrac / relâché;29/08/2018;24;18;0.75;0;0
-an exculpation;une disculpation;29/08/2018;21;16;0.76;0;0
-out of the blue;tout à coup;29/08/2018;24;6;0.25;0;0
 to suffuse;se répander sur. colorer. pigmenter;29/08/2018;26;19;0.73;0;0
+appalled;consterné. épouvanté. scandalisé;29/08/2018;24;18;0.75;0;0
+a gaol;une prison. une geôle;29/08/2018;29;21;0.72;0;0
+a mischief;une malice. une espièglerie / un tort;29/08/2018;34;-23;-0.68;1;0
+to quibble;ergoter. chicaner;29/08/2018;26;-12;-0.46;0;0
+exerted;exercé. déployé;29/08/2018;29;16;0.55;0;0
+loose;en vrac / relâché;29/08/2018;24;18;0.75;0;0
+to cave in;s'effondrer. faire chuter;29/08/2018;17;-15;-0.88;1;0
 a hunch;un pressentiment;29/09/2018;29;19;0.66;0;0
 backdoor (adj.);détourné. déguisé;29/09/2021;17;-3;-0.18;0;0
-bygone (adj.);(évènement) passé;29/10/2019;26;20;0.77;0;0
-scalding (adj.);bouillant;29/10/2019;28;-12;-0.43;0;0
-a bangle;un bracelet;29/10/2019;30;-7;-0.23;0;0
-a hollyhock (flower);une trémière (espèce de rose);29/10/2019;28;16;0.57;0;0
-searing (adj.);brûlant;29/10/2019;28;12;0.43;0;0
-tusks;les défenses (d'un animal);29/10/2019;23;17;0.74;0;0
-a jibe;une moquerie;29/10/2019;26;17;0.65;0;0
-the bark / to bark;l'écorce / aboyer;29/10/2019;24;12;0.5;0;0
-to billow;onduler;29/10/2019;38;21;0.55;0;0
-a headgear;une coiffure;29/10/2019;28;20;0.71;0;0
-the swine;le porc;29/10/2019;25;18;0.72;0;0
 dusk (common name);le crépuscule;29/10/2019;23;11;0.48;0;0
+a headgear;une coiffure;29/10/2019;28;20;0.71;0;0
+a spat;une prise de bec;29/10/2019;27;-1;-0.04;0;0
+a jibe;une moquerie;29/10/2019;26;17;0.65;0;0
+a bangle;un bracelet;29/10/2019;30;-7;-0.23;0;0
+scalding (adj.);bouillant;29/10/2019;28;-12;-0.43;0;0
+bygone (adj.);(évènement) passé;29/10/2019;26;20;0.77;0;0
+searing (adj.);brûlant;29/10/2019;28;12;0.43;0;0
+a hollyhock (flower);une trémière (espèce de rose);29/10/2019;28;16;0.57;0;0
+ensuing;qui s'ensuit;29/10/2019;23;18;0.78;0;0
+a demur;une hésitation;29/10/2019;31;-2;-0.06;0;0
 fern (common name);la fougère;29/10/2019;24;16;0.67;0;0
 the truss;la charpente;29/10/2019;35;21;0.6;0;0
 to garner;recueillir;29/10/2019;25;6;0.24;0;0
-ensuing;qui s'ensuit;29/10/2019;23;18;0.78;0;0
-a demur;une hésitation;29/10/2019;31;-2;-0.06;0;0
-a spat;une prise de bec;29/10/2019;27;-1;-0.04;0;0
+to billow;onduler;29/10/2019;38;21;0.55;0;0
 ear plugs;des bouchons d'oreille;29/10/2019;20;15;0.75;0;0
+the bark / to bark;l'écorce / aboyer;29/10/2019;24;12;0.5;0;0
+the swine;le porc;29/10/2019;25;18;0.72;0;0
+tusks;les défenses (d'un animal);29/10/2019;23;17;0.74;0;0
 inbred;inné;29/10/2021;22;6;0.27;0;0
 a thicket;un bosquet / une touffe;29/10/2021;21;5;0.24;0;0
 a yank;un coup sec. une saccade;29/11/2021;23;-19;-0.83;1;0
@@ -2267,16 +2265,16 @@ an oleander;un laurier rose;29/12/2021;14;-2;-0.14;0;0
 a periwinkle;une pervenche;29/12/2021;16;14;0.88;0;0
 itchy (adj.);qui démange;29/12/2021;13;-3;-0.23;0;0
 to construe;interpréter;29/12/2022;7;-7;-1.0;0;0
-to warble;gazouiller. roucouler;30/01/2022;17;-5;-0.29;0;0
 the clout;le poids. l'influence;30/01/2022;12;-12;-1.0;1;0
 to muffle;étouffer. assourdir;30/01/2022;16;-16;-1.0;1;0
-smithereens (common name);des morceaux;30/01/2022;11;-9;-0.82;0;0
 a dove;une colombe;30/01/2022;23;9;0.39;0;0
-a bequest;un legs;30/01/2022;20;12;0.6;0;0
-pox (common name);la variole / la vérole;30/01/2022;19;11;0.58;0;0
-to encroach;empiéter;30/01/2022;21;9;0.43;0;0
-deer antler;la ramure d'un cerf;30/01/2022;15;13;0.87;0;0
+smithereens (common name);des morceaux;30/01/2022;11;-9;-0.82;0;0
+to warble;gazouiller. roucouler;30/01/2022;17;-5;-0.29;0;0
 a roost;un perchoir;30/01/2022;18;10;0.56;0;0
+pox (common name);la variole / la vérole;30/01/2022;19;11;0.58;0;0
+a bequest;un legs;30/01/2022;20;12;0.6;0;0
+to encroach;empiéter;30/01/2022;22;10;0.45;0;0
+deer antler;la ramure d'un cerf;30/01/2022;15;13;0.87;0;0
 to mitigate;atténuer. réduire / mitiger;30/03/2022;16;6;0.38;0;0
 a roundabout;un rond-point / un manège;30/04/2022;12;2;0.17;0;0
 cursory (adj.);superficiel;30/04/2023;3;-1;-0.33;0;0
@@ -2298,10 +2296,10 @@ the fluke;le coup de chance;30/10/2018;26;11;0.42;0;0
 the parlance;le langage;30/10/2018;25;6;0.24;0;0
 a boon;une aubaine;30/10/2021;19;7;0.37;0;0
 a pothole;un nid-de-poule;30/10/2022;9;5;0.56;0;0
-to undersay;sous-estimer;30/12/2021;14;6;0.43;0;0
 to limp;boîter. clopiner;30/12/2021;21;-5;-0.24;0;0
-at the outskirts;en périphérie;30/12/2021;10;6;0.6;0;0
+to undersay;sous-estimer;30/12/2021;14;6;0.43;0;0
 a booth;un stand. un kiosque;30/12/2021;18;-6;-0.33;0;0
+at the outskirts;en périphérie;30/12/2021;10;6;0.6;0;0
 to pilfer;chaparder;31/01/2022;17;-15;-0.88;1;0
 a groom;un jeune marié / un valet d'écurie;31/03/2022;15;9;0.6;0;0
 to groom;panser / préparer;31/03/2022;21;-9;-0.43;0;0

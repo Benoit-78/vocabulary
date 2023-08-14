@@ -10,7 +10,7 @@ def get_os_type():
     operating_system = platform.platform()
     operating_system = operating_system.split('-')[0]
     if operating_system.lower() not in ['windows', 'linux', 'mac', 'android']:
-        print("# ERROR operating system cannot be identified")
+        print("# ERROR: Operating system cannot be identified.")
         raise OSError
     os_type = operating_system
     return os_type
@@ -26,6 +26,6 @@ def get_os_separator():
     elif os_type in ['Linux', 'Mac', 'Android']:
         os_sep = '/'
     else:
-        print("# ERROR: wrong input for operating system")
+        print("# ERROR: Wrong input for operating system.")
         raise NameError
     return os_sep

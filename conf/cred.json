@@ -1,7 +1,63 @@
 {
-    "Database": "vocabulary"
+    "Database":
     {
         "usr": "root",
-        "pwd": "IBM-vocabulary7"
+        "pwd": "IBM-vocabulary7",
+        "database": "vocabulary",
+        "host": "127.0.0.1",
+        "port": "3306"
+    },
+    "Tables":
+    {
+        "version_voc":
+        {
+            "Columns":
+            [
+                "English", "Français", "Date", "Nb", "Score", "Taux"
+            ]
+        },
+        "version_perf":
+        {
+            "Columns":
+            [
+                "date", "test", "rattrapage"
+            ]
+        },
+        "version_words_count":
+        {
+            "Columns":
+            [
+                "date", "nombre_de_mots"
+            ]
+        },
+        "theme_voc":
+        {
+            "Columns":
+            [
+                "English", "Français", "Date", "Nb", "Score", "Taux"
+            ]
+        },
+        "theme_perf":
+        {
+            "Columns":
+            [
+                "date", "test", "rattrapage"
+            ]
+        },
+        "theme_words_count":
+        {
+            "Columns":
+            [
+                "date", "nombre_de_mots"
+            ]
+        },
+        "archives":
+        {
+            "Columns":
+            [
+                "Egnlish", "Français"
+            ]
+        }
+        
     }
 }
