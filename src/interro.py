@@ -13,18 +13,12 @@ from datetime import date
 from abc import ABC, abstractmethod
 import sys
 from typing import List
-
 import pandas as pd
 import numpy as np
 
 import utils
-from data import csv_handler
+from data import database_handler
 
-global os_sep
-STEEP_GOOD = -1.25
-ORDINATE_GOOD = 112.5
-STEEP_BAD = 2.5
-ORDINATE_BAD = -125
 
 
 def parse_arguments(arg: List[str]) -> argparse.Namespace:
@@ -70,23 +64,24 @@ def get_arguments() -> argparse.Namespace:
 
 class Loader():
     """Data loader"""
-    def __init__(self, arguments_: argparse.Namespace):
+    def __init__(self, arguments_: argparse.Namespace, data_handler_):
         """Must be done in the same session than the interroooo is launched"""
         self.test_type = arguments_.type
         self.rattraps = arguments_.rattraps
-        self.paths = []
         self.tables = {}
+        self.data_handler = data_handler_
+        self.output_table = ''
 
     def load_tables(self):
         """Return the tables necessary for the interro to run"""
-        self.paths = csv_handler.set_paths(os_sep, self.test_type)
-        self.tables = csv_handler.get_tables(os_sep, self.test_type)
-        self.tables['voc']['Query'] = [0] * self.tables['voc'].shape[0]
-        self.tables['voc'] = self.tables['voc'].sort_values(by='Date', ascending=True)
-        self.tables['voc'] = self.tables['voc'].replace(r',', r'.', regex=True)
-        self.tables['voc']['Taux'] = self.tables['voc']['Taux'].astype(float)
-        if 'bad_word' not in self.tables['voc'].columns:
-            self.tables['voc']['bad_word'] = [0] * self.tables['voc'].shape[0]
+        self.tables = self.data_handler.get_tables()
+        voc_table = self.test_type + '_voc'
+        self.tables[voc_table]['Query'] = [0] * self.tables[voc_table].shape[0]
+        self.tables[voc_table] = self.tables[voc_table].sort_values(by='Date', ascending=True)
+        self.tables[voc_table] = self.tables[voc_table].replace(r',', r'.', regex=True)
+        self.tables[voc_table]['Taux'] = self.tables[voc_table]['Taux'].astype(float)
+        if 'bad_word' not in self.tables[voc_table].columns:
+            self.tables[voc_table]['bad_word'] = [0] * self.tables[voc_table].shape[0]
 
 
 
@@ -139,7 +134,6 @@ class Test(Interro):
         self.word_cnt_df = words_cnt_df
         self.output_df = output_df
         self.perf = []
-        self.well_known_words = pd.DataFrame()
         self.step = 0
 
     def create_random_step(self):
@@ -206,11 +200,6 @@ class Test(Interro):
             self.update_faults_df(word_guessed, row)
         self.compute_success_rate()
 
-    def get_known_words(self) -> pd.DataFrame:
-        """Identify the words that have been sufficiently guessed."""
-        self.words_df['image_good'] = (ORDINATE_GOOD + STEEP_GOOD * self.words_df['Nb']) / 100
-        self.well_known_words = self.words_df[self.words_df['Taux'] >= self.words_df['image_good']]
-
 
 
 class Rattrap(Interro):
@@ -248,37 +237,52 @@ class Updater():
     def __init__(self, loader: Loader, interro: Interro):
         self.loader = loader
         self.interro = interro
+        self.well_known_words = pd.DataFrame()
+        self.steep_good = -1.25
+        self.ordinate_good = 112.5
+        self.steep_bad = 2.5
+        self.ordinate_bad = -125
+        self.output_table_name = ''
+
+    def get_known_words(self):
+        """Identify the words that have been sufficiently guessed."""
+        self.interro.words_df['image_good'] = (self.ordinate_good + self.steep_good * self.interro.words_df['Nb']) / 100
+        self.well_known_words = self.interro.words_df[
+            self.interro.words_df['Taux'] >= self.interro.words_df['image_good']
+        ]
+
+    def get_output_table_name(self):
+        """Get output table name."""
+        test_types = ['version', 'theme']
+        test_types.remove(self.loader.test_type)
+        self.output_table_name = test_types[0] + '_voc'
 
     def copy_well_known_words(self):
         """Copy the well-known words in the next step table"""
-        self.interro.get_known_words()
-        output_col = self.loader.tables['output'].columns
-        well_known_words_col = self.interro.well_known_words.columns
+        self.get_known_words()
+        self.get_output_table_name()
+        output_col = self.loader.tables[self.output_table_name].columns
+        well_known_words_col = self.well_known_words.columns
         missing_columns = set(output_col).difference(set(well_known_words_col))
         for column in missing_columns:
-            self.interro.well_known_words[column] = [0] * self.interro.well_known_words.shape[0]
-        self.loader.tables['output'] = pd.concat(
-            [
-                self.loader.tables['output'],
-                self.interro.well_known_words
-            ]
+            self.well_known_words[column] = [0] * self.well_known_words.shape[0]
+        self.loader.tables[self.output_table_name] = pd.concat(
+            [self.loader.tables[self.output_table_name],
+            self.well_known_words]
         )
 
     def transfer_well_known_words(self):
         """Transfer the well-known words in an ouput table, and save this."""
         self.copy_well_known_words()
-        csv_handler.save_table(
-            self.loader.test_type,
-            os_sep,
-            'output',
-            self.loader.tables['output'],
+        self.loader.data_handler.save_table(
+            self.output_table_name,
+            self.loader.tables[self.output_table_name]
         )
 
     def delete_known_words(self) -> pd.DataFrame:
         """Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
         only under the author's dictatorial will."""
-        self.interro.words_df['image_good'] = (ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['Nb']) / 100
         self.interro.words_df = self.interro.words_df[
             self.interro.words_df['Taux'] < self.interro.words_df['image_good']
         ]
@@ -288,7 +292,7 @@ class Updater():
         """Apply special flag to difficult words, i.e. words that are rarely guessed by the user."""
         if 'image_bad' in self.interro.words_df.columns:
             self.interro.words_df.drop('image_bad', axis=1, inplace=True)
-        self.interro.words_df['image_bad'] = (ORDINATE_BAD + STEEP_BAD * self.interro.words_df['Nb']) / 100
+        self.interro.words_df['image_bad'] = (self.ordinate_bad + self.steep_bad * self.interro.words_df['Nb']) / 100
         self.interro.words_df['bad_word'] = np.where(
             self.interro.words_df['Taux'] < self.interro.words_df['image_bad'],
             1,
@@ -298,20 +302,16 @@ class Updater():
 
     def save_words(self):
         """Prepare the words table for saving, and save it."""
-        csv_handler.save_table(
-            self.loader.test_type,
-            os_sep,
-            'voc',
+        self.loader.data_handler.save_table(
+            self.loader.test_type + '_voc',
             self.interro.words_df
         )
 
     def save_performances(self):
         """Save performances for further analysis."""
         self.interro.perf_df.loc[self.interro.perf_df.shape[0]] = self.interro.perf
-        csv_handler.save_table(
-            self.loader.test_type,
-            os_sep,
-            'perf',
+        self.loader.data_handler.save_table(
+            self.loader.test_type + '_perf',
             self.interro.perf_df
         )
 
@@ -323,10 +323,8 @@ class Updater():
         self.interro.word_cnt_df.loc[count_before] = [today_date, word_counts]
         count_after = self.interro.word_cnt_df.shape[0]
         if count_after == count_before + 1:
-            csv_handler.save_table(
-                self.loader.test_type,
-                os_sep,
-                'word_cnt',
+            self.loader.data_handler.save_table(
+                self.loader.test_type + '_words_count',
                 self.interro.word_cnt_df
             )
         else:
@@ -374,21 +372,20 @@ class ViewQuestion():
 
 
 
-# @profile
 def main():
     """Highest level of abstraction for interro!!! program."""
-    os_sep = utils.get_os_separator()
     # Get user inputs
     arguments = get_arguments()
     # Load data
-    loader = Loader(arguments)
+    data_handler = database_handler.MariaDBHandler(arguments.type)
+    loader = Loader(arguments, data_handler)
     loader.load_tables()
     # WeuuAaaInterrooo !!!
     test = Test(
-        loader.tables['voc'],
+        loader.tables[loader.test_type + '_voc'],
         arguments,
-        loader.tables['perf'],
-        loader.tables['word_cnt']
+        loader.tables[loader.test_type + '_perf'],
+        loader.tables[loader.test_type + '_words_count']
     )
     test.run()
     # Rattraaaaaaap's !!!!
