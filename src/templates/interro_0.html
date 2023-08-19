@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Configuration</title>
+    <link rel="stylesheet" type="text/css" href="/static/interro_0.css">
+    <script type="text/javascript" src="/static/interro_0.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <h1>Choose your preferences</h1>
+        </div>
+        <form>
+            <div class="row">
+                <label for="test-type">Test type:</label>
+                <select id="test-type" name="test-type" class="dropdown-container" required>
+                    <option value="Version">Version</option>
+                    <option value="Theme">Theme</option>
+                </select>
+            </div>
+            <div class="row">
+                <label for="num-words">Number of words to be asked:</label>
+                <select id="num-words" name="num-words" class="dropdown-container" required>
+                    <option value="100">100</option>
+                    <option value="50">50</option>
+                    <option value="20">20</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
+            <div class="row">
+                <label for="num-rattraps">Number of catch-ups:</label>
+                <select id="num-rattraps" name="num-rattraps" class="dropdown-container" required>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                    <option value="0">0</option>
+                    <option value="-1">Until the end</option>
+                </select>
+            </div>
+        </form>
+        <div class="row">
+            <button class="button" onclick="startTest()">Start Test</button>
+        </div>
+    </div>
+</body>
+</html>

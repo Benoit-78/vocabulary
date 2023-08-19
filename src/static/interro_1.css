@@ -1,0 +1,126 @@
+/* CSS file for interro page */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #faeada;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    background-color: white;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+}
+
+.flag-box {
+    display: flex;
+    align-items: center;
+}
+
+.middle_button {
+    width: 200px;
+}
+
+.flag {
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.flag-us {
+    color: #0055a4;
+    font-weight: bold;
+}
+
+.flag-fr {
+    color: #0055a4;
+    font-weight: bold;
+}
+
+
+/* ================================== */
+/*  Y E S   /   N O   B U T T O N S   */
+/* ================================== */
+.button {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 10px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.button.green {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.button.green:hover {
+    background-color: #3d8b40;
+}
+
+.button.red {
+    background-color: #f44336;
+    color: white;
+}
+
+.button.red:hover {
+    background-color: #c93b34;
+}
+
+
+
+/* ================================== */
+/*  Q U I T   B U T T O N             */
+/* ================================== */
+.quit-button {
+    margin-left: auto;
+}
+
+.left-align {
+    text-align: left;
+}
+
+
+
+/* ================================== */
+/*  P R O G R E S S   B A R           */
+/* ================================== */
+.progress-container {
+    width: 100%;
+    background-color: #ddd;
+    height: 10px;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    width: 1%;
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease-in-out;
+}
+
+.progress-bar.full {
+    width: 47%;
+}

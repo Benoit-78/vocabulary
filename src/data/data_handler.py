@@ -1,5 +1,5 @@
 """
-    Main purpose: provides with methods for CRUD operations.
+    Main purpose: methods for CRUD operations.
 """
 
 import json
@@ -7,10 +7,11 @@ from datetime import datetime
 from typing import List
 import mysql.connector as mariadb
 import pandas as pd
-import pymysql
 from sqlalchemy import create_engine
 
 import utils
+
+
 
 class CsvHandler():
     """Provide with all methods necessary to interact with csv files."""
@@ -24,16 +25,16 @@ class CsvHandler():
     def set_paths(self):
         """List paths to data csv."""
         self.paths['voc'] = self.os_sep.join(
-            [r'.', 'data', self.test_type + '.csv']
+            [r'.', 'data', self.test_type + '_voc.csv']
         )
         self.paths['perf'] = self.os_sep.join(
-            [r'.', 'logs', self.test_type + '_perf.csv']
+            [r'.', 'data', self.test_type + '_perf.csv']
         )
         self.paths['word_cnt'] = self.os_sep.join(
-            [r'.', 'logs', self.test_type + '_words_count.csv']
+            [r'.', 'data', self.test_type + '_words_count.csv']
         )
         if self.test_type == 'version':
-            self.paths['output'] = self.os_sep.join(['.', 'data', 'theme.csv'])
+            self.paths['output'] = self.os_sep.join(['.', 'data', 'theme_voc.csv'])
         elif self.test_type == 'theme':
             self.paths['output'] = self.os_sep.join(['.', 'data', 'archives.csv'])
         else:
@@ -85,7 +86,7 @@ class CsvHandler():
         """Delete the given word in the given table."""
         pass
 
-    def copy(self, word, table):
+    def Transfer(self, word, table):
         """Copy a word from its original table to the output table (theme or archive)."""
         pass
 
@@ -239,7 +240,6 @@ class MariaDBHandler():
         connection.close()
         return True
 
-    def copy(self, test_type, row):
-        """Copy a word from a table to another."""
+    def transfer(self, test_type, row):
+        """Transfer a word from a table to another."""
         pass
-
