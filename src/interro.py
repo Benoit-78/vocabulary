@@ -7,7 +7,6 @@
 """
 
 import random
-from tkinter import messagebox
 import argparse
 from datetime import date
 from abc import ABC, abstractmethod
@@ -17,7 +16,8 @@ import pandas as pd
 import numpy as np
 
 import utils
-from data import database_handler
+from data import data_handler
+import views
 
 
 
@@ -87,9 +87,7 @@ class Loader():
 
 class Interro(ABC):
     """Abstract class for interrooooo!!!! !!! !"""
-    def __init__(self,
-                 words_df_: pd.DataFrame,
-                 args: argparse.Namespace):
+    def __init__(self, words_df_: pd.DataFrame, args: argparse.Namespace):
         self.words_df = words_df_
         self.words = args.words
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
@@ -109,7 +107,7 @@ class Interro(ABC):
     def guess_word(self, row: List[str], i: int):
         """Given an index, ask a word to the user, and return a boolean."""
         title = f"Word {i}/{self.words}"
-        question = ViewQuestion()
+        question = interro_view.Question()
         question.ask_word(title, row)
         word_guessed = question.check_word(title, row)
         return word_guessed
@@ -128,7 +126,7 @@ class Test(Interro):
                  args: argparse.Namespace,
                  perf_df_: pd.DataFrame=None,
                  words_cnt_df: pd.DataFrame=None,
-                 output_df: pd.DataFrame=None,):
+                 output_df: pd.DataFrame=None):
         super().__init__(words_df_, args)
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
@@ -341,44 +339,13 @@ class Updater():
 
 
 
-class ViewQuestion():
-    """View in MVC pattern."""
-    def ask_word(self, title: str, row: List[str]):
-        """Ask a word to the user through a GUI"""
-        mot_etranger = row[0]
-        text_1 = f"Quelle traduction donnez-vous pour : {mot_etranger}?"
-        user_answer = messagebox.showinfo(title=title, message=text_1)
-        if user_answer is False:
-            print("# ERROR: Interruption by user")
-            raise SystemExit
-
-    def check_word(self, title: str, row: str) -> bool:
-        """Ask the user to decide if the answer was correct or not."""
-        mot_natal = row[1]
-        text_2 = f"Voici la traduction correcte : \'{mot_natal}\'. \nAviez-vous la bonne réponse ?"
-        word_guessed = messagebox.askyesnocancel(title=title, message=text_2)
-        if word_guessed is None:
-            print("# ERROR: Interruption by user")
-            raise SystemExit
-        return word_guessed
-
-    def save_nuage_de_points(self):
-        """
-        Scatterplot of words, abscisses number of guesses, ordinates rate of
-        success.
-        Save the graph, so that analysis can be made on series of graphs.
-        """
-        # sns.scatterplot(words_df[['Nb', 'Taux']])
-
-
-
 def main():
     """Highest level of abstraction for interro!!! program."""
     # Get user inputs
     arguments = get_arguments()
     # Load data
-    data_handler = database_handler.MariaDBHandler(arguments.type)
-    loader = Loader(arguments, data_handler)
+    data_handler_ = data_handler.MariaDBHandler(arguments.type)
+    loader = Loader(arguments, data_handler_)
     loader.load_tables()
     # WeuuAaaInterrooo !!!
     test = Test(
