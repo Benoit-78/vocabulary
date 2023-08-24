@@ -107,7 +107,7 @@ class Interro(ABC):
     def guess_word(self, row: List[str], i: int):
         """Given an index, ask a word to the user, and return a boolean."""
         title = f"Word {i}/{self.words}"
-        question = interro_view.Question()
+        question = views.Question()
         question.ask_word(title, row)
         word_guessed = question.check_word(title, row)
         return word_guessed
@@ -121,18 +121,21 @@ class Interro(ABC):
 
 class Test(Interro):
     """First round"""
-    def __init__(self,
-                 words_df_,
-                 args: argparse.Namespace,
-                 perf_df_: pd.DataFrame=None,
-                 words_cnt_df: pd.DataFrame=None,
-                 output_df: pd.DataFrame=None):
-        super().__init__(words_df_, args)
+    def __init__(
+        self,
+        words_df_,
+        args: argparse.Namespace,
+        perf_df_: pd.DataFrame=None,
+        words_cnt_df: pd.DataFrame=None,
+        output_df: pd.DataFrame=None):
+        super().__init__(words_df_, args
+        )
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
         self.output_df = output_df
         self.perf = []
         self.step = 0
+        self.interro_df = pd.DataFrame(columns=['english', 'french'])
 
     def create_random_step(self):
         """Get random step, the jump from one word to another"""
@@ -186,17 +189,22 @@ class Test(Interro):
         success_rate = int(100 * (1 - (faults_total / self.words)))
         self.perf = success_rate
 
-    def run(self):
-        """Launch the vocabulary interoooooo !!!!"""
+    def get_interro_df(self):
+        """Extract the words that will be asked."""
         self.create_random_step()
         self.index = self.step
-        for i in range(1, self.words + 1):
+        for _ in range(1, self.words + 1):
             self.index = self.get_next_index()
             row = self.get_row()
+            self.interro_df.loc[len(self.interro_df)] = row
+
+    def run(self):
+        """Launch the vocabulary interoooooo !!!!"""
+        for i in range(1, len(self.interro_df) + 1):
+            row = self.interro_df.loc[i-1]
             word_guessed = self.guess_word(row, i)
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)
-        self.compute_success_rate()
 
 
 
@@ -209,7 +217,6 @@ class Rattrap(Interro):
 
     def run(self):
         """Launch a rattrapage"""
-        self.words = self.words_df.shape[0]
         for j in range(0, self.words_df.shape[0]):
             self.index = j
             row = self.get_row()
@@ -354,7 +361,9 @@ def main():
         loader.tables[loader.test_type + '_perf'],
         loader.tables[loader.test_type + '_words_count']
     )
+    test.get_interro_df()
     test.run()
+    test.compute_success_rate()
     # Rattraaaaaaap's !!!!
     rattrap = Rattrap(test.faults_df, arguments)
     rattrap.start_loop()

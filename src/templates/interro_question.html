@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Translation Quiz</title>
-        <link rel="stylesheet" type="text/css" href="/static/interro_1.css">
-        <script type="text/javascript" src="/static/interro_1.js"></script>
-    </head>
+<head>
+    <title>Translation Quiz</title>
+    <link rel="stylesheet" type="text/css" href="/static/interro.css">
+    <script type="text/javascript" src="/static/interro.js"></script>
+</head>
 <body>
     <div class="container">
         <div class="progress-container">
@@ -20,20 +20,13 @@
                     {{ content_box1 }}
                 </div>
             </div>
-            <p class="middle_button">Translation:</p>
+            <button class="button middle_button" onclick="showTranslation()">Show translation</button>
             <div class="box">
                 <div class="flag-box">
                     <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
-                    {{ content_box2 }}
+                    <input type="text" id="user-input" class="user-input-box">
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <p>Did you get it?</p>
-        </div>
-        <div class="row">
-            <button class="button green" onclick="nextGuess()">Yes</button>
-            <button class="button red" onclick="nextGuess()">No</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
