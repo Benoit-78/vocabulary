@@ -7,8 +7,31 @@ body {
     display: flex;
     justify-content: center;
     min-height: 100vh;
-    background-color: #faeada;
+    background-color: #c3b9ff;
 }
+
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+input {
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
 
 .container {
     text-align: center;
@@ -123,4 +146,13 @@ body {
 
 .progress-bar.full {
     width: 47%;
+}
+
+
+/* ================================== */
+/*  D R O P D O W N S                 */
+/* ================================== */
+.dropdown-container {
+    width: 150px;
+    margin-bottom: 10px;
 }
