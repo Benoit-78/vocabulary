@@ -40,6 +40,8 @@ def start_page():
 
 @app.get("/interro_settings", response_class=HTMLResponse)
 def interro_settings(request: Request):
+    global progress_percent
+    progress_percent = 1
     return templates.TemplateResponse(
         "interro_settings.html",
         {
@@ -48,16 +50,31 @@ def interro_settings(request: Request):
     )
 
 
+@app.post("/user-settings")
+async def get_user_settings(settings: dict):
+    print('"# DEBUG: settings', settings)
+    global test_type
+    test_type = settings["testType"]
+    global words
+    words = settings["numWords"]
+    return JSONResponse(
+        content={
+            "message": "User response and progress percent stored successfully"
+        }
+    )
+
+
 @app.get("/interro_question", response_class=HTMLResponse)
 def interro_page_1(request: Request):
     english = "Hello"
-    progress_percent = 1
+    global progress_percent
+    progress_percent += 1
     return templates.TemplateResponse(
         "interro_question.html",
         {
             "request": request,
             "content_box1": english,
-            "progress_percent": progress_percent
+            "progress_percent": progress_percent,
         }
     )
 
@@ -66,55 +83,29 @@ def interro_page_1(request: Request):
 def interro_page_2(request: Request):
     english = "Hello"
     french = "Bonjour"
-    progress_percent = 2
     return templates.TemplateResponse(
         "interro_answer.html",
         {
             "request": request,
             "content_box1": english,
             "content_box2": french,
+            "number_of_questions": words,
             "progress_percent": progress_percent
         }
     )
 
 
+
 @app.post("/user-response")
 async def get_user_response(data: dict):
     print(data)
-    global user_response
-    user_response = data["response"]
+    global user_answer
+    user_answer = data["answer"]
     progress_percent = data.get("progress_percent")
     return JSONResponse(
         content=
         {
             "message": "User response and progress percent stored successfully"
-        }
-    )
-
-
-
-@app.get("/get-user-response")
-async def get_stored_user_response(response: dict):
-    global user_response
-    print("Stored user response:", user_response)
-    return JSONResponse(
-        content=
-        {
-            "user_response": user_response
-        }
-    )
-
-
-@app.get("/print-user-response", response_class=HTMLResponse)
-def print_user_response(
-    request: Request,
-    user_response: str = Query(..., description="User's response")
-):
-    return templates.TemplateResponse(
-        "debug_response.html",
-        {
-            "request": request,
-            "user_response": user_response
         }
     )
 

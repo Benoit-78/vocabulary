@@ -20,4 +20,4 @@ USER benito
 
 # Run the service
 EXPOSE 8000
-CMD ["uvicorn", "src/user_interface:app", "--reload"]
+CMD ["uvicorn", "src/routes:app", "--reload"]

@@ -1,3 +1,5 @@
+
+
 Vocabulary application
 
 A few years ago, I had great difficulties to keep certain english words in my mind.
@@ -12,4 +14,4 @@ There is an arabic sentence that says that a language is a sea without shores. I
 
 But I encounter far more words that passed through my app, and are in my memory now.
 
-I wish you the same result.
+I wish you the same result, happy learning!
