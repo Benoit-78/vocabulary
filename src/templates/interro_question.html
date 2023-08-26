@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Translation Quiz</title>
-    <link rel="stylesheet" type="text/css" href="/static/interro.css">
-    <script type="text/javascript" src="/static/interro.js"></script>
-</head>
+    <head>
+        <title>Translation Quiz</title>
+        <link rel="stylesheet" type="text/css" href="/static/interro.css">
+        <script type="text/javascript" src="/static/interro.js"></script>
+    </head>
 <body>
     <div class="container">
         <div class="progress-container">
@@ -14,19 +14,21 @@
             <p>What is the translation for:</p>
         </div>
         <div class="row">
-            <div class="box">
-                <div class="flag-box">
-                    <span class="flag flag-us">&#x1F1FA;&#x1F1F8;</span>
+            <div class="flag-box">
+                <div class="box">
                     {{ content_box1 }}
                 </div>
+                <span class="flag flag-us">&#x1F1FA;&#x1F1F8;</span>
             </div>
-            <button class="button middle_button" onclick="showTranslation()">Show translation</button>
-            <div class="box">
-                <div class="flag-box">
-                    <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
-                    <input type="text" id="user-input" class="user-input-box">
+            <div class="flag-box">
+                <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
+                <div class="box">
+                    ?
                 </div>
             </div>
+        </div>
+        <div class="row">
+            <button class="button middle_button" onclick="showTranslation()">Show translation</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>

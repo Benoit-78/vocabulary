@@ -14,16 +14,15 @@
             <p>What is the translation for:</p>
         </div>
         <div class="row">
-            <div class="box">
-                <div class="flag-box">
-                    <span class="flag flag-us">&#x1F1FA;&#x1F1F8;</span>
+            <div class="flag-box">
+                <div class="box">
                     {{ content_box1 }}
                 </div>
+                <span class="flag flag-us">&#x1F1FA;&#x1F1F8;</span>
             </div>
-            <p class="middle_button">Translation:</p>
-            <div class="box">
-                <div class="flag-box">
-                    <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
+            <div class="flag-box">
+                <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
+                <div class="box">
                     {{ content_box2 }}
                 </div>
             </div>
@@ -32,8 +31,8 @@
             <p>Did you get it?</p>
         </div>
         <div class="row">
-            <button class="button green" id="yes-button" onclick="sendUserResponse('Yes', {{ progress_percent }})">Yes</button>
-            <button class="button red" id="no-button" onclick="nextGuess()">No</button>
+            <button class="button green" id="yes-button" onclick="sendUserAnswer('Yes', {{ progress_percent }}, {{ number_of_questions }})">Yes</button>
+            <button class="button red" id="no-button" onclick="sendUserAnswer('No', {{ progress_percent }}, {{ number_of_questions }})">No</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
