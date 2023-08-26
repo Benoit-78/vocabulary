@@ -1,68 +1,36 @@
-annotated-types @ file:///home/conda/feedstock_root/build_artifacts/annotated-types_1685597160053/work
-anyio @ file:///home/conda/feedstock_root/build_artifacts/anyio_1688651106312/work/dist
-asttokens==2.2.1
-backcall==0.2.0
-certifi==2023.7.22
-cffi @ file:///D:/bld/cffi_1671179520384/work
-click @ file:///D:/bld/click_1692312014553/work
-colorama @ file:///home/conda/feedstock_root/build_artifacts/colorama_1666700638685/work
-comm==0.1.3
-cryptography @ file:///D:/bld/cryptography-split_1691444362804/work
-debugpy==1.6.7
-decorator==5.1.1
-dnspython @ file:///home/conda/feedstock_root/build_artifacts/dnspython_1691598144738/work
-exceptiongroup @ file:///home/conda/feedstock_root/build_artifacts/exceptiongroup_1692026125334/work
-executing==1.2.0
-fastapi @ file:///home/conda/feedstock_root/build_artifacts/fastapi_1692014902720/work
-Flask==2.2.5
-greenlet @ file:///D:/bld/greenlet_1684083065609/work
-h11 @ file:///home/conda/feedstock_root/build_artifacts/h11_1664132893548/work
-h2 @ file:///home/conda/feedstock_root/build_artifacts/h2_1634280454336/work
-hpack==4.0.0
-httpcore @ file:///home/conda/feedstock_root/build_artifacts/httpcore_1688612313164/work
-hyperframe @ file:///home/conda/feedstock_root/build_artifacts/hyperframe_1619110129307/work
-idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1663625384323/work
-ipykernel==6.23.1
-ipython==8.13.2
-jedi==0.18.2
-Jinja2 @ file:///home/conda/feedstock_root/build_artifacts/jinja2_1654302431367/work
-joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1691577114857/work
-jupyter_client==8.2.0
-jupyter_core==5.3.0
-MarkupSafe @ file:///D:/bld/markupsafe_1685769163058/work
-matplotlib-inline==0.1.6
-memory-profiler==0.61.0
-mysql-connector-python @ file:///D:/bld/mysql-connector-python_1686438949736/work
-nest-asyncio==1.5.6
-nltk @ file:///home/conda/feedstock_root/build_artifacts/nltk_1672696305909/work
-numpy @ file:///D:/bld/numpy_1691056524419/work
-pandas @ file:///D:/bld/pandas_1688740700873/work
-parso==0.8.3
-pickleshare==0.7.5
-prompt-toolkit==3.0.38
-protobuf @ file:///D:/bld/protobuf_1681050297321/work/python
-psutil==5.9.5
-pure-eval==0.2.2
-pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1636257122734/work
-pydantic @ file:///home/conda/feedstock_root/build_artifacts/pydantic_1692395748114/work
-pydantic_core @ file:///D:/bld/pydantic-core_1692379223933/work
-Pygments==2.15.1
-PyMySQL @ file:///home/conda/feedstock_root/build_artifacts/pymysql_1687787790599/work
-python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1626286286081/work
-pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1680088766131/work
-pywin32==306
-pyzmq==25.1.0
-regex @ file:///D:/bld/regex_1691539092660/work
-six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
-sniffio @ file:///home/conda/feedstock_root/build_artifacts/sniffio_1662051266223/work
-SQLAlchemy @ file:///D:/bld/sqlalchemy_1689437420940/work
-stack-data==0.6.2
-starlette @ file:///home/conda/feedstock_root/build_artifacts/starlette-recipe_1684245096404/work
-tornado==6.3.2
-tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1691671248568/work
-traitlets==5.9.0
-typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1688315532570/work
-tzdata @ file:///home/conda/feedstock_root/build_artifacts/python-tzdata_1680081134351/work
-uvicorn @ file:///D:/bld/uvicorn-split_1690810299287/work
-wcwidth==0.2.6
-Werkzeug==2.2.3
+altgraph==0.17.3
+annotated-types==0.5.0
+anyio==3.7.1
+astroid==2.15.5
+click==8.1.7
+colorama==0.4.6
+dill==0.3.6
+fastapi==0.103.0
+h11==0.14.0
+idna==3.4
+isort==5.12.0
+Jinja2==3.1.2
+lazy-object-proxy==1.9.0
+MarkupSafe==2.1.3
+mccabe==0.7.0
+numpy==1.25.0
+pandas==2.0.2
+pefile==2023.2.7
+platformdirs==3.8.0
+pydantic==2.3.0
+pydantic_core==2.6.3
+pyinstaller==5.12.0
+pyinstaller-hooks-contrib==2023.3
+pylint==2.17.4
+python-dateutil==2.8.2
+pytz==2023.3
+pywin32-ctypes==0.2.1
+six==1.16.0
+sniffio==1.3.0
+starlette==0.27.0
+tk==0.1.0
+tomlkit==0.11.8
+typing_extensions==4.7.1
+tzdata==2023.3
+uvicorn==0.23.2
+wrapt==1.15.0

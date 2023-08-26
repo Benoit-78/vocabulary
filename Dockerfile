@@ -19,5 +19,5 @@ RUN useradd --uid 1000 benito && chown -R benito /app
 USER benito
 
 # Run the service
-EXPOSE 8000
-CMD ["uvicorn", "src/routes:app", "--reload"]
+WORKDIR /app/src
+CMD ["uvicorn", "routes:app", "--reload", "--host", "0.0.0.0", "--port", "80"]
