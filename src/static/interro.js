@@ -23,10 +23,7 @@ function endInterro() {
 }
 
 
-function sendUserSettings() {
-    var testType = document.getElementById("test-type").value;
-    var numWords = document.getElementById("num-words").value;
-    // Send the response and progress_percent to the server (FastAPI)
+function sendUserSettings(testType, numWords) {
     fetch("/user-settings", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -47,8 +44,7 @@ function sendUserSettings() {
 
 function sendUserAnswer(answer, progressBar, numberOfQuestions) {
     if (progressBar < numberOfQuestions + 1) {
-        // Send the response and progress_percent to the server (FastAPI)
-        fetch("/user-response", {
+        fetch("/user-answer", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({

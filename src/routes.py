@@ -57,6 +57,8 @@ async def get_user_settings(settings: dict):
     test_type = settings["testType"]
     global words
     words = settings["numWords"]
+    global score
+    score = 0
     return JSONResponse(
         content={
             "message": "User response and progress percent stored successfully"
@@ -95,13 +97,13 @@ def interro_page_2(request: Request):
     )
 
 
-
-@app.post("/user-response")
+@app.post("/user-answer")
 async def get_user_response(data: dict):
-    print(data)
-    global user_answer
     user_answer = data["answer"]
     progress_percent = data.get("progress_percent")
+    global score
+    if user_answer == 'Yes':
+        score += 1
     return JSONResponse(
         content=
         {
@@ -112,12 +114,14 @@ async def get_user_response(data: dict):
 
 @app.get("/interro_end", response_class=HTMLResponse)
 def display_score(request: Request):
-    score = 84
+    global score
+    global words
     return templates.TemplateResponse(
         "interro_end.html",
         {
             "request": request,
-            "score": score
+            "score": score,
+            "total": words
         }
     )
 

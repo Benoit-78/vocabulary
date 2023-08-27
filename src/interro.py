@@ -183,12 +183,6 @@ class Test(Interro):
         # Update Query
         self.words_df.loc[self.index, 'Query'] += 1
 
-    def compute_success_rate(self):
-        """Compute success rate."""
-        faults_total = self.faults_df.shape[0]
-        success_rate = int(100 * (1 - (faults_total / self.words)))
-        self.perf = success_rate
-
     def get_interro_df(self):
         """Extract the words that will be asked."""
         self.create_random_step()
@@ -205,6 +199,12 @@ class Test(Interro):
             word_guessed = self.guess_word(row, i)
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)
+
+    def compute_success_rate(self):
+        """Compute success rate."""
+        faults_total = self.faults_df.shape[0]
+        success_rate = int(100 * (1 - (faults_total / self.words)))
+        self.perf = success_rate
 
 
 
@@ -348,8 +348,8 @@ class Updater():
 
 def main():
     """Highest level of abstraction for interro!!! program."""
-    # Get user inputs
-    arguments = get_arguments()
+    # Get user settings
+    arguments = get_arguments()  ###
     # Load data
     data_handler_ = data_handler.MariaDBHandler(arguments.type)
     loader = Loader(arguments, data_handler_)
@@ -362,10 +362,10 @@ def main():
         loader.tables[loader.test_type + '_words_count']
     )
     test.get_interro_df()
-    test.run()
+    test.run()  ###
     test.compute_success_rate()
     # Rattraaaaaaap's !!!!
-    rattrap = Rattrap(test.faults_df, arguments)
+    rattrap = Rattrap(test.faults_df, arguments)  ### conditionné au user_input
     rattrap.start_loop()
     # Save the results
     updater = Updater(loader, test)
