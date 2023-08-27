@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 
+import interro
 
 global user_response
 
@@ -59,6 +60,7 @@ async def get_user_settings(settings: dict):
     words = settings["numWords"]
     global score
     score = 0
+    
     return JSONResponse(
         content={
             "message": "User response and progress percent stored successfully"

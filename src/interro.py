@@ -21,44 +21,45 @@ import views
 
 
 
-def parse_arguments(arg: List[str]) -> argparse.Namespace:
-    """Parse command line argument"""
-    another_parser = argparse.ArgumentParser()
-    another_parser.add_argument("-t", "--type", type=str)
-    another_parser.add_argument("-w", "--words", type=int)
-    another_parser.add_argument("-r", "--rattraps", type=int)
-    if '-t' not in arg:
-        arg.append('-t')
-        arg.append('version')
-    if '-w' not in arg:
-        arg.append('-w')
-        arg.append('10')
-    if '-r' not in arg:
-        arg.append('-r')
-        arg.append('2')
-    args = another_parser.parse_args(arg)
-    return args
+class CliUser():
+    def __init__(self):
+        self.settings = None
 
+    def parse_arguments(self, arg: List[str]) -> argparse.Namespace:
+        """Parse command line argument"""
+        another_parser = argparse.ArgumentParser()
+        another_parser.add_argument("-t", "--type", type=str)
+        another_parser.add_argument("-w", "--words", type=int)
+        another_parser.add_argument("-r", "--rattraps", type=int)
+        if '-t' not in arg:
+            arg.append('-t')
+            arg.append('version')
+        if '-w' not in arg:
+            arg.append('-w')
+            arg.append('10')
+        if '-r' not in arg:
+            arg.append('-r')
+            arg.append('2')
+        self.settings = another_parser.parse_args(arg)
 
-def get_arguments() -> argparse.Namespace:
-    """Check the kind of interro, version or theme"""
-    args = parse_arguments(sys.argv[1:])
-    if not args.type or not args.words or not args.rattraps :
-        print("# ERROR: Please give -t <test type>, -w <number of words> and -r <number of rattraps>")
-        raise SystemExit
-    if args.type == '':
-        print("# ERROR: Please give a test type: either version or theme")
-        raise SystemExit
-    if args.type not in ['version', 'theme']:
-        print("# ERROR: Test type must be either version or theme")
-        raise SystemExit
-    if args.rattraps < -1:
-        print("# ERROR: Number of rattraps must be greater than -1.")
-        raise SystemExit
-    if args.words < 1:
-        print("# ERROR: Number of words must be greater than 0.")
-        raise SystemExit
-    return args
+    def get_settings(self) -> argparse.Namespace:
+        """Check the kind of interro, version or theme"""
+        self.parse_arguments(sys.argv[1:])
+        if not self.settings.type or not self.settings.words or not self.settings.rattraps :
+            print("# ERROR: Please give -t <test type>, -w <number of words> and -r <number of rattraps>")
+            raise SystemExit
+        if self.settings.type == '':
+            print("# ERROR: Please give a test type: either version or theme")
+            raise SystemExit
+        if self.settings.type not in ['version', 'theme']:
+            print("# ERROR: Test type must be either version or theme")
+            raise SystemExit
+        if self.settings.rattraps < -1:
+            print("# ERROR: Number of rattraps must be greater than -1.")
+            raise SystemExit
+        if self.settings.words < 1:
+            print("# ERROR: Number of words must be greater than 0.")
+            raise SystemExit
 
 
 
@@ -194,8 +195,7 @@ class Test(Interro):
         """Launch the vocabulary interoooooo !!!!"""
         for i in range(1, len(self.interro_df) + 1):
             row = self.interro_df.loc[i-1]
-            title = f"Word {i}/{self.words}"
-            word_guessed = self.guesser.guess_word(row, title)
+            word_guessed = self.guesser.guess_word(row, i, self.words)
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)
 
@@ -224,8 +224,7 @@ class Rattrap(Interro):
         for j in range(0, words_total):
             self.index = j
             row = self.get_row()
-            title = f"Word {j}/{words_total}"
-            word_guessed = self.guesser.guess_word(row, title)
+            word_guessed = self.guesser.guess_word(row, j+1, words_total)
             self.update_faults_df(word_guessed, row)
         self.words_df = self.faults_df.copy()
         self.faults_df.drop(self.faults_df.index, inplace=True)
@@ -354,27 +353,31 @@ class Updater():
 def main():
     """Highest level of abstraction for interro!!! program."""
     # Get user settings
-    arguments = get_arguments()  ###
+    user = CliUser()
+    user.get_settings()
     # Load data
-    data_handler_ = data_handler.MariaDBHandler(arguments.type)
-    loader = Loader(arguments, data_handler_)
+    data_handler_ = data_handler.MariaDBHandler(user.settings.type)
+    loader = Loader(
+        user.settings,
+        data_handler_
+    )
     loader.load_tables()
     # WeuuAaaInterrooo !!!
-    guesser = views.CliGuesser()
+    guesser = views.CliGuesser()  # /!\
     test = Test(
         loader.tables[loader.test_type + '_voc'],
-        arguments,
+        user.settings,
         guesser,
         loader.tables[loader.test_type + '_perf'],
         loader.tables[loader.test_type + '_words_count']
     )
     test.get_interro_df()
-    test.run()  ###
+    test.run()  # /!\
     test.compute_success_rate()
     # Rattraaaaaaap's !!!!
     rattrap = Rattrap(
         test.faults_df,
-        arguments,
+        user.settings,
         guesser
     )
     rattrap.start_loop()
