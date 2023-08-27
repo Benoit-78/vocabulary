@@ -6,7 +6,7 @@ from tkinter import messagebox
 from typing import List
 
 
-class Question():
+class CliGuesser():
     """View in MVC pattern."""
     def ask_word(self, title: str, row: List[str]):
         """Ask a word to the user through a GUI"""
@@ -27,10 +27,8 @@ class Question():
             raise SystemExit
         return word_guessed
 
-    def save_nuage_de_points(self):
-        """
-        Scatterplot of words, abscisses number of guesses, ordinates rate of
-        success.
-        Save the graph, so that analysis can be made on series of graphs.
-        """
-        # sns.scatterplot(words_df[['Nb', 'Taux']])
+    def guess_word(self, row: List[str], title: str):
+        """Given an index, ask a word to the user, and return a boolean."""
+        self.ask_word(title, row)
+        word_guessed = self.check_word(title, row)
+        return word_guessed

@@ -8,6 +8,7 @@ from typing import List
 import mysql.connector as mariadb
 import pandas as pd
 from sqlalchemy import create_engine
+import os
 
 import utils
 
@@ -103,7 +104,7 @@ class MariaDBHandler():
     # Common operations
     def set_database_cred(self):
         """Get credentials necessary for connection with vocabulary database."""
-        with open(".\\conf\\cred.json", 'rb') as cred_file:
+        with open("..\\conf\\cred.json", 'rb') as cred_file:
             self.params = json.load(cred_file)
 
     def set_db_cursor(self):

@@ -87,9 +87,15 @@ class Loader():
 
 class Interro(ABC):
     """Abstract class for interrooooo!!!! !!! !"""
-    def __init__(self, words_df_: pd.DataFrame, args: argparse.Namespace):
+    def __init__(
+        self,
+        words_df_: pd.DataFrame,
+        args: argparse.Namespace,
+        guesser
+        ):
         self.words_df = words_df_
         self.words = args.words
+        self.guesser = guesser
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
 
@@ -104,14 +110,6 @@ class Interro(ABC):
         row = [mot_etranger, mot_natal]
         return row
 
-    def guess_word(self, row: List[str], i: int):
-        """Given an index, ask a word to the user, and return a boolean."""
-        title = f"Word {i}/{self.words}"
-        question = views.Question()
-        question.ask_word(title, row)
-        word_guessed = question.check_word(title, row)
-        return word_guessed
-
     def update_faults_df(self, word_guessed: bool, row: List[str]):
         """Save the faulty answers for the second test."""
         if word_guessed is False:
@@ -125,11 +123,11 @@ class Test(Interro):
         self,
         words_df_,
         args: argparse.Namespace,
+        guesser,
         perf_df_: pd.DataFrame=None,
         words_cnt_df: pd.DataFrame=None,
         output_df: pd.DataFrame=None):
-        super().__init__(words_df_, args
-        )
+        super().__init__(words_df_, args, guesser)
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
         self.output_df = output_df
@@ -196,7 +194,8 @@ class Test(Interro):
         """Launch the vocabulary interoooooo !!!!"""
         for i in range(1, len(self.interro_df) + 1):
             row = self.interro_df.loc[i-1]
-            word_guessed = self.guess_word(row, i)
+            title = f"Word {i}/{self.words}"
+            word_guessed = self.guesser.guess_word(row, title)
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)
 
@@ -210,17 +209,23 @@ class Test(Interro):
 
 class Rattrap(Interro):
     """Rattrapage !!!"""
-    def __init__(self, faults_df_: pd.DataFrame, arguments_: argparse.Namespace):
-        super().__init__(faults_df_, arguments_)
+    def __init__(
+        self,
+        faults_df_: pd.DataFrame,
+        arguments_: argparse.Namespace,
+        guesser):
+        super().__init__(faults_df_, arguments_, guesser)
         self.words_df = faults_df_.copy()
         self.rattraps = arguments_.rattraps
 
     def run(self):
         """Launch a rattrapage"""
-        for j in range(0, self.words_df.shape[0]):
+        words_total = self.words_df.shape[0]
+        for j in range(0, words_total):
             self.index = j
             row = self.get_row()
-            word_guessed = self.guess_word(row, j+1)
+            title = f"Word {j}/{words_total}"
+            word_guessed = self.guesser.guess_word(row, title)
             self.update_faults_df(word_guessed, row)
         self.words_df = self.faults_df.copy()
         self.faults_df.drop(self.faults_df.index, inplace=True)
@@ -355,9 +360,11 @@ def main():
     loader = Loader(arguments, data_handler_)
     loader.load_tables()
     # WeuuAaaInterrooo !!!
+    guesser = views.CliGuesser()
     test = Test(
         loader.tables[loader.test_type + '_voc'],
         arguments,
+        guesser,
         loader.tables[loader.test_type + '_perf'],
         loader.tables[loader.test_type + '_words_count']
     )
@@ -365,7 +372,11 @@ def main():
     test.run()  ###
     test.compute_success_rate()
     # Rattraaaaaaap's !!!!
-    rattrap = Rattrap(test.faults_df, arguments)  ### conditionné au user_input
+    rattrap = Rattrap(
+        test.faults_df,
+        arguments,
+        guesser
+    )
     rattrap.start_loop()
     # Save the results
     updater = Updater(loader, test)
