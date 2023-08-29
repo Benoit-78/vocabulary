@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 
+from data import data_handler
 import interro
 
 global user_response
@@ -20,6 +21,7 @@ app.mount(
     StaticFiles(directory="static"),
     name="static"
 )
+
 templates = Jinja2Templates(directory="templates")
 
 
@@ -53,14 +55,18 @@ def interro_settings(request: Request):
 
 @app.post("/user-settings")
 async def get_user_settings(settings: dict):
-    print('"# DEBUG: settings', settings)
-    global test_type
-    test_type = settings["testType"]
     global words
     words = settings["numWords"]
     global score
     score = 0
-    
+    test_type = settings["testType"].lower()
+    data_handler_ = data_handler.MariaDBHandler(test_type)
+    loader = interro.Loader(
+        test_type,
+        0,
+        data_handler_
+    )
+    loader.load_tables()
     return JSONResponse(
         content={
             "message": "User response and progress percent stored successfully"

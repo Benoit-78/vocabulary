@@ -14,14 +14,20 @@ import sys
 from typing import List
 import pandas as pd
 import numpy as np
+import uvicorn
 
-import utils
 from data import data_handler
 import views
+
+STEEP_GOOD = -1.25
+ORDINATE_GOOD = 112.5
+STEEP_BAD = 2.5
+ORDINATE_BAD = -125
 
 
 
 class CliUser():
+    "Class dedicated to users that launche the app through the CLI."
     def __init__(self):
         self.settings = None
 
@@ -46,7 +52,13 @@ class CliUser():
         """Check the kind of interro, version or theme"""
         self.parse_arguments(sys.argv[1:])
         if not self.settings.type or not self.settings.words or not self.settings.rattraps :
-            print("# ERROR: Please give -t <test type>, -w <number of words> and -r <number of rattraps>")
+            message = ' '.join([
+                "# ERROR: Please give",
+                "-t <test type>, ",
+                "-w <number of words> and ",
+                "-r <number of rattraps>"
+            ])
+            print(message)
             raise SystemExit
         if self.settings.type == '':
             print("# ERROR: Please give a test type: either version or theme")
@@ -65,10 +77,10 @@ class CliUser():
 
 class Loader():
     """Data loader"""
-    def __init__(self, arguments_: argparse.Namespace, data_handler_):
+    def __init__(self, test_type, rattraps, data_handler_):
         """Must be done in the same session than the interroooo is launched"""
-        self.test_type = arguments_.type
-        self.rattraps = arguments_.rattraps
+        self.test_type = test_type
+        self.rattraps = rattraps
         self.tables = {}
         self.data_handler = data_handler_
         self.output_table = ''
@@ -77,6 +89,7 @@ class Loader():
         """Return the tables necessary for the interro to run"""
         self.tables = self.data_handler.get_tables()
         voc_table = self.test_type + '_voc'
+        print("# DEBUG: ")
         self.tables[voc_table]['Query'] = [0] * self.tables[voc_table].shape[0]
         self.tables[voc_table] = self.tables[voc_table].sort_values(by='Date', ascending=True)
         self.tables[voc_table] = self.tables[voc_table].replace(r',', r'.', regex=True)
@@ -247,15 +260,13 @@ class Updater():
         self.loader = loader
         self.interro = interro
         self.well_known_words = pd.DataFrame()
-        self.steep_good = -1.25
-        self.ordinate_good = 112.5
-        self.steep_bad = 2.5
-        self.ordinate_bad = -125
         self.output_table_name = ''
 
     def get_known_words(self):
         """Identify the words that have been sufficiently guessed."""
-        self.interro.words_df['image_good'] = (self.ordinate_good + self.steep_good * self.interro.words_df['Nb']) / 100
+        self.interro.words_df['image_good'] = (
+            ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['Nb']
+        ) / 100
         self.well_known_words = self.interro.words_df[
             self.interro.words_df['Taux'] >= self.interro.words_df['image_good']
         ]
@@ -298,10 +309,15 @@ class Updater():
         self.interro.words_df.drop('image_good', axis=1, inplace=True)
 
     def flag_bad_words(self):
-        """Apply special flag to difficult words, i.e. words that are rarely guessed by the user."""
+        """
+            Apply special flag to difficult words,
+            i.e. words that are rarely guessed by the user.
+        """
         if 'image_bad' in self.interro.words_df.columns:
             self.interro.words_df.drop('image_bad', axis=1, inplace=True)
-        self.interro.words_df['image_bad'] = (self.ordinate_bad + self.steep_bad * self.interro.words_df['Nb']) / 100
+        self.interro.words_df['image_bad'] = (
+            ORDINATE_BAD + STEEP_BAD * self.interro.words_df['Nb']
+        ) / 100
         self.interro.words_df['bad_word'] = np.where(
             self.interro.words_df['Taux'] < self.interro.words_df['image_bad'],
             1,
@@ -350,7 +366,7 @@ class Updater():
 
 
 
-def main():
+def cli_main():
     """Highest level of abstraction for interro!!! program."""
     # Get user settings
     user = CliUser()
@@ -358,7 +374,8 @@ def main():
     # Load data
     data_handler_ = data_handler.MariaDBHandler(user.settings.type)
     loader = Loader(
-        user.settings,
+        user.settings.type,
+        user.settings.rattraps,
         data_handler_
     )
     loader.load_tables()
@@ -380,11 +397,11 @@ def main():
         user.settings,
         guesser
     )
-    rattrap.start_loop()
+    rattrap.start_loop()  # /!\
     # Save the results
     updater = Updater(loader, test)
     updater.update_data()
 
 
 if __name__ == '__main__':
-    main()
+    cli_main()
