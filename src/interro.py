@@ -27,7 +27,7 @@ ORDINATE_BAD = -125
 
 
 class CliUser():
-    "Class dedicated to users that launche the app through the CLI."
+    """User who launchs the app through the CLI."""
     def __init__(self):
         self.settings = None
 
@@ -89,7 +89,6 @@ class Loader():
         """Return the tables necessary for the interro to run"""
         self.tables = self.data_handler.get_tables()
         voc_table = self.test_type + '_voc'
-        print("# DEBUG: ")
         self.tables[voc_table]['Query'] = [0] * self.tables[voc_table].shape[0]
         self.tables[voc_table] = self.tables[voc_table].sort_values(by='Date', ascending=True)
         self.tables[voc_table] = self.tables[voc_table].replace(r',', r'.', regex=True)
@@ -104,11 +103,11 @@ class Interro(ABC):
     def __init__(
         self,
         words_df_: pd.DataFrame,
-        args: argparse.Namespace,
+        words,
         guesser
         ):
         self.words_df = words_df_
-        self.words = args.words
+        self.words = words
         self.guesser = guesser
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
@@ -136,12 +135,13 @@ class Test(Interro):
     def __init__(
         self,
         words_df_,
-        args: argparse.Namespace,
+        words: int,
         guesser,
         perf_df_: pd.DataFrame=None,
         words_cnt_df: pd.DataFrame=None,
-        output_df: pd.DataFrame=None):
-        super().__init__(words_df_, args, guesser)
+        output_df: pd.DataFrame=None
+        ):
+        super().__init__(words_df_, int(words), guesser)
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
         self.output_df = output_df
@@ -206,11 +206,13 @@ class Test(Interro):
 
     def run(self):
         """Launch the vocabulary interoooooo !!!!"""
+        self.get_interro_df()
         for i in range(1, len(self.interro_df) + 1):
             row = self.interro_df.loc[i-1]
             word_guessed = self.guesser.guess_word(row, i, self.words)
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)
+        self.compute_success_rate()
 
     def compute_success_rate(self):
         """Compute success rate."""
@@ -225,11 +227,12 @@ class Rattrap(Interro):
     def __init__(
         self,
         faults_df_: pd.DataFrame,
-        arguments_: argparse.Namespace,
-        guesser):
-        super().__init__(faults_df_, arguments_, guesser)
+        rattraps: int,
+        guesser
+        ):
+        super().__init__(faults_df_, faults_df_.shape[0], guesser)
         self.words_df = faults_df_.copy()
-        self.rattraps = arguments_.rattraps
+        self.rattraps = int(rattraps)
 
     def run(self):
         """Launch a rattrapage"""
@@ -255,7 +258,7 @@ class Rattrap(Interro):
 
 
 class Updater():
-    """Update the tables of words (version and theme), counts, and archives."""
+    """Update tables."""
     def __init__(self, loader: Loader, interro: Interro):
         self.loader = loader
         self.interro = interro
@@ -367,7 +370,7 @@ class Updater():
 
 
 def cli_main():
-    """Highest level of abstraction for interro!!! program."""
+    """Series of instructions execuated when the user launches the program from CLI."""
     # Get user settings
     user = CliUser()
     user.get_settings()
@@ -380,24 +383,22 @@ def cli_main():
     )
     loader.load_tables()
     # WeuuAaaInterrooo !!!
-    guesser = views.CliGuesser()  # /!\
+    guesser = views.CliGuesser()
     test = Test(
         loader.tables[loader.test_type + '_voc'],
-        user.settings,
+        user.settings.words,
         guesser,
         loader.tables[loader.test_type + '_perf'],
         loader.tables[loader.test_type + '_words_count']
     )
-    test.get_interro_df()
-    test.run()  # /!\
-    test.compute_success_rate()
+    test.run()
     # Rattraaaaaaap's !!!!
     rattrap = Rattrap(
         test.faults_df,
-        user.settings,
+        user.settings.rattraps,
         guesser
     )
-    rattrap.start_loop()  # /!\
+    rattrap.start_loop()
     # Save the results
     updater = Updater(loader, test)
     updater.update_data()

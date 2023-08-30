@@ -43,25 +43,25 @@ function sendUserSettings(testType, numWords) {
 
 
 function sendUserAnswer(answer, progressBar, numberOfQuestions) {
-    if (progressBar < numberOfQuestions + 1) {
-        fetch("/user-answer", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                answer: answer,
-                progress_percent: progressBar
-            }),
-        })
-        .then(answer => answer.json())
-        .then(data => {
-            nextGuess()
-        })
-        .catch(error => {
-            console.error("Error sending user response:", error);
-        });
-    } else {
-        endInterro()
-    }
+    fetch("/user-answer", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            answer: answer,
+            progress_percent: progressBar
+        }),
+    })
+    .then(answer => answer.json())
+    .then(data => {
+        if (progressBar <= numberOfQuestions) {
+            nextGuess();
+        } else {
+            endInterro();
+        }
+    })
+    .catch(error => {
+        console.error("Error sending user response:", error);
+    });
 }
 
 
