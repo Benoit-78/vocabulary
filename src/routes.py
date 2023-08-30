@@ -8,6 +8,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 
+from data import data_handler
+import interro, views
 
 global user_response
 
@@ -19,6 +21,7 @@ app.mount(
     StaticFiles(directory="static"),
     name="static"
 )
+
 templates = Jinja2Templates(directory="templates")
 
 
@@ -52,11 +55,13 @@ def interro_settings(request: Request):
 
 @app.post("/user-settings")
 async def get_user_settings(settings: dict):
-    print('"# DEBUG: settings', settings)
-    global test_type
-    test_type = settings["testType"]
     global words
     words = settings["numWords"]
+    global score
+    score = 0
+    test_type = settings["testType"].lower()
+    global interro_df
+    interro_df = load_interro_df(test_type, words)
     return JSONResponse(
         content={
             "message": "User response and progress percent stored successfully"
@@ -64,11 +69,30 @@ async def get_user_settings(settings: dict):
     )
 
 
+def load_interro_df(test_type, words):
+    """Load the words that will be asked to the user."""
+    data_handler_ = data_handler.MariaDBHandler(test_type)
+    loader = interro.Loader(test_type, 0, data_handler_)
+    loader.load_tables()
+    guesser = views.FastapiGuesser()
+    test = interro.Test(
+        loader.tables[loader.test_type + '_voc'],
+        words,
+        guesser,
+        loader.tables[loader.test_type + '_perf'],
+        loader.tables[loader.test_type + '_words_count']
+    )
+    test.get_interro_df()
+    return test.interro_df
+
+
 @app.get("/interro_question", response_class=HTMLResponse)
 def interro_page_1(request: Request):
-    english = "Hello"
     global progress_percent
+    global interro_df
+    english = interro_df.loc[progress_percent - 1][0]
     progress_percent += 1
+    print("# DEBUG: progress_percent after increment:", progress_percent)
     return templates.TemplateResponse(
         "interro_question.html",
         {
@@ -81,8 +105,10 @@ def interro_page_1(request: Request):
 
 @app.get("/interro_answer", response_class=HTMLResponse)
 def interro_page_2(request: Request):
-    english = "Hello"
-    french = "Bonjour"
+    global progress_percent
+    global interro_df
+    english = interro_df.loc[progress_percent - 2][0]
+    french = interro_df.loc[progress_percent - 2][1]
     return templates.TemplateResponse(
         "interro_answer.html",
         {
@@ -95,13 +121,14 @@ def interro_page_2(request: Request):
     )
 
 
-
-@app.post("/user-response")
+@app.post("/user-answer")
 async def get_user_response(data: dict):
-    print(data)
-    global user_answer
     user_answer = data["answer"]
     progress_percent = data.get("progress_percent")
+    global score
+    if user_answer == 'Yes':
+        score += 1
+    print("# DEBUG: new score:", score)
     return JSONResponse(
         content=
         {
@@ -112,12 +139,14 @@ async def get_user_response(data: dict):
 
 @app.get("/interro_end", response_class=HTMLResponse)
 def display_score(request: Request):
-    score = 84
+    global score
+    global words
     return templates.TemplateResponse(
         "interro_end.html",
         {
             "request": request,
-            "score": score
+            "score": score,
+            "total": words
         }
     )
 
