@@ -62,40 +62,41 @@ async def get_user_settings(settings: dict):
     global score
     score = 0
     test_type = settings["testType"].lower()
-    global interro_df
-    interro_df = load_interro_df(test_type, words)
+    global test
+    test = load_test(test_type, words)
     return JSONResponse(
-        content={
-            "message": "User response and progress percent stored successfully"
+        content=
+        {
+            "message": "User settings stored successfully."
         }
     )
 
 
-def load_interro_df(test_type, words):
-    """Load the words that will be asked to the user."""
+def load_test(test_type, words_):
+    """Load the interroooo!"""
     data_handler_ = data_handler.MariaDBHandler(test_type)
     loader = interro.Loader(test_type, 0, data_handler_)
     loader.load_tables()
     guesser = views.FastapiGuesser()
-    test = interro.Test(
+    test_ = interro.Test(
         loader.tables[loader.test_type + '_voc'],
-        words,
+        words_,
         guesser,
         loader.tables[loader.test_type + '_perf'],
         loader.tables[loader.test_type + '_words_count']
     )
-    test.get_interro_df()
-    return test.interro_df
+    test_.get_interro_df()
+    return test_
 
 
 @app.get("/interro_question", response_class=HTMLResponse)
-def interro_page_1(request: Request):
+def load_interro_question(request: Request):
     global progress_percent
-    global interro_df
+    print("# DEBUG: progress_percent:", progress_percent)
+    global test
+    print("# DEBUG: test.interro_df:\n", test.interro_df.head(3))
+    english = test.interro_df.loc[progress_percent - 1][0]
     global words
-    english = interro_df.loc[progress_percent - 1][0]
-    progress_percent += 1
-    print("# DEBUG: progress_percent after increment:", progress_percent)
     return templates.TemplateResponse(
         "interro_question.html",
         {
@@ -108,21 +109,22 @@ def interro_page_1(request: Request):
 
 
 @app.get("/interro_answer", response_class=HTMLResponse)
-def interro_page_2(request: Request):
+def load_interro_answer(request: Request):
     global progress_percent
-    global interro_df
-    global score
+    progress_percent += 1
+    global test
+    english = test.interro_df.loc[progress_percent - 2][0]
+    french = test.interro_df.loc[progress_percent - 2][1]
     global words
-    english = interro_df.loc[progress_percent - 2][0]
-    french = interro_df.loc[progress_percent - 2][1]
+    global score
     return templates.TemplateResponse(
         "interro_answer.html",
         {
             "request": request,
+            "progress_percent": progress_percent,
             "content_box1": english,
             "content_box2": french,
             "number_of_questions": words,
-            "progress_percent": progress_percent,
             "score": score
         }
     )
@@ -130,14 +132,19 @@ def interro_page_2(request: Request):
 
 @app.post("/user-answer")
 async def get_user_response(data: dict):
-    user_answer = data["answer"]
-    global score
-    if user_answer == 'Yes':
+    if data["answer"] == 'Yes':
+        global score
         score += 1
+    global test
+    test.update_faults_df(
+        data["answer"],
+        [data.get('english'), data.get('french')]
+    )
     return JSONResponse(
         content=
         {
-            "message": "User response and progress percent stored successfully"
+            # "score": score,
+            "message": "User response stored successfully."
         }
     )
 
@@ -146,13 +153,51 @@ async def get_user_response(data: dict):
 def propose_rattraps(request: Request):
     global score
     global words
-    
+    global progress_percent
+    progress_percent = 1
     return templates.TemplateResponse(
-        "propose_rattraps.html",
+        "rattraps_propose.html",
         {
             "request": request,
             "score": score,
             "total": words
+        }
+    )
+
+
+@app.get("/rattraps_question", response_class=HTMLResponse)
+def load_rattraps_question(request: Request):
+    global progress_percent
+    progress_percent += 1
+    global test
+    english = test.faults_df.loc[progress_percent - 1][0]
+    return templates.TemplateResponse(
+        "interro_question.html",
+        {
+            "request": request,
+            "progress_percent": progress_percent,
+            "content_box1": english,
+            "number_of_questions": test.faults_df.shape[0]
+        }
+    )
+
+
+@app.get("/rattraps_answer", response_class=HTMLResponse)
+def load_rattraps_answer(request: Request):
+    global progress_percent
+    global test
+    english = test.faults_df.loc[progress_percent - 2][0]
+    french = test.faults_df.loc[progress_percent - 2][1]
+    global score
+    return templates.TemplateResponse(
+        "interro_answer.html",
+        {
+            "request": request,
+            "progress_percent": progress_percent,
+            "content_box1": english,
+            "content_box2": french,
+            "number_of_questions": test.faults_df.shape[0],
+            "score": score
         }
     )
 
