@@ -3,7 +3,7 @@
     Author: B.Delorme
     Mail: delormebenoit211@gmail.com
     Creation date: 2nd March 2023
-    Main purpose: main script of vocabulary application.
+    Main purpose: script containing the logic of the vocabulary application.
 """
 
 import random
@@ -14,10 +14,6 @@ import sys
 from typing import List
 import pandas as pd
 import numpy as np
-import uvicorn
-
-from data import data_handler
-import views
 
 STEEP_GOOD = -1.25
 ORDINATE_GOOD = 112.5
@@ -366,43 +362,3 @@ class Updater():
         self.save_words()
         self.save_performances()
         self.save_words_count()
-
-
-
-def cli_main():
-    """Series of instructions execuated when the user launches the program from CLI."""
-    # Get user settings
-    user = CliUser()
-    user.get_settings()
-    # Load data
-    data_handler_ = data_handler.MariaDBHandler(user.settings.type)
-    loader = Loader(
-        user.settings.type,
-        user.settings.rattraps,
-        data_handler_
-    )
-    loader.load_tables()
-    # WeuuAaaInterrooo !!!
-    guesser = views.CliGuesser()
-    test = Test(
-        loader.tables[loader.test_type + '_voc'],
-        user.settings.words,
-        guesser,
-        loader.tables[loader.test_type + '_perf'],
-        loader.tables[loader.test_type + '_words_count']
-    )
-    test.run()
-    # Rattraaaaaaap's !!!!
-    rattrap = Rattrap(
-        test.faults_df,
-        user.settings.rattraps,
-        guesser
-    )
-    rattrap.start_loop()
-    # Save the results
-    updater = Updater(loader, test)
-    updater.update_data()
-
-
-if __name__ == '__main__':
-    cli_main()

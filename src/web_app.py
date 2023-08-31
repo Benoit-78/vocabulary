@@ -1,5 +1,7 @@
 """
-    FastAPI user interface of interroooooo !!!!! application.
+    Author: Benoît DELORME
+    Decoupling date: 26th August 2023
+    Main purpose: FastAPI user interface of interroooooo !!!!! application.
 """
 
 from fastapi import FastAPI, Request, Query
