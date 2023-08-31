@@ -1,10 +1,10 @@
-function startTest() {
-    window.location.href = '/interro_question';
+function goToRoot() {
+    window.location.href = '/';
 }
 
 
-function goToRoot() {
-    window.location.href = '/';
+function startTest() {
+    window.location.href = '/interro_question';
 }
 
 
@@ -18,8 +18,12 @@ function nextGuess() {
 }
 
 
-function endInterro() {
-    window.location.href = '/interro_end';
+function endInterro(score, numberOfQuestions) {
+    if (score === numberOfQuestions) {
+        window.location.href = '/interro_end';
+    } else {
+        window.location.href = '/propose_rattraps';
+    }
 }
 
 
@@ -42,13 +46,14 @@ function sendUserSettings(testType, numWords) {
 }
 
 
-function sendUserAnswer(answer, progressBar, numberOfQuestions) {
+function sendUserAnswer(answer, progressBar, numberOfQuestions, score) {
     fetch("/user-answer", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             answer: answer,
-            progress_percent: progressBar
+            progress_percent: progressBar,
+            number_of_questions: numberOfQuestions
         }),
     })
     .then(answer => answer.json())
@@ -56,7 +61,8 @@ function sendUserAnswer(answer, progressBar, numberOfQuestions) {
         if (progressBar <= numberOfQuestions) {
             nextGuess();
         } else {
-            endInterro();
+            score++;
+            endInterro(score, numberOfQuestions);
         }
     })
     .catch(error => {

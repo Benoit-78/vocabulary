@@ -92,6 +92,7 @@ def load_interro_df(test_type, words):
 def interro_page_1(request: Request):
     global progress_percent
     global interro_df
+    global words
     english = interro_df.loc[progress_percent - 1][0]
     progress_percent += 1
     print("# DEBUG: progress_percent after increment:", progress_percent)
@@ -101,6 +102,7 @@ def interro_page_1(request: Request):
             "request": request,
             "content_box1": english,
             "progress_percent": progress_percent,
+            "number_of_questions": words
         }
     )
 
@@ -109,6 +111,8 @@ def interro_page_1(request: Request):
 def interro_page_2(request: Request):
     global progress_percent
     global interro_df
+    global score
+    global words
     english = interro_df.loc[progress_percent - 2][0]
     french = interro_df.loc[progress_percent - 2][1]
     return templates.TemplateResponse(
@@ -118,7 +122,8 @@ def interro_page_2(request: Request):
             "content_box1": english,
             "content_box2": french,
             "number_of_questions": words,
-            "progress_percent": progress_percent
+            "progress_percent": progress_percent,
+            "score": score
         }
     )
 
@@ -126,11 +131,9 @@ def interro_page_2(request: Request):
 @app.post("/user-answer")
 async def get_user_response(data: dict):
     user_answer = data["answer"]
-    progress_percent = data.get("progress_percent")
     global score
     if user_answer == 'Yes':
         score += 1
-    print("# DEBUG: new score:", score)
     return JSONResponse(
         content=
         {
@@ -139,8 +142,23 @@ async def get_user_response(data: dict):
     )
 
 
+@app.get("/propose_rattraps", response_class=HTMLResponse)
+def propose_rattraps(request: Request):
+    global score
+    global words
+    
+    return templates.TemplateResponse(
+        "propose_rattraps.html",
+        {
+            "request": request,
+            "score": score,
+            "total": words
+        }
+    )
+
+
 @app.get("/interro_end", response_class=HTMLResponse)
-def display_score(request: Request):
+def end_interro(request: Request):
     global score
     global words
     return templates.TemplateResponse(

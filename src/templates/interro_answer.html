@@ -10,6 +10,9 @@
         <div class="progress-container">
             <div class="progress-bar full" style="width: {{ progress_percent }}%;" id="progress-bar"></div>
         </div>
+        <div>
+            <p>{{ progress_percent - 1 }} / {{ number_of_questions }}</p>
+        </div>
         <div class="row">
             <p>What is the translation for:</p>
         </div>
@@ -31,8 +34,8 @@
             <p>Did you get it?</p>
         </div>
         <div class="row">
-            <button class="button green" id="yes-button" onclick="sendUserAnswer('Yes', {{ progress_percent }}, {{ number_of_questions }})">Yes</button>
-            <button class="button red" id="no-button" onclick="sendUserAnswer('No', {{ progress_percent }}, {{ number_of_questions }})">No</button>
+            <button class="button green" id="yes-button" onclick="sendUserAnswer('Yes', {{ progress_percent }}, {{ number_of_questions }}, {{ score }})">Yes</button>
+            <button class="button red" id="no-button" onclick="sendUserAnswer('No', {{ progress_percent }}, {{ number_of_questions }}, {{ score }})">No</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
