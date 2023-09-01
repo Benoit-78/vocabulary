@@ -53,19 +53,19 @@ function sendUserAnswer(answer, progressBar, numberOfQuestions, score, content_b
         body: JSON.stringify({
             answer: answer,
             progress_percent: progressBar,
-            number_of_questions: numberOfQuestions,
             english: content_box1,
-            french: content_box2
+            french: content_box2,
+            number_of_questions: numberOfQuestions,
+            score: score
         }),
     })
     .then(answer => answer.json())
     .then(data => {
         // Extract the updated score from the JSON response
-        // const updatedScore = data.score;
-        if (progressBar <= numberOfQuestions) {
+        const score = data.score;
+        if (progressBar < numberOfQuestions) {
             nextGuess();
         } else {
-            score++;
             endInterro(score, numberOfQuestions);
         }
     })

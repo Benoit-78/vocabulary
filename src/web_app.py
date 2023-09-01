@@ -18,12 +18,13 @@ global user_response
 
 app = FastAPI()
 # Serve static files (HTML and CSS)
+# CSS
 app.mount(
     "/static",
     StaticFiles(directory="static"),
     name="static"
 )
-
+# HTML
 templates = Jinja2Templates(directory="templates")
 
 
@@ -46,7 +47,7 @@ def start_page():
 @app.get("/interro_settings", response_class=HTMLResponse)
 def interro_settings(request: Request):
     global progress_percent
-    progress_percent = 1
+    progress_percent = 0
     return templates.TemplateResponse(
         "interro_settings.html",
         {
@@ -92,10 +93,9 @@ def load_test(test_type, words_):
 @app.get("/interro_question", response_class=HTMLResponse)
 def load_interro_question(request: Request):
     global progress_percent
-    print("# DEBUG: progress_percent:", progress_percent)
     global test
-    print("# DEBUG: test.interro_df:\n", test.interro_df.head(3))
-    english = test.interro_df.loc[progress_percent - 1][0]
+    english = test.interro_df.loc[progress_percent][0]
+    progress_percent += 1
     global words
     return templates.TemplateResponse(
         "interro_question.html",
@@ -111,10 +111,9 @@ def load_interro_question(request: Request):
 @app.get("/interro_answer", response_class=HTMLResponse)
 def load_interro_answer(request: Request):
     global progress_percent
-    progress_percent += 1
     global test
-    english = test.interro_df.loc[progress_percent - 2][0]
-    french = test.interro_df.loc[progress_percent - 2][1]
+    english = test.interro_df.loc[progress_percent - 1 ][0]
+    french = test.interro_df.loc[progress_percent - 1][1]
     global words
     global score
     return templates.TemplateResponse(
@@ -132,18 +131,23 @@ def load_interro_answer(request: Request):
 
 @app.post("/user-answer")
 async def get_user_response(data: dict):
-    if data["answer"] == 'Yes':
-        global score
-        score += 1
     global test
-    test.update_faults_df(
-        data["answer"],
-        [data.get('english'), data.get('french')]
-    )
+    global score
+    score = data.get('score')
+    if data["answer"] == 'Yes':
+        score += 1
+    elif data["answer"] == 'No':
+        test.update_faults_df(
+            data["answer"],
+            [
+                data.get('english'),
+                data.get('french')
+            ]
+        )    
     return JSONResponse(
         content=
         {
-            # "score": score,
+            "score": score,
             "message": "User response stored successfully."
         }
     )
@@ -154,7 +158,7 @@ def propose_rattraps(request: Request):
     global score
     global words
     global progress_percent
-    progress_percent = 1
+    progress_percent = 0
     return templates.TemplateResponse(
         "rattraps_propose.html",
         {
