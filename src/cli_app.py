@@ -1,8 +1,7 @@
 """
     Author: Benoît DELORME
     Decoupling date: 31st August 2023
-    Main purpose: executable python script that launchs the app
-                in its CLI version.
+    Main purpose: vocabulary application in its CLI version.
 """
 
 import interro

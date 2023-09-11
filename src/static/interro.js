@@ -3,8 +3,65 @@ function goToRoot() {
 }
 
 
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+        const progressBar = document.getElementById("progress-bar");
+        progressBar.style.width = `${progressBar}%`;
+    }
+);
+
+
+function sendUserSettings(testType, numWords) {
+    fetch("/user-settings", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            testType: testType,
+            numWords: numWords
+        }),
+    })
+    .then(answer => answer.json())
+    .then(data => {
+        startTest()
+    })
+    .catch(error => {
+        console.error("Error sending user answer:", error);
+    });
+}
+
+
 function startTest() {
     window.location.href = '/interro_question';
+}
+
+
+function sendUserAnswer(answer, count, numberOfQuestions, score, content_box1, content_box2) {
+    fetch("/user-answer", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            answer: answer,
+            count: count,
+            number_of_questions: numberOfQuestions,
+            score: score,
+            english: content_box1,
+            french: content_box2
+        }),
+    })
+    .then(answer => answer.json())
+    .then(data => {
+        // Extract the updated score from the JSON response
+        const score = data.score;
+        if (count < numberOfQuestions) {
+            nextGuess();
+        } else {
+            endInterro(score, numberOfQuestions);
+        }
+    })
+    .catch(error => {
+        console.error("Error sending user response:", error);
+    });
 }
 
 
@@ -27,58 +84,6 @@ function endInterro(score, numberOfQuestions) {
 }
 
 
-function sendUserSettings(testType, numWords) {
-    fetch("/user-settings", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            testType: testType,
-            numWords: numWords
-        }),
-    })
-    .then(answer => answer.json())
-    .then(data => {
-        startTest()
-    })
-    .catch(error => {
-        console.error("Error sending user answer:", error);
-    });
+function nextCatchupGuess() {
+    window.location.href = '/rattraps_question';
 }
-
-
-function sendUserAnswer(answer, progressBar, numberOfQuestions, score, content_box1, content_box2) {
-    fetch("/user-answer", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            answer: answer,
-            progress_percent: progressBar,
-            english: content_box1,
-            french: content_box2,
-            number_of_questions: numberOfQuestions,
-            score: score
-        }),
-    })
-    .then(answer => answer.json())
-    .then(data => {
-        // Extract the updated score from the JSON response
-        const score = data.score;
-        if (progressBar < numberOfQuestions) {
-            nextGuess();
-        } else {
-            endInterro(score, numberOfQuestions);
-        }
-    })
-    .catch(error => {
-        console.error("Error sending user response:", error);
-    });
-}
-
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-        const progressBar = document.getElementById("progress-bar");
-        progressBar.style.width = `${progress_percent}%`;
-    }
-);
