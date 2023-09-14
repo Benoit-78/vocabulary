@@ -16,6 +16,7 @@ import views
 
 
 app = FastAPI()
+test = None
 
 # Serve CSS files
 app.mount(
@@ -55,15 +56,11 @@ def interro_settings(request: Request):
 
 @app.post("/user-settings")
 async def get_user_settings(settings: dict):
-    global words
-    words = settings["numWords"]
-    global score
-    score = 0
-    global count
-    count = 0
-    test_type = settings["testType"].lower()
     global test
-    test = load_test(test_type, words)
+    test = load_test(
+        settings["testType"].lower(),
+        settings["numWords"]
+    )
     return JSONResponse(
         content=
         {
@@ -72,7 +69,7 @@ async def get_user_settings(settings: dict):
     )
 
 
-def load_test(test_type, words_):
+def load_test(test_type, words):
     """Load the interroooo!"""
     data_handler_ = data_handler.MariaDBHandler(test_type)
     loader = interro.Loader(test_type, 0, data_handler_)
@@ -80,7 +77,7 @@ def load_test(test_type, words_):
     guesser = views.FastapiGuesser()
     test_ = interro.Test(
         loader.tables[loader.test_type + '_voc'],
-        words_,
+        words,
         guesser,
         loader.tables[loader.test_type + '_perf'],
         loader.tables[loader.test_type + '_words_count']
@@ -89,50 +86,60 @@ def load_test(test_type, words_):
     return test_
 
 
-@app.get("/interro_question", response_class=HTMLResponse)
-def load_interro_question(request: Request):
-    global count
-    global test
+@app.get("/interro_question/{words}/{count}/{score}", response_class=HTMLResponse)
+def load_interro_question(
+    request: Request,
+    words: int,
+    count=None,
+    score=None,
+    ):
+    # Instantiation
+    try:
+        count = int(count)
+    except NameError:
+        count = 0
+    try:
+        score = int(score)
+    except NameError:
+        score = 0
+    progress_percent = int(count / int(words) * 100)
     english = test.interro_df.loc[count][0]
     count += 1
-    global words
-    global progress_percent
-    try:
-        progress_percent
-    except NameError:
-        progress_percent = 0
     return templates.TemplateResponse(
         "interro_question.html",
         {
             "request": request,
-            "content_box1": english,
+            "numWords": words,
             "count": count,
-            "numberOfQuestions": words,
-            "progressPercent": progress_percent
+            "score": score,
+            "progressPercent": progress_percent,
+            "content_box1": english
         }
     )
 
 
-@app.get("/interro_answer", response_class=HTMLResponse)
-def load_interro_answer(request: Request):
-    global count
+@app.get("/interro_answer/{words}/{count}/{score}", response_class=HTMLResponse)
+def load_interro_answer(
+    request: Request,
+    words: int,
+    count,
+    score,
+    ):
+    count = int(count)
     global test
-    english = test.interro_df.loc[count - 1 ][0]
+    english = test.interro_df.loc[count - 1][0]
     french = test.interro_df.loc[count - 1][1]
-    global words
-    global score
-    global progress_percent
     progress_percent = int(count / int(words) * 100)
     return templates.TemplateResponse(
         "interro_answer.html",
         {
             "request": request,
+            "numWords": words,
             "count": count,
+            "score": score,
+            "progressPercent": progress_percent,
             "content_box1": english,
             "content_box2": french,
-            "numberOfQuestions": words,
-            "progressPercent": progress_percent,
-            "score": score
         }
     )
 
@@ -152,7 +159,6 @@ async def get_user_response(data: dict):
                 data.get('french')
             ]
         )
-        print("# DEBUG: test.faults_df\n", test.faults_df)
     return JSONResponse(
         content=
         {

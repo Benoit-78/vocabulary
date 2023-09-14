@@ -23,7 +23,7 @@ function sendUserSettings(testType, numWords) {
     })
     .then(answer => answer.json())
     .then(data => {
-        startTest()
+        startTest(numWords)
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
@@ -31,8 +31,26 @@ function sendUserSettings(testType, numWords) {
 }
 
 
-function startTest() {
-    window.location.href = '/interro_question';
+function startTest(numWords) {
+    numWords = parseInt(numWords, 10);
+    // Check if the conversion was successful
+    if (!isNaN(numWords)) {
+        window.location.href = `/interro_question/${numWords}/0/0`;
+    } else {
+        console.error("Invalid numWords:", numWords);
+    }
+}
+
+
+function showTranslation(numWords, count, score) {
+    numWords = parseInt(numWords, 10);
+    count = parseInt(count, 10);
+    score = parseInt(score, 10);
+    if (!isNaN(numWords)) {
+        window.location.href = `/interro_answer/${numWords}/${count}/${score}`;
+    } else {
+        console.error("Invalid numWords:", numWords);
+    }
 }
 
 
@@ -62,11 +80,6 @@ function sendUserAnswer(answer, count, numberOfQuestions, score, content_box1, c
     .catch(error => {
         console.error("Error sending user response:", error);
     });
-}
-
-
-function showTranslation() {
-    window.location.href = '/interro_answer';
 }
 
 

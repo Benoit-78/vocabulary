@@ -7,9 +7,6 @@
 </head>
 <body>
     <div class="container">
-        <div class="row">
-            <h1>Choose your preferences</h1>
-        </div>
         <form>
             <div class="row">
                 <label for="test-type">Test type:</label>
@@ -37,7 +34,7 @@
             <button class="button" onclick="sendUserSettings(
                 document.getElementById('test-type').value,
                 document.getElementById('num-words').value
-            )">Start Test</button>
+                )">Start Test</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
