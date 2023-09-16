@@ -8,6 +8,7 @@ from typing import List
 import mysql.connector as mariadb
 import pandas as pd
 from sqlalchemy import create_engine
+from loguru import logger
 
 import utils
 
@@ -103,7 +104,9 @@ class MariaDBHandler():
     # Common operations
     def set_database_cred(self):
         """Get credentials necessary for connection with vocabulary database."""
-        with open("..\\conf\\cred.json", 'rb') as cred_file:
+        os_sep = utils.get_os_separator()
+        cred_path = os_sep.join(['..', 'conf', 'cred.json'])
+        with open(cred_path, 'rb') as cred_file:
             self.params = json.load(cred_file)
 
     def set_db_cursor(self):
@@ -112,7 +115,8 @@ class MariaDBHandler():
             "user": self.params['Database']['usr'],
             "password": self.params['Database']['pwd'],
             "host": self.params['Database']['host'],
-            "database": self.params['Database']['database']
+            "database": self.params['Database']['database'],
+            "port": self.params['Database']['port']
         }
         self.connection = mariadb.connect(**config)
         self.cursor = self.connection.cursor()

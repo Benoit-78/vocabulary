@@ -1,10 +1,12 @@
 {
     "Database":
     {
-        "usr": "root",
-        "pwd": "IBM-vocabulary7",
+        "root": "root",
+        "root_pwd": "IBM-vocabulary7",
+        "usr": "benito",
+        "pwd": "benito_voc89",
         "database": "vocabulary",
-        "host": "127.0.0.1",
+        "host": "db",
         "port": "3306"
     },
     "Tables":
