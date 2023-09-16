@@ -1,5 +1,5 @@
 """
-    Main purpose: methods for CRUD operations.
+    Methods for CRUD operations.
 """
 
 import json
@@ -8,7 +8,6 @@ from typing import List
 import mysql.connector as mariadb
 import pandas as pd
 from sqlalchemy import create_engine
-import os
 
 import utils
 

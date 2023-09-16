@@ -14,6 +14,8 @@ import sys
 from typing import List
 import pandas as pd
 import numpy as np
+from loguru import logger
+from datetime import datetime
 
 STEEP_GOOD = -1.25
 ORDINATE_GOOD = 112.5
@@ -333,7 +335,10 @@ class Updater():
 
     def save_performances(self):
         """Save performances for further analysis."""
-        self.interro.perf_df.loc[self.interro.perf_df.shape[0]] = self.interro.perf
+        logger.debug(f"perf: \n{self.interro.perf}")
+        today_date = datetime.today().date().strftime('%Y-%m-%d')
+        new_row = [today_date, self.interro.perf]
+        self.interro.perf_df.loc[self.interro.perf_df.shape[0]] = new_row
         self.loader.data_handler.save_table(
             self.loader.test_type + '_perf',
             self.interro.perf_df

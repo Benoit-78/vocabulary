@@ -4,19 +4,25 @@
     Main purpose: vocabulary application in its FastAPI version.
 """
 
+import pandas as pd
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from loguru import logger
 
 from data import data_handler
 import interro
 import views
 
 
+
 app = FastAPI()
 test = None
+loader = None
+flag_data_updated = False
 
 # Serve CSS files
 app.mount(
@@ -30,6 +36,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 def welcome_page(request: Request):
+    """Call the welcome page"""
     return templates.TemplateResponse(
         "welcome.html",
         {
@@ -40,12 +47,14 @@ def welcome_page(request: Request):
 
 @app.get("/get_started", response_class=HTMLResponse)
 def start_page():
+    """Call the page that helps the user to get started."""
     title = "Get started with interro application."
     return title
 
 
 @app.get("/interro_settings", response_class=HTMLResponse)
 def interro_settings(request: Request):
+    """Call the page that gets the user settings for one interro."""
     return templates.TemplateResponse(
         "interro_settings.html",
         {
@@ -56,11 +65,14 @@ def interro_settings(request: Request):
 
 @app.post("/user-settings")
 async def get_user_settings(settings: dict):
+    """Acquire the user settings for one interro."""
+    global loader
     global test
-    test = load_test(
+    loader, test = load_test(
         settings["testType"].lower(),
         settings["numWords"]
     )
+    logger.info("User data loaded")
     return JSONResponse(
         content=
         {
@@ -72,18 +84,18 @@ async def get_user_settings(settings: dict):
 def load_test(test_type, words):
     """Load the interroooo!"""
     data_handler_ = data_handler.MariaDBHandler(test_type)
-    loader = interro.Loader(test_type, 0, data_handler_)
-    loader.load_tables()
+    loader_ = interro.Loader(test_type, 0, data_handler_)
+    loader_.load_tables()
     guesser = views.FastapiGuesser()
     test_ = interro.Test(
-        loader.tables[loader.test_type + '_voc'],
+        loader_.tables[loader_.test_type + '_voc'],
         words,
         guesser,
-        loader.tables[loader.test_type + '_perf'],
-        loader.tables[loader.test_type + '_words_count']
+        loader_.tables[loader_.test_type + '_perf'],
+        loader_.tables[loader_.test_type + '_words_count']
     )
     test_.get_interro_df()
-    return test_
+    return loader_, test_
 
 
 @app.get("/interro_question/{words}/{count}/{score}", response_class=HTMLResponse)
@@ -93,6 +105,7 @@ def load_interro_question(
     count=None,
     score=None,
     ):
+    """Call the page that asks the user the meaning of a word"""
     # Instantiation
     try:
         count = int(count)
@@ -122,9 +135,13 @@ def load_interro_question(
 def load_interro_answer(
     request: Request,
     words: int,
-    count,
-    score,
+    count: int,
+    score: int,
     ):
+    """
+    Call the page that displays the right answer
+    Asks the user to tell if his guess was right or wrong.
+    """
     count = int(count)
     global test
     english = test.interro_df.loc[count - 1][0]
@@ -146,8 +163,8 @@ def load_interro_answer(
 
 @app.post("/user-answer")
 async def get_user_response(data: dict):
+    """Acquire the user decision: was his answer right or wrong."""
     global test
-    global score
     score = data.get('score')
     if data["answer"] == 'Yes':
         score += 1
@@ -168,80 +185,64 @@ async def get_user_response(data: dict):
     )
 
 
-@app.get("/propose_rattraps", response_class=HTMLResponse)
-def propose_rattraps(request: Request):
-    global score
-    global words
-    previous_words = words
+@app.get("/propose_rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
+def propose_rattraps(
+    request: Request,
+    words: int,
+    count: int,
+    score: int,
+    ):
+    global test
+    # Enregistrer les résultats
+    global flag_data_updated
+    if flag_data_updated is False:
+        global loader
+        test.compute_success_rate()
+        updater = interro.Updater(loader, test)
+        updater.update_data()
+        logger.info("User data updated.")
+        flag_data_updated = True
     # Réinitialisation
-    words = test.faults_df.shape[0]
-    global count
-    count = 0
-    global rattraps_count
-    rattraps_count = 0
+    new_count = 0
+    new_score = 0
+    new_words = test.faults_df.shape[0]
+    test.interro_df = test.faults_df
+    test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
     return templates.TemplateResponse(
         "rattraps_propose.html",
         {
             "request": request,
             "score": score,
-            "total": previous_words
-        }
-    )
-
-
-@app.get("/rattraps_question", response_class=HTMLResponse)
-def load_rattraps_question(request: Request):
-    global count
-    global test
-    english = test.faults_df.loc[count][0]
-    count += 1
-    global words
-    global progress_percent
-    progress_percent = int(count / int(words) * 100)
-    return templates.TemplateResponse(
-        "interro_question.html",
-        {
-            "request": request,
+            "numWords": words,
             "count": count,
-            "content_box1": english,
-            "numberOfQuestions": words,
-            "progressBar": progress_percent
+            "newScore": new_score,
+            "newWords": new_words,
+            "newCount": new_count
         }
     )
 
 
-@app.get("/rattraps_answer", response_class=HTMLResponse)
-def load_rattraps_answer(request: Request):
-    global count
-    global test
-    english = test.faults_df.loc[count - 2][0]
-    french = test.faults_df.loc[count - 2][1]
-    global rattraps_score
-    global progress_percent
-    return templates.TemplateResponse(
-        "interro_answer.html",
-        {
-            "request": request,
-            "count": count,
-            "content_box1": english,
-            "content_box2": french,
-            "numberOfQuestions": test.faults_df.shape[0],
-            "progressPercent": progress_percent,
-            "score": rattraps_score
-        }
-    )
-
-
-@app.get("/interro_end", response_class=HTMLResponse)
-def end_interro(request: Request):
-    global score
-    global words
+@app.get("/interro_end/{words}/{score}", response_class=HTMLResponse)
+def end_interro(
+    request: Request,
+    words: int,
+    score: int
+    ):
+    global flag_data_updated
+    if flag_data_updated is False:
+        global loader
+        global test
+        test.compute_success_rate()
+        updater = interro.Updater(loader, test)
+        updater.update_data()
+        logger.info("User data updated.")
+        flag_data_updated = True
     return templates.TemplateResponse(
         "interro_end.html",
         {
             "request": request,
             "score": score,
-            "total": words
+            "numWords": words
         }
     )
 
