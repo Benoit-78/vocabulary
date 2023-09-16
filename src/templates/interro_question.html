@@ -8,7 +8,10 @@
 <body>
     <div class="container">
         <div class="progress-container">
-            <div class="progress-bar full" style="width: {{ progress_percent }}%;" id="progress-bar"></div>
+            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
+        </div>
+        <div>
+            <p>{{ count }} / {{ numWords }}</p>
         </div>
         <div class="row">
             <p>What is the translation for:</p>
@@ -28,7 +31,7 @@
             </div>
         </div>
         <div class="row">
-            <button class="button middle_button" onclick="showTranslation()">Show translation</button>
+            <button class="button middle_button" onclick="showTranslation({{ numWords }}, {{ count }}, {{ score }})">Show translation</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>

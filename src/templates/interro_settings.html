@@ -7,9 +7,6 @@
 </head>
 <body>
     <div class="container">
-        <div class="row">
-            <h1>Choose your preferences</h1>
-        </div>
         <form>
             <div class="row">
                 <label for="test-type">Test type:</label>
@@ -25,6 +22,7 @@
             </div>
             <div class="row">
                 <select id="num-words" name="num-words" class="dropdown-container" required>
+                    <option value="2">2</option>
                     <option value="100">100</option>
                     <option value="50">50</option>
                     <option value="20">20</option>
@@ -36,7 +34,10 @@
             <button class="button" onclick="sendUserSettings(
                 document.getElementById('test-type').value,
                 document.getElementById('num-words').value
-            )">Start Test</button>
+                )">Start Test</button>
+        </div>
+        <div class="row">
+            <button class="button quit-button" onclick="goToRoot()">Quit</button>
         </div>
     </div>
 </body>

@@ -20,7 +20,7 @@
         {
             "Columns":
             [
-                "date", "test", "rattrapage"
+                "date", "test"
             ]
         },
         "version_words_count":
@@ -41,7 +41,7 @@
         {
             "Columns":
             [
-                "date", "test", "rattrapage"
+                "date", "test"
             ]
         },
         "theme_words_count":

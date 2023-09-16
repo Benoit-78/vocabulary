@@ -1,26 +1,15 @@
-function startTest() {
-    window.location.href = '/interro_question';
-}
-
-
 function goToRoot() {
     window.location.href = '/';
 }
 
 
-function showTranslation() {
-    window.location.href = '/interro_answer';
-}
-
-
-function nextGuess() {
-    window.location.href = '/interro_question';
-}
-
-
-function endInterro() {
-    window.location.href = '/interro_end';
-}
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+        const progressBar = document.getElementById("progress-bar");
+        progressBar.style.width = `${progressBar}%`;
+    }
+);
 
 
 function sendUserSettings(testType, numWords) {
@@ -34,7 +23,7 @@ function sendUserSettings(testType, numWords) {
     })
     .then(answer => answer.json())
     .then(data => {
-        startTest()
+        startTest(numWords)
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
@@ -42,21 +31,50 @@ function sendUserSettings(testType, numWords) {
 }
 
 
-function sendUserAnswer(answer, progressBar, numberOfQuestions) {
+function startTest(numWords) {
+    numWords = parseInt(numWords, 10);
+    // Check if the conversion was successful
+    if (!isNaN(numWords)) {
+        window.location.href = `/interro_question/${numWords}/0/0`;
+    } else {
+        console.error("Invalid numWords:", numWords);
+    }
+}
+
+
+function showTranslation(numWords, count, score) {
+    numWords = parseInt(numWords, 10);
+    count = parseInt(count, 10);
+    score = parseInt(score, 10);
+    if (!isNaN(numWords)) {
+        window.location.href = `/interro_answer/${numWords}/${count}/${score}`;
+    } else {
+        console.error("Invalid numWords:", numWords);
+    }
+}
+
+
+function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2) {
     fetch("/user-answer", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             answer: answer,
-            progress_percent: progressBar
+            count: count,
+            number_of_questions: numWords,
+            score: score,
+            english: content_box1,
+            french: content_box2
         }),
     })
     .then(answer => answer.json())
     .then(data => {
-        if (progressBar <= numberOfQuestions) {
-            nextGuess();
+        // Extract the updated score from the JSON response
+        const score = data.score;
+        if (count < numWords) {
+            nextGuess(numWords, count, score);
         } else {
-            endInterro();
+            endInterro(numWords, count, score);
         }
     })
     .catch(error => {
@@ -65,10 +83,21 @@ function sendUserAnswer(answer, progressBar, numberOfQuestions) {
 }
 
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-        const progressBar = document.getElementById("progress-bar");
-        progressBar.style.width = `${progress_percent}%`;
+function nextGuess(numWords, count, score) {
+    numWords = parseInt(numWords, 10);
+    count = parseInt(count, 10);
+    score = parseInt(score, 10);
+    window.location.href = `/interro_question/${numWords}/${count}/${score}`;
+}
+
+
+function endInterro(numWords, count, score) {
+    numWords = parseInt(numWords, 10);
+    count = parseInt(count, 10);
+    score = parseInt(score, 10);
+    if (score === numWords) {
+        window.location.href = `/interro_end/${numWords}/${score}`;
+    } else {
+        window.location.href = `/propose_rattraps/${numWords}/${count}/${score}`;
     }
-);
+}

@@ -11,7 +11,7 @@
             <h1>Your score is: {{ score }} / {{ numWords }}</h1>
         </div>
         <div class="row">
-            <p>You have found all of them, congratulations!</p>
+            <button class="button quit-button" onclick="nextGuess({{ newWords }}, {{ newCount }}, {{ newScore }})">Take a catch-up test</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
