@@ -15,49 +15,49 @@
         {
             "Columns":
             [
-                "English", "Français", "Date", "Nb", "Score", "Taux"
+                "English", "Français", "Date_de_creation", "Nb", "Score", "Taux"
             ]
         },
         "version_perf":
         {
             "Columns":
             [
-                "date", "test"
+                "date_du_test", "test"
             ]
         },
         "version_words_count":
         {
             "Columns":
             [
-                "date", "nombre_de_mots"
+                "date_du_test", "nombre_de_mots"
             ]
         },
         "theme_voc":
         {
             "Columns":
             [
-                "English", "Français", "Date", "Nb", "Score", "Taux"
+                "English", "Français", "Date_de_creation", "Nb", "Score", "Taux"
             ]
         },
         "theme_perf":
         {
             "Columns":
             [
-                "date", "test"
+                "date_du_test", "test"
             ]
         },
         "theme_words_count":
         {
             "Columns":
             [
-                "date", "nombre_de_mots"
+                "date_du_test", "nombre_de_mots"
             ]
         },
         "archives":
         {
             "Columns":
             [
-                "Egnlish", "Français"
+                "English", "Français"
             ]
         }
         

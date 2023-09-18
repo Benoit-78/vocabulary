@@ -86,13 +86,13 @@ class Loader():
     def load_tables(self):
         """Return the tables necessary for the interro to run"""
         self.tables = self.data_handler.get_tables()
-        voc_table = self.test_type + '_voc'
-        self.tables[voc_table]['Query'] = [0] * self.tables[voc_table].shape[0]
-        self.tables[voc_table] = self.tables[voc_table].sort_values(by='Date', ascending=True)
-        self.tables[voc_table] = self.tables[voc_table].replace(r',', r'.', regex=True)
-        self.tables[voc_table]['Taux'] = self.tables[voc_table]['Taux'].astype(float)
-        if 'bad_word' not in self.tables[voc_table].columns:
-            self.tables[voc_table]['bad_word'] = [0] * self.tables[voc_table].shape[0]
+        voc = self.test_type + '_voc'
+        self.tables[voc]['Query'] = [0] * self.tables[voc].shape[0]
+        self.tables[voc] = self.tables[voc].sort_values(by='Date_de_creation', ascending=True)
+        self.tables[voc]['Taux'] = self.tables[voc]['Taux'].replace(r',', r'.', regex=True)
+        self.tables[voc]['Taux'] = self.tables[voc]['Taux'].astype(float)
+        if 'bad_word' not in self.tables[voc].columns:
+            self.tables[voc]['bad_word'] = [0] * self.tables[voc].shape[0]
 
 
 
@@ -166,7 +166,7 @@ class Test(Interro):
         """
         If the word is NOT a bad word, it is skipped and another word is searched.
         This process is not a loop, it happens only once.
-        This way, bad words (which are not skipped) are asked twice as much as other words.
+        Bad words are not skipped: this way, they are asked twice as much as other words.
         """
         another_index = self.get_another_index()
         bad_word = self.words_df['bad_word'].loc[another_index] == 1
@@ -335,7 +335,7 @@ class Updater():
 
     def save_performances(self):
         """Save performances for further analysis."""
-        logger.debug(f"perf: \n{self.interro.perf}")
+        logger.debug(f"perf: {self.interro.perf}")
         today_date = datetime.today().date().strftime('%Y-%m-%d')
         new_row = [today_date, self.interro.perf]
         self.interro.perf_df.loc[self.interro.perf_df.shape[0]] = new_row

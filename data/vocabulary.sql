@@ -15,10 +15,96 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
--- Listage des données de la table vocabulary.theme_perf : ~47 rows (environ)
+
+-------------------------------------
+--  T A B L E S   C R E A T I O N  --
+-------------------------------------
 CREATE TABLE IF NOT EXISTS theme_perf (
+	id_test INT AUTO_INCREMENT PRIMARY KEY,
     date_du_test DATE,
     test TINYINT);
+
+
+CREATE TABLE IF NOT EXISTS theme_voc (
+	id_word INT AUTO_INCREMENT PRIMARY KEY,
+    English TEXT,
+    Français  TEXT,
+	Date_de_creation TEXT,
+	Nb TINYINT,
+	Score TINYINT,
+	Taux DOUBLE);
+
+
+CREATE TABLE IF NOT EXISTS theme_words_count (
+	id_test INT AUTO_INCREMENT PRIMARY KEY,
+    date_du_test TEXT,
+	nombre_de_mots SMALLINT);
+
+
+CREATE TABLE IF NOT EXISTS version_perf (
+	id_test INT AUTO_INCREMENT PRIMARY KEY,
+    date_du_test DATE,
+    test TINYINT);
+
+
+CREATE TABLE IF NOT EXISTS version_voc (
+	id_word INT AUTO_INCREMENT PRIMARY KEY,
+    English TEXT,
+    Français  TEXT,
+	Date_de_creation TEXT,
+	Nb TINYINT,
+	Score TINYINT,
+	Taux DOUBLE);
+
+
+CREATE TABLE IF NOT EXISTS version_words_count (
+	id_test INT AUTO_INCREMENT PRIMARY KEY,
+    date_du_test TEXT,
+	nombre_de_mots SMALLINT);
+
+
+
+---------------------------
+--  N E W   T A B L E S  --
+---------------------------
+-- Intérêt : id_test unique
+CREATE TABLE IF NOT EXISTS tests (
+	id_test INT AUTO_INCREMENT PRIMARY KEY,
+	tests_flow TINYTEXT, -- version -> theme | theme -> version
+	test_type TINYTEXT, -- version | theme
+    test_date DATE,
+    test_perf TINYINT,
+	words_count SMALLINT);
+
+
+-- Intérêt : id_word unique
+CREATE TABLE IF NOT EXISTS voc (
+	id_word INT AUTO_INCREMENT PRIMARY KEY,
+	tests_flow TINYTEXT, -- version -> theme | theme -> version
+	test_type TINYTEXT, -- version | theme
+    English TEXT,
+    Français  TEXT,
+	Date_de_creation TEXT,
+	Nb TINYINT,
+	Score TINYINT,
+	Taux DOUBLE);
+
+
+------------------------------------------
+--  T A B L E S   P E R M I S S I O N S --
+------------------------------------------
+GRANT INSERT, UPDATE ON vocabulary.theme_perf TO 'benito'@'db';
+GRANT INSERT, UPDATE ON vocabulary.theme_voc TO 'benito'@'db';
+GRANT INSERT, UPDATE ON vocabulary.theme_words_count TO 'benito'@'db';
+GRANT INSERT, UPDATE ON vocabulary.version_perf TO 'benito'@'db';
+GRANT INSERT, UPDATE ON vocabulary.version_voc TO 'benito'@'db';
+GRANT INSERT, UPDATE ON vocabulary.version_words_count TO 'benito'@'db';
+
+
+
+-----------------------------------
+--  T A B L E S   F I L L I N G  --
+-----------------------------------
 INSERT INTO `theme_perf` (`date_du_test`, `test`) VALUES
 	('30/10/2022', 55),
 	('06/11/2022', 80),
@@ -69,14 +155,6 @@ INSERT INTO `theme_perf` (`date_du_test`, `test`) VALUES
 	('2023-09-16', 50);
 
 
--- Listage des données de la table vocabulary.theme_voc : ~941 rows (environ)
-CREATE TABLE IF NOT EXISTS theme_voc (
-    English TEXT,
-    Français  TEXT,
-	Date_de_creation TEXT,
-	Nb TINYINT,
-	Score TINYINT,
-	Taux DOUBLE);
 INSERT INTO `theme_voc` (`English`, `Français`, `Date_de_creation`, `Nb`, `Score`, `Taux`) VALUES
 	('hawthorne (common name)', 'l''aubépine', '01/02/2022', 8, 8, 1),
 	('terse', 'laconique. concis', '01/05/2019', 3, -1, -0.333333333),
@@ -1021,10 +1099,6 @@ INSERT INTO `theme_voc` (`English`, `Français`, `Date_de_creation`, `Nb`, `Scor
 	('foolproof', 'infaillible (f…)', '31/10/2018', 9, 1, 0.111111111);
 
 
--- Listage des données de la table vocabulary.theme_words_count : ~11 rows (environ)
-CREATE TABLE IF NOT EXISTS theme_words_count (
-    date_du_test TEXT,
-	nombre_de_mots SMALLINT);
 INSERT INTO `theme_words_count` (`date_du_test`, `nombre_de_mots`) VALUES
 	('29/12/2022', 439),
 	('30/12/2022', 446),
@@ -1039,22 +1113,10 @@ INSERT INTO `theme_words_count` (`date_du_test`, `nombre_de_mots`) VALUES
 	('2023-09-16', 941);
 
 
--- Listage des données de la table vocabulary.version_perf : ~0 rows (environ)
-CREATE TABLE IF NOT EXISTS version_perf (
-    date_du_test DATE,
-    test TINYINT);
 INSERT INTO `version_perf` (`date_du_test`, `test`) VALUES
 	('2023-09-16', 100);
 
 
--- Listage des données de la table vocabulary.version_voc : ~2 424 rows (environ)
-CREATE TABLE IF NOT EXISTS version_voc (
-    English TEXT,
-    Français  TEXT,
-	Date_de_creation TEXT,
-	Nb TINYINT,
-	Score TINYINT,
-	Taux DOUBLE);
 INSERT INTO `version_voc` (`English`, `Français`, `Date_de_creation`, `Nb`, `Score`, `Taux`) VALUES
 	('fatuous', 'imbécile. idiot', '2011-03-09', 25, -6, -0.24),
 	('nimble (adj.)', 'agile. leste', '2011-03-09', 39, 9, 0.23),
@@ -3481,10 +3543,6 @@ INSERT INTO `version_voc` (`English`, `Français`, `Date_de_creation`, `Nb`, `Sc
 	('to grapple with', 'lutter avec', '2022-10-18', 10, 10, 1);
 
 
--- Listage des données de la table vocabulary.version_words_count : ~0 rows (environ)
-CREATE TABLE IF NOT EXISTS version_words_count (
-    date_du_test TEXT,
-	nombre_de_mots SMALLINT);
 INSERT INTO `version_words_count` (`date_du_test`, `nombre_de_mots`) VALUES
 	('22/12/2022', 2922),
 	('23/12/2022', 2935),
@@ -3601,6 +3659,9 @@ INSERT INTO `version_words_count` (`date_du_test`, `nombre_de_mots`) VALUES
 	('2023-08-30', 2410),
 	('2023-08-31', 2409),
 	('2023-09-16', 2409);
+
+
+
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
