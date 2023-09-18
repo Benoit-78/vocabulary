@@ -22,7 +22,7 @@ import views
 app = FastAPI()
 test = None
 loader = None
-flag_data_updated = False
+flag_data_updated = None
 
 # Serve CSS files
 app.mount(
@@ -73,6 +73,8 @@ async def get_user_settings(settings: dict):
         settings["numWords"]
     )
     logger.info("User data loaded")
+    global flag_data_updated
+    flag_data_updated = False
     return JSONResponse(
         content=
         {
@@ -202,6 +204,8 @@ def propose_rattraps(
         updater.update_data()
         logger.info("User data updated.")
         flag_data_updated = True
+    else:
+        logger.info("User data not updated yet.")
     # Réinitialisation
     new_count = 0
     new_score = 0
@@ -236,7 +240,6 @@ def end_interro(
         updater = interro.Updater(loader, test)
         updater.update_data()
         logger.info("User data updated.")
-        flag_data_updated = True
     return templates.TemplateResponse(
         "interro_end.html",
         {

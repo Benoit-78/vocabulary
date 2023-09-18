@@ -165,6 +165,8 @@ class MariaDBHandler():
         self.set_database_cred()
         self.set_db_cursor()
         table = table[self.params["Tables"][table_name]["Columns"]]
+        logger.info(f"table_name: {table_name}")
+        logger.info(f"table.columns: {table.columns}")
         engine = create_engine(
             ''.join([
                 "mysql+pymysql",
