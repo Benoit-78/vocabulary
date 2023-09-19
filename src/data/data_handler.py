@@ -98,6 +98,7 @@ class MariaDBHandler():
     def __init__(self, test_type):
         self.test_type = test_type
         self.params = None
+        self.config = None
         self.connection = None
         self.cursor = None
 
@@ -111,14 +112,18 @@ class MariaDBHandler():
 
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
-        config = {
-            "user": self.params['Database']['usr'],
-            "password": self.params['Database']['pwd'],
-            "host": self.params['Database']['host'],
-            "database": self.params['Database']['database'],
-            "port": self.params['Database']['port']
+        self.config = {
+            'user': self.params['Database']['user'],
+            'password': self.params['Database']['password'],
+            'database': self.params['Database']['database'],
+            'port': self.params['Database']['port']
         }
-        self.connection = mariadb.connect(**config)
+        local = False
+        if local:
+            self.config['host'] = self.params['Database']['local_host']
+        else:
+            self.config['host'] = self.params['Database']['docker_host']
+        self.connection = mariadb.connect(**self.config)
         self.cursor = self.connection.cursor()
 
     def get_tables_names(self) -> List[str]:
@@ -156,6 +161,8 @@ class MariaDBHandler():
                 columns=self.params["Tables"][table_name]["Columns"],
                 data=self.cursor.fetchall()
             )
+            index_col = tables[table_name].columns[0]
+            tables[table_name] = tables[table_name].set_index(index_col)
         self.cursor.close()
         self.connection.close()
         return tables
@@ -165,15 +172,13 @@ class MariaDBHandler():
         self.set_database_cred()
         self.set_db_cursor()
         table = table[self.params["Tables"][table_name]["Columns"]]
-        logger.info(f"table_name: {table_name}")
-        logger.info(f"table.columns: {table.columns}")
         engine = create_engine(
             ''.join([
                 "mysql+pymysql",
-                "://", self.params['Database']['usr'],
-                ':', self.params['Database']['pwd'],
-                '@', self.params['Database']['host'],
-                '/', self.params['Database']['database']
+                "://", self.config['user'],
+                ':', self.config['password'],
+                '@', self.config['host'],
+                '/', self.config['database']
             ])
         )
         table.to_sql(

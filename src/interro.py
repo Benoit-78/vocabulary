@@ -8,14 +8,14 @@
 
 import random
 import argparse
-from datetime import date
+from datetime import date, datetime
 from abc import ABC, abstractmethod
 import sys
 from typing import List
 import pandas as pd
 import numpy as np
 from loguru import logger
-from datetime import datetime
+
 
 STEEP_GOOD = -1.25
 ORDINATE_GOOD = 112.5
@@ -114,17 +114,17 @@ class Interro(ABC):
     def run(self):
         """Launch the interroooo !!!!"""
 
-    def get_row(self) -> List[str]:
+    def get_row(self) -> pd.DataFrame:
         """Get the row of the word to be asked"""
         mot_etranger = self.words_df[self.words_df.columns[0]].loc[self.index]
         mot_natal = self.words_df[self.words_df.columns[1]].loc[self.index]
-        row = [mot_etranger, mot_natal]
+        row = [self.index, mot_etranger, mot_natal]
         return row
 
     def update_faults_df(self, word_guessed: bool, row: List[str]):
         """Save the faulty answers for the second test."""
         if word_guessed is False:
-            self.faults_df.loc[self.faults_df.shape[0]] = [row[0], row[1]]
+            self.faults_df.loc[self.faults_df.shape[0]] = [row[-2], row[-1]]
 
 
 
@@ -137,12 +137,10 @@ class Test(Interro):
         guesser,
         perf_df_: pd.DataFrame=None,
         words_cnt_df: pd.DataFrame=None,
-        output_df: pd.DataFrame=None
         ):
         super().__init__(words_df_, int(words), guesser)
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
-        self.output_df = output_df
         self.perf = []
         self.step = 0
         self.interro_df = pd.DataFrame(columns=['english', 'french'])
@@ -176,7 +174,7 @@ class Test(Interro):
             next_index = another_index
         return next_index
 
-    def update_voc_df(self, word_guessed: str):
+    def update_voc_df(self, word_guessed: bool):
         """Update the vocabulary dataframe"""
         # Update Nb
         self.words_df.loc[self.index, 'Nb'] += 1
@@ -200,11 +198,12 @@ class Test(Interro):
         for _ in range(1, self.words + 1):
             self.index = self.get_next_index()
             row = self.get_row()
-            self.interro_df.loc[len(self.interro_df)] = row
+            self.interro_df.loc[row[0]] = row[1:]
 
     def run(self):
         """Launch the vocabulary interoooooo !!!!"""
         self.get_interro_df()
+        logger.debug(f"interro_df:\n{self.interro_df}")
         for i in range(1, len(self.interro_df) + 1):
             row = self.interro_df.loc[i-1]
             word_guessed = self.guesser.guess_word(row, i, self.words)
@@ -295,12 +294,13 @@ class Updater():
     def transfer_well_known_words(self):
         """Transfer the well-known words in an ouput table, and save this."""
         self.copy_well_known_words()
+        self.loader.tables[self.output_table_name].reset_index(inplace=True)
         self.loader.data_handler.save_table(
             self.output_table_name,
             self.loader.tables[self.output_table_name]
         )
 
-    def delete_known_words(self) -> pd.DataFrame:
+    def delete_well_known_words(self) -> pd.DataFrame:
         """Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
         only under the author's dictatorial will."""
@@ -328,6 +328,7 @@ class Updater():
 
     def save_words(self):
         """Prepare the words table for saving, and save it."""
+        self.interro.words_df.reset_index(inplace=True)
         self.loader.data_handler.save_table(
             self.loader.test_type + '_voc',
             self.interro.words_df
@@ -335,10 +336,10 @@ class Updater():
 
     def save_performances(self):
         """Save performances for further analysis."""
-        logger.debug(f"perf: {self.interro.perf}")
         today_date = datetime.today().date().strftime('%Y-%m-%d')
         new_row = [today_date, self.interro.perf]
         self.interro.perf_df.loc[self.interro.perf_df.shape[0]] = new_row
+        self.interro.perf_df.reset_index(inplace=True)
         self.loader.data_handler.save_table(
             self.loader.test_type + '_perf',
             self.interro.perf_df
@@ -352,17 +353,18 @@ class Updater():
         self.interro.word_cnt_df.loc[count_before] = [today_date, word_counts]
         count_after = self.interro.word_cnt_df.shape[0]
         if count_after == count_before + 1:
+            self.interro.word_cnt_df.reset_index(inplace=True)
             self.loader.data_handler.save_table(
                 self.loader.test_type + '_words_count',
                 self.interro.word_cnt_df
             )
         else:
-            print("# ERROR: Words count not saved.")
+            print("# ERROR: Words count not be saved.")
 
     def update_data(self):
         """Main method of Updater class"""
         self.transfer_well_known_words()
-        self.delete_known_words()
+        self.delete_well_known_words()
         self.flag_bad_words()
         self.save_words()
         self.save_performances()
