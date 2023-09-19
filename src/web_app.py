@@ -118,7 +118,8 @@ def load_interro_question(
     except NameError:
         score = 0
     progress_percent = int(count / int(words) * 100)
-    english = test.interro_df.loc[count][0]
+    index = test.interro_df.index[count]
+    english = test.interro_df.loc[index][0]
     count += 1
     return templates.TemplateResponse(
         "interro_question.html",
@@ -146,8 +147,9 @@ def load_interro_answer(
     """
     count = int(count)
     global test
-    english = test.interro_df.loc[count - 1][0]
-    french = test.interro_df.loc[count - 1][1]
+    index = test.interro_df.index[count - 1]
+    english = test.interro_df.loc[index][0]
+    french = test.interro_df.loc[index][1]
     progress_percent = int(count / int(words) * 100)
     return templates.TemplateResponse(
         "interro_answer.html",
@@ -170,7 +172,9 @@ async def get_user_response(data: dict):
     score = data.get('score')
     if data["answer"] == 'Yes':
         score += 1
+        test.update_voc_df(True)
     elif data["answer"] == 'No':
+        test.update_voc_df(False)
         test.update_faults_df(
             False,
             [
