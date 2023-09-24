@@ -10,13 +10,15 @@ import pandas as pd
 from sqlalchemy import create_engine
 from loguru import logger
 
+from typing import Dict
+
 import utils
 
 
 
 class CsvHandler():
     """Provide with all methods necessary to interact with csv files."""
-    def __init__(self, test_type):
+    def __init__(self, test_type: str):
         self.test_type = test_type
         self.os_sep = utils.get_os_separator()
         self.paths = {}
@@ -50,12 +52,12 @@ class CsvHandler():
         self.tables['word_cnt'] = pd.read_csv(self.paths['word_cnt'], sep=';', encoding='utf-8')
         self.tables['output'] = pd.read_csv(self.paths['output'], sep=';', encoding='utf-8')
 
-    def get_paths(self):
+    def get_paths(self) -> Dict[str, str]:
         """Return the paths"""
         self.set_paths()
         return self.paths
 
-    def get_tables(self):
+    def get_tables(self) -> Dict[str, pd.DataFrame]:
         """Load the tables"""
         self.set_tables()
         return self.tables
@@ -95,10 +97,10 @@ class CsvHandler():
 
 class MariaDBHandler():
     """Provide with all methods necessary to interact with MariaDB database."""
-    def __init__(self, test_type):
+    def __init__(self, test_type: str):
         self.test_type = test_type
-        self.params = None
-        self.config = None
+        self.params = {}
+        self.config = {}
         self.connection = None
         self.cursor = None
 
@@ -113,8 +115,8 @@ class MariaDBHandler():
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
         self.config = {
-            'user': self.params['Database']['user'],
-            'password': self.params['Database']['password'],
+            'user': self.params['Database']['user']['user_1']['name'],
+            'password': self.params['Database']['user']['user_1']['password'],
             'database': self.params['Database']['database'],
             'port': self.params['Database']['port']
         }
