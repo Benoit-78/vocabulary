@@ -18,7 +18,6 @@ import interro
 import views
 
 
-
 app = FastAPI()
 test = None
 loader = None

@@ -113,8 +113,8 @@ class MariaDBHandler():
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
         self.config = {
-            'user': self.params['Database']['user'],
-            'password': self.params['Database']['password'],
+            'user': self.params['Database']['user']['user_1']['name'],
+            'password': self.params['Database']['user']['user_1']['password'],
             'database': self.params['Database']['database'],
             'port': self.params['Database']['port']
         }
