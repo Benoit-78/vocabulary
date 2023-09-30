@@ -18,6 +18,7 @@ import interro
 import views
 
 
+
 app = FastAPI()
 test = None
 loader = None
@@ -119,7 +120,6 @@ def load_interro_question(
     progress_percent = int(count / int(words) * 100)
     index = test.interro_df.index[count]
     english = test.interro_df.loc[index][0]
-    english = english.replace("'", "\'")
     count += 1
     return templates.TemplateResponse(
         "interro_question.html",
@@ -150,8 +150,6 @@ def load_interro_answer(
     index = test.interro_df.index[count - 1]
     english = test.interro_df.loc[index][0]
     french = test.interro_df.loc[index][1]
-    english = english.replace("'", "\'")
-    french = french.replace("'", "\'")
     progress_percent = int(count / int(words) * 100)
     return templates.TemplateResponse(
         "interro_answer.html",

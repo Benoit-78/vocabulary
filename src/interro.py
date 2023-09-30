@@ -310,7 +310,10 @@ class Updater():
         self.interro.words_df.drop('image_good', axis=1, inplace=True)
 
     def flag_bad_words(self):
-        """Apply special flag to difficult words, i.e. words that are rarely guessed by the user."""
+        """
+            Apply special flag to difficult words,
+            i.e. words that are rarely guessed by the user.
+        """
         if 'image_bad' in self.interro.words_df.columns:
             self.interro.words_df.drop('image_bad', axis=1, inplace=True)
         self.interro.words_df['image_bad'] = (

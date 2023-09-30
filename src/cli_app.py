@@ -10,7 +10,7 @@ import views_local
 
 
 def cli_main():
-    """Series of instructions executed when the user launches the program from CLI."""
+    """Series of instructions execuated when the user launches the program from CLI."""
     # Get user settings
     user = interro.CliUser()
     user.get_settings()
