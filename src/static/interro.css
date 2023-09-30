@@ -125,7 +125,9 @@ button {
     text-align: left;
 }
 
-
+.rattraps_button {
+    font-size: 20px;
+}
 
 /* ================================== */
 /*  P R O G R E S S   B A R           */
