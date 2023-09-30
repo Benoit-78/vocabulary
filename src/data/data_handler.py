@@ -16,7 +16,7 @@ import utils
 
 class CsvHandler():
     """Provide with all methods necessary to interact with csv files."""
-    def __init__(self, test_type):
+    def __init__(self, test_type: str):
         self.test_type = test_type
         self.os_sep = utils.get_os_separator()
         self.paths = {}
@@ -71,23 +71,23 @@ class CsvHandler():
         )
 
     # Row-level operations
-    def create(self, word, table):
+    def create(self, word: str, table: str):
         """Add a word to the table."""
         pass
 
-    def read(self, word, table):
+    def read(self, word: str, table: str):
         """Read the given word."""
         pass
 
-    def update(self, word, table):
+    def update(self, word: str, table: str):
         """Update statistics on the given word."""
         pass
 
-    def delete(self, word, table):
+    def delete(self, word: str, table: str):
         """Delete the given word in the given table."""
         pass
 
-    def Transfer(self, word, table):
+    def Transfer(self, word: str, table: str):
         """Copy a word from its original table to the output table (theme or archive)."""
         pass
 
@@ -95,10 +95,10 @@ class CsvHandler():
 
 class MariaDBHandler():
     """Provide with all methods necessary to interact with MariaDB database."""
-    def __init__(self, test_type):
+    def __init__(self, test_type: str):
         self.test_type = test_type
-        self.params = None
-        self.config = None
+        self.params = {}
+        self.config = {}
         self.connection = None
         self.cursor = None
 
@@ -192,7 +192,7 @@ class MariaDBHandler():
         self.connection.close()
 
     # Row-level operations
-    def create(self, test_type, row):
+    def create(self, test_type: str, row):
         """Add a word to the table"""
         # Create request string
         today = datetime.now()
@@ -207,7 +207,7 @@ class MariaDBHandler():
         connection.close()
         return True
 
-    def read(self, test_type, row):
+    def read(self, test_type: str, row):
         """Read the given word"""
         # Create request string
         table_name, english, native = get_words_from_test_type(test_type, row)
@@ -222,22 +222,22 @@ class MariaDBHandler():
         connection.close()
         return english, native, score
 
-    def update(self, test_type, row, new_nb, new_score):
+    def update(self, test_type: str, row, new_nb: int, new_score):
         """Update statistics on the given word"""
         # Create request string
-        table_name, english, _ = get_words_from_test_type(test_type, row)
+        table_name, english, _ = self.get_words_from_test_type(test_type, row)
         request_1 = f"UPDATE {table_name}"
         request_2 = f"SET Nb = {new_nb}, Score = {new_score}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
-        cred = get_database_cred()
-        connection, cursor = get_db_cursor(cred)
+        cred = self.get_database_cred()
+        connection, cursor = self.get_db_cursor(cred)
         cursor.execute(sql_request)
         connection.close()
         return True
 
-    def delete(self, test_type, row):
+    def delete(self, test_type: str, row):
         """Delete a word from table."""
         # Create request string
         table_name, english, _ = get_words_from_test_type(test_type, row)
@@ -251,6 +251,6 @@ class MariaDBHandler():
         connection.close()
         return True
 
-    def transfer(self, test_type, row):
+    def transfer(self, test_type: str, row):
         """Transfer a word from a table to another."""
         pass
