@@ -10,6 +10,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 from loguru import logger
 
+from typing import Dict
+
 import utils
 
 
@@ -50,12 +52,12 @@ class CsvHandler():
         self.tables['word_cnt'] = pd.read_csv(self.paths['word_cnt'], sep=';', encoding='utf-8')
         self.tables['output'] = pd.read_csv(self.paths['output'], sep=';', encoding='utf-8')
 
-    def get_paths(self):
+    def get_paths(self) -> Dict[str, str]:
         """Return the paths"""
         self.set_paths()
         return self.paths
 
-    def get_tables(self):
+    def get_tables(self) -> Dict[str, pd.DataFrame]:
         """Load the tables"""
         self.set_tables()
         return self.tables

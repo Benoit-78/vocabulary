@@ -12,5 +12,4 @@ spec:
     - protocol: TCP # Specifies the protocol (TCP in this case).
       port: 80 # Specifies the port on which the Service will be available.
       targetPort: 80 # Specifies the port to forward to on the pods.
-
   type: LoadBalancer
