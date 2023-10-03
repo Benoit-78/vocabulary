@@ -21,6 +21,7 @@ RUN useradd --uid 1001 guess && chown -R guess /app
 RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+# RUN rm requirements.txt
 
 
 # Copy the application contents
