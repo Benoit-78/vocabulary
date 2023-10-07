@@ -89,7 +89,7 @@ class CsvHandler():
         """Delete the given word in the given table."""
         pass
 
-    def Transfer(self, word, table):
+    def transfer(self, word, table):
         """Copy a word from its original table to the output table (theme or archive)."""
         pass
 
@@ -97,12 +97,14 @@ class CsvHandler():
 
 class MariaDBHandler():
     """Provide with all methods necessary to interact with MariaDB database."""
-    def __init__(self, test_type: str):
+    def __init__(self, test_type: str, mode: str):
         self.test_type = test_type
+        self.mode = mode
         self.params = {}
         self.config = {}
         self.connection = None
         self.cursor = None
+        self.hosts = ['cli', 'web_local', 'container']
 
     # Common operations
     def set_database_cred(self):
@@ -120,11 +122,11 @@ class MariaDBHandler():
             'database': self.params['Database']['database'],
             'port': self.params['Database']['port']
         }
-        local = False
-        if local:
-            self.config['host'] = self.params['Database']['local_host']
+        if self.mode not in self.hosts:
+            logger.warning(f"Mode: {self.mode}")
+            logger.error(f"Mode should be in {self.hosts}")
         else:
-            self.config['host'] = self.params['Database']['docker_host']
+            self.config['host'] = self.params['Database']['host'][self.mode]
         self.connection = mariadb.connect(**self.config)
         self.cursor = self.connection.cursor()
 
