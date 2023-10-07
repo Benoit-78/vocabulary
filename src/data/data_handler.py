@@ -142,9 +142,9 @@ class MariaDBHandler():
             raise ValueError
         return [voc_table, perf_table, word_cnt_table, output_table]
 
-    def get_words_from_test_type(self, test_type: str, row: list):
+    def get_words(self, row: list):
         """Common method used by all 4 CRUD operations"""
-        [words_table_name, _, _, _] = get_words_table_from_test_type(test_type)
+        [words_table_name, _, _, _] = self.get_tables_names()
         english = row[row.columns[0]]
         native = row[row.columns[1]]
         return [words_table_name, english, native]
@@ -194,63 +194,63 @@ class MariaDBHandler():
         self.connection.close()
 
     # Row-level operations
-    def create(self, test_type, row):
+    def create(self, row):
         """Add a word to the table"""
         # Create request string
         today = datetime.now()
-        table_name, english, native = get_words_from_test_type(test_type, row)
+        table_name, english, native = self.get_words(row)
         request_1 = f"INSERT INTO {table_name} (english, francais, Date, Nb, Score, Taux)"
         request_2 = f"VALUES ({english}, {native}, {today}, 0, 0, 0);"
         sql_request = " ".join([request_1, request_2])
         # Execute request
-        cred = get_database_cred()
-        connection, cursor = get_db_cursor(cred)
-        cursor.execute(sql_request)
-        connection.close()
+        self.set_database_cred()
+        self.set_db_cursor()
+        self.cursor.execute(sql_request)
+        self.connection.close()
         return True
 
     def read(self, test_type, row):
         """Read the given word"""
         # Create request string
-        table_name, english, native = get_words_from_test_type(test_type, row)
+        table_name, english, native = self.get_words(row)
         request_1 = "SELECT english, native, Score"
         request_2 = f"FROM {table_name}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
-        cred = get_database_cred()
-        connection, cursor = get_db_cursor(cred)
-        english, native, score = cursor.execute(sql_request)
-        connection.close()
+        self.set_database_cred()
+        self.set_db_cursor()
+        english, native, score = self.cursor.execute(sql_request)
+        self.connection.close()
         return english, native, score
 
     def update(self, test_type, row, new_nb, new_score):
         """Update statistics on the given word"""
         # Create request string
-        table_name, english, _ = get_words_from_test_type(test_type, row)
+        table_name, english, _ = self.get_words(row)
         request_1 = f"UPDATE {table_name}"
         request_2 = f"SET Nb = {new_nb}, Score = {new_score}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
-        cred = get_database_cred()
-        connection, cursor = get_db_cursor(cred)
-        cursor.execute(sql_request)
-        connection.close()
+        self.set_database_cred()
+        self.set_db_cursor()
+        self.cursor.execute(sql_request)
+        self.connection.close()
         return True
 
     def delete(self, test_type, row):
         """Delete a word from table."""
         # Create request string
-        table_name, english, _ = get_words_from_test_type(test_type, row)
+        table_name, english, _ = self.get_words(row)
         request_1 = f"DELETE FROM {table_name}"
         request_2 = f"WHERE english = {english}"
         sql_request = " ".join([request_1, request_2])
         # Execute request
-        cred = get_database_cred()
-        connection, cursor = get_db_cursor(cred)
-        cursor.execute(sql_request)
-        connection.close()
+        self.set_database_cred()
+        self.set_db_cursor()
+        self.cursor.execute(sql_request)
+        self.connection.close()
         return True
 
     def transfer(self, test_type, row):
