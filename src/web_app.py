@@ -84,7 +84,7 @@ async def get_user_settings(settings: dict):
 
 def load_test(test_type, words):
     """Load the interroooo!"""
-    data_handler_ = data_handler.MariaDBHandler(test_type)
+    data_handler_ = data_handler.MariaDBHandler(test_type, 'container')
     loader_ = interro.Loader(test_type, 0, data_handler_)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
@@ -95,7 +95,7 @@ def load_test(test_type, words):
         loader_.tables[loader_.test_type + '_perf'],
         loader_.tables[loader_.test_type + '_words_count']
     )
-    test_.get_interro_df()
+    test_.set_interro_df()
     return loader_, test_
 
 
