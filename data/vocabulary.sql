@@ -21,46 +21,46 @@
 -------------------------------------
 CREATE TABLE IF NOT EXISTS theme_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    date_du_test DATE,
+    test_date DATE,
     test TINYINT);
 
 
 CREATE TABLE IF NOT EXISTS theme_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    English TEXT,
-    Français  TEXT,
-	Date_de_creation TEXT,
-	Nb TINYINT,
-	Score TINYINT,
-	Taux DOUBLE);
+    english TEXT,
+    français  TEXT,
+	creation_date TEXT,
+	nb TINYINT,
+	score TINYINT,
+	taux DOUBLE);
 
 
 CREATE TABLE IF NOT EXISTS theme_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    date_du_test TEXT,
-	nombre_de_mots SMALLINT);
+    test_date TEXT,
+	words_count SMALLINT);
 
 
 CREATE TABLE IF NOT EXISTS version_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    date_du_test CHAR,
+    test_date CHAR,
     test TINYINT);
 
 
 CREATE TABLE IF NOT EXISTS version_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    English CHAR,
-    Français CHAR,
-	Date_de_creation CHAR,
-	Nb TINYINT,
-	Score TINYINT,
-	Taux TINYINT);
+    english CHAR,
+    français CHAR,
+	creation_date CHAR,
+	nb TINYINT,
+	score TINYINT,
+	taux TINYINT);
 
 
 CREATE TABLE IF NOT EXISTS version_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    date_du_test CHAR,
-	nombre_de_mots SMALLINT);
+    test_date CHAR,
+	words_count SMALLINT);
 
 
 
@@ -82,12 +82,12 @@ CREATE TABLE IF NOT EXISTS voc (
 	id_word INT AUTO_INCREMENT PRIMARY KEY,
 	tests_flow TINYTEXT, -- version -> theme | theme -> version
 	test_type TINYTEXT, -- version | theme
-    English TEXT,
-    Français  TEXT,
-	Date_de_creation TEXT,
-	Nb TINYINT,
-	Score TINYINT,
-	Taux DOUBLE);
+    English CHAR,
+    Français CHAR,
+	creation_date DATE,
+	nb TINYINT,
+	score TINYINT,
+	taux TINYINT);
 
 
 ------------------------------------------
@@ -105,7 +105,7 @@ GRANT INSERT, UPDATE ON vocabulary.version_words_count TO 'benito'@'db';
 -----------------------------------
 --  T A B L E S   F I L L I N G  --
 -----------------------------------
-INSERT INTO `theme_perf` (`id_test`, `date_du_test`, `test`) VALUES
+INSERT INTO `theme_perf` (`id_test`, `test_date`, `test`) VALUES
 	(2, '2022-10-29', 83),
 	(3, '2022-10-29', 75),
 	(4, '2022-10-30', 55),
@@ -335,7 +335,7 @@ INSERT INTO `theme_perf` (`id_test`, `date_du_test`, `test`) VALUES
 	(228, '2023-10-07', 84);
 
 
-INSERT INTO `theme_voc` (`id_word`, `english`, `français`, `date`, `nb`, `score`, `taux`) VALUES
+INSERT INTO `theme_voc` (`id_word`, `english`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES
 	(1, 'sheer (adj.)', 'véritable', '2011-03-09', 14, 10, 71),
 	(2, 'to lecture somebody', 'faire la leçon à quelqu''un', '2011-03-09', 15, 10, 67),
 	(3, 'a haul', 'un voyage, un trajet', '2011-03-09', 17, -1, -6),
@@ -2307,7 +2307,7 @@ INSERT INTO `theme_voc` (`id_word`, `english`, `français`, `date`, `nb`, `score
 	(1969, 'soot (common name)', 'de la suie', '2023-10-07', 0, 0, 0);
 
 
-INSERT INTO `theme_words_count` (`id_tests`, `date`, `nombre_de_mots`) VALUES
+INSERT INTO `theme_words_count` (`id_test`, `test_date`, `words_count`) VALUES
 	(1, '2022-12-29', 439),
 	(2, '2023-01-01', 452),
 	(3, '2023-01-10', 482),
@@ -2346,7 +2346,7 @@ INSERT INTO `theme_words_count` (`id_tests`, `date`, `nombre_de_mots`) VALUES
 	(36, '2023-10-01', 1217);
 
 
-INSERT INTO `version_perf` (`id_test`, `date_du_test`, `test`) VALUES
+INSERT INTO `version_perf` (`id_test`, `test_date`, `test`) VALUES
 	(1, '2018-06-26', 33),
 	(2, '2018-06-27', 43),
 	(3, '2018-07-03', 50),
@@ -3267,7 +3267,7 @@ INSERT INTO `version_perf` (`id_test`, `date_du_test`, `test`) VALUES
 	(918, '2023-10-07', 88);
 
 
-INSERT INTO `version_voc` (`id_word`, `english`, `français`, `date`, `nb`, `score`, `taux`) VALUES
+INSERT INTO `version_voc` (`id_word`, `english`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES
 	(1, 'sheer (adj.)', 'véritable', '2011-03-09', 14, 10, 1),
 	(2, 'to lecture somebody', 'faire la leçon à quelqu''un', '2011-03-09', 15, 10, 1),
 	(3, 'a haul', 'un voyage, un trajet', '2011-03-09', 17, -1, 0),
@@ -5239,7 +5239,7 @@ INSERT INTO `version_voc` (`id_word`, `english`, `français`, `date`, `nb`, `sco
 	(1969, 'soot (common name)', 'de la suie', '2023-10-07', 0, 0, 0);
 
 
-INSERT INTO `version_words_count` (`id_test`, `date_du_test`, `nombre_de_mots`) VALUES
+INSERT INTO `version_words_count` (`id_test`, `test_date`, `words_count`) VALUES
 	(1, '2022-12-22', 2922),
 	(2, '2022-12-29', 2915),
 	(3, '2023-01-03', 2887),

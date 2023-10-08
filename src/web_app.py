@@ -33,6 +33,7 @@ app.mount(
 templates = Jinja2Templates(directory="templates")
 
 
+
 @app.get("/", response_class=HTMLResponse)
 def welcome_page(request: Request):
     """Call the welcome page"""
@@ -44,6 +45,10 @@ def welcome_page(request: Request):
     )
 
 
+
+# ==================================================
+#  G E T   S T A R T E D
+# ==================================================
 @app.get("/get_started", response_class=HTMLResponse)
 def start_page():
     """Call the page that helps the user to get started."""
@@ -51,6 +56,10 @@ def start_page():
     return title
 
 
+
+# ==================================================
+#  I N T E R R O
+# ==================================================
 @app.get("/interro_settings", response_class=HTMLResponse)
 def interro_settings(request: Request):
     """Call the page that gets the user settings for one interro."""
@@ -84,8 +93,8 @@ async def get_user_settings(settings: dict):
 
 def load_test(test_type, words):
     """Load the interroooo!"""
-    data_handler_ = data_handler.MariaDBHandler(test_type, 'container')
-    loader_ = interro.Loader(test_type, 0, data_handler_)
+    db_handler = data_handler.MariaDBHandler(test_type, 'container')
+    loader_ = interro.Loader(test_type, 0, db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
     test_ = interro.Test(
@@ -256,18 +265,53 @@ def end_interro(
     )
 
 
+
+# ==================================================
+#  D A T A B A S E
+# ==================================================
+@app.get("/database", response_class=HTMLResponse)
+def data_page(request: Request):
+    """Base page for data input by the user."""
+    title = "Here you can add words to your database."
+    return templates.TemplateResponse(
+        "database_add_word.html",
+        {
+            "request": request,
+            "title": title
+        }
+    )
+
+
+@app.post("/create-word")
+async def create_word(english: str, french: str):
+    """Save the word in the database."""
+    db_handler = data_handler.MariaDBHandler('version', 'container')
+    if db_handler.create([english, french]) is True:
+        message = "Word stored successfully."
+    else:
+        message = "Error with the storing of the word."
+    return JSONResponse(
+        content=
+        {
+            "message": message
+        }
+    )
+
+
+
+# ==================================================
+#  D A S H B O A R D
+# ==================================================
 @app.get("/dashboard", response_class=HTMLResponse)
 def graphs_page():
     title = "Here are the graphs that represents your progress."
     return title
 
 
-@app.get("/database", response_class=HTMLResponse)
-def data_page():
-    title = "Here you can add words to your database."
-    return title
 
-
+# ==================================================
+#  S E T T I N G S
+# ==================================================
 @app.get("/settings", response_class=HTMLResponse)
 def settings_page():
     title = "Here you can change your personal settings."

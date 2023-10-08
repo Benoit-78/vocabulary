@@ -22,7 +22,7 @@ function sendUserSettings(testType, numWords) {
         }),
     })
     .then(answer => answer.json())
-    .then(data => {
+    .then(numWords => {
         startTest(numWords)
     })
     .catch(error => {
