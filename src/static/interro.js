@@ -1,8 +1,3 @@
-function goToRoot() {
-    window.location.href = '/';
-}
-
-
 document.addEventListener(
     "DOMContentLoaded",
     function () {

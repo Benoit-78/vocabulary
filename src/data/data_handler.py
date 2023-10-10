@@ -4,13 +4,13 @@
 
 import json
 from datetime import datetime
+from typing import Dict
 from typing import List
 import mysql.connector as mariadb
 import pandas as pd
 from sqlalchemy import create_engine
-from loguru import logger
 
-from typing import Dict
+from loguru import logger
 
 import utils
 
@@ -144,7 +144,7 @@ class MariaDBHandler():
             raise ValueError
         return [voc_table, perf_table, word_cnt_table, output_table]
 
-    def get_words(self, row: list):
+    def get_words_from_test_type(self, row: list):
         """Common method used by all 4 CRUD operations"""
         [words_table_name, _, _, _] = self.get_tables_names()
         english = row[row.columns[0]]
@@ -196,13 +196,15 @@ class MariaDBHandler():
         self.connection.close()
 
     # Row-level operations
-    def create(self, row):
+    def create(self, row: list):
         """Add a word to the table"""
         # Create request string
-        today = datetime.now()
-        table_name, english, native = self.get_words(row)
-        request_1 = f"INSERT INTO {table_name} (english, francais, Date, Nb, Score, Taux)"
-        request_2 = f"VALUES ({english}, {native}, {today}, 0, 0, 0);"
+        today = datetime.today().date()
+        table_name = 'vocabulary' + '.' + 'version_voc'
+        english = row[0]
+        native = row[1]
+        request_1 = f"INSERT INTO {table_name} (english, français, creation_date, nb, score, taux)"
+        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2])
         # Execute request
         self.set_database_cred()
@@ -211,11 +213,11 @@ class MariaDBHandler():
         self.connection.close()
         return True
 
-    def read(self, test_type, row):
+    def read(self, row):
         """Read the given word"""
         # Create request string
-        table_name, english, native = self.get_words(row)
-        request_1 = "SELECT english, native, Score"
+        table_name, english, native = self.get_words_from_test_type(row)
+        request_1 = "SELECT english, native, score"
         request_2 = f"FROM {table_name}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
@@ -226,12 +228,12 @@ class MariaDBHandler():
         self.connection.close()
         return english, native, score
 
-    def update(self, test_type, row, new_nb, new_score):
+    def update(self, row, new_nb, new_score):
         """Update statistics on the given word"""
         # Create request string
-        table_name, english, _ = self.get_words(row)
+        table_name, english, _ = self.get_words_from_test_type(row)
         request_1 = f"UPDATE {table_name}"
-        request_2 = f"SET Nb = {new_nb}, Score = {new_score}"
+        request_2 = f"SET nb = {new_nb}, score = {new_score}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
@@ -241,10 +243,10 @@ class MariaDBHandler():
         self.connection.close()
         return True
 
-    def delete(self, test_type, row):
+    def delete(self, row):
         """Delete a word from table."""
         # Create request string
-        table_name, english, _ = self.get_words(row)
+        table_name, english, _ = self.get_words_from_test_type(row)
         request_1 = f"DELETE FROM {table_name}"
         request_2 = f"WHERE english = {english}"
         sql_request = " ".join([request_1, request_2])
