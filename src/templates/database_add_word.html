@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Test Configuration</title>
-    <link rel="stylesheet" type="text/css" href="/static/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/database.css">
-    <script type="text/javascript" src="/static/database.js"></script>
-</head>
+    <head>
+        <title>Add a word</title>
+        <link rel="stylesheet" type="text/css" href="/static/main.css">
+        <!-- <link rel="stylesheet" type="text/css" href="/static/database.css"> -->
+        <script type="text/javascript" src="/static/main.js"></script>
+        <script type="text/javascript" src="/static/database.js"></script>
+    </head>
 <body>
     <div class="container">
-
         <div class="row">
             <div class="flag-box">
                 <label for="input1">English</label>
@@ -16,18 +16,15 @@
             </div>
             <div class="flag-box">
                 <input type="text" id="input2" name="input2">
-                <label for="input2"> Français</label>
+                <label for="input2">Français</label>
             </div>
         </div>
-
         <div class="row">
-            <button class="button" onclick="sendUserAnswer({{ input1 }}, {{ input2 }})">Add word</button>
+            <button class="button" onclick="createWord()">Add word</button>
         </div>
-
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
         </div>
-
     </div>
 </body>
 </html>

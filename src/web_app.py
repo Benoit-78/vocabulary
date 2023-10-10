@@ -283,9 +283,11 @@ def data_page(request: Request):
 
 
 @app.post("/create-word")
-async def create_word(english: str, french: str):
+async def create_word(data: dict):
     """Save the word in the database."""
     db_handler = data_handler.MariaDBHandler('version', 'container')
+    english = data['english']
+    french = data['french']
     if db_handler.create([english, french]) is True:
         message = "Word stored successfully."
     else:

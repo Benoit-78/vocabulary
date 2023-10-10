@@ -88,7 +88,7 @@ class Loader():
         self.tables = self.data_handler.get_tables()
         voc = self.test_type + '_voc'
         self.tables[voc]['Query'] = [0] * self.tables[voc].shape[0]
-        self.tables[voc] = self.tables[voc].sort_values(by='Date_de_creation', ascending=True)
+        self.tables[voc] = self.tables[voc].sort_values(by='creation_date', ascending=True)
         self.tables[voc]['taux'] = self.tables[voc]['taux'].replace(r',', r'.', regex=True)
         self.tables[voc]['taux'] = self.tables[voc]['taux'].astype(float)
         if 'bad_word' not in self.tables[voc].columns:
@@ -204,7 +204,7 @@ class Test(Interro):
         """Launch the vocabulary interoooooo !!!!"""
         self.set_interro_df()
         for i, index in enumerate(self.interro_df.index):
-            row = self.interro_df.loc[index]
+            row = list(self.interro_df.loc[index])
             word_guessed = self.guesser.guess_word(row, i+1, self.words)
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)

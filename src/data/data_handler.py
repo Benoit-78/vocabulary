@@ -4,13 +4,13 @@
 
 import json
 from datetime import datetime
+from typing import Dict
 from typing import List
 import mysql.connector as mariadb
 import pandas as pd
 from sqlalchemy import create_engine
-from loguru import logger
 
-from typing import Dict
+from loguru import logger
 
 import utils
 
@@ -126,7 +126,6 @@ class MariaDBHandler():
             logger.warning(f"Mode: {self.mode}")
             logger.error(f"Mode should be in {self.hosts}")
         else:
-            logger.debug(self.params['Database'])
             self.config['host'] = self.params['Database']['host'][self.mode]
         self.connection = mariadb.connect(**self.config)
         self.cursor = self.connection.cursor()
@@ -148,8 +147,8 @@ class MariaDBHandler():
     def get_words_from_test_type(self, row: list):
         """Common method used by all 4 CRUD operations"""
         [words_table_name, _, _, _] = self.get_tables_names()
-        english = row[0]
-        native = row[1]
+        english = row[row.columns[0]]
+        native = row[row.columns[1]]
         return [words_table_name, english, native]
 
     # Table-level operations
@@ -200,11 +199,12 @@ class MariaDBHandler():
     def create(self, row: list):
         """Add a word to the table"""
         # Create request string
-        today = datetime.now()
-        table_name, english, native = self.get_words_from_test_type(row)
-        # columns = tuple()
+        today = datetime.today().date()
+        table_name = 'vocabulary' + '.' + 'version_voc'
+        english = row[0]
+        native = row[1]
         request_1 = f"INSERT INTO {table_name} (english, français, creation_date, nb, score, taux)"
-        request_2 = f"VALUES ({english}, {native}, {today}, 0, 0, 0);"
+        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2])
         # Execute request
         self.set_database_cred()

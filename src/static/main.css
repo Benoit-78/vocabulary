@@ -80,3 +80,19 @@ button {
     color: #0055a4;
     font-weight: bold;
 }
+
+
+/* ================================== */
+/*  Q U I T   B U T T O N             */
+/* ================================== */
+.quit-button {
+    margin-left: auto;
+}
+
+.left-align {
+    text-align: left;
+}
+
+.rattraps_button {
+    font-size: 20px;
+}

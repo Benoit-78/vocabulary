@@ -1,8 +1,3 @@
-function goToRoot() {
-    window.location.href = '/';
-}
-
-
 document.addEventListener(
     "DOMContentLoaded",
     function () {
@@ -22,7 +17,7 @@ function sendUserSettings(testType, numWords) {
         }),
     })
     .then(answer => answer.json())
-    .then(numWords => {
+    .then(data => {
         startTest(numWords)
     })
     .catch(error => {
