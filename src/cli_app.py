@@ -6,7 +6,7 @@
 
 import interro
 from data import data_handler
-import views_local
+import views
 
 
 def cli_main():
@@ -23,7 +23,7 @@ def cli_main():
     )
     loader.load_tables()
     # WeuuAaaInterrooo !!!
-    guesser = views_local.CliGuesser()
+    guesser = views.CliGuesser()
     test = interro.Test(
         loader.tables[loader.test_type + '_voc'],
         user.settings.words,

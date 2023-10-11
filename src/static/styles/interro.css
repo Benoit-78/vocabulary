@@ -1,0 +1,28 @@
+
+/*  P R O G R E S S   B A R  */
+
+.progress-container {
+    width: 100%;
+    background-color: #ddd;
+    height: 10px;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    width: 1%;
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease-in-out;
+}
+
+.progress-bar.full {
+    width: 47%;
+}
+
+
+/*  D R O P D O W N S  */
+
+.dropdown-container {
+    width: 150px;
+    margin-bottom: 10px;
+}
