@@ -1,11 +1,10 @@
 """
-    Main purpose: user interface on local host.
+    Main purpose: user local interface, for CLI.
 """
 
-
-from typing import List
 from tkinter import messagebox
 from loguru import logger
+
 
 
 class CliGuesser():

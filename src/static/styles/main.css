@@ -1,4 +1,3 @@
-/* General-purpose CSS file */
 
 body {
     font-family: Arial, sans-serif;
@@ -17,22 +16,6 @@ label {
 }
 
 
-input {
-    padding: 5px;
-    margin-bottom: 10px;
-    width: 100%;
-}
-
-
-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-
 .container {
     text-align: center;
     padding: 20px;
@@ -44,6 +27,17 @@ button {
     align-items: center;
     margin-bottom: 10px;
 }
+
+.left-align {
+    text-align: left;
+}
+
+
+/*   _____   */
+/*  /_   _\  */
+/* | o , o | */
+/*  \  _  /  */
+
 
 .box {
     border: 1px solid #ccc;
@@ -62,10 +56,6 @@ button {
     align-items: center;
 }
 
-.middle_button {
-    width: 200px;
-}
-
 .flag {
     font-size: 20px;
     margin-right: 5px;
@@ -81,18 +71,8 @@ button {
     font-weight: bold;
 }
 
-
-/* ================================== */
-/*  Q U I T   B U T T O N             */
-/* ================================== */
-.quit-button {
-    margin-left: auto;
-}
-
-.left-align {
-    text-align: left;
-}
-
-.rattraps_button {
-    font-size: 20px;
+input {
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
 }

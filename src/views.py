@@ -2,8 +2,8 @@
     Main purpose: user web interface.
 """
 
-
 from typing import List
+
 
 
 class FastapiGuesser():

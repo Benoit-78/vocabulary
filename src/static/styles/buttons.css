@@ -1,0 +1,41 @@
+
+.button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 10px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.button.green {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.button.green:hover {
+    background-color: #3d8b40;
+}
+
+.button.red {
+    background-color: #f44336;
+    color: white;
+}
+
+.button.red:hover {
+    background-color: #c93b34;
+}
+
+.middle_button {
+    width: 200px;
+}
+
+.quit-button {
+    margin-left: auto;
+}
+
+.rattraps_button {
+    font-size: 20px;
+}
