@@ -33,4 +33,5 @@ COPY tests/ ./tests/
 
 # Run the service
 WORKDIR /app/src
-CMD ["uvicorn", "web_app:app", "--reload", "--host", "0.0.0.0", "--port", "80"]
+# CMD ["uvicorn", "web_app:app", "--reload", "--host", "0.0.0.0", "--port", "80"]
+CMD uvicorn web:app --reload --host 0.0.0.0 --port 80
