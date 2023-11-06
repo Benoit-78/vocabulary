@@ -22,4 +22,4 @@ services:             # Define the services (containers) that make up the applic
       MYSQL_USER: benito
       MYSQL_PASSWORD: benito_voc89
     volumes:
-      - ./data/vocabulary.sql:/docker-entrypoint-initdb.d/vocabulary.sql
+      - ./data/init-script.sql:/docker-entrypoint-initdb.d/init-script.sql

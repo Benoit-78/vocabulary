@@ -9,12 +9,12 @@ spec:
 
   selector: # Defines how the Deployment selects which pods to manage.
     matchLabels:
-      app: vocabulary # Selects pods with the label 'app' set to 'vocabulary'.
+      app: vocabulary_web # Selects pods with the label 'app' set to 'vocabulary'.
 
   template: # Defines the structure of the pods that will be created.
     metadata:
       labels:
-        app: vocabulary # Sets the label of the pods to 'vocabulary'.
+        app: vocabulary_web # Sets the label of the pods to 'vocabulary'.
     spec:
       containers:
         - name: vocabulary-container

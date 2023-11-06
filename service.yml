@@ -6,7 +6,7 @@ metadata:
 
 spec:
   selector:
-    app: vocabulary # Selects pods with the label 'app' set to 'vocabulary'.
+    app: vocabulary_web # Selects pods with the label 'app' set to 'vocabulary'.
 
   ports: # Defines the ports that the Service will expose.
     - protocol: TCP # Specifies the protocol (TCP in this case).
