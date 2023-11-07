@@ -28,7 +28,6 @@ RUN rm requirements.txt
 COPY conf/cred.json ./conf/
 COPY data/vocabulary.sql /docker-entrypoint-initdb.d/
 COPY src/ ./src/
-COPY tests/ ./tests/
 
 
 # Run the service
