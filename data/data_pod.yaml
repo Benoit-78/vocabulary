@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: data_pod
+  labels:
+    app: vocabulary
+    type: back-end
+
+spec:
+  containers:
+  - name: mariadb
+    image: mariadb:latest
+    resources:
+      requests:
+        memory: "256 Mi"
+        cpu: "500m"
+      limits:
+        memory: "512Mi"
+        cpu: "1"
+    ports:
+      - containerPort: 3306
