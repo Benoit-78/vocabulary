@@ -17,5 +17,6 @@ src/data/__pycache__/
 token.txt
 cred.json
 nltk_tries_out.py
+common/secret.yaml
 *.exe
 *.pyc

@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: vocabulary
   name: voc-deployment
   labels:
     app: vocabulary
@@ -21,10 +22,14 @@ spec:
         image: delormebenoit/vocabulary_web:v1.0
         ports:
           - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /get_started
+            port: 80
         resources:
           requests:
             memory: "256Mi"
             cpu: "500m"
           limits:
             memory: "512Mi"
-            cpu: "1000m"
+            cpu: "1"
