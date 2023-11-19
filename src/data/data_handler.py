@@ -27,13 +27,13 @@ class CsvHandler():
     # Table-level operations
     def set_paths(self):
         """List paths to data csv."""
-        self.paths['voc'] = self.os_sep.join(
+        self.paths[self.test_type + '_voc'] = self.os_sep.join(
             [r'.', 'data', self.test_type + '_voc.csv']
         )
-        self.paths['perf'] = self.os_sep.join(
+        self.paths[self.test_type + '_perf'] = self.os_sep.join(
             [r'.', 'data', self.test_type + '_perf.csv']
         )
-        self.paths['word_cnt'] = self.os_sep.join(
+        self.paths[self.test_type + '_word_cnt'] = self.os_sep.join(
             [r'.', 'data', self.test_type + '_words_count.csv']
         )
         if self.test_type == 'version':
@@ -47,10 +47,26 @@ class CsvHandler():
     def set_tables(self):
         """Load the different tables necessary to the app."""
         self.set_paths()
-        self.tables['voc'] = pd.read_csv(self.paths['voc'], sep=';', encoding='utf-8')
-        self.tables['perf'] = pd.read_csv(self.paths['perf'], sep=';', encoding='utf-8')
-        self.tables['word_cnt'] = pd.read_csv(self.paths['word_cnt'], sep=';', encoding='utf-8')
-        self.tables['output'] = pd.read_csv(self.paths['output'], sep=';', encoding='utf-8')
+        self.tables[self.test_type + '_voc'] = pd.read_csv(
+            self.paths[self.test_type + '_voc'],
+            sep=';',
+            encoding='utf-8'
+        )
+        self.tables[self.test_type + '_perf'] = pd.read_csv(
+            self.paths[self.test_type + '_perf'],
+            sep=';',
+            encoding='utf-8'
+        )
+        self.tables[self.test_type + '_word_cnt'] = pd.read_csv(
+            self.paths[self.test_type + '_word_cnt'],
+            sep=';',
+            encoding='utf-8'
+        )
+        self.tables['output'] = pd.read_csv(
+            self.paths['output'],
+            sep=';',
+            encoding='utf-8'
+        )
 
     def get_paths(self) -> Dict[str, str]:
         """Return the paths"""

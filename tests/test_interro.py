@@ -182,10 +182,10 @@ class TestTest(unittest.TestCase):
         words_df.loc[words_df.shape[0]] = ['Nine', 'Neuf']
         words_df.loc[words_df.shape[0]] = ['Ten', 'Dix']
         words_df['Query'] = [0] * words_df.shape[0]
-        words_df['nb'] = [0] * words_df.shape[0]
-        words_df['score'] = [0] * words_df.shape[0]
-        words_df['taux'] = [0] * words_df.shape[0]
-        words_df['bad_word'] = [0] * words_df.shape[0]
+        words_df['Nb'] = [0] * words_df.shape[0]
+        words_df['Score'] = [0] * words_df.shape[0]
+        words_df['Taux'] = [0] * words_df.shape[0]
+        words_df['Bad_word'] = [0] * words_df.shape[0]
         words = words_df.shape[0] //  2
         guesser = views_local.CliGuesser()
         cls.interro_1 = interro.Test(words_df, words, guesser)
@@ -322,9 +322,9 @@ class TestTest(unittest.TestCase):
         self.interro_1.update_voc_df(word_guessed)
         new_row = self.interro_1.words_df.loc[self.interro_1.index]
         # Assert
-        self.assertEqual(new_row['nb'], old_row['nb'] + 1)
-        self.assertEqual(new_row['score'], old_row['score'] + 1)
-        self.assertGreater(new_row['taux'], old_row['taux'])
+        self.assertEqual(new_row['Nb'], old_row['Nb'] + 1)
+        self.assertEqual(new_row['Score'], old_row['Score'] + 1)
+        self.assertGreater(new_row['Taux'], old_row['Taux'])
         self.assertEqual(new_row['Query'], old_row['Query'] + 1)
 
     def test_update_voc_df_failure(self):
@@ -339,9 +339,9 @@ class TestTest(unittest.TestCase):
         self.interro_1.update_voc_df(word_guessed)
         new_row = self.interro_1.words_df.loc[self.interro_1.index]
         # Assert
-        self.assertEqual(new_row['nb'], old_row['nb'] + 1)
-        self.assertEqual(new_row['score'], old_row['score'] - 1)
-        self.assertLess(new_row['taux'], old_row['taux'])
+        self.assertEqual(new_row['Nb'], old_row['Nb'] + 1)
+        self.assertEqual(new_row['Score'], old_row['Score'] - 1)
+        self.assertLess(new_row['Taux'], old_row['Taux'])
         self.assertEqual(new_row['Query'], old_row['Query'] + 1)
 
     def test_compute_success_rate(self):
@@ -375,21 +375,12 @@ class TestUpdater(unittest.TestCase):
         """Run once before all tests."""
         rattraps = 1
         cls.user_1 = interro.CliUser()
-        cls.user_2 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.user_2.parse_arguments(['-t', 'theme'])
-        cls.data_handler_1 = data_handler.MariaDBHandler(
-            cls.user_1.settings.type,
-            'cli',
-            'English'
-        )
-        cls.data_handler_2 = data_handler.MariaDBHandler(
-            cls.user_2.settings.type,
-            'cli',
-            'English'
+        cls.data_handler_1 = data_handler.CsvHandler(
+            cls.user_1.settings.type
         )
         cls.loader_1 = interro.Loader(rattraps, cls.data_handler_1)
-        cls.loader_2 = interro.Loader(rattraps, cls.data_handler_2)
+        cls.loader_1.load_tables()
         words_df = pd.DataFrame(columns=['English', 'Français'])
         words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
         words_df.loc[words_df.shape[0]] = [
@@ -407,20 +398,20 @@ class TestUpdater(unittest.TestCase):
         words_df.loc[words_df.shape[0]] = ['Nine', 'Neuf']
         words_df.loc[words_df.shape[0]] = ['Ten', 'Dix']
         words_df['Query'] = [0] * words_df.shape[0]
-        words_df['nb'] = [0] * words_df.shape[0]
-        words_df['score'] = [0] * words_df.shape[0]
-        words_df['taux'] = [0] * words_df.shape[0]
-        words_df['bad_word'] = [0] * words_df.shape[0]
+        words_df['Nb'] = [0] * words_df.shape[0]
+        words_df['Score'] = [0] * words_df.shape[0]
+        words_df['Taux'] = [0] * words_df.shape[0]
+        words_df['Bad_word'] = [0] * words_df.shape[0]
         words = 10
         cls.guesser = views_local.CliGuesser()
         cls.interro_1 = interro.Test(words_df, words, cls.guesser)
-        # cls.interro_2 = interro.Test(words_df, words, cls.guesser)
         cls.updater_1 = interro.Updater(cls.loader_1, cls.interro_1)
-        # cls.updater_2 = interro.Updater(cls.loader_2, cls.interro_2)
 
-    def test_get_known_words(self):
+    def test_set_known_words(self):
         """Should flag the words that have been guessed sufficiently enough."""
         # Arrange
+        if 'img_good' in self.interro_1.words_df.columns:
+            self.interro_1.words_df = self.interro_1.words_df.drop('img_good', axis=1)
         old_columns = list(self.interro_1.words_df.columns)
         # Act
         self.updater_1.set_known_words()
@@ -438,6 +429,10 @@ class TestUpdater(unittest.TestCase):
         self.assertIsInstance(self.updater_1.output_table_name, str)
         self.assertIn(self.updater_1.output_table_name, ['theme_voc', 'archive'])
 
-    def test_copy_well_known_words(self):
+    def test_copy_known_words(self):
         """Should copy the well known words in the output table."""
-        
+        # Arrange
+        # Act
+        self.updater_1.copy_known_words()
+        # Assert
+

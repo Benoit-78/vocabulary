@@ -1,22 +1,22 @@
 """
-    Author: Benoît DELORME
-    Decoupling date: 26th August 2023
-    Main purpose: vocabulary application in its FastAPI version.
+    Author:
+        Benoît DELORME
+    Decoupling date:
+        26th August 2023
+    Main purpose:
+        Vocabulary application in its FastAPI version.
 """
 
 import pandas as pd
-
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-from data import data_handler
 import interro
 import views
-
+from data import data_handler
 
 app = FastAPI()
 LANGUAGE = 'zhongwen'

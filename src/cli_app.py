@@ -5,8 +5,8 @@
 """
 
 import interro
-from data import data_handler
 import views_local
+from data import data_handler
 
 
 def cli_main():

@@ -58,7 +58,15 @@ class TestCsvHandler(unittest.TestCase):
             self.assertIsInstance(csv_handler.tables, dict)
             self.assertEqual(len(csv_handler.tables), 4)
             for df_name, dataframe in csv_handler.tables.items():
-                self.assertIn(df_name, ['voc', 'perf', 'word_cnt', 'output'])
+                self.assertIn(
+                    df_name,
+                    [
+                        csv_handler.test_type + '_voc',
+                        csv_handler.test_type + '_perf',
+                        csv_handler.test_type + '_word_cnt',
+                        'output'
+                    ]
+                )
                 self.assertIsInstance(dataframe, type(pd.DataFrame()))
                 self.assertGreater(dataframe.shape[1], 0)
         os.chdir('tests')

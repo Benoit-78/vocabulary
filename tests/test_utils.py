@@ -6,6 +6,7 @@ import unittest
 import sys
 import logging
 from unittest.mock import patch, MagicMock
+import pandas as pd
 
 sys.path.append('..\\')
 from src import utils
@@ -57,3 +58,13 @@ class TestUtils(unittest.TestCase):
         elif os_type in ['Linux', 'Android', 'Mac']:
             self.assertEqual(os_sep, '/')
         # Sad paths
+
+    def test_complete_columns(self):
+        """"""
+        # Arrange
+        df_1 = pd.DataFrame(columns=['col1', 'col2', 'col3'])
+        df_2 = pd.DataFrame(columns=['col1', 'col4'])
+        # Act
+        df_1 = utils.complete_columns(df_1, df_2)
+        # Assert
+        self.assertIn('col4', df_1)

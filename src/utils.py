@@ -3,9 +3,9 @@
 """
 
 import platform
-from loguru import logger
-from typing import List
+
 import pandas as pd
+from loguru import logger
 
 
 def get_os_type():
@@ -31,14 +31,12 @@ def get_os_separator():
     return os_sep
 
 
-def complete_columns(df_2: pd.DataFrame, df_1: pd.DataFrame):
+def complete_columns(df_1: pd.DataFrame, df_2: pd.DataFrame):
     """
     Guarantee that the well_known_words dataframe contains exactly
     the columns of the output dataframe
     """
-    known_words_cols = df_1.columns
-    output_columns = df_2.columns
-    missing_columns = set(output_columns).difference(set(known_words_cols))
+    missing_columns = set(df_1.columns).difference(set(df_2.columns))
     for column in missing_columns:
-        df_1[column] = [0] * df_1.shape[0]
-    return df_1
+        df_2[column] = [0] * df_2.shape[0]
+    return df_2
