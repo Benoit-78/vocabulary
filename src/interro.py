@@ -154,11 +154,12 @@ class Test(Interro):
         """The word must not have been already asked."""
         logger.debug("----------")
         next_index = random.randint(1, self.words_df.shape[0] - 1)
+        next_index = max(next_index, 1)
         already_asked = self.words_df.loc[next_index, 'Query'] == 1
         i = 0
-        while already_asked and i < self.words_df.shape[0] + 1:
+        while already_asked and i < (self.words_df.shape[0] + 1):
             next_index = random.randint(1, self.words_df.shape[0] - 1)
-            logger.debug(f"row: {list(self.words_df.loc[next_index])}")
+            next_index = max(next_index, 1)
             already_asked = self.words_df.loc[next_index, 'Query'] == 1
             i += 1
         if i >= self.words_df.shape[0]:
@@ -223,7 +224,7 @@ class Test(Interro):
         self.set_interro_df()
         for i, index in enumerate(self.interro_df.index):
             row = list(self.interro_df.loc[index])
-            word_guessed = self.guesser.guess_word(row, i+1, self.words)
+            word_guessed = self.guesser.guess_word(row, i + 1, self.words)
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)
         self.compute_success_rate()
@@ -273,23 +274,25 @@ class Updater():
         self.well_known_words = pd.DataFrame()
         self.output_table_name = ''
 
-    def get_known_words(self):
+    def set_known_words(self):
         """Identify the words that have been sufficiently guessed."""
         self.interro.words_df['img_good'] = ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['nb']
         self.well_known_words = self.interro.words_df[
             self.interro.words_df['taux'] >= self.interro.words_df['img_good']
         ]
 
-    def get_output_table_name(self):
+    def set_output_table_name(self):
         """Get output table name."""
-        test_types = ['version', 'theme']
-        test_types.remove(self.loader.test_type)
-        self.output_table_name = test_types[0] + '_voc'
+        output_dict = {
+            'version': 'theme_voc',
+            'theme': 'archives'
+        }
+        self.output_table_name = output_dict[self.loader.test_type]
 
     def copy_well_known_words(self):
         """Copy the well-known words in the next step table"""
-        self.get_known_words()
-        self.get_output_table_name()
+        self.set_known_words()
+        self.set_output_table_name()
         output_col = self.loader.tables[self.output_table_name].columns
         well_known_words_col = self.well_known_words.columns
         missing_columns = set(output_col).difference(set(well_known_words_col))

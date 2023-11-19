@@ -35,7 +35,10 @@ class TestUtils(unittest.TestCase):
         # Assert
         self.assertEqual(os_type, 'Windows')
 
-    @patch('platform.platform', return_value='Linux-4.15.0-65-generic-x86_64-with-Ubuntu-18.04-bionic')
+    @patch(
+        'platform.platform',
+        return_value='Linux-4.15.0-65-generic-x86_64-with-Ubuntu-18.04-bionic'
+    )
     def test_get_os_type_linux(self, mock_platform):
         """Linux should be recognized a valid OS."""
         # Act

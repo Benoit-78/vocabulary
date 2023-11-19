@@ -9,14 +9,9 @@
 
 import unittest
 from unittest.mock import patch
-import pytest
+import sys
 import numpy as np
 import pandas as pd
-import random
-import argparse
-from io import StringIO
-import sys
-import os
 from loguru import logger
 
 sys.path.append('..\\')
@@ -60,9 +55,9 @@ class TestParser(unittest.TestCase):
         # assert result.type == 'theme'
         # assert result.rattraps is None
         # ### Sad paths
-        pass
 
     def test_get_settings(self):
+        """Should save the user's settings as attributes."""
         # ### Happy paths
         # # Test case 1
         # for test_kind in ['version', 'theme']:
@@ -85,7 +80,6 @@ class TestParser(unittest.TestCase):
         # args = argparse.Namespace(type="invalid", words=10, rattraps=1)
         # with pytest.raises(SystemExit):
         #     interro.check_args(args)
-        pass
 
 
 
@@ -187,15 +181,15 @@ class TestTest(unittest.TestCase):
         words_df.loc[words_df.shape[0]] = ['Eight', 'Huit']
         words_df.loc[words_df.shape[0]] = ['Nine', 'Neuf']
         words_df.loc[words_df.shape[0]] = ['Ten', 'Dix']
+        words_df['Query'] = [0] * words_df.shape[0]
+        words_df['nb'] = [0] * words_df.shape[0]
+        words_df['score'] = [0] * words_df.shape[0]
+        words_df['taux'] = [0] * words_df.shape[0]
+        words_df['bad_word'] = [0] * words_df.shape[0]
         words = words_df.shape[0] //  2
         guesser = views_local.CliGuesser()
         cls.interro_1 = interro.Test(words_df, words, guesser)
         cls.interro_1.step = 1
-        cls.interro_1.words_df['Query'] = [0] * cls.interro_1.words_df.shape[0]
-        cls.interro_1.words_df['nb'] = [0] * cls.interro_1.words_df.shape[0]
-        cls.interro_1.words_df['score'] = [0] * cls.interro_1.words_df.shape[0]
-        cls.interro_1.words_df['taux'] = [0] * cls.interro_1.words_df.shape[0]
-        cls.interro_1.words_df['bad_word'] = [0] * cls.interro_1.words_df.shape[0]
 
     def test_set_row(self):
         """
@@ -363,10 +357,71 @@ class TestTest(unittest.TestCase):
         self.assertLess(self.interro_1.perf, 101)
         self.assertGreater(self.interro_1.perf, -1)
 
+
+
 class TestRattrap(unittest.TestCase):
     """Tests on Rattrap class methods."""
 
 
 
-class TestGraphiques(unittest.TestCase):
-    """Tests on Rattrap class methods."""
+class TestUpdater(unittest.TestCase):
+    """
+    Should save the user's guesses in the database, after having processed the dataset so as to: 
+    - flag bad words;
+    - and remove good words.
+    """
+    @classmethod
+    def setUpClass(cls):
+        """Run once before all tests."""
+        rattraps = 1
+        cls.user = interro.CliUser()
+        cls.user.parse_arguments(['-t', 'version'])
+        cls.data_handler = data_handler.MariaDBHandler(
+            cls.user.settings.type,
+            'cli',
+            'English'
+        )
+        cls.loader = interro.Loader(rattraps, cls.data_handler)
+        words_df = pd.DataFrame(columns=['English', 'Français'])
+        words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
+        words_df.loc[words_df.shape[0]] = [
+            'Do you want to dance with me?',
+            'M\'accorderiez-vous cette danse ?'
+        ]
+        words_df.loc[words_df.shape[0]] = ['One', 'Un']
+        words_df.loc[words_df.shape[0]] = ['Two', 'Deux']
+        words_df.loc[words_df.shape[0]] = ['Three', 'Trois']
+        words_df.loc[words_df.shape[0]] = ['Four', 'Quatre']
+        words_df.loc[words_df.shape[0]] = ['Cinq', 'Cinq']
+        words_df.loc[words_df.shape[0]] = ['Six', 'Six']
+        words_df.loc[words_df.shape[0]] = ['Seven', 'Sept']
+        words_df.loc[words_df.shape[0]] = ['Eight', 'Huit']
+        words_df.loc[words_df.shape[0]] = ['Nine', 'Neuf']
+        words_df.loc[words_df.shape[0]] = ['Ten', 'Dix']
+        words_df['Query'] = [0] * words_df.shape[0]
+        words_df['nb'] = [0] * words_df.shape[0]
+        words_df['score'] = [0] * words_df.shape[0]
+        words_df['taux'] = [0] * words_df.shape[0]
+        words_df['bad_word'] = [0] * words_df.shape[0]
+        words = 10
+        cls.guesser = views_local.CliGuesser()
+        cls.interro = interro.Test(words_df, words, cls.guesser)
+        cls.updater = interro.Updater(cls.loader, cls.interro)
+        cls.well_known_words = pd.DataFrame()
+        cls.output_table_name = ''
+
+    def test_get_known_words(self):
+        """Should flag the words that have been guessed sufficiently enough."""
+        # Arrange
+        old_columns = list(self.interro.words_df.columns)
+        # Act
+        self.updater.set_known_words()
+        # Assert
+        new_columns = list(self.interro.words_df.columns)
+        self.assertIn('img_good', new_columns)
+        self.assertEqual(len(new_columns), len(old_columns) + 1)
+        self.assertIsInstance(self.updater.well_known_words, pd.DataFrame)
+
+    def test_set_output_table_name(self):
+        """Should save the name of the output table as an atttribute."""
+        pass

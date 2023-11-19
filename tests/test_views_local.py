@@ -4,9 +4,8 @@
 
 import sys
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from tkinter import messagebox
-from loguru import logger
 
 sys.path.append('..\\')
 from src import views_local
@@ -29,7 +28,7 @@ class TestCliGuesser(unittest.TestCase):
 
     @patch('tkinter.messagebox.showinfo', return_value=True)
     def test_ask_word(self, mock_showinfo):
-        """"""
+        """Should ask the user a translation for the word proposed to him."""
         # Arrange
         title = "Test Title"
         # Act
@@ -44,6 +43,7 @@ class TestCliGuesser(unittest.TestCase):
     @patch('builtins.print')
     @patch('builtins.exit')
     def test_ask_word_user_interrupt(self, mock_print, mock_exit, mock_showinfo):
+        """User should be able to interrupt the test at anytime."""
         # Arrange
         title = "Test Title"
         with self.assertRaises(SystemExit):
