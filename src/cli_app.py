@@ -31,7 +31,7 @@ def cli_main():
         loader.tables[loader.test_type + '_words_count']
     )
     test.run()
-    # Rattraaaaaaap's !!!!
+    # Raaattraaaaaaap's !!!!
     rattrap = interro.Rattrap(
         test.faults_df,
         user.settings.rattraps,

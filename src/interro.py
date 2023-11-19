@@ -18,10 +18,12 @@ import pandas as pd
 import numpy as np
 from loguru import logger
 
+from src import utils
+
 STEEP_GOOD = -1.25
-ORDINATE_GOOD = 112.5
+ORD_GOOD = 112.5
 STEEP_BAD = 2.5
-ORDINATE_BAD = -125
+ORD_BAD = -125
 
 
 
@@ -50,7 +52,10 @@ class CliUser():
     def get_settings(self) -> argparse.Namespace:
         """Check the kind of interro, version or theme"""
         self.parse_arguments(sys.argv[1:])
-        if not self.settings.type or not self.settings.words or not self.settings.rattraps :
+        cond_1 = not self.settings.type
+        cond_2 = not self.settings.words
+        cond_3 = not self.settings.rattraps
+        if cond_1 or cond_2 or cond_3:
             message = ' '.join([
                 "Please give",
                 "-t <test type>, ",
@@ -89,8 +94,15 @@ class Loader():
         self.tables = self.data_handler.get_tables()
         voc = self.test_type + '_voc'
         self.tables[voc]['Query'] = [0] * self.tables[voc].shape[0]
-        self.tables[voc] = self.tables[voc].sort_values(by='creation_date', ascending=True)
-        self.tables[voc]['taux'] = self.tables[voc]['taux'].replace(r',', r'.', regex=True)
+        self.tables[voc] = self.tables[voc].sort_values(
+            by='creation_date',
+            ascending=True
+        )
+        self.tables[voc]['taux'] = self.tables[voc]['taux'].replace(
+            r',',
+            r'.',
+            regex=True
+        )
         self.tables[voc]['taux'] = self.tables[voc]['taux'].astype(float)
         if 'bad_word' not in self.tables[voc].columns:
             self.tables[voc]['bad_word'] = [0] * self.tables[voc].shape[0]
@@ -99,12 +111,7 @@ class Loader():
 
 class Interro(ABC):
     """Abstract class for interrooooo!!!! !!! !"""
-    def __init__(
-        self,
-        words_df_: pd.DataFrame,
-        words: int,
-        guesser
-        ):
+    def __init__(self, words_df_: pd.DataFrame, words: int, guesser):
         self.words_df = words_df_
         self.words = words
         self.guesser = guesser
@@ -131,14 +138,7 @@ class Interro(ABC):
 
 class Test(Interro):
     """First round"""
-    def __init__(
-        self,
-        words_df_,
-        words: int,
-        guesser,
-        perf_df_: pd.DataFrame=None,
-        words_cnt_df: pd.DataFrame=None,
-        ):
+    def __init__(self, words_df_, words: int, guesser, perf_df_=None, words_cnt_df=None):
         super().__init__(words_df_, int(words), guesser)
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
@@ -170,7 +170,7 @@ class Test(Interro):
 
     def get_next_index(self) -> int:
         """
-        If the word is NOT a bad word, it IS skipped, and another word is searched.
+        If the word is NOT a bad word, it IS skipped.
         This process happens only once, it is not a loop.
         If the word IS a bad word, it is NOT skipped.
         This way, bad words are asked twice as much as other words.
@@ -271,13 +271,13 @@ class Updater():
     def __init__(self, loader: Loader, interro: Interro):
         self.loader = loader
         self.interro = interro
-        self.well_known_words = pd.DataFrame()
+        self.known_words_df = pd.DataFrame()
         self.output_table_name = ''
 
     def set_known_words(self):
         """Identify the words that have been sufficiently guessed."""
-        self.interro.words_df['img_good'] = ORDINATE_GOOD + STEEP_GOOD * self.interro.words_df['nb']
-        self.well_known_words = self.interro.words_df[
+        self.interro.words_df['img_good'] = ORD_GOOD + STEEP_GOOD * self.interro.words_df['nb']
+        self.known_words_df = self.interro.words_df[
             self.interro.words_df['taux'] >= self.interro.words_df['img_good']
         ]
 
@@ -289,30 +289,31 @@ class Updater():
         }
         self.output_table_name = output_dict[self.loader.test_type]
 
-    def copy_well_known_words(self):
+    def copy_known_words(self):
         """Copy the well-known words in the next step table"""
         self.set_known_words()
         self.set_output_table_name()
-        output_col = self.loader.tables[self.output_table_name].columns
-        well_known_words_col = self.well_known_words.columns
-        missing_columns = set(output_col).difference(set(well_known_words_col))
-        for column in missing_columns:
-            self.well_known_words[column] = [0] * self.well_known_words.shape[0]
+        self.known_words_df = utils.complete_columns(
+            self.loader.tables[self.output_table_name],
+            self.known_words_df
+        )
         self.loader.tables[self.output_table_name] = pd.concat(
-            [self.loader.tables[self.output_table_name],
-            self.well_known_words]
+            [
+                self.loader.tables[self.output_table_name],
+                self.known_words_df
+            ]
         )
 
-    def transfer_well_known_words(self):
+    def transfer_known_words(self):
         """Transfer the well-known words in an ouput table, and save this."""
-        self.copy_well_known_words()
+        self.copy_known_words()
         self.loader.tables[self.output_table_name].reset_index(inplace=True)
         self.loader.data_handler.save_table(
             self.output_table_name,
             self.loader.tables[self.output_table_name]
         )
 
-    def delete_well_known_words(self) -> pd.DataFrame:
+    def delete_known_words(self) -> pd.DataFrame:
         """Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
         only under the author's dictatorial will."""
@@ -322,10 +323,13 @@ class Updater():
         self.interro.words_df.drop('img_good', axis=1, inplace=True)
 
     def flag_bad_words(self):
-        """Apply special flag to difficult words, i.e. words that are rarely guessed by the user."""
+        """
+        Apply special flag to difficult words,
+        i.e. words that are rarely guessed by the user.
+        """
         if 'img_bad' in self.interro.words_df.columns:
             self.interro.words_df.drop('img_bad', axis=1, inplace=True)
-        self.interro.words_df['img_bad'] = ORDINATE_BAD + STEEP_BAD * self.interro.words_df['nb']
+        self.interro.words_df['img_bad'] = ORD_BAD + STEEP_BAD * self.interro.words_df['nb']
         self.interro.words_df['bad_word'] = np.where(
             self.interro.words_df['taux'] < self.interro.words_df['img_bad'],
             1,
@@ -367,11 +371,19 @@ class Updater():
                 },
             index=[count_before + 1]
         )
-        self.interro.word_cnt_df = pd.concat([self.interro.word_cnt_df, new_row])
+        self.interro.word_cnt_df = pd.concat(
+            [
+                self.interro.word_cnt_df,
+                new_row
+            ]
+        )
         self.interro.word_cnt_df.sort_index(inplace=True)
         count_after = self.interro.word_cnt_df.shape[0]
         if count_after == count_before + 1:
-            self.interro.word_cnt_df.reset_index(inplace=True, names=['id_test'])
+            self.interro.word_cnt_df.reset_index(
+                inplace=True,
+                names=['id_test']
+            )
             self.loader.data_handler.save_table(
                 self.loader.test_type + '_words_count',
                 self.interro.word_cnt_df
@@ -381,8 +393,8 @@ class Updater():
 
     def update_data(self):
         """Main method of Updater class"""
-        self.transfer_well_known_words()
-        self.delete_well_known_words()
+        self.transfer_known_words()
+        self.delete_known_words()
         self.flag_bad_words()
         self.save_words()
         self.save_performances()

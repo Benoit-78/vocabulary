@@ -49,8 +49,6 @@ class TestCsvHandler(unittest.TestCase):
 
     def test_set_tables(self):
         """Data should be correctly loaded"""
-        # Arrange
-        os.chdir('..')
         # Act
         self.csv_handler_1.set_tables()
         self.csv_handler_2.set_tables()

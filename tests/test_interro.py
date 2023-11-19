@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-sys.path.append('..\\')
+sys.path.append('\\src')
 from src import interro
 from src import views_local
 from src.data import data_handler
@@ -374,14 +374,22 @@ class TestUpdater(unittest.TestCase):
     def setUpClass(cls):
         """Run once before all tests."""
         rattraps = 1
-        cls.user = interro.CliUser()
-        cls.user.parse_arguments(['-t', 'version'])
-        cls.data_handler = data_handler.MariaDBHandler(
-            cls.user.settings.type,
+        cls.user_1 = interro.CliUser()
+        cls.user_2 = interro.CliUser()
+        cls.user_1.parse_arguments(['-t', 'version'])
+        cls.user_2.parse_arguments(['-t', 'theme'])
+        cls.data_handler_1 = data_handler.MariaDBHandler(
+            cls.user_1.settings.type,
             'cli',
             'English'
         )
-        cls.loader = interro.Loader(rattraps, cls.data_handler)
+        cls.data_handler_2 = data_handler.MariaDBHandler(
+            cls.user_2.settings.type,
+            'cli',
+            'English'
+        )
+        cls.loader_1 = interro.Loader(rattraps, cls.data_handler_1)
+        cls.loader_2 = interro.Loader(rattraps, cls.data_handler_2)
         words_df = pd.DataFrame(columns=['English', 'Français'])
         words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
         words_df.loc[words_df.shape[0]] = [
@@ -405,23 +413,31 @@ class TestUpdater(unittest.TestCase):
         words_df['bad_word'] = [0] * words_df.shape[0]
         words = 10
         cls.guesser = views_local.CliGuesser()
-        cls.interro = interro.Test(words_df, words, cls.guesser)
-        cls.updater = interro.Updater(cls.loader, cls.interro)
-        cls.well_known_words = pd.DataFrame()
-        cls.output_table_name = ''
+        cls.interro_1 = interro.Test(words_df, words, cls.guesser)
+        # cls.interro_2 = interro.Test(words_df, words, cls.guesser)
+        cls.updater_1 = interro.Updater(cls.loader_1, cls.interro_1)
+        # cls.updater_2 = interro.Updater(cls.loader_2, cls.interro_2)
 
     def test_get_known_words(self):
         """Should flag the words that have been guessed sufficiently enough."""
         # Arrange
-        old_columns = list(self.interro.words_df.columns)
+        old_columns = list(self.interro_1.words_df.columns)
         # Act
-        self.updater.set_known_words()
+        self.updater_1.set_known_words()
         # Assert
-        new_columns = list(self.interro.words_df.columns)
+        new_columns = list(self.interro_1.words_df.columns)
         self.assertIn('img_good', new_columns)
         self.assertEqual(len(new_columns), len(old_columns) + 1)
-        self.assertIsInstance(self.updater.well_known_words, pd.DataFrame)
+        self.assertIsInstance(self.updater_1.known_words_df, pd.DataFrame)
 
     def test_set_output_table_name(self):
         """Should save the name of the output table as an atttribute."""
-        pass
+        # Act
+        self.updater_1.set_output_table_name()
+        # Assert
+        self.assertIsInstance(self.updater_1.output_table_name, str)
+        self.assertIn(self.updater_1.output_table_name, ['theme_voc', 'archive'])
+
+    def test_copy_well_known_words(self):
+        """Should copy the well known words in the output table."""
+        
