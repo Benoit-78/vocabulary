@@ -4,7 +4,7 @@
 
 from tkinter import messagebox
 from loguru import logger
-
+from typing import List
 
 
 class CliGuesser():
@@ -15,7 +15,7 @@ class CliGuesser():
         text_1 = f"Quelle traduction donnez-vous pour : {mot_etranger}?"
         user_answer = messagebox.showinfo(title=title, message=text_1)
         if user_answer is False:
-            print("# ERROR: Interruption by user")
+            logger.error("Interruption by user")
             raise SystemExit
 
     def get_user_answer(self, row: str, title: str) -> bool:
@@ -24,7 +24,7 @@ class CliGuesser():
         text_2 = f"Voici la traduction correcte : \'{mot_natal}\'. \nAviez-vous la bonne réponse ?"
         word_guessed = messagebox.askyesnocancel(title=title, message=text_2)
         if word_guessed is None:
-            print("# ERROR: Interruption by user")
+            logger.error("Interruption by user")
             raise SystemExit
         return word_guessed
 

@@ -93,13 +93,12 @@ CREATE TABLE IF NOT EXISTS voc (
 ------------------------------------------
 --  T A B L E S   P E R M I S S I O N S --
 ------------------------------------------
-GRANT INSERT, UPDATE ON vocabulary.theme_perf TO 'benito'@'db';
-GRANT INSERT, UPDATE ON vocabulary.theme_voc TO 'benito'@'db';
-GRANT INSERT, UPDATE ON vocabulary.theme_words_count TO 'benito'@'db';
-GRANT INSERT, UPDATE ON vocabulary.version_perf TO 'benito'@'db';
-GRANT INSERT, UPDATE ON vocabulary.version_voc TO 'benito'@'db';
-GRANT INSERT, UPDATE ON vocabulary.version_words_count TO 'benito'@'db';
-
+GRANT INSERT, UPDATE ON english.theme_perf TO 'benito'@'db';
+GRANT INSERT, UPDATE ON english.theme_voc TO 'benito'@'db';
+GRANT INSERT, UPDATE ON english.theme_words_count TO 'benito'@'db';
+GRANT INSERT, UPDATE ON english.version_perf TO 'benito'@'db';
+GRANT INSERT, UPDATE ON english.version_voc TO 'benito'@'db';
+GRANT INSERT, UPDATE ON english.version_words_count TO 'benito'@'db';
 
 
 -----------------------------------

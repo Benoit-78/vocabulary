@@ -19,6 +19,7 @@ import views
 
 
 app = FastAPI()
+LANGUAGE = 'zhongwen'
 test = None
 loader = None
 flag_data_updated = None
@@ -93,8 +94,8 @@ async def get_user_settings(settings: dict):
 
 def load_test(test_type, words):
     """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(test_type, 'container')
-    loader_ = interro.Loader(test_type, 0, db_handler)
+    db_handler = data_handler.MariaDBHandler(test_type, 'container', LANGUAGE)
+    loader_ = interro.Loader(0, db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
     test_ = interro.Test(
@@ -285,7 +286,7 @@ def data_page(request: Request):
 @app.post("/create-word")
 async def create_word(data: dict):
     """Save the word in the database."""
-    db_handler = data_handler.MariaDBHandler('version', 'container')
+    db_handler = data_handler.MariaDBHandler('version', 'container', LANGUAGE)
     english = data['english']
     french = data['french']
     if db_handler.create([english, french]) is True:

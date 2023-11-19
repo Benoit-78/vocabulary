@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    Author: B.Delorme
-    Mail: delormebenoit211@gmail.com
-    Creation date: 2nd March 2023
-    Main purpose: script containing the logic of the vocabulary application.
+    Creator:
+        B.Delorme
+    Creation date:
+        2nd March 2023
+    Main purpose:
+        Logic of the vocabulary application, including the interoooooo!!!!!
 """
 
 import random
@@ -15,7 +17,6 @@ from typing import List
 import pandas as pd
 import numpy as np
 from loguru import logger
-
 
 STEEP_GOOD = -1.25
 ORDINATE_GOOD = 112.5
@@ -75,12 +76,12 @@ class CliUser():
 
 class Loader():
     """Data loader"""
-    def __init__(self, test_type, rattraps, data_handler_):
+    def __init__(self, rattraps, data_handler_):
         """Must be done in the same session than the interroooo is launched"""
-        self.test_type = test_type
+        self.test_type = data_handler_.test_type
         self.rattraps = rattraps
-        self.tables = {}
         self.data_handler = data_handler_
+        self.tables = {}
         self.output_table = ''
 
     def load_tables(self):
@@ -101,7 +102,7 @@ class Interro(ABC):
     def __init__(
         self,
         words_df_: pd.DataFrame,
-        words,
+        words: int,
         guesser
         ):
         self.words_df = words_df_
@@ -109,17 +110,17 @@ class Interro(ABC):
         self.guesser = guesser
         self.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
         self.index = 1
+        self.row = []
 
     @abstractmethod
     def run(self):
         """Launch the interroooo !!!!"""
 
-    def get_row(self) -> pd.DataFrame:
+    def set_row(self) -> pd.DataFrame:
         """Get the row of the word to be asked"""
         mot_etranger = self.words_df.loc[self.index, self.words_df.columns[0]]
         mot_natal = self.words_df.loc[self.index, self.words_df.columns[1]]
-        row = [self.index, mot_etranger, mot_natal]
-        return row
+        self.row = [self.index, mot_etranger, mot_natal]
 
     def update_faults_df(self, word_guessed: bool, row: List[str]):
         """Save the faulty answers for the second test."""
@@ -151,28 +152,48 @@ class Test(Interro):
 
     def get_another_index(self) -> int:
         """The word must not have been already asked."""
-        next_index = (self.index + self.step) % self.words_df.shape[0]
+        logger.debug("----------")
+        next_index = random.randint(1, self.words_df.shape[0] - 1)
         already_asked = self.words_df.loc[next_index, 'Query'] == 1
-        title_row = next_index == 0
-        while already_asked or title_row:
-            next_index = (next_index + self.step) % self.words_df.shape[0]
+        i = 0
+        while already_asked and i < self.words_df.shape[0] + 1:
+            next_index = random.randint(1, self.words_df.shape[0] - 1)
+            logger.debug(f"row: {list(self.words_df.loc[next_index])}")
             already_asked = self.words_df.loc[next_index, 'Query'] == 1
-            title_row = next_index == 0
+            i += 1
+        if i >= self.words_df.shape[0]:
+            logger.error("Infinite loop stopped.")
+            raise RecursionError
+        self.words_df.loc[next_index, 'Query'] = 1
         return next_index
 
     def get_next_index(self) -> int:
         """
-        If the word is NOT a bad word, it is skipped and another word is searched.
-        This process is not a loop, it happens only once.
-        Bad words are not skipped: this way, they are asked twice as much as other words.
+        If the word is NOT a bad word, it IS skipped, and another word is searched.
+        This process happens only once, it is not a loop.
+        If the word IS a bad word, it is NOT skipped.
+        This way, bad words are asked twice as much as other words.
         """
+        logger.debug("--------------------")
         another_index = self.get_another_index()
         bad_word = self.words_df.loc[another_index, 'bad_word'] == 1
-        if not bad_word:
-            next_index = self.get_another_index()
-        else:
+        if bad_word:
             next_index = another_index
+        else:
+            self.words_df.loc[another_index, 'Query'] = 0
+            next_index = self.get_another_index()
         return next_index
+
+    def set_interro_df(self):
+        """Extract the words that will be asked."""
+        self.create_random_step()
+        self.index = self.step
+        for _ in range(1, self.words + 1):
+            self.index = self.get_next_index()
+            self.set_row()
+            self.interro_df.loc[self.row[0]] = self.row[1:]
+            logger.debug(self.row)
+        logger.debug(f"\n{self.interro_df}")
 
     def update_voc_df(self, word_guessed: bool):
         """Update the vocabulary dataframe"""
@@ -191,14 +212,11 @@ class Test(Interro):
         # Update Query
         self.words_df.loc[self.index, 'Query'] += 1
 
-    def set_interro_df(self):
-        """Extract the words that will be asked."""
-        self.create_random_step()
-        self.index = self.step
-        for _ in range(1, self.words + 1):
-            self.index = self.get_next_index()
-            row = self.get_row()
-            self.interro_df.loc[row[0]] = row[1:]
+    def compute_success_rate(self):
+        """Compute success rate."""
+        faults_total = self.faults_df.shape[0]
+        success_rate = int(100 * (1 - (faults_total / self.words)))
+        self.perf = success_rate
 
     def run(self):
         """Launch the vocabulary interoooooo !!!!"""
@@ -209,12 +227,6 @@ class Test(Interro):
             self.update_voc_df(word_guessed)
             self.update_faults_df(word_guessed, row)
         self.compute_success_rate()
-
-    def compute_success_rate(self):
-        """Compute success rate."""
-        faults_total = self.faults_df.shape[0]
-        success_rate = int(100 * (1 - (faults_total / self.words)))
-        self.perf = success_rate
 
 
 
@@ -235,9 +247,9 @@ class Rattrap(Interro):
         words_total = self.words_df.shape[0]
         for j in range(0, words_total):
             self.index = j
-            row = self.get_row()
-            word_guessed = self.guesser.guess_word(row, j+1, words_total)
-            self.update_faults_df(word_guessed, row)
+            self.set_row()
+            word_guessed = self.guesser.guess_word(self.row, j+1, words_total)
+            self.update_faults_df(word_guessed, self.row)
         self.words_df = self.faults_df.copy()
         self.faults_df.drop(self.faults_df.index, inplace=True)
 

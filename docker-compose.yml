@@ -1,7 +1,6 @@
 version: '3.9'        # Version of the Docker Compose file format
 
 services:             # Define the services (containers) that make up the application
-
   web:                # Service name for the web application
     build: .          # Use the Dockerfile in the current directory to build the image
     ports:            # List of ports to expose (host:container)
@@ -11,15 +10,15 @@ services:             # Define the services (containers) that make up the applic
     volumes:
       - ./src:/app/src
     command: uvicorn web_app:app --reload --host 0.0.0.0 --port 80
-
   db:                 # Service name for the database
-    image: mariadb:latest  # Use the latest official MariaDB image from Docker Hub
+    image: mariadb:latest  # latest MariaDB image from Docker Hub
     ports:
       - "3306:3306"
     environment:      # Set environment variables for the MariaDB container
       MYSQL_ROOT_PASSWORD: IBM-vocabulary7
-      MYSQL_DATABASE: vocabulary
+      MYSQL_DATABASE: zhongwen
       MYSQL_USER: benito
       MYSQL_PASSWORD: benito_voc89
     volumes:
-      - ./data/vocabulary.sql:/docker-entrypoint-initdb.d/vocabulary.sql
+      # - ./data/english.sql:/docker-entrypoint-initdb.d/english.sql
+      - ./data/zhongwen.sql:/docker-entrypoint-initdb.d/zhongwen.sql

@@ -9,10 +9,10 @@ from typing import List
 import mysql.connector as mariadb
 import pandas as pd
 from sqlalchemy import create_engine
-
+import os
 from loguru import logger
 
-import utils
+from src import utils
 
 
 
@@ -41,7 +41,7 @@ class CsvHandler():
         elif self.test_type == 'theme':
             self.paths['output'] = self.os_sep.join(['.', 'data', 'archives.csv'])
         else:
-            print("# ERROR: Wrong test_type argument:", self.test_type)
+            logger.error(f"Wrong test_type argument: {self.test_type}")
             raise SystemExit
 
     def set_tables(self):
@@ -97,36 +97,43 @@ class CsvHandler():
 
 class MariaDBHandler():
     """Provide with all methods necessary to interact with MariaDB database."""
-    def __init__(self, test_type: str, mode: str):
+    def __init__(self, test_type: str, mode: str, language_1: str):
+        if test_type not in ['version', 'theme']:
+            logger.error(f"Test type {test_type} incorrect, should be either version or theme.")
         self.test_type = test_type
         self.mode = mode
-        self.params = {}
+        self.language_1 = language_1
+        self.cred = {}
         self.config = {}
         self.connection = None
         self.cursor = None
         self.hosts = ['cli', 'web_local', 'container']
+        self.cols = {}
 
     # Common operations
     def set_database_cred(self):
         """Get credentials necessary for connection with vocabulary database."""
         os_sep = utils.get_os_separator()
-        cred_path = os_sep.join(['..', 'conf', 'cred.json'])
+        cred_path = os_sep.join(['', 'app', 'conf', 'cred.json'])
         with open(cred_path, 'rb') as cred_file:
-            self.params = json.load(cred_file)
+            self.cred = json.load(cred_file)
+        col_path = os_sep.join(['', 'app', 'conf', 'columns.json'])
+        with open(col_path, 'rb') as col_file:
+            self.cols = json.load(col_file)
 
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
         self.config = {
-            'user': self.params['Database']['user']['user_1']['name'],
-            'password': self.params['Database']['user']['user_1']['password'],
-            'database': self.params['Database']['database'],
-            'port': self.params['Database']['port']
+            'user': self.cred['user']['user_1']['name'],
+            'password': self.cred['user']['user_1']['password'],
+            'database': self.language_1.lower(),
+            'port': self.cred['port']
         }
         if self.mode not in self.hosts:
             logger.warning(f"Mode: {self.mode}")
             logger.error(f"Mode should be in {self.hosts}")
         else:
-            self.config['host'] = self.params['Database']['host'][self.mode]
+            self.config['host'] = self.cred['host'][self.mode]
         self.connection = mariadb.connect(**self.config)
         self.cursor = self.connection.cursor()
 
@@ -159,10 +166,13 @@ class MariaDBHandler():
         tables_names = self.get_tables_names()
         tables = {}
         for table_name in tables_names:
+            logger.debug(table_name)
             sql_request = f"SELECT * FROM {table_name}"
             self.cursor.execute(sql_request)
+            logger.debug(self.cols[self.language_1][table_name]["Columns"])
+            logger.debug(self.cursor.fetchall())
             tables[table_name] = pd.DataFrame(
-                columns=self.params["Tables"][table_name]["Columns"],
+                columns=self.cols[self.language_1][table_name]["Columns"],
                 data=self.cursor.fetchall()
             )
             index_col = tables[table_name].columns[0]
@@ -175,14 +185,14 @@ class MariaDBHandler():
         """Save given table."""
         self.set_database_cred()
         self.set_db_cursor()
-        table = table[self.params["Tables"][table_name]["Columns"]]
+        table = table[self.cols[self.language_1][table_name]["Columns"]]
         engine = create_engine(
             ''.join([
                 "mysql+pymysql",
                 "://", self.config['user'],
                 ':', self.config['password'],
                 '@', self.config['host'],
-                '/', self.config['database']
+                '/', self.language_1.lower()
             ])
         )
         table.to_sql(
@@ -200,7 +210,7 @@ class MariaDBHandler():
         """Add a word to the table"""
         # Create request string
         today = datetime.today().date()
-        table_name = 'vocabulary' + '.' + 'version_voc'
+        table_name = self.language_1 + '.' + 'version_voc'
         english = row[0]
         native = row[1]
         request_1 = f"INSERT INTO {table_name} (english, français, creation_date, nb, score, taux)"

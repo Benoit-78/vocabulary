@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vocabulary-service
+
+spec:
+  type: LoadBalancer
+  ports: # Defines the ports that the Service will expose.
+    - targetPort: 80 # port to forward to on the pods.
+      port: 80 # port on which the Service will be available.
+      protocol: TCP
+  selector:
+    app: vocabulary # Selects pods with the label 'app' set to 'vocabulary'.
