@@ -421,18 +421,16 @@ class TestUpdater(unittest.TestCase):
         self.assertEqual(len(new_columns), len(old_columns) + 1)
         self.assertIsInstance(self.updater_1.known_words_df, pd.DataFrame)
 
-    def test_set_output_table_name(self):
-        """Should save the name of the output table as an atttribute."""
-        # Act
-        self.updater_1.set_output_table_name()
-        # Assert
-        self.assertIsInstance(self.updater_1.output_table_name, str)
-        self.assertIn(self.updater_1.output_table_name, ['theme_voc', 'archive'])
-
     def test_copy_known_words(self):
         """Should copy the well known words in the output table."""
         # Arrange
+        old_output_shape = self.loader_1.tables['output'].shape
+        good_words = self.updater_1.known_words_df.shape[0]
         # Act
         self.updater_1.copy_known_words()
         # Assert
+        new_output_shape = self.loader_1.tables['output'].shape
+        self.assertEqual(new_output_shape[0], old_output_shape[0] + good_words)
 
+    def test_transfer_known_words(self):
+        """"""

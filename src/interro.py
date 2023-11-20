@@ -273,7 +273,6 @@ class Updater():
         self.loader = loader
         self.interro = interro
         self.known_words_df = pd.DataFrame()
-        self.output_table_name = ''
 
     def set_known_words(self):
         """Identify the words that have been sufficiently guessed."""
@@ -282,37 +281,30 @@ class Updater():
             self.interro.words_df['Taux'] >= self.interro.words_df['img_good']
         ]
 
-    def set_output_table_name(self):
-        """Get output table name."""
-        output_dict = {
-            'version': 'theme_voc',
-            'theme': 'archives'
-        }
-        self.output_table_name = output_dict[self.loader.test_type]
-
     def copy_known_words(self):
-        """Copy the well-known words in the next step table"""
+        """Copy the well-known words in the next step table."""
         self.set_known_words()
-        self.set_output_table_name()
-        logger.debug(f"Tables: \n{self.loader.tables}")
+        logger.debug(self.known_words_df.shape)
         self.known_words_df = utils.complete_columns(
-            self.loader.tables[self.output_table_name],
+            self.loader.tables['output'],
             self.known_words_df
         )
-        self.loader.tables[self.output_table_name] = pd.concat(
+        logger.debug(self.known_words_df.shape)
+        self.loader.tables['output'] = pd.concat(
             [
-                self.loader.tables[self.output_table_name],
+                self.loader.tables['output'],
                 self.known_words_df
             ]
         )
+        logger.debug(self.loader.tables['output'].shape)
 
     def transfer_known_words(self):
         """Transfer the well-known words in an ouput table, and save this."""
         self.copy_known_words()
-        self.loader.tables[self.output_table_name].reset_index(inplace=True)
+        self.loader.tables['output'].reset_index(inplace=True)
         self.loader.data_handler.save_table(
-            self.output_table_name,
-            self.loader.tables[self.output_table_name]
+            'output',
+            self.loader.tables['output']
         )
 
     def delete_known_words(self) -> pd.DataFrame:

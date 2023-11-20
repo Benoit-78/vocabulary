@@ -70,3 +70,29 @@ class TestCsvHandler(unittest.TestCase):
                 self.assertIsInstance(dataframe, type(pd.DataFrame()))
                 self.assertGreater(dataframe.shape[1], 0)
         os.chdir('tests')
+
+    def test_save_table(self):
+        """Should save the table as a csv file."""
+        # Arrange
+        csv_handler = data_handler.CsvHandler('version')
+        csv_handler.set_paths()
+        old_df = pd.DataFrame(columns=['words', 'integers', 'floats', 'booleans'])
+        old_df.loc[old_df.shape[0]] = ['a', 0, 0.0, True]
+        old_df.loc[old_df.shape[0]] = ['b', 1, 1.0, False]
+        old_df.loc[old_df.shape[0]] = ['c', 2, 2.0, False]
+        csv_handler.paths['for_test_only'] = csv_handler.os_sep.join(
+            [r'.', 'data', 'for_test_only.csv']
+        )
+        # Act
+        csv_handler.save_table(
+            table_name='for_test_only',
+            table=old_df
+        )
+        new_df = pd.read_csv(csv_handler.paths['for_test_only'], sep=';')
+        # Assert
+        self.assertEqual(old_df.shape, new_df.shape)
+        for column in new_df.columns:
+            self.assertEqual(
+                list(old_df[column]),
+                list(new_df[column])
+            )
