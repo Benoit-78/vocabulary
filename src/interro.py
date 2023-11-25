@@ -177,7 +177,7 @@ class Test(Interro):
         This way, bad words are asked twice as much as other words.
         """
         another_index = self.get_another_index()
-        bad_word = self.words_df.loc[another_index, 'bad_word'] == 1
+        bad_word = self.words_df.loc[another_index, 'Bad_word'] == 1
         if bad_word:
             next_index = another_index
         else:
@@ -196,20 +196,28 @@ class Test(Interro):
 
     def update_voc_df(self, word_guessed: bool):
         """Update the vocabulary dataframe"""
-        # Update Nb
+        # -----
         self.words_df.loc[self.index, 'Nb'] += 1
-        # Update Score
+        # -----
         if word_guessed:
             self.words_df.loc[self.index, 'Score'] += 1
         else:
             self.words_df.loc[self.index, 'Score'] -= 1
-        # Update Taux
+        # -----
         nombre = self.words_df.loc[self.index, 'Nb']
         score = self.words_df.loc[self.index, 'Score']
         taux = int(score / nombre * 100)
         self.words_df.loc[self.index, 'Taux'] = taux
-        # Update Query
+        # -----
         self.words_df.loc[self.index, 'Query'] += 1
+
+    def ask_series_of_guesses(self):
+        """"""
+        for i, index in enumerate(self.interro_df.index):
+            row = list(self.interro_df.loc[index])
+            word_guessed = self.guesser.guess_word(row, i + 1, self.words)
+            self.update_voc_df(word_guessed)
+            self.update_faults_df(word_guessed, row)
 
     def compute_success_rate(self):
         """Compute success rate."""
@@ -218,13 +226,13 @@ class Test(Interro):
         self.perf = success_rate
 
     def run(self):
-        """Launch the vocabulary interoooooo !!!!"""
+        """
+        1) Set the interro table,
+        2) Ask guesses to the user,
+        3) Compute the performances.
+        """
         self.set_interro_df()
-        for i, index in enumerate(self.interro_df.index):
-            row = list(self.interro_df.loc[index])
-            word_guessed = self.guesser.guess_word(row, i + 1, self.words)
-            self.update_voc_df(word_guessed)
-            self.update_faults_df(word_guessed, row)
+        self.ask_series_of_guesses()
         self.compute_success_rate()
 
 
@@ -319,8 +327,6 @@ class Updater():
         3) Flag the words having a worst score as their bad_image, as bad words.
         4) Drop the img_bad column.
         """
-        if 'img_bad' in self.interro.words_df.columns:
-            self.interro.words_df.drop('img_bad', axis=1, inplace=True)
         self.interro.words_df['img_bad'] = ORD_BAD + STEEP_BAD * self.interro.words_df['Nb']
         self.interro.words_df['Bad_word'] = np.where(
             self.interro.words_df['Taux'] < self.interro.words_df['img_bad'], 1, 0

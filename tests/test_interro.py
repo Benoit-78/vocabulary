@@ -165,6 +165,8 @@ class TestTest(unittest.TestCase):
             cls.user_2.settings.rattraps,
             cls.data_handler_2
         )
+
+    def setUp(self):
         words_df = pd.DataFrame(columns=['English', 'Français'])
         words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
         words_df.loc[words_df.shape[0]] = [
@@ -188,8 +190,8 @@ class TestTest(unittest.TestCase):
         words_df['Bad_word'] = [0] * words_df.shape[0]
         words = words_df.shape[0] //  2
         guesser = views_local.CliGuesser()
-        cls.interro_1 = interro.Test(words_df, words, guesser)
-        cls.interro_1.step = 1
+        self.interro_1 = interro.Test(words_df, words, guesser)
+        self.interro_1.step = 1
 
     def test_set_row(self):
         """
@@ -277,7 +279,7 @@ class TestTest(unittest.TestCase):
         So the index search method should be called once.
         """
         # Arrange
-        self.interro_1.words_df['bad_word'] = [1] * self.interro_1.words_df.shape[0]
+        self.interro_1.words_df['Bad_word'] = [1] * self.interro_1.words_df.shape[0]
         # Act
         next_index = self.interro_1.get_next_index()
         # Assert
@@ -292,7 +294,7 @@ class TestTest(unittest.TestCase):
         So the index search method should be called twice.
         """
         # Arrange
-        self.interro_1.words_df['bad_word'] = [0] * self.interro_1.words_df.shape[0]
+        self.interro_1.words_df['Bad_word'] = [0] * self.interro_1.words_df.shape[0]
         # Act
         next_index = self.interro_1.get_next_index()
         # Assert
@@ -344,6 +346,14 @@ class TestTest(unittest.TestCase):
         self.assertLess(new_row['Taux'], old_row['Taux'])
         self.assertEqual(new_row['Query'], old_row['Query'] + 1)
 
+    # def test_ask_series_of_guesses(self):
+    #     """Should ask a series of guesses to the user."""
+        # Arrange
+
+        # Ask
+        # self.interro_1.ask_series_of_guesses()
+        # Assert
+
     def test_compute_success_rate(self):
         """Based on the user's guesses and the umber of words asked, a success rate is computed."""
         # Arrange
@@ -357,7 +367,23 @@ class TestTest(unittest.TestCase):
         self.assertLess(self.interro_1.perf, 101)
         self.assertGreater(self.interro_1.perf, -1)
 
-
+    @patch.object(interro.Test, 'set_interro_df')
+    @patch.object(interro.Test, 'ask_series_of_guesses')
+    @patch.object(interro.Test, 'compute_success_rate')
+    def test_run(
+        self,
+        mock_compute_success_rate,
+        mock_ask_series_of_guesses,
+        mock_set_interro_df):
+        """
+        Should run a series of guesses to be answered by the user.
+        """
+        # Act
+        self.interro_1.run()
+        # Assert
+        mock_compute_success_rate.assert_called_once()
+        mock_ask_series_of_guesses.assert_called_once()
+        mock_set_interro_df.assert_called_once()
 
 class TestRattrap(unittest.TestCase):
     """Tests on Rattrap class methods."""
