@@ -114,8 +114,7 @@ def load_interro_question(
     request: Request,
     words: int,
     count=None,
-    score=None,
-    ):
+    score=None):
     """Call the page that asks the user the meaning of a word"""
     # Instantiation
     try:
@@ -149,8 +148,7 @@ def load_interro_answer(
     request: Request,
     words: int,
     count: int,
-    score: int,
-    ):
+    score: int):
     """
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
@@ -208,8 +206,8 @@ def propose_rattraps(
     request: Request,
     words: int,
     count: int,
-    score: int,
-    ):
+    score: int):
+    """Load a page that proposes the user to take a rattraps, or leave the test."""
     global test
     # Enregistrer les résultats
     global flag_data_updated
@@ -246,8 +244,11 @@ def propose_rattraps(
 def end_interro(
     request: Request,
     words: int,
-    score: int
-    ):
+    score: int):
+    """
+    Page that ends the interro with a congratulation message,
+    or a blaming message depending on the performances.
+    """
     global flag_data_updated
     if flag_data_updated is False:
         global loader
@@ -307,6 +308,7 @@ async def create_word(data: dict):
 # ==================================================
 @app.get("/dashboard", response_class=HTMLResponse)
 def graphs_page():
+    """Load the main page for performances visualization"""
     title = "Here are the graphs that represents your progress."
     return title
 
@@ -317,5 +319,6 @@ def graphs_page():
 # ==================================================
 @app.get("/settings", response_class=HTMLResponse)
 def settings_page():
+    """Load the main page for settings."""
     title = "Here you can change your personal settings."
     return title

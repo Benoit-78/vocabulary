@@ -26,6 +26,7 @@ class FastapiGuesser():
         return word_guessed
 
     def guess_word(self, row: List[str], i: int, words: int):
+        """Steps of the user's guessing process."""
         self.ask_word(row)
         self.return_translation(row)
         self.get_user_answer()

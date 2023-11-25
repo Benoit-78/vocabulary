@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     Creator:
         B.Delorme
@@ -272,42 +271,31 @@ class Updater():
     def __init__(self, loader: Loader, interro: Interro):
         self.loader = loader
         self.interro = interro
-        self.known_words_df = pd.DataFrame()
+        self.good_words_df = pd.DataFrame()
 
-    def set_known_words(self):
+    def set_good_words(self):
         """Identify the words that have been sufficiently guessed."""
         self.interro.words_df['img_good'] = ORD_GOOD + STEEP_GOOD * self.interro.words_df['Nb']
-        self.known_words_df = self.interro.words_df[
+        self.good_words_df = self.interro.words_df[
             self.interro.words_df['Taux'] >= self.interro.words_df['img_good']
         ]
 
-    def copy_known_words(self):
-        """Copy the well-known words in the next step table."""
-        self.set_known_words()
-        logger.debug(self.known_words_df.shape)
-        self.known_words_df = utils.complete_columns(
+    def copy_good_words(self):
+        """Copy the well-good words in the next step table."""
+        self.good_words_df = utils.complete_columns(
             self.loader.tables['output'],
-            self.known_words_df
+            self.good_words_df
         )
-        logger.debug(self.known_words_df.shape)
+        logger.debug(self.good_words_df.shape)
         self.loader.tables['output'] = pd.concat(
             [
                 self.loader.tables['output'],
-                self.known_words_df
+                self.good_words_df
             ]
         )
         logger.debug(self.loader.tables['output'].shape)
 
-    def transfer_known_words(self):
-        """Transfer the well-known words in an ouput table, and save this."""
-        self.copy_known_words()
-        self.loader.tables['output'].reset_index(inplace=True)
-        self.loader.data_handler.save_table(
-            'output',
-            self.loader.tables['output']
-        )
-
-    def delete_known_words(self) -> pd.DataFrame:
+    def delete_good_words(self) -> pd.DataFrame:
         """Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
         only under the author's dictatorial will."""
@@ -316,23 +304,38 @@ class Updater():
         ]
         self.interro.words_df.drop('img_good', axis=1, inplace=True)
 
+    def move_good_words(self):
+        """Transfer the well-good words in an ouput table, and save this."""
+        self.set_good_words()
+        self.copy_good_words()
+        self.loader.tables['output'].reset_index(inplace=True)
+        self.loader.data_handler.save_table(
+            'output',
+            self.loader.tables['output']
+        )
+        self.delete_good_words()
+
     def flag_bad_words(self):
         """
-        Apply special flag to difficult words,
-        i.e. words that are rarely guessed by the user.
+        1) Drop the img_bad columns if present.
+        2) Create the img_bad columns, that is the score of each word if it were a bad word,
+        based on the number of guesses on it.
+        3) Flag the words having a worst score as their bad_image, as bad words.
+        4) Drop the img_bad column.
         """
         if 'img_bad' in self.interro.words_df.columns:
             self.interro.words_df.drop('img_bad', axis=1, inplace=True)
         self.interro.words_df['img_bad'] = ORD_BAD + STEEP_BAD * self.interro.words_df['Nb']
         self.interro.words_df['Bad_word'] = np.where(
-            self.interro.words_df['Taux'] < self.interro.words_df['img_bad'],
-            1,
-            0
+            self.interro.words_df['Taux'] < self.interro.words_df['img_bad'], 1, 0
         )
         self.interro.words_df.drop('img_bad', axis=1, inplace=True)
 
     def save_words(self):
-        """Prepare the words table for saving, and save it."""
+        """
+        1) Reset the index of words dataframe.
+        2) Use data_handler instance to save the table in the database.
+        """
         self.interro.words_df.reset_index(inplace=True)
         self.loader.data_handler.save_table(
             self.loader.test_type + '_voc',
@@ -340,12 +343,16 @@ class Updater():
         )
 
     def save_performances(self):
-        """Save performances for further analysis."""
+        """
+        1) Save the user performance & today date.
+        2) Save the former in the performance table.
+        3) Save the updated performance table through the data_handler instance.
+        """
         new_row = pd.DataFrame(
             data={
-                'test_date': datetime.today().date().strftime('%Y-%m-%d'),
-                'test': self.interro.perf
-                },
+                'Date': datetime.today().date().strftime('%Y-%m-%d'),
+                'Test': self.interro.perf
+            },
             index=[self.interro.perf_df.shape[0] + 1]
         )
         self.interro.perf_df = pd.concat([self.interro.perf_df, new_row])
@@ -356,7 +363,9 @@ class Updater():
         )
 
     def save_words_count(self):
-        """Save the length of vocabulary list in a file"""
+        """
+        1) 
+        """
         count_before = self.interro.word_cnt_df.shape[0]
         new_row = pd.DataFrame(
             data={
@@ -387,8 +396,7 @@ class Updater():
 
     def update_data(self):
         """Main method of Updater class"""
-        self.transfer_known_words()
-        self.delete_known_words()
+        self.move_good_words()
         self.flag_bad_words()
         self.save_words()
         self.save_performances()

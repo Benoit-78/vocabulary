@@ -7,18 +7,18 @@
         Test script for interro.py, main script of vocabulary application
 """
 
-import unittest
-from unittest.mock import patch
+import os
 import sys
+import unittest
+from unittest.mock import MagicMock, patch
+
 import numpy as np
 import pandas as pd
 from loguru import logger
 
 sys.path.append('\\src')
-from src import interro
-from src import views_local
+from src import interro, views_local
 from src.data import data_handler
-
 
 
 class TestParser(unittest.TestCase):
@@ -137,7 +137,7 @@ class TestLoader(unittest.TestCase):
 
 class TestTest(unittest.TestCase):
     """
-    The Interro class represents the concept of a test to be taken by the user.
+    The Interro class represents the concept of a test taken by the user.
     It should then be abstract.
     """
     @classmethod
@@ -366,7 +366,8 @@ class TestRattrap(unittest.TestCase):
 
 class TestUpdater(unittest.TestCase):
     """
-    Should save the user's guesses in the database, after having processed the dataset so as to: 
+    Should save the user's guesses in the database,
+    after having processed the dataset so as to: 
     - flag bad words;
     - and remove good words.
     """
@@ -381,6 +382,9 @@ class TestUpdater(unittest.TestCase):
         )
         cls.loader_1 = interro.Loader(rattraps, cls.data_handler_1)
         cls.loader_1.load_tables()
+
+    def setUp(self):
+        """Runs before each test"""
         words_df = pd.DataFrame(columns=['English', 'Français'])
         words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
         words_df.loc[words_df.shape[0]] = [
@@ -402,35 +406,154 @@ class TestUpdater(unittest.TestCase):
         words_df['Score'] = [0] * words_df.shape[0]
         words_df['Taux'] = [0] * words_df.shape[0]
         words_df['Bad_word'] = [0] * words_df.shape[0]
+        words_df['img_good'] = [0] * words_df.shape[0]
         words = 10
-        cls.guesser = views_local.CliGuesser()
-        cls.interro_1 = interro.Test(words_df, words, cls.guesser)
-        cls.updater_1 = interro.Updater(cls.loader_1, cls.interro_1)
+        self.guesser = views_local.CliGuesser()
+        self.interro_1 = interro.Test(words_df, words, self.guesser)
+        self.updater_1 = interro.Updater(self.loader_1, self.interro_1)
 
-    def test_set_known_words(self):
+    def test_set_good_words(self):
         """Should flag the words that have been guessed sufficiently enough."""
         # Arrange
-        if 'img_good' in self.interro_1.words_df.columns:
-            self.interro_1.words_df = self.interro_1.words_df.drop('img_good', axis=1)
-        old_columns = list(self.interro_1.words_df.columns)
+        if 'img_good' in self.updater_1.interro.words_df.columns:
+            self.updater_1.interro.words_df.drop('img_good', axis=1, inplace=True)
+        old_columns = list(self.updater_1.interro.words_df.columns)
         # Act
-        self.updater_1.set_known_words()
+        self.updater_1.set_good_words()
         # Assert
-        new_columns = list(self.interro_1.words_df.columns)
+        new_columns = list(self.updater_1.interro.words_df.columns)
         self.assertIn('img_good', new_columns)
         self.assertEqual(len(new_columns), len(old_columns) + 1)
-        self.assertIsInstance(self.updater_1.known_words_df, pd.DataFrame)
+        self.assertIsInstance(self.updater_1.good_words_df, pd.DataFrame)
 
-    def test_copy_known_words(self):
-        """Should copy the well known words in the output table."""
+    def test_copy_good_words(self):
+        """Should copy the well good words in the output table."""
         # Arrange
+        good_words_df = pd.DataFrame(columns=['English', 'Français', 'Date'])
+        good_words_df.loc[good_words_df.shape[0]] = ['One', 'Un', '2023-01-01']
+        good_words_df.loc[good_words_df.shape[0]] = ['Two', 'Deux', '2023-02-01']
+        good_words_df.loc[good_words_df.shape[0]] = ['Three', 'Trois', '2023-03-01']
+        self.updater_1.good_words_df = good_words_df
+        good_words = self.updater_1.good_words_df.shape[0]
         old_output_shape = self.loader_1.tables['output'].shape
-        good_words = self.updater_1.known_words_df.shape[0]
         # Act
-        self.updater_1.copy_known_words()
+        self.updater_1.copy_good_words()
         # Assert
         new_output_shape = self.loader_1.tables['output'].shape
         self.assertEqual(new_output_shape[0], old_output_shape[0] + good_words)
 
-    def test_transfer_known_words(self):
-        """"""
+    def test_delete_good_words(self):
+        """Should remove good words from the table of to-be-guessed words."""
+        # Arrange
+        old_shape = self.interro_1.words_df.shape
+        # Act
+        self.updater_1.delete_good_words()
+        # Assert
+        new_shape = self.interro_1.words_df.shape
+        self.assertLessEqual(new_shape[0], old_shape[0])
+        self.assertEqual(new_shape[1], old_shape[1] - 1)
+        self.assertNotIn('img_good', self.interro_1.words_df.columns)
+
+    def test_move_good_words(self):
+        """
+        Should move the words that have been guessed sufficiently enough
+        from one table to its output.
+        """
+        # Arrange
+        self.updater_1.set_good_words = MagicMock()
+        self.updater_1.copy_good_words = MagicMock()
+        self.updater_1.loader.tables['output'] = MagicMock()
+        self.updater_1.loader.data_handler.save_table = MagicMock()
+        self.updater_1.delete_good_words = MagicMock()
+        # Act
+        self.updater_1.move_good_words()
+        # Assert
+        self.updater_1.set_good_words.assert_called_once()
+        self.updater_1.copy_good_words.assert_called_once()
+        self.updater_1.loader.tables['output'].reset_index.assert_called_once()
+        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+            'output',
+            self.updater_1.loader.tables['output']
+        )
+        self.updater_1.delete_good_words.assert_called_once()
+
+    def test_flag_bad_words(self):
+        """Should flag bad words, i.e. words rarely guessed by the user."""
+        # Arrange
+        old_length, old_width = self.updater_1.interro.words_df.shape
+        # Act
+        self.updater_1.flag_bad_words()
+        new_length, new_width = self.updater_1.interro.words_df.shape
+        first_word = self.updater_1.interro.words_df.iloc[0]
+        img_bad = interro.ORD_BAD + interro.STEEP_BAD * first_word['Nb']
+        # Assert
+        self.assertLessEqual(new_length, old_length)
+        self.assertEqual(new_width, old_width)
+        if first_word['Bad_word'] == 1:
+            self.assertLess(first_word['Taux'], img_bad) # strictly less
+        elif first_word['Bad_word'] == 0:
+            self.assertGreaterEqual(first_word['Taux'], img_bad) # greater or equal
+
+    def test_save_words(self):
+        """Prepare the words table for saving, and save it."""
+        # Arrange
+        self.updater_1.loader.data_handler.save_table = MagicMock()
+        old_width = self.updater_1.interro.words_df.shape[1]
+        # Act
+        self.updater_1.save_words()
+        new_width = self.updater_1.interro.words_df.shape[1]
+        # Assert
+        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+            self.updater_1.loader.test_type + '_voc',
+            self.updater_1.interro.words_df
+        )
+        self.assertEqual(new_width, old_width + 1)
+
+    def test_save_performances(self):
+        """Save performances for further analysis."""
+        # Arrange
+        perf_df = pd.DataFrame(columns=['Date', 'Test'])
+        perf_df.loc[perf_df.shape[0]] = ["2022-01-01", 65]
+        perf_df.loc[perf_df.shape[0]] = ["2022-02-01", 75]
+        perf_df.loc[perf_df.shape[0]] = ["2022-03-01", 85]
+        perf_df.loc[perf_df.shape[0]] = ["2022-04-01", 0]
+        self.updater_1.interro.perf_df = perf_df
+        old_shape = self.updater_1.interro.perf_df.shape
+        # Act
+        self.updater_1.save_performances()
+        new_shape = self.updater_1.interro.perf_df.shape
+        # Assert
+        self.assertEqual(new_shape[0], old_shape[0] + 1)
+        self.assertEqual(new_shape[1], old_shape[1] + 1)
+        last_perf = self.updater_1.interro.perf_df.loc[self.updater_1.interro.perf_df.shape[0] - 1]
+        last_perf = last_perf['Test']
+        self.assertEqual(last_perf, self.updater_1.interro.perf)
+
+    def test_save_words_count(self):
+        """Save the number of words recorded on the current date."""
+        
+
+    @patch.object(interro.Updater, 'move_good_words')
+    @patch.object(interro.Updater, 'flag_bad_words')
+    @patch.object(interro.Updater, 'save_words')
+    @patch.object(interro.Updater, 'save_performances')
+    @patch.object(interro.Updater, 'save_words_count')
+    def test_update_data(
+        self,
+        mock_save_words_count,
+        mock_save_performances,
+        mock_save_words,
+        mock_flag_bad_words,
+        mock_move_good_words):
+        """
+        Should move good words, flag bad words,
+        save the table as well as performances & words count.
+        """
+        # Act
+        self.updater_1.update_data()
+        # Assert
+        mock_move_good_words.assert_called_once()
+        mock_flag_bad_words.assert_called_once()
+        mock_save_words.assert_called_once()
+        mock_save_performances.assert_called_once()
+        mock_save_words_count.assert_called_once()

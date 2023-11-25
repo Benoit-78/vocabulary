@@ -3,17 +3,16 @@
 """
 
 import json
+import os
 from datetime import datetime
-from typing import Dict
-from typing import List
+from typing import Dict, List
+
 import mysql.connector as mariadb
 import pandas as pd
-from sqlalchemy import create_engine
-import os
 from loguru import logger
+from sqlalchemy import create_engine
 
 from src import utils
-
 
 
 class CsvHandler():
@@ -91,23 +90,18 @@ class CsvHandler():
     # Row-level operations
     def create(self, word, table):
         """Add a word to the table."""
-        pass
 
     def read(self, word, table):
         """Read the given word."""
-        pass
 
     def update(self, word, table):
         """Update statistics on the given word."""
-        pass
 
     def delete(self, word, table):
         """Delete the given word in the given table."""
-        pass
 
     def transfer(self, word, table):
         """Copy a word from its original table to the output table (theme or archive)."""
-        pass
 
 
 
@@ -285,4 +279,3 @@ class MariaDBHandler():
 
     def transfer(self, test_type, row):
         """Transfer a word from a table to another."""
-        pass

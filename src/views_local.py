@@ -3,8 +3,9 @@
 """
 
 from tkinter import messagebox
-from loguru import logger
 from typing import List
+
+from loguru import logger
 
 
 class CliGuesser():
