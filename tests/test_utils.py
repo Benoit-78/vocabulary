@@ -10,6 +10,7 @@ import pandas as pd
 
 sys.path.append('..\\')
 from src import utils
+from src.utils import get_os_type, get_os_separator
 
 
 class TestUtils(unittest.TestCase):
@@ -36,10 +37,7 @@ class TestUtils(unittest.TestCase):
         # Assert
         self.assertEqual(os_type, 'Windows')
 
-    @patch(
-        'platform.platform',
-        return_value='Linux-4.15.0-65-generic-x86_64-with-Ubuntu-18.04-bionic'
-    )
+    @patch('platform.platform', return_value='Linux-4.15.0-65-generic-x86_64-with-Ubuntu-18.04-bionic')
     def test_get_os_type_linux(self, mock_platform):
         """Linux should be recognized a valid OS."""
         # Act
@@ -47,20 +45,45 @@ class TestUtils(unittest.TestCase):
         # Assert
         self.assertEqual(os_type, 'Linux')
 
-    def test_set_os_separator(self):
-        """Separator should be OS-specific"""
-        # Arrange
-        os_type = utils.get_os_type()
-        # Happy paths
-        os_sep = utils.get_os_separator()
-        if os_type == 'Windows':
-            self.assertEqual(os_sep, '\\')
-        elif os_type in ['Linux', 'Android', 'Mac']:
-            self.assertEqual(os_sep, '/')
-        # Sad paths
+    @patch('src.utils.get_os_type', return_value='Windows')
+    def test_get_os_separator_windows(self, mock_get_os_type):
+        # Act
+        result = utils.get_os_separator()
+        # Assert
+        self.assertEqual(result, '\\')
+
+    @patch('src.utils.get_os_type', return_value='Linux')
+    def test_get_os_separator_linux(self, mock_get_os_type):
+        # Act
+        result = utils.get_os_separator()
+        # Assert
+        self.assertEqual(result, '/')
+
+    @patch('src.utils.get_os_type', return_value='Mac')
+    def test_get_os_separator_mac(self, mock_get_os_type):
+        # Act
+        result = utils.get_os_separator()
+        # Assert
+        self.assertEqual(result, '/')
+
+    @patch('src.utils.get_os_type', return_value='Android')
+    def test_get_os_separator_android(self, mock_get_os_type):
+        # Act
+        result = utils.get_os_separator()
+        # Assert
+        self.assertEqual(result, '/')
+
+    @patch('src.utils.get_os_type', return_value='Unknown')
+    def test_get_os_separator_unknown(self, mock_get_os_type):
+        with self.assertRaises(NameError):
+            # Assert
+            utils.get_os_separator()
 
     def test_complete_columns(self):
-        """"""
+        """
+        Guarantee that the well_known_words dataframe contains exactly 
+        the columns of the output dataframe.
+        """
         # Arrange
         df_1 = pd.DataFrame(columns=['col1', 'col2', 'col3'])
         df_2 = pd.DataFrame(columns=['col1', 'col4'])

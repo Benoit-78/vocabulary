@@ -28,8 +28,8 @@ class TestParser(unittest.TestCase):
         """Run once before all tests."""
         cls.user = interro.CliUser()
 
-    def test_parse_arguments(self):
-        """The method should store three arguments."""
+    # def test_parse_arguments(self):
+    #     """The method should store three arguments."""
         # with unittest.mock.patch('argparse.ArgumentParser.parse_args') as mock_parse_args:
         #     self.user.parse_arguments([])
         #     mock_parse_args.assert_called_with(
@@ -56,8 +56,8 @@ class TestParser(unittest.TestCase):
         # assert result.rattraps is None
         # ### Sad paths
 
-    def test_get_settings(self):
-        """Should save the user's settings as attributes."""
+    # def test_get_settings(self):
+    #     """Should save the user's settings as attributes."""
         # ### Happy paths
         # # Test case 1
         # for test_kind in ['version', 'theme']:
@@ -512,6 +512,7 @@ class TestUpdater(unittest.TestCase):
     def test_save_performances(self):
         """Save performances for further analysis."""
         # Arrange
+        self.updater_1.loader.data_handler.save_table = MagicMock()
         perf_df = pd.DataFrame(columns=['Date', 'Test'])
         perf_df.loc[perf_df.shape[0]] = ["2022-01-01", 65]
         perf_df.loc[perf_df.shape[0]] = ["2022-02-01", 75]
@@ -525,13 +526,40 @@ class TestUpdater(unittest.TestCase):
         # Assert
         self.assertEqual(new_shape[0], old_shape[0] + 1)
         self.assertEqual(new_shape[1], old_shape[1] + 1)
-        last_perf = self.updater_1.interro.perf_df.loc[self.updater_1.interro.perf_df.shape[0] - 1]
+        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+            self.updater_1.loader.test_type + '_perf',
+            self.updater_1.interro.perf_df
+        )
+        last_perf = self.updater_1.interro.perf_df.loc[
+            self.updater_1.interro.perf_df.shape[0] - 1
+        ]
         last_perf = last_perf['Test']
         self.assertEqual(last_perf, self.updater_1.interro.perf)
 
     def test_save_words_count(self):
         """Save the number of words recorded on the current date."""
-        
+        # Arrange
+        self.updater_1.loader.data_handler.save_table = MagicMock()
+        word_cnt_df = pd.DataFrame(columns=['Date', 'Words_count'])
+        word_cnt_df.loc[word_cnt_df.shape[0]] = ["2022-01-01", 1876]
+        word_cnt_df.loc[word_cnt_df.shape[0]] = ["2022-02-01", 2341]
+        self.updater_1.interro.word_cnt_df = word_cnt_df
+        old_shape = self.updater_1.interro.word_cnt_df.shape
+        # Act
+        self.updater_1.save_words_count()
+        new_shape = self.updater_1.interro.word_cnt_df.shape
+        # Assert
+        self.assertEqual(new_shape[0], old_shape[0] + 1)
+        self.assertEqual(new_shape[1], old_shape[1] + 1)
+        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+            self.updater_1.loader.test_type + '_words_count',
+            self.updater_1.interro.word_cnt_df
+        )
+        last_count = self.updater_1.interro.word_cnt_df.loc[
+            self.updater_1.interro.word_cnt_df.shape[0] - 1
+        ]
+        last_count = last_count['Words_count']
+        self.assertEqual(last_count, self.updater_1.interro.words_df.shape[0])
 
     @patch.object(interro.Updater, 'move_good_words')
     @patch.object(interro.Updater, 'flag_bad_words')

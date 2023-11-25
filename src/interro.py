@@ -136,6 +136,11 @@ class Interro(ABC):
 
 
 
+class InfiniteLoopError(Exception):
+    pass
+
+
+
 class Test(Interro):
     """First round"""
     def __init__(self, words_df_, words: int, guesser, perf_df_=None, words_cnt_df=None):
@@ -152,7 +157,6 @@ class Test(Interro):
 
     def get_another_index(self) -> int:
         """The word must not have been already asked."""
-        logger.debug("----------")
         next_index = random.randint(1, self.words_df.shape[0] - 1)
         next_index = max(next_index, 1)
         already_asked = self.words_df.loc[next_index, 'Query'] == 1
@@ -162,9 +166,6 @@ class Test(Interro):
             next_index = max(next_index, 1)
             already_asked = self.words_df.loc[next_index, 'Query'] == 1
             i += 1
-        if i >= self.words_df.shape[0]:
-            logger.error("Infinite loop stopped.")
-            raise RecursionError
         self.words_df.loc[next_index, 'Query'] = 1
         return next_index
 
@@ -175,7 +176,6 @@ class Test(Interro):
         If the word IS a bad word, it is NOT skipped.
         This way, bad words are asked twice as much as other words.
         """
-        logger.debug("--------------------")
         another_index = self.get_another_index()
         bad_word = self.words_df.loc[another_index, 'bad_word'] == 1
         if bad_word:
@@ -193,8 +193,6 @@ class Test(Interro):
             self.index = self.get_next_index()
             self.set_row()
             self.interro_df.loc[self.row[0]] = self.row[1:]
-            logger.debug(self.row)
-        logger.debug(f"\n{self.interro_df}")
 
     def update_voc_df(self, word_guessed: bool):
         """Update the vocabulary dataframe"""
@@ -286,14 +284,12 @@ class Updater():
             self.loader.tables['output'],
             self.good_words_df
         )
-        logger.debug(self.good_words_df.shape)
         self.loader.tables['output'] = pd.concat(
             [
                 self.loader.tables['output'],
                 self.good_words_df
             ]
         )
-        logger.debug(self.loader.tables['output'].shape)
 
     def delete_good_words(self) -> pd.DataFrame:
         """Remove words that have been guessed sufficiently enough.
@@ -369,8 +365,8 @@ class Updater():
         count_before = self.interro.word_cnt_df.shape[0]
         new_row = pd.DataFrame(
             data={
-                'test_date': datetime.today().date().strftime('%Y-%m-%d'),
-                'words_count': self.interro.words_df.shape[0]
+                'Date': datetime.today().date().strftime('%Y-%m-%d'),
+                'Words_count': self.interro.words_df.shape[0]
                 },
             index=[count_before + 1]
         )
@@ -382,17 +378,14 @@ class Updater():
         )
         self.interro.word_cnt_df.sort_index(inplace=True)
         count_after = self.interro.word_cnt_df.shape[0]
-        if count_after == count_before + 1:
-            self.interro.word_cnt_df.reset_index(
-                inplace=True,
-                names=['id_test']
-            )
-            self.loader.data_handler.save_table(
-                self.loader.test_type + '_words_count',
-                self.interro.word_cnt_df
-            )
-        else:
-            logger.error("Words count could not be saved.")
+        self.interro.word_cnt_df.reset_index(
+            inplace=True,
+            names=['id_test']
+        )
+        self.loader.data_handler.save_table(
+            self.loader.test_type + '_words_count',
+            self.interro.word_cnt_df
+        )
 
     def update_data(self):
         """Main method of Updater class"""

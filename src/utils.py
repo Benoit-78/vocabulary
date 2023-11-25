@@ -19,7 +19,7 @@ def get_os_type():
 
 
 def get_os_separator():
-    """Get separator specific to operating system: / or \\ """
+    """Get separator specific to operating system."""
     os_type = get_os_type()
     if os_type == 'Windows':
         os_sep = '\\'
