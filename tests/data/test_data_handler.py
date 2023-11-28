@@ -97,3 +97,46 @@ class TestCsvHandler(unittest.TestCase):
                 list(new_df[column])
             )
         os.remove(csv_handler.paths['for_test_only'])
+
+
+
+class TestMariaDBHandler(unittest.TestCase):
+    """The MariaDBHandler class should serve as an interface with MariaDB databases."""
+    @classmethod
+    def setUpClass(cls):
+        """Run once before all tests."""
+        cls.db_handler_1 = data_handler.MariaDBHandler(
+            'version',
+            mode='cli',
+            language_1='English'
+        )
+        cls.db_handler_2 = data_handler.MariaDBHandler(
+            'theme',
+            mode='cli',
+            language_1='English'
+        )
+        cls.error_data_handler = None
+
+    def test_get_database_cred(self):
+        """Should return the credentials."""
+        # Arrange
+        # Act
+        result = self.db_handler_1.get_database_cred()
+        # Assert
+        self.assertEqual(len(result), 3)
+        self.assertIn('user', result.keys())
+        self.assertIn('host', result.keys())
+        self.assertIn('port', result.keys())
+
+    def test_get_database_cols(self):
+        """
+        Should return the columns that will be used in the tables.
+        """
+        # Arrange
+        # Act
+        result = self.db_handler_1.get_database_cols()
+        # Assert
+        key_1 = list(result.keys())[0]
+        key_2 = list(result[key_1].keys())[0]
+        key_3 = list(result[key_1][key_2].keys())[0]
+        self.assertEqual(key_3, 'Columns')

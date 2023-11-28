@@ -346,13 +346,21 @@ class TestTest(unittest.TestCase):
         self.assertLess(new_row['Taux'], old_row['Taux'])
         self.assertEqual(new_row['Query'], old_row['Query'] + 1)
 
-    # def test_ask_series_of_guesses(self):
-    #     """Should ask a series of guesses to the user."""
+    @patch('src.interro.Test.update_voc_df')
+    @patch('src.interro.Test.update_faults_df')
+    def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df):
+        """Should ask a series of guesses to the user."""
         # Arrange
-
-        # Ask
-        # self.interro_1.ask_series_of_guesses()
+        mock_guess_word = MagicMock(return_value=True)
+        self.interro_1.guesser.guess_word = mock_guess_word
+        # Act
+        self.interro_1.ask_series_of_guesses()
         # Assert
+        self.assertEqual(mock_guess_word.call_count, len(self.interro_1.interro_df))
+        for _, index in enumerate(self.interro_1.interro_df.index):
+            row = list(self.interro_1.interro_df.loc[index])
+            mock_update_voc_df.assert_any_call(True)
+            mock_update_faults_df.assert_any_call(True, row)
 
     def test_compute_success_rate(self):
         """Based on the user's guesses and the umber of words asked, a success rate is computed."""

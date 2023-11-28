@@ -212,7 +212,12 @@ class Test(Interro):
         self.words_df.loc[self.index, 'Query'] += 1
 
     def ask_series_of_guesses(self):
-        """"""
+        """
+        1) Extract one sample
+        2) Ask a guess to the user
+        3) Update the words table with the user input
+        4) Update the faults table with the user input
+        """
         for i, index in enumerate(self.interro_df.index):
             row = list(self.interro_df.loc[index])
             word_guessed = self.guesser.guess_word(row, i + 1, self.words)

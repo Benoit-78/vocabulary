@@ -14,6 +14,9 @@ from sqlalchemy import create_engine
 
 from src import utils
 
+HOSTS = ['cli', 'web_local', 'container']
+
+
 
 class CsvHandler():
     """Provide with all methods necessary to interact with csv files."""
@@ -106,44 +109,56 @@ class CsvHandler():
 
 
 class MariaDBHandler():
-    """Provide with all methods necessary to interact with MariaDB database."""
+    """
+    Provide with all methods necessary to interact with MariaDB database.
+    """
     def __init__(self, test_type: str, mode: str, language_1: str):
         if test_type not in ['version', 'theme']:
-            logger.error(f"Test type {test_type} incorrect, should be either version or theme.")
+            logger.error(f"Test type {test_type} incorrect, \
+            should be either version or theme.")
         self.test_type = test_type
+        self.os_sep = utils.get_os_separator()
         self.mode = mode
         self.language_1 = language_1
-        self.cred = {}
         self.config = {}
         self.connection = None
         self.cursor = None
-        self.hosts = ['cli', 'web_local', 'container']
-        self.cols = {}
 
     # Common operations
-    def set_database_cred(self):
-        """Get credentials necessary for connection with vocabulary database."""
-        os_sep = utils.get_os_separator()
-        cred_path = os_sep.join(['', 'app', 'conf', 'cred.json'])
+    def get_database_cred(self):
+        """
+        Get credentials necessary for connection with vocabulary database.
+        """
+        if os.getcwd().endswith('tests'):
+            os.chdir('..')
+        cred_path = self.os_sep.join([os.getcwd(), 'conf', 'cred.json'])
         with open(cred_path, 'rb') as cred_file:
-            self.cred = json.load(cred_file)
-        col_path = os_sep.join(['', 'app', 'conf', 'columns.json'])
+            cred = json.load(cred_file)
+        return cred
+
+    def get_database_cols(self):
+        """Get table columns."""
+        if os.getcwd().endswith('tests'):
+            os.chdir('..')
+        col_path = self.os_sep.join([os.getcwd(), 'conf', 'columns.json'])
         with open(col_path, 'rb') as col_file:
-            self.cols = json.load(col_file)
+            cols = json.load(col_file)
+        return cols
 
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
+        cred = self.get_database_cred()
         self.config = {
-            'user': self.cred['user']['user_1']['name'],
-            'password': self.cred['user']['user_1']['password'],
+            'user': cred['user']['user_1']['name'],
+            'password': cred['user']['user_1']['password'],
             'database': self.language_1.lower(),
-            'port': self.cred['port']
+            'port': cred['port']
         }
-        if self.mode not in self.hosts:
+        if self.mode not in HOSTS:
             logger.warning(f"Mode: {self.mode}")
-            logger.error(f"Mode should be in {self.hosts}")
+            logger.error(f"Mode should be in {HOSTS}")
         else:
-            self.config['host'] = self.cred['host'][self.mode]
+            self.config['host'] = cred['host'][self.mode]
         self.connection = mariadb.connect(**self.config)
         self.cursor = self.connection.cursor()
 
@@ -171,18 +186,18 @@ class MariaDBHandler():
     # Table-level operations
     def get_tables(self):
         """Load the different tables necessary to the app."""
-        self.set_database_cred()
         self.set_db_cursor()
+        cols = self.get_database_cols()
         tables_names = self.get_tables_names()
         tables = {}
         for table_name in tables_names:
             logger.debug(table_name)
             sql_request = f"SELECT * FROM {table_name}"
             self.cursor.execute(sql_request)
-            logger.debug(self.cols[self.language_1][table_name]["Columns"])
+            logger.debug(cols[self.language_1][table_name]["Columns"])
             logger.debug(self.cursor.fetchall())
             tables[table_name] = pd.DataFrame(
-                columns=self.cols[self.language_1][table_name]["Columns"],
+                columns=cols[self.language_1][table_name]["Columns"],
                 data=self.cursor.fetchall()
             )
             index_col = tables[table_name].columns[0]
@@ -193,9 +208,9 @@ class MariaDBHandler():
 
     def save_table(self, table_name: str, table: pd.DataFrame):
         """Save given table."""
-        self.set_database_cred()
         self.set_db_cursor()
-        table = table[self.cols[self.language_1][table_name]["Columns"]]
+        cols = self.get_database_cols()
+        table = table[cols[self.language_1][table_name]["Columns"]]
         engine = create_engine(
             ''.join([
                 "mysql+pymysql",
@@ -223,11 +238,11 @@ class MariaDBHandler():
         table_name = self.language_1 + '.' + 'version_voc'
         english = row[0]
         native = row[1]
-        request_1 = f"INSERT INTO {table_name} (english, français, creation_date, nb, score, taux)"
+        request_1 = f"INSERT INTO {table_name} \
+            (english, français, creation_date, nb, score, taux)"
         request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2])
         # Execute request
-        self.set_database_cred()
         self.set_db_cursor()
         self.cursor.execute(sql_request)
         self.connection.close()
@@ -242,7 +257,6 @@ class MariaDBHandler():
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
-        self.set_database_cred()
         self.set_db_cursor()
         english, native, score = self.cursor.execute(sql_request)
         self.connection.close()
@@ -257,7 +271,6 @@ class MariaDBHandler():
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
-        self.set_database_cred()
         self.set_db_cursor()
         self.cursor.execute(sql_request)
         self.connection.close()
@@ -271,7 +284,6 @@ class MariaDBHandler():
         request_2 = f"WHERE english = {english}"
         sql_request = " ".join([request_1, request_2])
         # Execute request
-        self.set_database_cred()
         self.set_db_cursor()
         self.cursor.execute(sql_request)
         self.connection.close()
