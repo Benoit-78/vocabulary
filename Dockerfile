@@ -32,5 +32,6 @@ COPY src/ ./src/
 
 
 # Run the service
-WORKDIR /app/src
+# WORKDIR /app/src
+WORKDIR /app
 CMD uvicorn web:app --reload --host 0.0.0.0 --port 80

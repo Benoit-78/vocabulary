@@ -4,6 +4,7 @@
 
 import json
 import os
+import sys
 from datetime import datetime
 from typing import Dict, List
 
@@ -12,6 +13,8 @@ import pandas as pd
 from loguru import logger
 from sqlalchemy import create_engine
 
+REPO_DIR = os.getcwd().split('src')[0]
+sys.path.append(REPO_DIR)
 from src import utils
 
 HOSTS = ['cli', 'web_local', 'container']
@@ -129,9 +132,7 @@ class MariaDBHandler():
         """
         Get credentials necessary for connection with vocabulary database.
         """
-        if os.getcwd().endswith('tests'):
-            os.chdir('..')
-        cred_path = self.os_sep.join([os.getcwd(), 'conf', 'cred.json'])
+        cred_path = self.os_sep.join([REPO_DIR, 'conf', 'cred.json'])
         with open(cred_path, 'rb') as cred_file:
             cred = json.load(cred_file)
         return cred
@@ -148,9 +149,10 @@ class MariaDBHandler():
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
         cred = self.get_database_cred()
+        logger.debug(f"Credentials: {cred}")
         self.config = {
-            'user': cred['user']['user_1']['name'],
-            'password': cred['user']['user_1']['password'],
+            'user': cred['users']['user_1']['name'],
+            'password': cred['users']['user_1']['password'],
             'database': self.language_1.lower(),
             'port': cred['port']
         }

@@ -8,6 +8,7 @@
 """
 
 import argparse
+import os
 import random
 import sys
 from abc import ABC, abstractmethod
@@ -18,6 +19,8 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
+repo_dir = os.getcwd().split('src')[0]
+sys.path.append(repo_dir)
 from src import utils
 
 STEEP_GOOD = -1.25

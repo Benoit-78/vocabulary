@@ -16,7 +16,8 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-sys.path.append('\\src')
+REPO_DIR = os.getcwd().split('tests')[0]
+sys.path.append(REPO_DIR)
 from src import interro, views_local
 from src.data import data_handler
 

@@ -4,6 +4,7 @@
 
 from typing import List
 
+
 class FastapiGuesser():
     """FastApi UI"""
     def ask_word(self, row: List[str]):

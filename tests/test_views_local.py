@@ -2,14 +2,15 @@
     Test module for 
 """
 
+import os
 import sys
 import unittest
-from unittest.mock import patch
 from tkinter import messagebox
+from unittest.mock import patch
 
-sys.path.append('..\\')
+REPO_DIR = os.getcwd().split('tests')[0]
+sys.path.append(REPO_DIR)
 from src import views_local
-
 
 
 class TestCliGuesser(unittest.TestCase):

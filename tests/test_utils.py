@@ -2,15 +2,18 @@
     TEst function for utils module.
 """
 
-import unittest
-import sys
 import logging
-from unittest.mock import patch, MagicMock
+import os
+import sys
+import unittest
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
 
-sys.path.append('..\\')
+REPO_DIR = os.getcwd().split('tests')[0]
+sys.path.append(REPO_DIR)
 from src import utils
-from src.utils import get_os_type, get_os_separator
+from src.utils import get_os_separator, get_os_type
 
 
 class TestUtils(unittest.TestCase):

@@ -2,15 +2,19 @@
     Tests for data_handler module.
 """
 
+import logging
 import os
 import sys
 import unittest
-import logging
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
+
 import pandas as pd
 
-sys.path.append('..\\..\\')
+REPO_DIR = os.getcwd().split('tests')[0]
+sys.path.append(REPO_DIR)
 from src.data import data_handler
+
+
 
 class TestCsvHandler(unittest.TestCase):
     """The CsvHandler class should serve as an interface with csv data."""
@@ -101,7 +105,9 @@ class TestCsvHandler(unittest.TestCase):
 
 
 class TestMariaDBHandler(unittest.TestCase):
-    """The MariaDBHandler class should serve as an interface with MariaDB databases."""
+    """
+    The tested class should serve as an interface with MariaDB databases.
+    """
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
@@ -124,9 +130,12 @@ class TestMariaDBHandler(unittest.TestCase):
         result = self.db_handler_1.get_database_cred()
         # Assert
         self.assertEqual(len(result), 3)
-        self.assertIn('user', result.keys())
+        self.assertIn('users', result.keys())
+        self.assertGreater(len(result['users']), 0)
         self.assertIn('host', result.keys())
+        self.assertGreater(len(result['host']), 2)
         self.assertIn('port', result.keys())
+        self.assertGreater(len(result['port']), 3)
 
     def test_get_database_cols(self):
         """
@@ -136,7 +145,36 @@ class TestMariaDBHandler(unittest.TestCase):
         # Act
         result = self.db_handler_1.get_database_cols()
         # Assert
-        key_1 = list(result.keys())[0]
-        key_2 = list(result[key_1].keys())[0]
-        key_3 = list(result[key_1][key_2].keys())[0]
-        self.assertEqual(key_3, 'Columns')
+        language = list(result.keys())[0]
+        table_1 = list(result[language].keys())[0]
+        key_1 = list(result[language][table_1].keys())[0]
+        self.assertEqual(key_1, 'Columns')
+
+    @patch('src.data.data_handler.mariadb.connect')
+    def test_set_db_cursor(self, mock_connect):
+        """
+        Should set cursor and connection to mariadb database as attributes
+        """
+        # Arrange
+        self.db_handler_1.get_database_cred = MagicMock(return_value={
+            'users': {'user_1': {'name': 'test_user', 'password': 'test_password'}},
+            'port': 3306,
+            'host': {'cli': 'localhost'},
+        })
+        self.db_handler_1.language_1 = 'English'
+        self.db_handler_1.mode = 'cli'
+        # Act
+        self.db_handler_1.set_db_cursor()
+        # Assert
+        self.assertIsInstance(self.db_handler_1.config, dict)
+        self.assertEqual(
+            {'user', 'password', 'database', 'port', 'host'},
+            set(self.db_handler_1.config.keys())
+        )
+        mock_connect.assert_called_once_with(
+            user='test_user',
+            password='test_password',
+            database='english',
+            port=3306,
+            host='localhost',
+        )
