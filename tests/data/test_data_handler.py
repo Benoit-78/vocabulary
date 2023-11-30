@@ -178,3 +178,13 @@ class TestMariaDBHandler(unittest.TestCase):
             port=3306,
             host='localhost',
         )
+
+    def test_get_tables_names(self):
+        """Should return a list containing the tables names."""
+        # Arrange
+        self.db_handler_1.test_type = 'version'
+        # Act
+        result = self.db_handler_1.get_tables_names()
+        # Assert
+        expected_result = ['version_voc', 'version_perf', 'version_words_count', 'theme_voc']
+        self.assertEqual(result, expected_result)
