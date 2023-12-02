@@ -149,7 +149,6 @@ class MariaDBHandler():
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
         cred = self.get_database_cred()
-        logger.debug(f"Credentials: {cred}")
         self.config = {
             'user': cred['users']['user_1']['name'],
             'password': cred['users']['user_1']['password'],
@@ -226,16 +225,19 @@ class MariaDBHandler():
         self.connection.close()
 
     # Row-level operations
-    def create(self, row: list):
+    def create(self, row: list, test_mode=False):
         """Add a word to the table"""
         # Create request string
-        today = datetime.today().date()
-        table_name = self.language_1 + '.' + 'version_voc'
+        today_date = datetime.today().date()
+        if test_mode:
+            table_name = 'test_table'
+        else:
+            table_name = self.language_1 + '.' + 'version_voc'
         english = row[0]
         native = row[1]
         request_1 = f"INSERT INTO {table_name} \
             (english, français, creation_date, nb, score, taux)"
-        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today}\', 0, 0, 0);"
+        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2])
         # Execute request
         self.set_db_cursor()
@@ -247,7 +249,7 @@ class MariaDBHandler():
         """Read the given word"""
         # Create request string
         table_name, english, native = self.get_words_from_test_type(word_series)
-        request_1 = "SELECT english, native, score"
+        request_1 = "SELECT english, français, score"
         request_2 = f"FROM {table_name}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])

@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 import unittest
+from datetime import datetime
 from unittest.mock import patch, MagicMock
 
 import pandas as pd
@@ -114,7 +115,7 @@ class TestMariaDBHandler(unittest.TestCase):
         cls.db_handler_1 = data_handler.MariaDBHandler(
             'version',
             mode='cli',
-            language_1='English'
+            language_1='test'
         )
         cls.db_handler_2 = data_handler.MariaDBHandler(
             'theme',
@@ -156,13 +157,23 @@ class TestMariaDBHandler(unittest.TestCase):
         Should set cursor and connection to mariadb database as attributes
         """
         # Arrange
-        self.db_handler_1.get_database_cred = MagicMock(return_value={
-            'users': {'user_1': {'name': 'test_user', 'password': 'test_password'}},
-            'port': 3306,
-            'host': {'cli': 'localhost'},
-        })
-        self.db_handler_1.language_1 = 'English'
-        self.db_handler_1.mode = 'cli'
+        self.db_handler_1.get_database_cred = MagicMock(
+            return_value={
+                'users':
+                {
+                    'user_1':
+                    {
+                        'name': 'test_user',
+                        'password': 'test_password'
+                    }
+                },
+                'port': 3306,
+                'host':
+                {
+                    'cli': 'localhost'
+                }
+            }
+        )
         # Act
         self.db_handler_1.set_db_cursor()
         # Assert
@@ -174,7 +185,7 @@ class TestMariaDBHandler(unittest.TestCase):
         mock_connect.assert_called_once_with(
             user='test_user',
             password='test_password',
-            database='english',
+            database='test',
             port=3306,
             host='localhost',
         )
@@ -193,6 +204,36 @@ class TestMariaDBHandler(unittest.TestCase):
         test_types = ['version', 'theme']
         test_types.remove(self.db_handler_1.test_type)
         self.assertIn(test_types[0], result[-1])
+
+    def test_create(self):
+        """Should add a word in the database"""
+        # Arrange
+        test_row = ['African swallow', 'Mouette africaine']
+        today_date = datetime.today().date()
+        table_name = 'test_table'
+        english = test_row[0]
+        native = test_row[1]
+        sql_request_1 = f"INSERT INTO {table_name} \
+            (english, français, creation_date, nb, score, taux)"
+        sql_request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
+        test_sql_request = " ".join([sql_request_1, sql_request_2])
+        # Act
+        result = self.db_handler_1.create(test_row, test_mode=True)
+        self.db_handler_1.set_db_cursor()
+        self.db_handler_1.cursor.execute(test_sql_request)
+        # Assert
+        # request_1 = "SELECT english, français, score"
+        # request_2 = f"FROM {table_name}"
+        # request_3 = f"WHERE english = '{english}';"
+        # sql_request = " ".join([request_1, request_2, request_3])
+        # self.db_handler_1.set_db_cursor()
+        # english_2, native_2, score_2 = self.db_handler_1.cursor.execute(sql_request)
+        expected_result = True
+        self.assertEqual(result, expected_result)
+        # self.assertEqual(english_2, english)
+        # self.assertEqual(native_2, native)
+        # self.assertEqual(score_2, 0)
+        self.db_handler_1.connection.close()
 
     @patch(
         'src.data.data_handler.MariaDBHandler.get_tables_names',
