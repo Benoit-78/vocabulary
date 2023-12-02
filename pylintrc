@@ -1,0 +1,5 @@
+[MESSAGE CONTROL]
+disable = E0401
+
+[FORMAT]
+good-names=i,j,k,X_train,X_test,X_val,df

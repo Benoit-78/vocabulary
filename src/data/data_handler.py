@@ -178,13 +178,6 @@ class MariaDBHandler():
             raise ValueError
         return [voc_table, perf_table, word_cnt_table, output_table]
 
-    def get_words_from_test_type(self, row: list):
-        """Common method used by all 4 CRUD operations"""
-        [words_table_name, _, _, _] = self.get_tables_names()
-        english = row[row.columns[0]]
-        native = row[row.columns[1]]
-        return [words_table_name, english, native]
-
     # Table-level operations
     def get_tables(self):
         """Load the different tables necessary to the app."""
@@ -250,10 +243,10 @@ class MariaDBHandler():
         self.connection.close()
         return True
 
-    def read(self, row):
+    def read(self, word_series: pd.DataFrame):
         """Read the given word"""
         # Create request string
-        table_name, english, native = self.get_words_from_test_type(row)
+        table_name, english, native = self.get_words_from_test_type(word_series)
         request_1 = "SELECT english, native, score"
         request_2 = f"FROM {table_name}"
         request_3 = f"WHERE english = {english};"
@@ -264,10 +257,10 @@ class MariaDBHandler():
         self.connection.close()
         return english, native, score
 
-    def update(self, row, new_nb, new_score):
+    def update(self, word_series: pd.DataFrame, new_nb, new_score):
         """Update statistics on the given word"""
         # Create request string
-        table_name, english, _ = self.get_words_from_test_type(row)
+        table_name, english, _ = self.get_words_from_test_type(word_series)
         request_1 = f"UPDATE {table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
         request_3 = f"WHERE english = {english};"
@@ -278,10 +271,10 @@ class MariaDBHandler():
         self.connection.close()
         return True
 
-    def delete(self, row):
+    def delete(self, word_series: pd.DataFrame):
         """Delete a word from table."""
         # Create request string
-        table_name, english, _ = self.get_words_from_test_type(row)
+        table_name, english, _ = self.get_words_from_test_type(word_series)
         request_1 = f"DELETE FROM {table_name}"
         request_2 = f"WHERE english = {english}"
         sql_request = " ".join([request_1, request_2])
@@ -291,5 +284,9 @@ class MariaDBHandler():
         self.connection.close()
         return True
 
-    def transfer(self, test_type, row):
-        """Transfer a word from a table to another."""
+    def get_words_from_test_type(self, word_series: pd.DataFrame):
+        """Common method used by all 4 CRUD operations"""
+        [words_table_name, _, _, _] = self.get_tables_names()
+        english = word_series[word_series.columns[0]]
+        native = word_series[word_series.columns[1]]
+        return [words_table_name, english, native]

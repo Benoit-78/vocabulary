@@ -188,3 +188,23 @@ class TestMariaDBHandler(unittest.TestCase):
         # Assert
         expected_result = ['version_voc', 'version_perf', 'version_words_count', 'theme_voc']
         self.assertEqual(result, expected_result)
+        for table_name in result[:-1]:
+            self.assertIn(self.db_handler_1.test_type, table_name)
+        test_types = ['version', 'theme']
+        test_types.remove(self.db_handler_1.test_type)
+        self.assertIn(test_types[0], result[-1])
+
+    @patch(
+        'src.data.data_handler.MariaDBHandler.get_tables_names',
+        return_value=['table_name', '', '', '']
+    )
+    def test_get_words_from_test_type(self, mock_get_table_names):
+        """Strange method that surely should be changed."""
+        # Arrange   
+        mock_df = pd.DataFrame(columns=['lang_1', 'lang_2'])
+        mock_df.loc[mock_df.shape[0]] = ['African swallow', 'Mouette africaine']
+        # Act
+        result = self.db_handler_1.get_words_from_test_type(mock_df)
+        # Assert
+        self.assertEqual(len(result), 3)
+        mock_get_table_names.assert_called_once()

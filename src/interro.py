@@ -139,11 +139,6 @@ class Interro(ABC):
 
 
 
-class InfiniteLoopError(Exception):
-    pass
-
-
-
 class Test(Interro):
     """First round"""
     def __init__(self, words_df_, words: int, guesser, perf_df_=None, words_cnt_df=None):
@@ -391,7 +386,6 @@ class Updater():
             ]
         )
         self.interro.word_cnt_df.sort_index(inplace=True)
-        count_after = self.interro.word_cnt_df.shape[0]
         self.interro.word_cnt_df.reset_index(
             inplace=True,
             names=['id_test']
