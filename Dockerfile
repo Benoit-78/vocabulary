@@ -25,11 +25,13 @@ RUN rm requirements.txt
 
 
 # Copy the application contents
-COPY conf/cred.json ./conf/
-COPY data/vocabulary.sql /docker-entrypoint-initdb.d/
+COPY conf/cred.json ./conf/cred.json
+COPY conf/columns.json ./conf/columns.json
+COPY data/zhongwen.sql /docker-entrypoint-initdb.d/zhongwen.sql
 COPY src/ ./src/
 
 
 # Run the service
-WORKDIR /app/src
-CMD ["uvicorn", "web_app:app", "--reload", "--host", "0.0.0.0", "--port", "80"]
+# WORKDIR /app/src
+WORKDIR /app
+CMD uvicorn web:app --reload --host 0.0.0.0 --port 80

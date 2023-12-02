@@ -4,23 +4,23 @@
 
 import platform
 
+import pandas as pd
+from loguru import logger
+
 
 def get_os_type():
     """Get operating system kind: Windows or Linux"""
-    operating_system = platform.platform()
-    operating_system = operating_system.split('-')[0]
-    if operating_system.lower() not in ['windows', 'linux', 'mac', 'android']:
-        print("# ERROR: Operating system cannot be identified.")
-        raise OSError
-    os_type = operating_system
+    os_type = platform.platform()
+    os_type = os_type.split('-')[0]
+    if os_type.lower() not in ['windows', 'linux', 'mac', 'android']:
+        logger.error("Operating system cannot be identified.")
+        logger.warning("Operating system was arbitrarily set to 'linux'.")
     return os_type
 
 
 def get_os_separator():
-    """Get separator specific to operating system: / or \\ """
+    """Get separator specific to operating system."""
     os_type = get_os_type()
-    if not isinstance(os_type, str):
-        raise TypeError
     if os_type == 'Windows':
         os_sep = '\\'
     elif os_type in ['Linux', 'Mac', 'Android']:
@@ -29,3 +29,14 @@ def get_os_separator():
         print("# ERROR: Wrong input for operating system.")
         raise NameError
     return os_sep
+
+
+def complete_columns(df_1: pd.DataFrame, df_2: pd.DataFrame):
+    """
+    Guarantee that the well_known_words dataframe contains exactly
+    the columns of the output dataframe
+    """
+    missing_columns = set(df_1.columns).difference(set(df_2.columns))
+    for column in missing_columns:
+        df_2[column] = [0] * df_2.shape[0]
+    return df_2

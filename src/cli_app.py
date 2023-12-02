@@ -5,8 +5,8 @@
 """
 
 import interro
-from data import data_handler
 import views_local
+from data import data_handler
 
 
 def cli_main():
@@ -15,9 +15,8 @@ def cli_main():
     user = interro.CliUser()
     user.get_settings()
     # Load data
-    data_handler_ = data_handler.MariaDBHandler(user.settings.type, 'cli')
+    data_handler_ = data_handler.MariaDBHandler(user.settings.type, 'cli', 'Zhongwen')
     loader = interro.Loader(
-        user.settings.type,
         user.settings.rattraps,
         data_handler_
     )
@@ -32,7 +31,7 @@ def cli_main():
         loader.tables[loader.test_type + '_words_count']
     )
     test.run()
-    # Rattraaaaaaap's !!!!
+    # Raaattraaaaaaap's !!!!
     rattrap = interro.Rattrap(
         test.faults_df,
         user.settings.rattraps,

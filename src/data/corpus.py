@@ -8,5 +8,5 @@
 
 # Elaborate a embedding matrix. The goal is to create a proximity between words.
 # This proximity will be useful to propose words to the user during the interoooo !!!! !! !!!! !
-### Create a special category for expressions that contains several words, or even a whole and independent sentence.
-
+# Create a special category for expressions that contains several words,
+# or even a whole and independent sentence.

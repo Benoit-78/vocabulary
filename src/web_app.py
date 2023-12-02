@@ -1,24 +1,25 @@
 """
-    Author: Benoît DELORME
-    Decoupling date: 26th August 2023
-    Main purpose: vocabulary application in its FastAPI version.
+    Author:
+        Benoît DELORME
+    Decoupling date:
+        26th August 2023
+    Main purpose:
+        Vocabulary application in its FastAPI version.
 """
 
 import pandas as pd
-
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-from data import data_handler
 import interro
 import views
-
+from data import data_handler
 
 app = FastAPI()
+LANGUAGE = 'zhongwen'
 test = None
 loader = None
 flag_data_updated = None
@@ -93,8 +94,8 @@ async def get_user_settings(settings: dict):
 
 def load_test(test_type, words):
     """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(test_type, 'container')
-    loader_ = interro.Loader(test_type, 0, db_handler)
+    db_handler = data_handler.MariaDBHandler(test_type, 'container', LANGUAGE)
+    loader_ = interro.Loader(0, db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
     test_ = interro.Test(
@@ -113,8 +114,7 @@ def load_interro_question(
     request: Request,
     words: int,
     count=None,
-    score=None,
-    ):
+    score=None):
     """Call the page that asks the user the meaning of a word"""
     # Instantiation
     try:
@@ -148,8 +148,7 @@ def load_interro_answer(
     request: Request,
     words: int,
     count: int,
-    score: int,
-    ):
+    score: int):
     """
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
@@ -207,8 +206,8 @@ def propose_rattraps(
     request: Request,
     words: int,
     count: int,
-    score: int,
-    ):
+    score: int):
+    """Load a page that proposes the user to take a rattraps, or leave the test."""
     global test
     # Enregistrer les résultats
     global flag_data_updated
@@ -245,8 +244,11 @@ def propose_rattraps(
 def end_interro(
     request: Request,
     words: int,
-    score: int
-    ):
+    score: int):
+    """
+    Page that ends the interro with a congratulation message,
+    or a blaming message depending on the performances.
+    """
     global flag_data_updated
     if flag_data_updated is False:
         global loader
@@ -285,7 +287,7 @@ def data_page(request: Request):
 @app.post("/create-word")
 async def create_word(data: dict):
     """Save the word in the database."""
-    db_handler = data_handler.MariaDBHandler('version', 'container')
+    db_handler = data_handler.MariaDBHandler('version', 'container', LANGUAGE)
     english = data['english']
     french = data['french']
     if db_handler.create([english, french]) is True:
@@ -306,6 +308,7 @@ async def create_word(data: dict):
 # ==================================================
 @app.get("/dashboard", response_class=HTMLResponse)
 def graphs_page():
+    """Load the main page for performances visualization"""
     title = "Here are the graphs that represents your progress."
     return title
 
@@ -316,5 +319,6 @@ def graphs_page():
 # ==================================================
 @app.get("/settings", response_class=HTMLResponse)
 def settings_page():
+    """Load the main page for settings."""
     title = "Here you can change your personal settings."
     return title
