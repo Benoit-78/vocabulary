@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: vocabulary
+  name: data-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vocabulary
+  template:
+    metadata:
+      labels:
+        app: vocabulary
+        type: back-end
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:latest
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: data-secret
+        ports:
+        - containerPort: 3306
+        #readinessProbe:
+        #  tcpSocket:
+        #    port: 3306
+        #  failureThreshold: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+        volumeMounts:
+          - name: mariadb-storage
+            mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mariadb-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pvc
