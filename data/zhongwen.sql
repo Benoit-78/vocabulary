@@ -19,34 +19,10 @@
 -------------------------------------
 --  T A B L E S   C R E A T I O N  --
 -------------------------------------
-CREATE TABLE IF NOT EXISTS theme_perf (
-	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    test_date DATE,
-    test TINYINT);
-
-
-CREATE TABLE IF NOT EXISTS theme_voc (
-	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    zhongwen CHAR(255),
-	pinyin CHAR(255),
-    français CHAR(255),
-	creation_date DATE,
-	nb TINYINT,
-	score TINYINT,
-	taux DOUBLE);
-
-
-CREATE TABLE IF NOT EXISTS theme_words_count (
-	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    test_date DATE,
-	words_count SMALLINT);
-
-
 CREATE TABLE IF NOT EXISTS version_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
     test_date DATE,
     test TINYINT);
-
 
 CREATE TABLE IF NOT EXISTS version_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
@@ -58,8 +34,28 @@ CREATE TABLE IF NOT EXISTS version_voc (
 	score TINYINT,
 	taux TINYINT);
 
-
 CREATE TABLE IF NOT EXISTS version_words_count (
+	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
+    test_date DATE,
+	words_count SMALLINT);
+
+
+CREATE TABLE IF NOT EXISTS theme_perf (
+	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
+    test_date DATE,
+    test TINYINT);
+
+CREATE TABLE IF NOT EXISTS theme_voc (
+	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
+    zhongwen CHAR(255),
+	pinyin CHAR(255),
+    français CHAR(255),
+	creation_date DATE,
+	nb TINYINT,
+	score TINYINT,
+	taux DOUBLE);
+
+CREATE TABLE IF NOT EXISTS theme_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
     test_date DATE,
 	words_count SMALLINT);
@@ -69,33 +65,21 @@ CREATE TABLE IF NOT EXISTS version_words_count (
 -------------------------------------------
 --  T A B L E S   P E R M I S S I O N S  --
 -------------------------------------------
-GRANT INSERT, UPDATE ON theme_perf TO 'benito'@'db';
-GRANT INSERT, UPDATE ON theme_voc TO 'benito'@'db';
-GRANT INSERT, UPDATE ON theme_words_count TO 'benito'@'db';
 GRANT INSERT, UPDATE ON version_perf TO 'benito'@'db';
 GRANT INSERT, UPDATE ON version_voc TO 'benito'@'db';
 GRANT INSERT, UPDATE ON version_words_count TO 'benito'@'db';
+
+GRANT INSERT, UPDATE ON theme_perf TO 'benito'@'db';
+GRANT INSERT, UPDATE ON theme_voc TO 'benito'@'db';
+GRANT INSERT, UPDATE ON theme_words_count TO 'benito'@'db';
 
 
 
 -----------------------------------
 --  T A B L E S   F I L L I N G  --
 -----------------------------------
-INSERT INTO `theme_perf` (`id_test`, `test_date`, `test`) VALUES
-	(1, '1991-12-03', 0);
-
-
-INSERT INTO `theme_voc` (`id_word`, `zhongwen`, `pinyin`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES
-	(1, '汉语', 'Hàn yǔ', 'la langue chinoise', '2011-03-09', 14, 10, 71);
-
-
-INSERT INTO `theme_words_count` (`id_test`, `test_date`, `words_count`) VALUES
-	(1, '1991-12-03', 0);
-
-
 INSERT INTO `version_perf` (`id_test`, `test_date`, `test`) VALUES
 	(1, '1991-12-03', 0);
-
 
 INSERT INTO `version_voc` (`id_word`, `zhongwen`, `pinyin`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES
 	(1, '汉语', 'Hàn yǔ', 'Langue chinoise', '12/11/2023', 0, 0, 0),
@@ -147,8 +131,17 @@ INSERT INTO `version_voc` (`id_word`, `zhongwen`, `pinyin`, `français`, `creati
 	(48, '厕所', 'Cèsuǒ', 'Toilettes', '12/11/2023', 0, 0, 0),
 	(49, '没关系', 'Méiguānxì', 'Ce n’est pas grave (pas de relation)', '12/11/2023', 0, 0, 0);
 
-
 INSERT INTO `version_words_count` (`id_test`, `test_date`, `words_count`) VALUES
+	(1, '1991-12-03', 0);
+
+
+INSERT INTO `theme_perf` (`id_test`, `test_date`, `test`) VALUES
+	(1, '1991-12-03', 0);
+
+INSERT INTO `theme_voc` (`id_word`, `zhongwen`, `pinyin`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES
+	(1, '汉语', 'Hàn yǔ', 'la langue chinoise', '2011-03-09', 14, 10, 71);
+
+INSERT INTO `theme_words_count` (`id_test`, `test_date`, `words_count`) VALUES
 	(1, '1991-12-03', 0);
 
 

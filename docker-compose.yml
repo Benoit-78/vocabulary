@@ -1,6 +1,7 @@
 version: '3.9'        # Version of the Docker Compose file format
 
 services:             # Define the services (containers) that make up the application
+
   web:                # Service name for the web application
     build: .          # Use the Dockerfile in the current directory to build the image
     ports:            # List of ports to expose (host:container)
@@ -9,7 +10,8 @@ services:             # Define the services (containers) that make up the applic
       - db
     volumes:
       - ./src:/app/src
-    command: uvicorn web_app:app --reload --host 0.0.0.0 --port 80
+    command: uvicorn src.web_app:app --reload --host 0.0.0.0 --port 80
+
   db:                 # Service name for the database
     image: mariadb:latest  # latest MariaDB image from Docker Hub
     ports:
