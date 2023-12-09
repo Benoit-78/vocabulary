@@ -10,7 +10,7 @@ doc/*
 env/*
 htmlcov/*
 mgmt/*
-src/data/__pycache__/
+src/data/__pycache__/*
 
 
 .coverage
