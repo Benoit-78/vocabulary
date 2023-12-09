@@ -235,17 +235,39 @@ class TestMariaDBHandler(unittest.TestCase):
         # self.assertEqual(score_2, 0)
         self.db_handler_1.connection.close()
 
-    @patch(
-        'src.data.data_handler.MariaDBHandler.get_tables_names',
-        return_value=['table_name', '', '', '']
-    )
-    def test_get_words_from_test_type(self, mock_get_table_names):
+    @patch('src.data.data_handler.mariadb.connect')
+    @patch('src.data.data_handler.MariaDBHandler.set_db_cursor')
+    def test_read(self, mock_connect, mock_set_cursor):
+        """Should get some words from the database."""
+        # Arrange
+        self.db_handler_1.get_database_cred = MagicMock(
+            return_value={
+                'users': {'user_1': {'name': 'test_user', 'password': 'test_password'}},
+                'port': 3306,
+                'host': {'cli': 'localhost'}
+            }
+        )
+        mock_set_cursor()
+        word_series = pd.DataFrame(columns=['english', 'français', 'score'])
+        word_series.loc[word_series.shape[0]] = ['hello', 'bonjour', 0]
+        with patch.object(
+            self.db_handler_1,
+            'get_tables_names',
+            return_value=['test_table', '_', '_', '_']
+            ):
+            # Act
+            result = self.db_handler_1.read(word_series)
+            # Assert
+            expected_result = self.db_handler_1.cursor.fetchone()
+            self.assertEqual(result, expected_result)
+
+    def test_get_words_from_df(self):
         """Strange method that surely should be changed."""
         # Arrange   
         mock_df = pd.DataFrame(columns=['lang_1', 'lang_2'])
         mock_df.loc[mock_df.shape[0]] = ['African swallow', 'Mouette africaine']
         # Act
-        result = self.db_handler_1.get_words_from_test_type(mock_df)
+        result = self.db_handler_1.get_words_from_df(mock_df)
         # Assert
-        self.assertEqual(len(result), 3)
-        mock_get_table_names.assert_called_once()
+        self.assertEqual(len(result), 2)
+        self.assertIsInstance(result[0], object)  # str, in reality

@@ -188,14 +188,15 @@ class MariaDBHandler():
             logger.debug(table_name)
             sql_request = f"SELECT * FROM {table_name}"
             self.cursor.execute(sql_request)
-            logger.debug(cols[self.language_1][table_name]["Columns"])
-            logger.debug(self.cursor.fetchall())
             tables[table_name] = pd.DataFrame(
                 columns=cols[self.language_1][table_name]["Columns"],
                 data=self.cursor.fetchall()
             )
             index_col = tables[table_name].columns[0]
             tables[table_name] = tables[table_name].set_index(index_col)
+        # Special case of output table
+        tables['output'] = tables[tables_names[-1]]
+        tables.pop(tables_names[-1])
         self.cursor.close()
         self.connection.close()
         return tables
@@ -204,6 +205,13 @@ class MariaDBHandler():
         """Save given table."""
         self.set_db_cursor()
         cols = self.get_database_cols()
+        if table_name == 'output':
+            if self.test_type == 'version':
+                table_name = 'theme_voc'
+            elif self.test_type == 'theme':
+                table_name = 'archives'
+        logger.debug(f"Table name: {table_name}")
+        logger.debug(f"Table columns: {table.columns}")
         table = table[cols[self.language_1][table_name]["Columns"]]
         engine = create_engine(
             ''.join([
@@ -248,21 +256,29 @@ class MariaDBHandler():
     def read(self, word_series: pd.DataFrame):
         """Read the given word"""
         # Create request string
-        table_name, english, native = self.get_words_from_test_type(word_series)
+        table_name, _, _, _ = self.get_tables_names()
+        english, native = self.get_words_from_df(word_series)
         request_1 = "SELECT english, français, score"
         request_2 = f"FROM {table_name}"
-        request_3 = f"WHERE english = {english};"
+        request_3 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
         self.set_db_cursor()
         english, native, score = self.cursor.execute(sql_request)
+        # self.cursor.execute(sql_request)
+        # result = self.cursor.fetchone()
+        # if result:
+        #     english, native, score = result
+        # else:
+        #     english, native, score = None, None, None
         self.connection.close()
         return english, native, score
 
     def update(self, word_series: pd.DataFrame, new_nb, new_score):
         """Update statistics on the given word"""
         # Create request string
-        table_name, english, _ = self.get_words_from_test_type(word_series)
+        table_name, _, _, _ = self.get_tables_names()
+        english, _ = self.get_words_from_df(word_series)
         request_1 = f"UPDATE {table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
         request_3 = f"WHERE english = {english};"
@@ -276,7 +292,8 @@ class MariaDBHandler():
     def delete(self, word_series: pd.DataFrame):
         """Delete a word from table."""
         # Create request string
-        table_name, english, _ = self.get_words_from_test_type(word_series)
+        table_name, _, _, _ = self.get_tables_names()
+        english, _ = self.get_words_from_df(word_series)
         request_1 = f"DELETE FROM {table_name}"
         request_2 = f"WHERE english = {english}"
         sql_request = " ".join([request_1, request_2])
@@ -286,9 +303,8 @@ class MariaDBHandler():
         self.connection.close()
         return True
 
-    def get_words_from_test_type(self, word_series: pd.DataFrame):
+    def get_words_from_df(self, word_series: pd.DataFrame):
         """Common method used by all 4 CRUD operations"""
-        [words_table_name, _, _, _] = self.get_tables_names()
         english = word_series[word_series.columns[0]]
         native = word_series[word_series.columns[1]]
-        return [words_table_name, english, native]
+        return english, native

@@ -14,9 +14,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-import interro
-import views
-from data import data_handler
+from src import interro
+from src import views
+from src.data import data_handler
 
 app = FastAPI()
 LANGUAGE = 'zhongwen'
@@ -27,11 +27,11 @@ flag_data_updated = None
 # Serve CSS files
 app.mount(
     "/static",
-    StaticFiles(directory="static"),
+    StaticFiles(directory="src/static"),
     name="static"
 )
 # Serve HTML files
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="src/templates")
 
 
 
