@@ -1,13 +1,11 @@
-apt-get update
-apt-get install -y pkg-config
-apt-get install -y default-libmysqlclient-dev
-apt-get install -y python3-dev
-apt-get install -y python3-pip
-apt-get install libssl-dev
-apt-get install -y build-essential
-apt-get install -y mariadb-client
-apt-get install awscli
-snap install docker
-
-pip install --upgrade pip
-pip install --no-cache-dir -r requirements.txt
+sudo apt-get update
+sudo apt-get install -y pkg-config
+sudo apt-get install -y default-libmysqlclient-dev
+sudo apt-get install -y python3-dev
+sudo apt-get install -y python3-pip
+sudo apt-get install -y python3.10-venv
+sudo apt-get install -y libssl-dev
+sudo apt-get install -y mariadb-client
+sudo apt-get install -y awscli
+sudo apt-get install -y uvicorn
+# sudo apt-get install -y build-essential

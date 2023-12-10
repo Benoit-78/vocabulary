@@ -18,7 +18,8 @@ s3transfer==0.6.2
 # Database
 mysql==0.0.3
 mysql-connector-python==8.1.0
-mysqlclient==2.2.0
+# mysqlclient==2.2.0
+mysqlclient>=2.0.1,<2.2.0
 PyMySQL==1.1.0
 SQLAlchemy==2.0.20
 
