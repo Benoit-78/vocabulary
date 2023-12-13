@@ -19,6 +19,7 @@ cred.json
 nltk_tries_out.py
 common/secret.yaml
 *.exe
-*.pyc
 *.pdf
+*.png
+*.pyc
 *.txt
