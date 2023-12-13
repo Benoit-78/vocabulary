@@ -15,6 +15,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
+-- If localhost
+CREATE DATABASE zhongwen;
+USE zhongwen;
+
 
 -------------------------------------
 --  T A B L E S   C R E A T I O N  --
@@ -65,13 +69,15 @@ CREATE TABLE IF NOT EXISTS theme_words_count (
 -------------------------------------------
 --  T A B L E S   P E R M I S S I O N S  --
 -------------------------------------------
-GRANT INSERT, UPDATE ON version_perf TO 'benito'@'db';
-GRANT INSERT, UPDATE ON version_voc TO 'benito'@'db';
-GRANT INSERT, UPDATE ON version_words_count TO 'benito'@'db';
+-- If through uvicorn: localhost
+-- If through a container: db
+GRANT INSERT, UPDATE ON version_perf TO 'benito'@'localhost';
+GRANT INSERT, UPDATE ON version_voc TO 'benito'@'localhost';
+GRANT INSERT, UPDATE ON version_words_count TO 'benito'@'localhost';
 
-GRANT INSERT, UPDATE ON theme_perf TO 'benito'@'db';
-GRANT INSERT, UPDATE ON theme_voc TO 'benito'@'db';
-GRANT INSERT, UPDATE ON theme_words_count TO 'benito'@'db';
+GRANT INSERT, UPDATE ON theme_perf TO 'benito'@'localhost';
+GRANT INSERT, UPDATE ON theme_voc TO 'benito'@'localhost';
+GRANT INSERT, UPDATE ON theme_words_count TO 'benito'@'localhost';
 
 
 

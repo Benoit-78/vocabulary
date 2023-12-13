@@ -35,6 +35,8 @@ grep "GroupId"
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 22 --cidr 88.161.167.12/32
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 8080 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 80 --cidr 0.0.0.0/0
+# aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-egress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
 
 
 aws ec2 describe-security-groups \
@@ -97,6 +99,8 @@ aws s3 sync \
     --exclude "*.pyc" \
     --exclude "*.txt"
 
+
+
 aws ec2 run-instances \
     --image-id ami-00983e8a26e4c9bd9 \
     --instance-type t2.medium \
@@ -110,7 +114,7 @@ aws ec2 run-instances \
 grep InstanceId
 
 aws ec2 describe-instances \
-    --instance-ids i-063a9eca2e01c2575 \
+    --instance-ids i-0d346ee03d9c2524e \
     --query "Reservations[0].Instances[0].State.Name"
 
 # Create Internet Gateway
@@ -128,8 +132,8 @@ grep PublicIp
 grep AllocationId
 
 aws ec2 associate-address \
-    --allocation-id eipalloc-03d7c5dae53ffbc4b \
-    --instance-id i-063a9eca2e01c2575
+    --allocation-id eipalloc-0188ef3e338bdd852 \
+    --instance-id i-0d346ee03d9c2524e
 # Check the route table, and manually confirm the internet gateway
 # Check the Access Control List
 # Actions -> Monitor and troubleshoot -> Get system log
@@ -137,7 +141,7 @@ aws ec2 associate-address \
 # How can I know if my instance is on a private or public network?
 
 # Use '-' in the IP address, not '.'
-ssh -i conf/voc_ssh_key_1.pem ubuntu@ec2-35-181-220-245.eu-west-3.compute.amazonaws.com
+ssh -i conf/voc_ssh_key_1.pem ubuntu@ec2-15-236-44-153.eu-west-3.compute.amazonaws.com
 
 
 
@@ -145,13 +149,11 @@ ssh -i conf/voc_ssh_key_1.pem ubuntu@ec2-35-181-220-245.eu-west-3.compute.amazon
 # Environment
 # =======================
 # Packages
-sudo apt-get update
+sudo apt-get update -y
 sudo apt-get install -y awscli
 sudo apt-get install -y default-libmysqlclient-dev
-sudo apt-get install -y python3
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python3-venv
-sudo apt-get install -y mariadb-client
 sudo apt-get install -y uvicorn
 sudo apt-get install -y nginx
 
@@ -167,10 +169,38 @@ source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
+
+
+# =======================
 # Nginx
+# =======================
 sudo nano /etc/nginx/sites-available/vocabulary_app.com
+# Copy this
+server {
+    listen 443;
+    server_name vocabulary-app.com www.vocabulary-app.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
 sudo ln -s /etc/nginx/sites-available/vocabulary_app.com /etc/nginx/sites-enabled/
 sudo service nginx restart
+
+
+
+# =======================
+# MariaDB
+# =======================
+sudo apt-get install -y mariadb-client
+sudo apt-get install -y mariadb-server
+sudo mariadb
+SELECT user, host FROM mysql.user;
+SHOW GRANTS FOR 'benito'@'localhost';
 
 
 uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
@@ -180,13 +210,12 @@ uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
 # =======================
 # Troubleshooting
 # =======================
-# Delete a folder
+# S3
 aws s3 rm s3://vocabulary-benito/vocabulary/logs \
     --recursive
-
-# Delete a file
 aws s3 rm s3://vocabulary-benito/vocabulary/bin/aws_commands.sh
-# See nginx error log
+# Nginx
+sudo service nginx status
 sudo tail -f /var/log/nginx/error.log
 
 
