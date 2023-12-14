@@ -71,13 +71,13 @@ CREATE TABLE IF NOT EXISTS theme_words_count (
 -------------------------------------------
 -- If through uvicorn: localhost
 -- If through a container: db
-GRANT INSERT, UPDATE ON version_perf TO 'benito'@'localhost';
-GRANT INSERT, UPDATE ON version_voc TO 'benito'@'localhost';
-GRANT INSERT, UPDATE ON version_words_count TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE ON, DROP version_perf TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE ON, DROP version_voc TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE ON, DROP version_words_count TO 'benito'@'localhost';
 
-GRANT INSERT, UPDATE ON theme_perf TO 'benito'@'localhost';
-GRANT INSERT, UPDATE ON theme_voc TO 'benito'@'localhost';
-GRANT INSERT, UPDATE ON theme_words_count TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE ON, DROP theme_perf TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE ON, DROP theme_voc TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE ON, DROP theme_words_count TO 'benito'@'localhost';
 
 
 

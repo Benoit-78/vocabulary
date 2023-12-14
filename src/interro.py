@@ -293,7 +293,6 @@ class Updater():
 
     def copy_good_words(self):
         """Copy the well-good words in the next step table."""
-        logger.debug(f"Table names:\n{self.loader.tables.keys()}")
         self.good_words_df = utils.complete_columns(
             self.loader.tables['output'],
             self.good_words_df

@@ -158,8 +158,9 @@ sudo apt-get install -y uvicorn
 sudo apt-get install -y nginx
 
 # Data
-aws s3 cp s3://vocabulary-benito/vocabulary /home/ubuntu/vocabulary \
-    --recursive
+aws s3 sync \
+    s3://vocabulary-benito/vocabulary \
+    /home/ubuntu/vocabulary
 
 # Python
 export PYTHONPATH=/home/ubuntu/vocabulary/src:$PYTHONPATH
@@ -198,10 +199,13 @@ sudo service nginx restart
 # =======================
 sudo apt-get install -y mariadb-client
 sudo apt-get install -y mariadb-server
+cd ~/vocabulary/data
 sudo mariadb
+SOURCE english.sql;
+SOURCE zhongwen.sql;
 SELECT user, host FROM mysql.user;
 SHOW GRANTS FOR 'benito'@'localhost';
-
+ALTER USER 'benito'@'localhost' IDENTIFIED BY '<database_password>';
 
 uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
 
