@@ -15,6 +15,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
+-- If localhost
+CREATE DATABASE english;
+USE english;
+
 
 -------------------------------------
 --  T A B L E S   C R E A T I O N  --
@@ -90,15 +94,20 @@ CREATE TABLE IF NOT EXISTS voc (
 	taux TINYINT);
 
 
+
 ------------------------------------------
 --  T A B L E S   P E R M I S S I O N S --
 ------------------------------------------
-GRANT INSERT, UPDATE ON english.theme_perf TO 'benito'@'db';
-GRANT INSERT, UPDATE ON english.theme_voc TO 'benito'@'db';
-GRANT INSERT, UPDATE ON english.theme_words_count TO 'benito'@'db';
-GRANT INSERT, UPDATE ON english.version_perf TO 'benito'@'db';
-GRANT INSERT, UPDATE ON english.version_voc TO 'benito'@'db';
-GRANT INSERT, UPDATE ON english.version_words_count TO 'benito'@'db';
+-- If through uvicorn: localhost
+-- If through a container: db
+GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_voc TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_words_count TO 'benito'@'localhost';
+
+GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON version_perf TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON version_voc TO 'benito'@'localhost';
+GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON version_words_count TO 'benito'@'localhost';
+
 
 
 -----------------------------------

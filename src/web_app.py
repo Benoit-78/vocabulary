@@ -19,7 +19,7 @@ from src import views
 from src.data import data_handler
 
 app = FastAPI()
-LANGUAGE = 'zhongwen'
+LANGUAGE = 'english'
 test = None
 loader = None
 flag_data_updated = None

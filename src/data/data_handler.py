@@ -185,7 +185,6 @@ class MariaDBHandler():
         tables_names = self.get_tables_names()
         tables = {}
         for table_name in tables_names:
-            logger.debug(table_name)
             sql_request = f"SELECT * FROM {table_name}"
             self.cursor.execute(sql_request)
             tables[table_name] = pd.DataFrame(
@@ -210,8 +209,6 @@ class MariaDBHandler():
                 table_name = 'theme_voc'
             elif self.test_type == 'theme':
                 table_name = 'archives'
-        logger.debug(f"Table name: {table_name}")
-        logger.debug(f"Table columns: {table.columns}")
         table = table[cols[self.language_1][table_name]["Columns"]]
         engine = create_engine(
             ''.join([
