@@ -307,10 +307,14 @@ async def create_word(data: dict):
 #  D A S H B O A R D
 # ==================================================
 @app.get("/dashboard", response_class=HTMLResponse)
-def graphs_page():
+def graphs_page(request: Request):
     """Load the main page for performances visualization"""
-    title = "Here are the graphs that represents your progress."
-    return title
+    return templates.TemplateResponse(
+        "interro_settings.html",
+        {
+            "request": request,
+        }
+    )
 
 
 
