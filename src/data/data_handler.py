@@ -182,9 +182,7 @@ class MariaDBHandler():
         """Load the different tables necessary to the app."""
         self.set_db_cursor()
         cols = self.get_database_cols()
-        logger.debug(f"cols: {cols}")
         tables_names = self.get_tables_names()
-        logger.debug(f"tables names: {tables_names}")
         tables = {}
         for table_name in tables_names:
             sql_request = f"SELECT * FROM {table_name}"
@@ -193,8 +191,6 @@ class MariaDBHandler():
                 columns=cols[self.language_1][table_name]["Columns"],
                 data=self.cursor.fetchall()
             )
-            logger.debug(f"table name: {table_name}")
-            logger.debug(f"table shape: {tables[table_name].shape}")
             index_col = tables[table_name].columns[0]
             tables[table_name] = tables[table_name].set_index(index_col)
         # Special case of output table

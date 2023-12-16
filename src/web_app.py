@@ -315,7 +315,11 @@ def graphs_page(request: Request):
         "dashboard.html",
         {
             "request": request,
-            "graph_1": graphs[0]
+            "graph_1": graphs[0],
+            "graph_2": graphs[1],
+            "graph_3": graphs[2],
+            "graph_4": graphs[3],
+            "graph_5": graphs[4]
         }
     )
 

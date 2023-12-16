@@ -18,15 +18,39 @@
 
 <body>
 
-    <h1>My dashboard</h1>
+    <div class="container">
+        <h1>My dashboard</h1>
 
-    <div id="plotly-graph-container">
-        <!-- The Python-generated graph will be inserted here -->
-        {{ graph_1|safe }}
-    </div>
+        <div id="plotly-graph-container">
+            <!-- The Python-generated graph will be inserted here -->
+            {{ graph_1|safe }}
+        </div>
 
-    <div class="row">
-        <button class="button quit-button" onclick="goToRoot()">Quit</button>
+        <div id="plotly-graph-container">
+            <!-- The Python-generated graph will be inserted here -->
+            {{ graph_2|safe }}
+        </div>
+
+        <div id="plotly-graph-container">
+            <!-- The Python-generated graph will be inserted here -->
+            {{ graph_3|safe }}
+        </div>
+
+        <div id="plotly-graph-container">
+            <!-- The Python-generated graph will be inserted here -->
+            {{ graph_4|safe }}
+        </div>
+
+        <div id="plotly-graph-container">
+            <!-- The Python-generated graph will be inserted here -->
+            {{ graph_5|safe }}
+        </div>
+
+
+        <div class="row">
+            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+        </div>
+
     </div>
 
 </body>
