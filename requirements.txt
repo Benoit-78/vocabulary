@@ -10,6 +10,9 @@ starlette==0.27.0
 urllib3==1.26.16
 uvicorn==0.23.2
 
+# Visualization
+plotly==5.18.0
+
 # Cloud
 awscli==1.29.54
 botocore==1.31.54

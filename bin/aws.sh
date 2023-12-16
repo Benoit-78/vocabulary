@@ -146,12 +146,31 @@ ssh -i conf/voc_ssh_key_1.pem ubuntu@ec2-15-236-44-153.eu-west-3.compute.amazona
 
 
 # =======================
+# User data
+# =======================
+sudo apt-get update
+sudo apt-get install -y awscli
+sudo apt-get install -y default-libmysqlclient-dev
+sudo apt-get install -y python3
+sudo apt-get install -y python3-pip
+sudo apt-get install -y python3-venv
+sudo apt-get install -y mariadb-client
+sudo apt-get install -y uvicorn
+# sudo apt-get install -y pkg-config
+# sudo apt-get install -y libssl-dev
+# sudo apt-get install -y build-essential
+
+
+
+# =======================
 # Environment
 # =======================
 # Packages
 sudo apt-get update -y
 sudo apt-get install -y awscli
 sudo apt-get install -y default-libmysqlclient-dev
+# On Red Hat-based systems
+# sudo dnf install mysql-devel
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python3-venv
 sudo apt-get install -y uvicorn
@@ -225,6 +244,19 @@ sudo tail -f /var/log/nginx/error.log
 
 
 # =======================
+#  E C R
+# =======================
+aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 098964451146.dkr.ecr.eu-west-3.amazonaws.com
+# docker build -t vocabulary .
+docker-compose build
+docker tag vocabulary_web:latest public.ecr.aws/e8w4p1y9/vocabulary_compose:latest
+#docker tag vocabulary_web:latest 098964451146.dkr.ecr.eu-west-3.amazonaws.com/vocabulary_web:latest
+#docker push 098964451146.dkr.ecr.eu-west-3.amazonaws.com/vocabulary_compose:latest
+docker push public.ecr.aws/e8w4p1y9/vocabulary_compose:latest
+
+
+
+# =======================
 # End of life
 # =======================
 aws ec2 terminate-instances \
@@ -232,3 +264,5 @@ aws ec2 terminate-instances \
 
 aws ec2 release-address \
     --allocation-id <alloc-id>
+
+
