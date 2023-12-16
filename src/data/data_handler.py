@@ -137,15 +137,6 @@ class MariaDBHandler():
             cred = json.load(cred_file)
         return cred
 
-    def get_database_cols(self):
-        """Get table columns."""
-        if os.getcwd().endswith('tests'):
-            os.chdir('..')
-        col_path = self.os_sep.join([os.getcwd(), 'conf', 'columns.json'])
-        with open(col_path, 'rb') as col_file:
-            cols = json.load(col_file)
-        return cols
-
     def set_db_cursor(self):
         """Connect to vocabulary database if credentials are correct."""
         cred = self.get_database_cred()
@@ -163,6 +154,15 @@ class MariaDBHandler():
         self.connection = mariadb.connect(**self.config)
         self.cursor = self.connection.cursor()
 
+    def get_database_cols(self):
+        """Get table columns."""
+        if os.getcwd().endswith('tests'):
+            os.chdir('..')
+        col_path = self.os_sep.join([os.getcwd(), 'conf', 'columns.json'])
+        with open(col_path, 'rb') as col_file:
+            cols = json.load(col_file)
+        return cols
+
     def get_tables_names(self) -> List[str]:
         """Get version or theme table according to the test type."""
         test_types = ['version', 'theme']
@@ -173,7 +173,7 @@ class MariaDBHandler():
             test_types.remove(self.test_type)
             output_table = test_types[0] + '_voc'
         else:
-            print("ERROR: Wrong test_type argument:", self.test_type)
+            logger.error(f"Wrong test_type argument: {self.test_type}")
             raise ValueError
         return [voc_table, perf_table, word_cnt_table, output_table]
 
@@ -182,7 +182,9 @@ class MariaDBHandler():
         """Load the different tables necessary to the app."""
         self.set_db_cursor()
         cols = self.get_database_cols()
+        logger.debug(f"cols: {cols}")
         tables_names = self.get_tables_names()
+        logger.debug(f"tables names: {tables_names}")
         tables = {}
         for table_name in tables_names:
             sql_request = f"SELECT * FROM {table_name}"
@@ -191,6 +193,8 @@ class MariaDBHandler():
                 columns=cols[self.language_1][table_name]["Columns"],
                 data=self.cursor.fetchall()
             )
+            logger.debug(f"table name: {table_name}")
+            logger.debug(f"table shape: {tables[table_name].shape}")
             index_col = tables[table_name].columns[0]
             tables[table_name] = tables[table_name].set_index(index_col)
         # Special case of output table

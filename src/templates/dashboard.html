@@ -11,16 +11,18 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <!-- Include Plotly.js -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!--<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
     <script type="text/javascript" src="/static/scripts/main.js"></script>
 
 </head>
 
 <body>
 
+    <h1>My dashboard</h1>
+
     <div id="plotly-graph-container">
         <!-- The Python-generated graph will be inserted here -->
-        {{ graph_html|safe }}
+        {{ graph_1|safe }}
     </div>
 
     <div class="row">

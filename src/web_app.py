@@ -17,6 +17,7 @@ from loguru import logger
 from src import interro
 from src import views
 from src.data import data_handler
+from src.dashboard import feed_dashboard
 
 app = FastAPI()
 LANGUAGE = 'english'
@@ -309,10 +310,12 @@ async def create_word(data: dict):
 @app.get("/dashboard", response_class=HTMLResponse)
 def graphs_page(request: Request):
     """Load the main page for performances visualization"""
+    graphs = feed_dashboard.load_graphs()
     return templates.TemplateResponse(
-        "interro_settings.html",
+        "dashboard.html",
         {
             "request": request,
+            "graph_1": graphs[0]
         }
     )
 
@@ -321,8 +324,13 @@ def graphs_page(request: Request):
 # ==================================================
 #  S E T T I N G S
 # ==================================================
-@app.get("/settings", response_class=HTMLResponse)
-def settings_page():
+@app.get("/user_settings", response_class=HTMLResponse)
+def settings_page(request: Request):
     """Load the main page for settings."""
-    title = "Here you can change your personal settings."
-    return title
+    return templates.TemplateResponse(
+        "user_settings.html",
+        {
+            "request": request,
+            
+        }
+    )
