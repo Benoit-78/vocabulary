@@ -17,6 +17,8 @@ k create secret docker-registry my-registry-secret \
 # ========================================
 #  D E P L O Y M E N T
 # ========================================
+minikube start
+
 minikube kubectl -- apply -f data/pv.yaml
 minikube kubectl -- apply -f data/pvc.yaml
 

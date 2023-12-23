@@ -8,7 +8,11 @@ aws configure
 # ====================
 # IAM
 # ====================
-# Policy
+# Users
+aws iam update-user \
+    --user-name vocabulary_test \
+    --new-user-name voc_tester
+
 # Roles
 aws iam attach-role-policy \
     --role-name vocabulary_read_on_bucket \
@@ -17,14 +21,13 @@ aws iam attach-role-policy \
 aws iam list-attached-role-policies \
     --role-name vocabulary_read_on_bucket
 
-# User
+# Policies
+
 
 # ====================
 # EC2
 # ====================
-# ----------
 # Security group
-# ----------
 aws ec2 create-security-group \
     --group-name vocabulary-sg \
     --description "Allows users to access the application" \
@@ -35,6 +38,7 @@ grep "GroupId"
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 22 --cidr 88.161.167.12/32
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 8080 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 80 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 443 --cidr 0.0.0.0/0
 # aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-egress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
 
@@ -43,30 +47,13 @@ aws ec2 describe-security-groups \
     --group-ids sg-08ebad99d1b1b98b6
 
 
-# ----------
-# Instance
-# ----------
-# Create a new policy for the IAM user, and declare the following
-{
-    "Version": "2012-10-17",
-    "Statement":
-    [
-        {
-            "Effect": "Allow",
-            "Action": "ec2:CreateKeyPair",
-            "Resource": "*"
-        }
-    ]
-}
-
+# EC2
 aws ec2 create-key-pair \
     --key-name voc_ssh_key_1 \
     --query 'KeyMaterial' \
     --output text > voc_ssh_key_1.pem
 
-aws s3 sync \
-    /home/benoit/Documents/vocabulary \
-    s3://vocabulary-benito/vocabulary \
+aws s3 sync /home/benoit/Documents/vocabulary s3://vocabulary-benito/vocabulary \
     --exclude ".pytest_cache/*" \
     --exclude ".vscode/*" \
     --exclude "__pycache__/*" \
@@ -177,9 +164,7 @@ sudo apt-get install -y uvicorn
 sudo apt-get install -y nginx
 
 # Data
-aws s3 sync \
-    s3://vocabulary-benito/vocabulary \
-    /home/ubuntu/vocabulary
+aws s3 sync s3://vocabulary-benito/vocabulary /home/ubuntu/vocabulary
 
 # Python
 export PYTHONPATH=/home/ubuntu/vocabulary/src:$PYTHONPATH
