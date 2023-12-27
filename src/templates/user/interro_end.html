@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>Translation Quiz</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <script type="text/javascript" src="/static/scripts/main.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h1>Your score is: {{ score }} / {{ numWords }}</h1>
+        </div>
+        <div class="row">
+            <p>You have found all of them, congratulations!</p>
+        </div>
+        <div class="row">
+            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -46,14 +46,18 @@ aws ec2 authorize-security-group-egress --group-id sg-08ebad99d1b1b98b6 --protoc
 aws ec2 describe-security-groups \
     --group-ids sg-08ebad99d1b1b98b6
 
-
-# EC2
 aws ec2 create-key-pair \
     --key-name voc_ssh_key_1 \
     --query 'KeyMaterial' \
     --output text > voc_ssh_key_1.pem
 
-aws s3 sync /home/benoit/Documents/vocabulary s3://vocabulary-benito/vocabulary \
+
+# ====================
+#  S 3
+# ====================
+aws s3 sync \
+    /home/benoit/Documents/vocabulary \
+    s3://vocabulary-benito/vocabulary \
     --exclude ".pytest_cache/*" \
     --exclude ".vscode/*" \
     --exclude "__pycache__/*" \
@@ -84,8 +88,14 @@ aws s3 sync /home/benoit/Documents/vocabulary s3://vocabulary-benito/vocabulary 
     --exclude "*.pdf" \
     --exclude "*.png" \
     --exclude "*.pyc" \
-    --exclude "*.txt"
+    --delete
 
+
+aws s3 sync \
+    s3://vocabulary-benito/vocabulary \
+    /home/ubuntu/vocabulary \
+    --exclude "env/*" \
+    --delete
 
 
 aws ec2 run-instances \
@@ -109,7 +119,9 @@ aws ec2 create-internet-gateway
 
 grep InternetGatewayId
 
-aws ec2 attach-internet-gateway --internet-gateway-id igw-067bdaf3b90f544d8 --vpc-id vpc-0011e2cd73034beb9
+aws ec2 attach-internet-gateway \
+    --internet-gateway-id igw-067bdaf3b90f544d8 \
+    --vpc-id vpc-0011e2cd73034beb9
 
 # Create an elastic IP
 aws ec2 allocate-address \
@@ -119,8 +131,8 @@ grep PublicIp
 grep AllocationId
 
 aws ec2 associate-address \
-    --allocation-id eipalloc-0188ef3e338bdd852 \
-    --instance-id i-0d346ee03d9c2524e
+    --allocation-id eipalloc-0e1af7a0b11f39ef7 \
+    --instance-id i-000d897a34bbabc2b
 # Check the route table, and manually confirm the internet gateway
 # Check the Access Control List
 # Actions -> Monitor and troubleshoot -> Get system log
@@ -128,45 +140,28 @@ aws ec2 associate-address \
 # How can I know if my instance is on a private or public network?
 
 # Use '-' in the IP address, not '.'
-ssh -i conf/voc_ssh_key_1.pem ubuntu@ec2-15-236-44-153.eu-west-3.compute.amazonaws.com
-
-
-
-# =======================
-# User data
-# =======================
-sudo apt-get update
-sudo apt-get install -y awscli
-sudo apt-get install -y default-libmysqlclient-dev
-sudo apt-get install -y python3
-sudo apt-get install -y python3-pip
-sudo apt-get install -y python3-venv
-sudo apt-get install -y mariadb-client
-sudo apt-get install -y uvicorn
-# sudo apt-get install -y pkg-config
-# sudo apt-get install -y libssl-dev
-# sudo apt-get install -y build-essential
+ssh -i  \
+    conf/voc_ssh_key_1.pem \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com
 
 
 
 # =======================
 # Environment
 # =======================
-# Packages
+# ----- Packages -----
 sudo apt-get update -y
 sudo apt-get install -y awscli
 sudo apt-get install -y default-libmysqlclient-dev
-# On Red Hat-based systems
-# sudo dnf install mysql-devel
+sudo apt-get install -y mariadb-client
+sudo apt-get install -y mariadb-server
+sudo apt-get install -y python3
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python3-venv
 sudo apt-get install -y uvicorn
 sudo apt-get install -y nginx
 
-# Data
-aws s3 sync s3://vocabulary-benito/vocabulary /home/ubuntu/vocabulary
-
-# Python
+# ----- Python -----
 export PYTHONPATH=/home/ubuntu/vocabulary/src:$PYTHONPATH
 cd vocabulary
 python3 -m venv env
@@ -174,13 +169,20 @@ source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-
-
-# =======================
-# Nginx
-# =======================
+# ----- Nginx -----
 sudo nano /etc/nginx/sites-available/vocabulary_app.com
-# Copy this
+server {
+    listen 80;
+    server_name vocabulary-app.com www.vocabulary-app.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
 server {
     listen 443;
     server_name vocabulary-app.com www.vocabulary-app.com;
@@ -201,8 +203,6 @@ sudo service nginx restart
 # =======================
 # MariaDB
 # =======================
-sudo apt-get install -y mariadb-client
-sudo apt-get install -y mariadb-server
 cd ~/vocabulary/data
 sudo mariadb
 SOURCE english.sql;
@@ -211,6 +211,12 @@ SELECT user, host FROM mysql.user;
 SHOW GRANTS FOR 'benito'@'localhost';
 ALTER USER 'benito'@'localhost' IDENTIFIED BY '<database_password>';
 
+
+
+# =======================
+#  L A U N C H
+# =======================
+cd ~/vocabulary
 uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
 
 
