@@ -62,8 +62,7 @@ aws s3 sync \
     --exclude ".vscode/*" \
     --exclude "__pycache__/*" \
     --exclude ".git/*" \
-    --exclude "bin/aws_commands.sh" \
-    --exclude "bin/kubectl_create_secret.sh" \
+    --exclude "bin/*" \
     --exclude "common/*" \
     --exclude "conf/*" \
     --exclude "data/__pycache__/*" \
@@ -73,6 +72,7 @@ aws s3 sync \
     --exclude "htmlcov/*" \
     --exclude "logs/*" \
     --exclude "mgmt/*" \
+    --exclude "scripts/*" \
     --exclude "src/data/__pycache__/*" \
     --exclude "tests/*" \
     --exclude ".gitignore" \
@@ -95,7 +95,24 @@ aws s3 sync \
     s3://vocabulary-benito/vocabulary \
     /home/ubuntu/vocabulary \
     --exclude "env/*" \
-    --delete
+    --delete \
+    --debug
+
+# Plus rapide :
+aws s3 cp \
+    /home/benoit/Documents/vocabulary/src/web_app.py \
+    s3://vocabulary-benito/vocabulary/src/web_app.py
+
+aws s3 cp \
+    s3://vocabulary-benito/vocabulary/src/web_app.py \
+    /home/ubuntu/vocabulary/src/web_app.py
+
+# Depuis Fedora à l'EC2
+scp -r -i \
+    conf/voc_ssh_key_1.pem \
+    /home/benoit/Documents/vocabulary/src/ \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/
+
 
 
 aws ec2 run-instances \
@@ -201,7 +218,7 @@ sudo service nginx restart
 
 
 # =======================
-# MariaDB
+#  M A R I A   D B
 # =======================
 cd ~/vocabulary/data
 sudo mariadb
@@ -214,10 +231,11 @@ ALTER USER 'benito'@'localhost' IDENTIFIED BY '<database_password>';
 
 
 # =======================
-#  L A U N C H
+#  U V I C O R N
 # =======================
 cd ~/vocabulary
 uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
+pkill uvicorn
 
 
 

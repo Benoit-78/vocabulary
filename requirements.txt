@@ -13,10 +13,10 @@ uvicorn==0.23.2
 # Visualization
 plotly==5.18.0
 
-# Cloud
-awscli==1.29.54
-botocore==1.31.54
-s3transfer==0.6.2
+# Cloud (better not to fix the version)
+awscli
+botocore
+s3transfer
 
 # Database
 mysql==0.0.3

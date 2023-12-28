@@ -30,7 +30,7 @@ function startTest(numWords) {
     numWords = parseInt(numWords, 10);
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
-        window.location.href = `/interro_question/${numWords}/0/0`;
+        window.location.href = `/interro-question/${numWords}/0/0`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
@@ -42,7 +42,7 @@ function showTranslation(numWords, count, score) {
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (!isNaN(numWords)) {
-        window.location.href = `/interro_answer/${numWords}/${count}/${score}`;
+        window.location.href = `/interro-answer/${numWords}/${count}/${score}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
@@ -82,7 +82,7 @@ function nextGuess(numWords, count, score) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
-    window.location.href = `/interro_question/${numWords}/${count}/${score}`;
+    window.location.href = `/interro-question/${numWords}/${count}/${score}`;
 }
 
 
@@ -91,8 +91,8 @@ function endInterro(numWords, count, score) {
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (score === numWords) {
-        window.location.href = `/interro_end/${numWords}/${score}`;
+        window.location.href = `/interro-end/${numWords}/${score}`;
     } else {
-        window.location.href = `/propose_rattraps/${numWords}/${count}/${score}`;
+        window.location.href = `/propose-rattraps/${numWords}/${count}/${score}`;
     }
 }

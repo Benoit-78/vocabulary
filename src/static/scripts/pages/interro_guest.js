@@ -8,7 +8,7 @@ document.addEventListener(
 
 
 function sendUserSettings(testType, numWords) {
-    fetch("/user-settings_guest", {
+    fetch("/user-settings-guest", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -30,7 +30,7 @@ function startTest(numWords) {
     numWords = parseInt(numWords, 10);
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
-        window.location.href = `/interro_question_guest/${numWords}/0/0`;
+        window.location.href = `/interro-question-guest/${numWords}/0/0`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
@@ -42,7 +42,7 @@ function showTranslation(numWords, count, score) {
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (!isNaN(numWords)) {
-        window.location.href = `/interro_answer_guest/${numWords}/${count}/${score}`;
+        window.location.href = `/interro-answer-guest/${numWords}/${count}/${score}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
@@ -50,7 +50,7 @@ function showTranslation(numWords, count, score) {
 
 
 function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2) {
-    fetch("/user-answer_guest", {
+    fetch("/user-answer-guest", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -82,7 +82,7 @@ function nextGuess(numWords, count, score) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
-    window.location.href = `/interro_question_guest/${numWords}/${count}/${score}`;
+    window.location.href = `/interro-question-guest/${numWords}/${count}/${score}`;
 }
 
 
@@ -91,8 +91,8 @@ function endInterro(numWords, count, score) {
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (score === numWords) {
-        window.location.href = `/interro_end_guest/${numWords}/${score}`;
+        window.location.href = `/interro-end-guest/${numWords}/${score}`;
     } else {
-        window.location.href = `/propose_rattraps_guest/${numWords}/${count}/${score}`;
+        window.location.href = `/propose-rattraps-guest/${numWords}/${count}/${score}`;
     }
 }

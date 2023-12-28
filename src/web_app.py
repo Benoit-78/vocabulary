@@ -54,12 +54,23 @@ def welcome_page(request: Request):
     )
 
 
-
-@app.get("/root", response_class=HTMLResponse)
-def root_page(request: Request):
-    """Call the root page"""
+@app.get("/sign-in", response_class=HTMLResponse)
+def sign_in(request: Request):
+    """Call the sign-in page"""
     return templates.TemplateResponse(
-        "user/root.html",
+        "user/sign_in.html",
+        {
+            "request": request,
+        }
+    )
+
+
+
+@app.get("/about-the-app", response_class=HTMLResponse)
+def about_the_app(request: Request):
+    """Call the page that helps the user to get started."""
+    return templates.TemplateResponse(
+        "about_the_app.html",
         {
             "request": request,
         }
@@ -79,24 +90,41 @@ def get_help(request: Request):
 
 
 # ==================================================
-#  G E T   S T A R T E D
+#  U S E R   S I G N - I N
 # ==================================================
-@app.get("/about_the_app", response_class=HTMLResponse)
-def about_the_app(request: Request):
-    """Call the page that helps the user to get started."""
+@app.post("/user-creds")
+async def get_user_creds(creds: dict):
+    """Acquire the user settings for one interro."""
+    global user_name
+    global user_password
+    user_name = creds['name']
+    user_password = creds['password']
+    logger.info("User data loaded")
+    global flag_data_updated
+    flag_data_updated = False
+    return JSONResponse(
+        content=
+        {
+            "message": "User settings stored successfully."
+        }
+    )
+
+
+@app.get("/root", response_class=HTMLResponse)
+def root_page(request: Request):
+    """Call the root page"""
     return templates.TemplateResponse(
-        "about_the_app.html",
+        "user/root.html",
         {
             "request": request,
         }
     )
 
 
-
 # ==================================================
 #  I N T E R R O   U S E R
 # ==================================================
-@app.get("/interro_settings", response_class=HTMLResponse)
+@app.get("/interro-settings", response_class=HTMLResponse)
 def interro_settings(request: Request):
     """Call the page that gets the user settings for one interro."""
     return templates.TemplateResponse(
@@ -144,7 +172,7 @@ def load_test(test_type, words):
     return loader_, test_
 
 
-@app.get("/interro_question/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/interro-question/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_question(
     request: Request,
     words: int,
@@ -178,7 +206,7 @@ def load_interro_question(
     )
 
 
-@app.get("/interro_answer/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/interro-answer/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_answer(
     request: Request,
     words: int,
@@ -236,7 +264,7 @@ async def get_user_response(data: dict):
     )
 
 
-@app.get("/propose_rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/propose-rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
 def propose_rattraps(
     request: Request,
     words: int,
@@ -275,7 +303,7 @@ def propose_rattraps(
     )
 
 
-@app.get("/interro_end/{words}/{score}", response_class=HTMLResponse)
+@app.get("/interro-end/{words}/{score}", response_class=HTMLResponse)
 def end_interro(
     request: Request,
     words: int,
@@ -306,23 +334,12 @@ def end_interro(
 # ==================================================
 # G U E S T
 # ==================================================
-@app.get("/root_guest", response_class=HTMLResponse)
-def root_guest_page(request: Request):
-    """
-    Call the guest root page.
-    The guest only can do some tests, and nothing more.
-    - this page must NOT contain pages like settings, add word, ...
-    - a guest should not access the 'root' page, even by accident.
-    """
-    return templates.TemplateResponse(
-        "guest/root_guest.html",
-        {
-            "request": request,
-        }
-    )
+# The guest only can do some tests, and nothing more.
+#     - this page must NOT contain pages like settings, add word, ...
+#     - a guest should not access the 'root' page, even by accident.
 
 
-@app.get("/guest_not_allowed", response_class=HTMLResponse)
+@app.get("/guest-not-allowed", response_class=HTMLResponse)
 def guest_not_allowed(request: Request):
     """
     Page used each time a guest tries to access a page he has not access to.
@@ -335,7 +352,7 @@ def guest_not_allowed(request: Request):
     )
 
 
-@app.get("/interro_settings_guest", response_class=HTMLResponse)
+@app.get("/interro-settings-guest", response_class=HTMLResponse)
 def interro_settings_guest(request: Request):
     """Call the page that gets the user settings for one interro."""
     return templates.TemplateResponse(
@@ -346,7 +363,7 @@ def interro_settings_guest(request: Request):
     )
 
 
-@app.post("/user-settings_guest")
+@app.post("/user-settings-guest")
 async def get_user_settings_guest(settings: dict):
     """Acquire the user settings for one interro."""
     global loader
@@ -383,7 +400,7 @@ def load_test_guest(test_type, words):
     return loader_, test_
 
 
-@app.get("/interro_question_guest/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/interro-question-guest/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_question_guest(
     request: Request,
     words: int,
@@ -417,7 +434,7 @@ def load_interro_question_guest(
     )
 
 
-@app.get("/interro_answer_guest/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/interro-answer-guest/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_answer_guest(
     request: Request,
     words: int,
@@ -449,7 +466,7 @@ def load_interro_answer_guest(
     )
 
 
-@app.post("/user-answer_guest")
+@app.post("/user-answer-guest")
 async def get_user_response_guest(data: dict):
     """Acquire the user decision: was his answer right or wrong."""
     global test
@@ -475,7 +492,7 @@ async def get_user_response_guest(data: dict):
     )
 
 
-@app.get("/propose_rattraps_guest/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/propose-rattraps-guest/{words}/{count}/{score}", response_class=HTMLResponse)
 def propose_rattraps_guest(
     request: Request,
     words: int,
@@ -514,7 +531,7 @@ def propose_rattraps_guest(
     )
 
 
-@app.get("/interro_end_guest/{words}/{score}", response_class=HTMLResponse)
+@app.get("/interro-end-guest/{words}/{score}", response_class=HTMLResponse)
 def end_interro_guest(
     request: Request,
     words: int,
@@ -601,7 +618,7 @@ def graphs_page(request: Request):
 # ==================================================
 #  S E T T I N G S
 # ==================================================
-@app.get("/user_settings", response_class=HTMLResponse)
+@app.get("/user-settings", response_class=HTMLResponse)
 def settings_page(request: Request):
     """Load the main page for settings."""
     return templates.TemplateResponse(
