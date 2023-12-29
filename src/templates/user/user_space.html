@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Vocabulary</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/root.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome {{ userName }}!</h1>
+        <div class="button-list">
+            <button onclick="window.location.href='/interro-settings/{{ userName }}'">Interroooo !!!</button>
+            <button onclick="window.location.href='/database/{{ userName }}'">Add a word</button>
+            <button onclick="window.location.href='/dashboard/{{ userName }}'">Dashboard</button>
+            <button onclick="window.location.href='/user-settings/{{ userName }}'">Settings</button>
+        </div>
+    </div>
+</body>
+
+</html>

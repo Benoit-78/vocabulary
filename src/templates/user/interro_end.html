@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
 </head>
 
 <body>
@@ -17,7 +18,7 @@
             <p>You have found all of them, congratulations!</p>
         </div>
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
     </div>
 </body>

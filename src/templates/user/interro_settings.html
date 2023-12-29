@@ -37,12 +37,13 @@
         </form>
         <div class="row">
             <button class="button" onclick="sendUserSettings(
+                `{{ userName }}`,
                 document.getElementById('test-type').value,
                 document.getElementById('num-words').value
                 )">Start Test</button>
         </div>
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
     </div>
 </body>

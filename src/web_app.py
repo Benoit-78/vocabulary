@@ -16,8 +16,10 @@ from loguru import logger
 
 from src import interro
 from src import views
-from src.data import data_handler
 from src.dashboard import feed_dashboard
+from src.data import data_handler
+from src.data import users
+
 
 app = FastAPI()
 LANGUAGE = 'english'
@@ -65,7 +67,6 @@ def sign_in(request: Request):
     )
 
 
-
 @app.get("/about-the-app", response_class=HTMLResponse)
 def about_the_app(request: Request):
     """Call the page that helps the user to get started."""
@@ -92,45 +93,51 @@ def get_help(request: Request):
 # ==================================================
 #  U S E R   S I G N - I N
 # ==================================================
-@app.post("/user-creds")
-async def get_user_creds(creds: dict):
+
+@app.post("/check-input-creds")
+async def check_input_creds(creds: dict):
     """Acquire the user settings for one interro."""
-    global user_name
     global user_password
-    user_name = creds['name']
-    user_password = creds['password']
-    logger.info("User data loaded")
-    global flag_data_updated
-    flag_data_updated = False
+    input_name = creds['input_name']
+    input_password = creds['input_password']
+    users.check_credentials(input_name, input_password)
+    user_name = input_name
+    user_password = input_password
     return JSONResponse(
         content=
         {
-            "message": "User settings stored successfully."
+            "message": "User credentials validated successfully",
+            "userName": user_name
         }
     )
 
 
-@app.get("/root", response_class=HTMLResponse)
-def root_page(request: Request):
-    """Call the root page"""
+@app.get("/user-space/{user_name}", response_class=HTMLResponse)
+def user_main_page(request: Request, user_name):
+    """Call the base page of user space"""
     return templates.TemplateResponse(
-        "user/root.html",
+        "user/user_space.html",
         {
             "request": request,
+            "userName": user_name
         }
     )
+
 
 
 # ==================================================
 #  I N T E R R O   U S E R
 # ==================================================
-@app.get("/interro-settings", response_class=HTMLResponse)
-def interro_settings(request: Request):
+@app.get("/interro-settings/{user_name}", response_class=HTMLResponse)
+def interro_settings(request: Request, user_name):
     """Call the page that gets the user settings for one interro."""
+    global user_password
+    users.check_credentials(user_name, user_password)
     return templates.TemplateResponse(
         "user/interro_settings.html",
         {
             "request": request,
+            "userName": user_name
         }
     )
 
@@ -172,13 +179,16 @@ def load_test(test_type, words):
     return loader_, test_
 
 
-@app.get("/interro-question/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/interro-question/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_question(
     request: Request,
+    user_name,
     words: int,
     count=None,
     score=None):
     """Call the page that asks the user the meaning of a word"""
+    global user_password
+    users.check_credentials(user_name, user_password)
     # Instantiation
     try:
         count = int(count)
@@ -197,6 +207,7 @@ def load_interro_question(
         "user/interro_question.html",
         {
             "request": request,
+            "userName": user_name,
             "numWords": words,
             "count": count,
             "score": score,
@@ -206,9 +217,10 @@ def load_interro_question(
     )
 
 
-@app.get("/interro-answer/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/interro-answer/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_answer(
     request: Request,
+    user_name,
     words: int,
     count: int,
     score: int):
@@ -216,6 +228,8 @@ def load_interro_answer(
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
     """
+    global user_password
+    users.check_credentials(user_name, user_password)
     count = int(count)
     global test
     index = test.interro_df.index[count - 1]
@@ -228,6 +242,7 @@ def load_interro_answer(
         "user/interro_answer.html",
         {
             "request": request,
+            "userName": user_name,
             "numWords": words,
             "count": count,
             "score": score,
@@ -264,13 +279,17 @@ async def get_user_response(data: dict):
     )
 
 
-@app.get("/propose-rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/propose-rattraps/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
 def propose_rattraps(
     request: Request,
+    user_name,
     words: int,
     count: int,
     score: int):
     """Load a page that proposes the user to take a rattraps, or leave the test."""
+    # Credential check
+    global user_password
+    users.check_credentials(user_name, user_password)
     global test
     # Enregistrer les résultats
     global flag_data_updated
@@ -293,6 +312,7 @@ def propose_rattraps(
         "user/rattraps_propose.html",
         {
             "request": request,
+            "userName": user_name,
             "score": score,
             "numWords": words,
             "count": count,
@@ -303,15 +323,20 @@ def propose_rattraps(
     )
 
 
-@app.get("/interro-end/{words}/{score}", response_class=HTMLResponse)
+@app.get("/interro-end/{user_name}/{words}/{score}", response_class=HTMLResponse)
 def end_interro(
     request: Request,
+    user_name,
     words: int,
     score: int):
     """
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performances.
     """
+    # Credential check
+    global user_password
+    users.check_credentials(user_name, user_password)
+    # Execution
     global flag_data_updated
     if flag_data_updated is False:
         global loader
@@ -325,7 +350,8 @@ def end_interro(
         {
             "request": request,
             "score": score,
-            "numWords": words
+            "numWords": words,
+            "userName": user_name
         }
     )
 
@@ -334,7 +360,7 @@ def end_interro(
 # ==================================================
 # G U E S T
 # ==================================================
-# The guest only can do some tests, and nothing more.
+# The guest is able to do some tests, but nothing more.
 #     - this page must NOT contain pages like settings, add word, ...
 #     - a guest should not access the 'root' page, even by accident.
 
@@ -386,18 +412,18 @@ async def get_user_settings_guest(settings: dict):
 def load_test_guest(test_type, words):
     """Load the interroooo!"""
     db_handler = data_handler.MariaDBHandler(test_type, 'web_local', LANGUAGE)
-    loader_ = interro.Loader(0, db_handler)
-    loader_.load_tables()
+    loader_object = interro.Loader(0, db_handler)
+    loader_object.load_tables()
     guesser = views.FastapiGuesser()
-    test_ = interro.Test(
-        loader_.tables[loader_.test_type + '_voc'],
+    test_object = interro.Test(
+        loader_object.tables[loader_object.test_type + '_voc'],
         words,
         guesser,
-        loader_.tables[loader_.test_type + '_perf'],
-        loader_.tables[loader_.test_type + '_words_count']
+        loader_object.tables[loader_object.test_type + '_perf'],
+        loader_object.tables[loader_object.test_type + '_words_count']
     )
-    test_.set_interro_df()
-    return loader_, test_
+    test_object.set_interro_df()
+    return loader_object, test_object
 
 
 @app.get("/interro-question-guest/{words}/{count}/{score}", response_class=HTMLResponse)
@@ -562,21 +588,22 @@ def end_interro_guest(
 # ==================================================
 #  D A T A B A S E
 # ==================================================
-@app.get("/database", response_class=HTMLResponse)
-def data_page(request: Request):
+@app.get("/database/{user_name}", response_class=HTMLResponse)
+def data_page(request: Request, user_name):
     """Base page for data input by the user."""
     title = "Here you can add words to your database."
     return templates.TemplateResponse(
         "user/database_add_word.html",
         {
             "request": request,
-            "title": title
+            "title": title,
+            "userName": user_name
         }
     )
 
 
-@app.post("/create-word")
-async def create_word(data: dict):
+@app.post("/create-word/{user_name}")
+async def create_word(data: dict, user_name):
     """Save the word in the database."""
     db_handler = data_handler.MariaDBHandler('version', 'web_local', LANGUAGE)
     english = data['english']
@@ -597,9 +624,11 @@ async def create_word(data: dict):
 # ==================================================
 #  D A S H B O A R D
 # ==================================================
-@app.get("/dashboard", response_class=HTMLResponse)
-def graphs_page(request: Request):
+@app.get("/dashboard/{user_name}", response_class=HTMLResponse)
+def graphs_page(request: Request, user_name):
     """Load the main page for performances visualization"""
+    global user_password
+    users.check_credentials(user_name, user_password)
     graphs = feed_dashboard.load_graphs()
     return templates.TemplateResponse(
         "user/dashboard.html",
@@ -609,21 +638,24 @@ def graphs_page(request: Request):
             "graph_2": graphs[1],
             "graph_3": graphs[2],
             "graph_4": graphs[3],
-            "graph_5": graphs[4]
+            "graph_5": graphs[4],
+            "userName": user_name
         }
     )
-
 
 
 # ==================================================
 #  S E T T I N G S
 # ==================================================
-@app.get("/user-settings", response_class=HTMLResponse)
-def settings_page(request: Request):
+@app.get("/user-settings/{user_name}", response_class=HTMLResponse)
+def settings_page(request: Request, user_name):
     """Load the main page for settings."""
+    global user_password
+    users.check_credentials(user_name, user_password)
     return templates.TemplateResponse(
         "user/settings.html",
         {
-            "request": request
+            "request": request,
+            "userName": user_name
         }
     )

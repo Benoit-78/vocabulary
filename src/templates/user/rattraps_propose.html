@@ -16,10 +16,10 @@
             <h1>Your score is: {{ score }} / {{ numWords }}</h1>
         </div>
         <div class="row">
-            <button class="button rattraps_button" onclick="nextGuess({{ newWords }}, {{ newCount }}, {{ newScore }})">Take a catch-up test</button>
+            <button class="button rattraps_button" onclick="nextGuess(`{{ userName }}`, {{ newWords }}, {{ newCount }}, {{ newScore }})">Take a catch-up test</button>
         </div>
         <div class="row">
-            <button class="button" onclick="goToRoot()">Quit</button>
+            <button class="button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
     </div>
 </body>

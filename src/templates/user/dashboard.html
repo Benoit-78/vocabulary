@@ -13,13 +13,14 @@
     <!-- Include Plotly.js -->
     <!--<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
     <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
 
 </head>
 
 <body>
 
     <div class="container">
-        <h1>My dashboard</h1>
+        <h1>Dashboard</h1>
 
         <div id="plotly-graph-container">
             {{ graph_1|safe }}
@@ -43,7 +44,7 @@
 
 
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
 
     </div>

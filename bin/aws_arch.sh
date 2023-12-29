@@ -1,13 +1,14 @@
 
-# ====================
-# General
-# ====================
+# ===========================================
+#  G E N E R A L
+# ===========================================
 aws configure
 
 
-# ====================
-# IAM
-# ====================
+
+# ===========================================
+#  I A M
+# ===========================================
 # Users
 aws iam update-user \
     --user-name vocabulary_test \
@@ -21,13 +22,13 @@ aws iam attach-role-policy \
 aws iam list-attached-role-policies \
     --role-name vocabulary_read_on_bucket
 
-# Policies
 
 
-# ====================
-# EC2
-# ====================
-# Security group
+# ===========================================
+#  E C 2
+# ===========================================
+
+# ----- Security groups -----
 aws ec2 create-security-group \
     --group-name vocabulary-sg \
     --description "Allows users to access the application" \
@@ -39,80 +40,18 @@ aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --proto
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 8080 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 80 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 443 --cidr 0.0.0.0/0
-# aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-egress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
 
 
 aws ec2 describe-security-groups \
     --group-ids sg-08ebad99d1b1b98b6
 
+# ----- Key pair -----
 aws ec2 create-key-pair \
     --key-name voc_ssh_key_1 \
     --query 'KeyMaterial' \
     --output text > voc_ssh_key_1.pem
-
-
-# ====================
-#  S 3
-# ====================
-aws s3 sync \
-    /home/benoit/Documents/vocabulary \
-    s3://vocabulary-benito/vocabulary \
-    --exclude ".pytest_cache/*" \
-    --exclude ".vscode/*" \
-    --exclude "__pycache__/*" \
-    --exclude ".git/*" \
-    --exclude "bin/*" \
-    --exclude "common/*" \
-    --exclude "conf/*" \
-    --exclude "data/__pycache__/*" \
-    --exclude "divers/*" \
-    --exclude "doc/*" \
-    --exclude "env/*" \
-    --exclude "htmlcov/*" \
-    --exclude "logs/*" \
-    --exclude "mgmt/*" \
-    --exclude "scripts/*" \
-    --exclude "src/data/__pycache__/*" \
-    --exclude "tests/*" \
-    --exclude ".gitignore" \
-    --exclude ".coverage" \
-    --exclude "common/secret.yaml" \
-    --exclude "cred.json" \
-    --exclude "nltk_tries_out.py" \
-    --exclude "pylintrc" \
-    --exclude "pyvenv.cfg" \
-    --exclude "README.md" \
-    --exclude "token.txt" \
-    --exclude "*.exe" \
-    --exclude "*.pdf" \
-    --exclude "*.png" \
-    --exclude "*.pyc" \
-    --delete
-
-
-aws s3 sync \
-    s3://vocabulary-benito/vocabulary \
-    /home/ubuntu/vocabulary \
-    --exclude "env/*" \
-    --delete \
-    --debug
-
-# Plus rapide :
-aws s3 cp \
-    /home/benoit/Documents/vocabulary/src/web_app.py \
-    s3://vocabulary-benito/vocabulary/src/web_app.py
-
-aws s3 cp \
-    s3://vocabulary-benito/vocabulary/src/web_app.py \
-    /home/ubuntu/vocabulary/src/web_app.py
-
-# Depuis Fedora à l'EC2
-scp -r -i \
-    conf/voc_ssh_key_1.pem \
-    /home/benoit/Documents/vocabulary/src/ \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/
-
 
 
 aws ec2 run-instances \
@@ -131,7 +70,7 @@ aws ec2 describe-instances \
     --instance-ids i-0d346ee03d9c2524e \
     --query "Reservations[0].Instances[0].State.Name"
 
-# Create Internet Gateway
+# ----- Internet Gateway -----
 aws ec2 create-internet-gateway
 
 grep InternetGatewayId
@@ -140,7 +79,7 @@ aws ec2 attach-internet-gateway \
     --internet-gateway-id igw-067bdaf3b90f544d8 \
     --vpc-id vpc-0011e2cd73034beb9
 
-# Create an elastic IP
+# ----- Elastic IP -----
 aws ec2 allocate-address \
     --domain vpc
 
@@ -155,18 +94,14 @@ aws ec2 associate-address \
 # Actions -> Monitor and troubleshoot -> Get system log
 # Why does an elastic IP address need an internet gateway, and a standard IP address does not?
 # How can I know if my instance is on a private or public network?
-
-# Use '-' in the IP address, not '.'
-ssh -i  \
-    conf/voc_ssh_key_1.pem \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com
+# -> IP like 10.*.*.* : private
+# -> IP like 172.*.*.* : public
 
 
 
-# =======================
-# Environment
-# =======================
-# ----- Packages -----
+# ==============================================
+#  P A C K A G E S
+# ==============================================
 sudo apt-get update -y
 sudo apt-get install -y awscli
 sudo apt-get install -y default-libmysqlclient-dev
@@ -178,16 +113,13 @@ sudo apt-get install -y python3-venv
 sudo apt-get install -y uvicorn
 sudo apt-get install -y nginx
 
-# ----- Python -----
-export PYTHONPATH=/home/ubuntu/vocabulary/src:$PYTHONPATH
-cd vocabulary
-python3 -m venv env
-source env/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
 
-# ----- Nginx -----
+
+# ==============================================
+#  N G I N X
+# ==============================================
 sudo nano /etc/nginx/sites-available/vocabulary_app.com
+
 server {
     listen 80;
     server_name vocabulary-app.com www.vocabulary-app.com;
@@ -200,6 +132,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+
 server {
     listen 443;
     server_name vocabulary-app.com www.vocabulary-app.com;
@@ -212,14 +145,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+
 sudo ln -s /etc/nginx/sites-available/vocabulary_app.com /etc/nginx/sites-enabled/
 sudo service nginx restart
 
 
 
-# =======================
+# ==============================================
 #  M A R I A   D B
-# =======================
+# ==============================================
 cd ~/vocabulary/data
 sudo mariadb
 SOURCE english.sql;
@@ -229,32 +163,24 @@ SHOW GRANTS FOR 'benito'@'localhost';
 ALTER USER 'benito'@'localhost' IDENTIFIED BY '<database_password>';
 
 
+# ==============================================
+#  T R O U B L E S H O O T I N G
+# ==============================================
 
-# =======================
-#  U V I C O R N
-# =======================
-cd ~/vocabulary
-uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
-pkill uvicorn
-
-
-
-# =======================
-# Troubleshooting
-# =======================
-# S3
+# ----- S3 -----
 aws s3 rm s3://vocabulary-benito/vocabulary/logs \
     --recursive
 aws s3 rm s3://vocabulary-benito/vocabulary/bin/aws_commands.sh
-# Nginx
+
+# ----- Nginx -----
 sudo service nginx status
 sudo tail -f /var/log/nginx/error.log
 
 
 
-# =======================
+# ==============================================
 #  E C R
-# =======================
+# ==============================================
 aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 098964451146.dkr.ecr.eu-west-3.amazonaws.com
 # docker build -t vocabulary .
 docker-compose build
@@ -265,9 +191,9 @@ docker push public.ecr.aws/e8w4p1y9/vocabulary_compose:latest
 
 
 
-# =======================
-# End of life
-# =======================
+# ==============================================
+#  E N D   O F   L I F E
+# ==============================================
 aws ec2 terminate-instances \
     --instance-ids <instance-id>
 

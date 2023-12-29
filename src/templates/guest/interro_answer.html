@@ -15,12 +15,15 @@
         <div class="progress-container">
             <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
+
         <div>
             <p>{{ count }} / {{ numWords }}</p>
         </div>
+
         <div class="row">
             <p>What is the translation for:</p>
         </div>
+
         <div class="row">
             <div class="flag-box">
                 <div class="box">
@@ -35,16 +38,20 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <p>Did you get it?</p>
         </div>
+
         <div class="row">
             <button class="button green" id="yes-button" onclick="sendUserAnswer('Yes', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`,`{{ content_box2|safe }}`)">Yes</button>
             <button class="button red" id="no-button" onclick="sendUserAnswer('No', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">No</button>
         </div>
+
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
         </div>
+
     </div>
 </body>
 
