@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>Test Configuration</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
+    <script type="text/javascript" src="/static/scripts/pages/interro.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <form>
+            <div class="row">
+                <label for="test-type">Test type:</label>
+            </div>
+            <div class="row">
+                <select id="test-type" name="test-type" class="dropdown-container" required>
+                    <option value="Version">EN -> FR</option>
+                    <option value="Theme">FR -> EN</option>
+                </select>
+            </div>
+            <div class="row">
+                <label for="num-words">Number of words:</label>
+            </div>
+            <div class="row">
+                <select id="num-words" name="num-words" class="dropdown-container" required>
+                    <option value="100">100</option>
+                    <option value="50">50</option>
+                    <option value="20">20</option>
+                    <option value="10">10</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+        </form>
+        <div class="row">
+            <button class="button" onclick="sendUserSettings(
+                `{{ userName }}`,
+                document.getElementById('test-type').value,
+                document.getElementById('num-words').value
+                )">Start Test</button>
+        </div>
+        <div class="row">
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
+        </div>
+    </div>
+</body>
+
+</html>

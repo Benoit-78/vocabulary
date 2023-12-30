@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/pages/interro.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
 
 </head>
 
@@ -16,10 +16,10 @@
 
     <div class="container">
     
-        <h1>User settings</h1>
+        <h1>Settings</h1>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
 
     </div>

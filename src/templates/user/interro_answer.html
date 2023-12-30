@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Translation Quiz</title>
-        <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-        <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-        <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
-        <script type="text/javascript" src="/static/scripts/main.js"></script>
-        <script type="text/javascript" src="/static/scripts/pages/interro.js"></script>
-    </head>
+
+<head>
+    <title>Translation Quiz</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
+    <script type="text/javascript" src="/static/scripts/pages/interro.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
+</head>
+
 <body>
     <div class="container">
         <div class="progress-container">
@@ -37,12 +39,13 @@
             <p>Did you get it?</p>
         </div>
         <div class="row">
-            <button class="button green" id="yes-button" onclick="sendUserAnswer('Yes', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`,`{{ content_box2|safe }}`)">Yes</button>
-            <button class="button red" id="no-button" onclick="sendUserAnswer('No', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">No</button>
+            <button class="button green" id="yes-button" onclick="sendUserAnswer(`{{ userName }}`, 'Yes', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`,`{{ content_box2|safe }}`)">Yes</button>
+            <button class="button red" id="no-button" onclick="sendUserAnswer(`{{ userName }}`, 'No', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">No</button>
         </div>
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
     </div>
 </body>
+
 </html>

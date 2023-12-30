@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add a word</title>
+        <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+        <script type="text/javascript" src="/static/scripts/main.js"></script>
+        <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
+    </head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="flag-box">
+                <label for="input1">User name</label>
+                <input type="text" id="input1" name="input1">
+            </div>
+        </div>
+        <div class="row"></div>
+            <div class="flag-box">
+                <label for="input2">Password</label>
+                <input type="text" id="input2" name="input2">
+            </div>
+        </div>
+        <div class="row">
+            <button class="button" onclick="signIn()">Sign in</button>
+        </div>
+        <div class="row">
+            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+        </div>
+    </div>
+</body>
+</html>

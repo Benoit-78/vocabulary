@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Translation Quiz</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
+    <script type="text/javascript" src="/static/scripts/pages/interro.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
+        </div>
+
+        <div>
+            <p>{{ count }} / {{ numWords }}</p>
+        </div>
+
+        <div class="row">
+            <p>What is the translation for:</p>
+        </div>
+
+        <div class="row">
+            <div class="flag-box">
+                <div class="box">
+                    {{ content_box1 }}
+                </div>
+                <span class="flag flag-us">&#x1F1FA;&#x1F1F8;</span>
+            </div>
+            <div class="flag-box">
+                <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
+                <div class="box">
+                    ?
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <button class="button middle_button" onclick="showTranslation(`{{ userName }}`, {{ numWords }}, {{ count }}, {{ score }})">Show translation</button>
+        </div>
+
+        <div class="row">
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
+        </div>
+
+    </div>
+</body>
+
+</html>

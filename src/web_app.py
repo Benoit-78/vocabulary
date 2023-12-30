@@ -1,7 +1,7 @@
 """
     Author:
         Benoît DELORME
-    Decoupling date:
+    Creation date:
         26th August 2023
     Main purpose:
         Vocabulary application in its FastAPI version.
@@ -16,26 +16,35 @@ from loguru import logger
 
 from src import interro
 from src import views
-from src.data import data_handler
 from src.dashboard import feed_dashboard
+from src.data import data_handler
+from src.data import users
+
 
 app = FastAPI()
 LANGUAGE = 'english'
 test = None
 loader = None
 flag_data_updated = None
+cred_checker = users.CredChecker()
 
-# Serve CSS files
+# CSS files
 app.mount(
     "/static",
     StaticFiles(directory="src/static"),
     name="static"
 )
-# Serve HTML files
-templates = Jinja2Templates(directory="src/templates")
+
+# HTML files
+templates = Jinja2Templates(
+    directory="src/templates"
+)
 
 
 
+# ==================================================
+#  W E L C O M E   P A G E
+# ==================================================
 @app.get("/", response_class=HTMLResponse)
 def welcome_page(request: Request):
     """Call the welcome page"""
@@ -47,28 +56,87 @@ def welcome_page(request: Request):
     )
 
 
-
-# ==================================================
-#  G E T   S T A R T E D
-# ==================================================
-@app.get("/get_started", response_class=HTMLResponse)
-def start_page():
-    """Call the page that helps the user to get started."""
-    title = "Get started with interro application."
-    return title
-
-
-
-# ==================================================
-#  I N T E R R O
-# ==================================================
-@app.get("/interro_settings", response_class=HTMLResponse)
-def interro_settings(request: Request):
-    """Call the page that gets the user settings for one interro."""
+@app.get("/sign-in", response_class=HTMLResponse)
+def sign_in(request: Request):
+    """Call the sign-in page"""
     return templates.TemplateResponse(
-        "interro_settings.html",
+        "user/sign_in.html",
+        {
+            "request": request
+        }
+    )
+
+
+@app.get("/about-the-app", response_class=HTMLResponse)
+def about_the_app(request: Request):
+    """Call the page that helps the user to get started."""
+    return templates.TemplateResponse(
+        "about_the_app.html",
         {
             "request": request,
+        }
+    )
+
+
+@app.get("/help", response_class=HTMLResponse)
+def get_help(request: Request):
+    """Help!"""
+    return templates.TemplateResponse(
+        "help.html",
+        {
+            "request": request,
+        }
+    )
+
+
+
+# ==================================================
+#  U S E R   S I G N - I N
+# ==================================================
+
+@app.post("/authenticate")
+async def authenticate(creds: dict):
+    """Acquire the user settings for one interro."""
+    # global cred_checker
+    cred_checker.name = creds['input_name']
+    cred_checker.password = creds['input_password']
+    cred_checker.check_credentials(creds['input_name'])
+    return JSONResponse(
+        content=
+        {
+            "message": "User credentials validated successfully",
+            "userName": cred_checker.name
+        }
+    )
+
+
+@app.get("/user-space/{user_name}", response_class=HTMLResponse)
+def user_main_page(request: Request, user_name):
+    """Call the base page of user space"""
+    # global cred_checker
+    cred_checker.check_credentials(user_name)
+    return templates.TemplateResponse(
+        "user/user_space.html",
+        {
+            "request": request,
+            "userName": user_name
+        }
+    )
+
+
+
+# ==================================================
+#  I N T E R R O   U S E R
+# ==================================================
+@app.get("/interro-settings/{user_name}", response_class=HTMLResponse)
+def interro_settings(request: Request, user_name):
+    """Call the page that gets the user settings for one interro."""
+    cred_checker.check_credentials(user_name)
+    return templates.TemplateResponse(
+        "user/interro_settings.html",
+        {
+            "request": request,
+            "userName": user_name
         }
     )
 
@@ -110,8 +178,250 @@ def load_test(test_type, words):
     return loader_, test_
 
 
-@app.get("/interro_question/{words}/{count}/{score}", response_class=HTMLResponse)
+@app.get("/interro-question/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_question(
+    request: Request,
+    user_name,
+    words: int,
+    count=None,
+    score=None):
+    """Call the page that asks the user the meaning of a word"""
+    cred_checker.check_credentials(user_name)
+    global test
+    try:
+        count = int(count)
+    except NameError:
+        count = 0
+    try:
+        score = int(score)
+    except NameError:
+        score = 0
+    progress_percent = int(count / int(words) * 100)
+    index = test.interro_df.index[count]
+    english = test.interro_df.loc[index][0]
+    english = english.replace("'", "\'")
+    count += 1
+    return templates.TemplateResponse(
+        "user/interro_question.html",
+        {
+            "request": request,
+            "userName": user_name,
+            "numWords": words,
+            "count": count,
+            "score": score,
+            "progressPercent": progress_percent,
+            "content_box1": english
+        }
+    )
+
+
+@app.get("/interro-answer/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
+def load_interro_answer(
+    request: Request,
+    user_name,
+    words: int,
+    count: int,
+    score: int):
+    """
+    Call the page that displays the right answer
+    Asks the user to tell if his guess was right or wrong.
+    """
+    cred_checker.check_credentials(user_name)
+    count = int(count)
+    global test
+    index = test.interro_df.index[count - 1]
+    english = test.interro_df.loc[index][0]
+    french = test.interro_df.loc[index][1]
+    english = english.replace("'", "\'")
+    french = french.replace("'", "\'")
+    progress_percent = int(count / int(words) * 100)
+    return templates.TemplateResponse(
+        "user/interro_answer.html",
+        {
+            "request": request,
+            "userName": user_name,
+            "numWords": words,
+            "count": count,
+            "score": score,
+            "progressPercent": progress_percent,
+            "content_box1": english,
+            "content_box2": french,
+        }
+    )
+
+
+@app.post("/user-answer/{user_name}")
+async def get_user_response(data: dict, user_name):
+    """Acquire the user decision: was his answer right or wrong."""
+    cred_checker.check_credentials(user_name)
+    global test
+    score = data.get('score')
+    if data["answer"] == 'Yes':
+        score += 1
+        test.update_voc_df(True)
+    elif data["answer"] == 'No':
+        test.update_voc_df(False)
+        test.update_faults_df(
+            False,
+            [
+                data.get('english'),
+                data.get('french')
+            ]
+        )
+    return JSONResponse(
+        content=
+        {
+            "score": score,
+            "message": "User response stored successfully."
+        }
+    )
+
+
+@app.get("/propose-rattraps/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
+def propose_rattraps(
+    request: Request,
+    user_name,
+    words: int,
+    count: int,
+    score: int):
+    """Load a page that proposes the user to take a rattraps, or leave the test."""
+    cred_checker.check_credentials(user_name)
+    global test
+    # Enregistrer les résultats
+    global flag_data_updated
+    if flag_data_updated is False:
+        global loader
+        test.compute_success_rate()
+        updater = interro.Updater(loader, test)
+        updater.update_data()
+        logger.info("User data updated.")
+        flag_data_updated = True
+    else:
+        logger.info("User data not updated yet.")
+    # Réinitialisation
+    new_count = 0
+    new_score = 0
+    new_words = test.faults_df.shape[0]
+    test.interro_df = test.faults_df
+    test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
+    return templates.TemplateResponse(
+        "user/rattraps_propose.html",
+        {
+            "request": request,
+            "userName": user_name,
+            "score": score,
+            "numWords": words,
+            "count": count,
+            "newScore": new_score,
+            "newWords": new_words,
+            "newCount": new_count
+        }
+    )
+
+
+@app.get("/interro-end/{user_name}/{words}/{score}", response_class=HTMLResponse)
+def end_interro(
+    request: Request,
+    user_name,
+    words: int,
+    score: int):
+    """
+    Page that ends the interro with a congratulation message,
+    or a blaming message depending on the performances.
+    """
+    cred_checker.check_credentials(user_name)
+    # Execution
+    global flag_data_updated
+    if flag_data_updated is False:
+        global loader
+        global test
+        test.compute_success_rate()
+        updater = interro.Updater(loader, test)
+        updater.update_data()
+        logger.info("User data updated.")
+    return templates.TemplateResponse(
+        "user/interro_end.html",
+        {
+            "request": request,
+            "score": score,
+            "numWords": words,
+            "userName": user_name
+        }
+    )
+
+
+
+# ==================================================
+# G U E S T
+# ==================================================
+# The guest is able to do some tests, but nothing more.
+#     - this page must NOT contain pages like settings, add word, ...
+#     - a guest should not access the 'root' page, even by accident.
+
+
+@app.get("/guest-not-allowed", response_class=HTMLResponse)
+def guest_not_allowed(request: Request):
+    """
+    Page used each time a guest tries to access a page he has not access to.
+    """
+    return templates.TemplateResponse(
+        "guest/guest_not_allowed.html",
+        {
+            "request": request,
+        }
+    )
+
+
+@app.get("/interro-settings-guest", response_class=HTMLResponse)
+def interro_settings_guest(request: Request):
+    """Call the page that gets the user settings for one interro."""
+    return templates.TemplateResponse(
+        "guest/interro_settings.html",
+        {
+            "request": request,
+        }
+    )
+
+
+@app.post("/user-settings-guest")
+async def get_user_settings_guest(settings: dict):
+    """Acquire the user settings for one interro."""
+    global loader
+    global test
+    loader, test = load_test(
+        settings["testType"].lower(),
+        settings["numWords"]
+    )
+    logger.info("User data loaded")
+    global flag_data_updated
+    flag_data_updated = False
+    return JSONResponse(
+        content=
+        {
+            "message": "User settings stored successfully."
+        }
+    )
+
+
+def load_test_guest(test_type, words):
+    """Load the interroooo!"""
+    db_handler = data_handler.MariaDBHandler(test_type, 'web_local', LANGUAGE)
+    loader_object = interro.Loader(0, db_handler)
+    loader_object.load_tables()
+    guesser = views.FastapiGuesser()
+    test_object = interro.Test(
+        loader_object.tables[loader_object.test_type + '_voc'],
+        words,
+        guesser,
+        loader_object.tables[loader_object.test_type + '_perf'],
+        loader_object.tables[loader_object.test_type + '_words_count']
+    )
+    test_object.set_interro_df()
+    return loader_object, test_object
+
+
+@app.get("/interro-question-guest/{words}/{count}/{score}", response_class=HTMLResponse)
+def load_interro_question_guest(
     request: Request,
     words: int,
     count=None,
@@ -132,7 +442,7 @@ def load_interro_question(
     english = english.replace("'", "\'")
     count += 1
     return templates.TemplateResponse(
-        "interro_question.html",
+        "guest/interro_question.html",
         {
             "request": request,
             "numWords": words,
@@ -144,8 +454,8 @@ def load_interro_question(
     )
 
 
-@app.get("/interro_answer/{words}/{count}/{score}", response_class=HTMLResponse)
-def load_interro_answer(
+@app.get("/interro-answer-guest/{words}/{count}/{score}", response_class=HTMLResponse)
+def load_interro_answer_guest(
     request: Request,
     words: int,
     count: int,
@@ -163,7 +473,7 @@ def load_interro_answer(
     french = french.replace("'", "\'")
     progress_percent = int(count / int(words) * 100)
     return templates.TemplateResponse(
-        "interro_answer.html",
+        "guest/interro_answer.html",
         {
             "request": request,
             "numWords": words,
@@ -176,8 +486,8 @@ def load_interro_answer(
     )
 
 
-@app.post("/user-answer")
-async def get_user_response(data: dict):
+@app.post("/user-answer-guest")
+async def get_user_response_guest(data: dict):
     """Acquire the user decision: was his answer right or wrong."""
     global test
     score = data.get('score')
@@ -202,8 +512,8 @@ async def get_user_response(data: dict):
     )
 
 
-@app.get("/propose_rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
-def propose_rattraps(
+@app.get("/propose-rattraps-guest/{words}/{count}/{score}", response_class=HTMLResponse)
+def propose_rattraps_guest(
     request: Request,
     words: int,
     count: int,
@@ -217,10 +527,10 @@ def propose_rattraps(
         test.compute_success_rate()
         updater = interro.Updater(loader, test)
         updater.update_data()
-        logger.info("User data updated.")
+        logger.info("Guest data updated.")
         flag_data_updated = True
     else:
-        logger.info("User data not updated yet.")
+        logger.info("Guest data not updated yet.")
     # Réinitialisation
     new_count = 0
     new_score = 0
@@ -228,7 +538,7 @@ def propose_rattraps(
     test.interro_df = test.faults_df
     test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
     return templates.TemplateResponse(
-        "rattraps_propose.html",
+        "guest/rattraps_propose.html",
         {
             "request": request,
             "score": score,
@@ -241,14 +551,14 @@ def propose_rattraps(
     )
 
 
-@app.get("/interro_end/{words}/{score}", response_class=HTMLResponse)
-def end_interro(
+@app.get("/interro-end-guest/{words}/{score}", response_class=HTMLResponse)
+def end_interro_guest(
     request: Request,
     words: int,
     score: int):
     """
     Page that ends the interro with a congratulation message,
-    or a blaming message depending on the performances.
+    or a blaming message depending on the performance.
     """
     global flag_data_updated
     if flag_data_updated is False:
@@ -257,9 +567,9 @@ def end_interro(
         test.compute_success_rate()
         updater = interro.Updater(loader, test)
         updater.update_data()
-        logger.info("User data updated.")
+        logger.info("Guest data updated.")
     return templates.TemplateResponse(
-        "interro_end.html",
+        "guest/interro_end.html",
         {
             "request": request,
             "score": score,
@@ -272,22 +582,25 @@ def end_interro(
 # ==================================================
 #  D A T A B A S E
 # ==================================================
-@app.get("/database", response_class=HTMLResponse)
-def data_page(request: Request):
+@app.get("/database/{user_name}", response_class=HTMLResponse)
+def data_page(request: Request, user_name):
     """Base page for data input by the user."""
+    cred_checker.check_credentials(user_name)
     title = "Here you can add words to your database."
     return templates.TemplateResponse(
-        "database_add_word.html",
+        "user/database_add_word.html",
         {
             "request": request,
-            "title": title
+            "title": title,
+            "userName": user_name
         }
     )
 
 
-@app.post("/create-word")
-async def create_word(data: dict):
+@app.post("/create-word/{user_name}")
+async def create_word(data: dict, user_name):
     """Save the word in the database."""
+    cred_checker.check_credentials(user_name)
     db_handler = data_handler.MariaDBHandler('version', 'web_local', LANGUAGE)
     english = data['english']
     french = data['french']
@@ -307,34 +620,36 @@ async def create_word(data: dict):
 # ==================================================
 #  D A S H B O A R D
 # ==================================================
-@app.get("/dashboard", response_class=HTMLResponse)
-def graphs_page(request: Request):
+@app.get("/dashboard/{user_name}", response_class=HTMLResponse)
+def graphs_page(request: Request, user_name):
     """Load the main page for performances visualization"""
+    cred_checker.check_credentials(user_name)
     graphs = feed_dashboard.load_graphs()
     return templates.TemplateResponse(
-        "dashboard.html",
+        "user/dashboard.html",
         {
             "request": request,
             "graph_1": graphs[0],
             "graph_2": graphs[1],
             "graph_3": graphs[2],
             "graph_4": graphs[3],
-            "graph_5": graphs[4]
+            "graph_5": graphs[4],
+            "userName": user_name
         }
     )
-
 
 
 # ==================================================
 #  S E T T I N G S
 # ==================================================
-@app.get("/user_settings", response_class=HTMLResponse)
-def settings_page(request: Request):
+@app.get("/user-settings/{user_name}", response_class=HTMLResponse)
+def settings_page(request: Request, user_name):
     """Load the main page for settings."""
+    cred_checker.check_credentials(user_name)
     return templates.TemplateResponse(
-        "user_settings.html",
+        "user/settings.html",
         {
             "request": request,
-            
+            "userName": user_name
         }
     )

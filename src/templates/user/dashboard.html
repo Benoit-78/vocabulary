@@ -13,42 +13,38 @@
     <!-- Include Plotly.js -->
     <!--<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
     <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
 
 </head>
 
 <body>
 
     <div class="container">
-        <h1>My dashboard</h1>
+        <h1>Dashboard</h1>
 
         <div id="plotly-graph-container">
-            <!-- The Python-generated graph will be inserted here -->
             {{ graph_1|safe }}
         </div>
 
         <div id="plotly-graph-container">
-            <!-- The Python-generated graph will be inserted here -->
             {{ graph_2|safe }}
         </div>
 
         <div id="plotly-graph-container">
-            <!-- The Python-generated graph will be inserted here -->
             {{ graph_3|safe }}
         </div>
 
         <div id="plotly-graph-container">
-            <!-- The Python-generated graph will be inserted here -->
             {{ graph_4|safe }}
         </div>
 
         <div id="plotly-graph-container">
-            <!-- The Python-generated graph will be inserted here -->
             {{ graph_5|safe }}
         </div>
 
 
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
 
     </div>

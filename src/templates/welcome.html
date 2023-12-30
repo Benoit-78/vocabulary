@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Vocabulary</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/welcome.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/root.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
 </head>
+
 <body>
     <div class="container">
         <h1>Welcome to the vocabulary application</h1>
-        <ul class="link-list">
-            <p><a href="/get_started">Get started</p>
-            <p><a href="/database">Add word</a></p>
-            <p><a href="/interro_settings">Interrooo !!!</a></p>
-            <p><a href="/dashboard">Dashboard</a></p>
-            <p><a href="/user_settings">Settings</a></p>
-        </ul>
+        <div class="button-list">
+            <button class="" onclick="window.location.href='/sign-in'">Sign in</button>
+            <button class="" onclick="window.location.href='/interro-settings-guest'">Try</button>
+            <button class="" onclick="window.location.href='/about-the-app'">About the app</button>
+            <button class="" onclick="window.location.href='/help'">Help</button>
+        </div>
     </div>
 </body>
+
 </html>

@@ -6,6 +6,7 @@
         <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
         <script type="text/javascript" src="/static/scripts/main.js"></script>
         <script type="text/javascript" src="/static/scripts/pages/database.js"></script>
+        <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
     </head>
 <body>
     <div class="container">
@@ -20,10 +21,10 @@
             </div>
         </div>
         <div class="row">
-            <button class="button" onclick="createWord()">Add word</button>
+            <button class="button" onclick="createWord(`{{ userName }}`)">Add word</button>
         </div>
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
         </div>
     </div>
 </body>
