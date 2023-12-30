@@ -23,6 +23,7 @@ from src.data import users
 
 app = FastAPI()
 LANGUAGE = 'english'
+GUEST_USER_NAME = 'benoit'
 test = None
 loader = None
 flag_data_updated = None
@@ -141,12 +142,13 @@ def interro_settings(request: Request, user_name):
     )
 
 
-@app.post("/user-settings")
-async def get_user_settings(settings: dict):
+@app.post("/save-interro-settings/{user_name}")
+async def save_interro_settings(settings: dict, user_name):
     """Acquire the user settings for one interro."""
     global loader
     global test
     loader, test = load_test(
+        user_name,
         settings["testType"].lower(),
         settings["numWords"]
     )
@@ -161,9 +163,9 @@ async def get_user_settings(settings: dict):
     )
 
 
-def load_test(test_type, words):
+def load_test(user_name, test_type, words):
     """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(test_type, 'web_local', LANGUAGE)
+    db_handler = data_handler.MariaDBHandler(user_name, test_type, 'web_local', LANGUAGE)
     loader_ = interro.Loader(0, db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
@@ -350,6 +352,18 @@ def end_interro(
     )
 
 
+@app.get("/sign-out/{user_name}", response_class=HTMLResponse)
+def sign_in(request: Request):
+    """Deconnect the user and return to welcome page."""
+    global cred_checker
+    cred_checker = users.CredChecker()
+    return templates.TemplateResponse(
+        "welcome.html",
+        {
+            "request": request
+        }
+    )
+
 
 # ==================================================
 # G U E S T
@@ -357,7 +371,6 @@ def end_interro(
 # The guest is able to do some tests, but nothing more.
 #     - this page must NOT contain pages like settings, add word, ...
 #     - a guest should not access the 'root' page, even by accident.
-
 
 @app.get("/guest-not-allowed", response_class=HTMLResponse)
 def guest_not_allowed(request: Request):
@@ -383,12 +396,13 @@ def interro_settings_guest(request: Request):
     )
 
 
-@app.post("/user-settings-guest")
-async def get_user_settings_guest(settings: dict):
+@app.post("/save-interro-settings-guest")
+async def save_interro_settings_guest(settings: dict):
     """Acquire the user settings for one interro."""
     global loader
     global test
     loader, test = load_test(
+        GUEST_USER_NAME,
         settings["testType"].lower(),
         settings["numWords"]
     )
@@ -401,23 +415,6 @@ async def get_user_settings_guest(settings: dict):
             "message": "User settings stored successfully."
         }
     )
-
-
-def load_test_guest(test_type, words):
-    """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(test_type, 'web_local', LANGUAGE)
-    loader_object = interro.Loader(0, db_handler)
-    loader_object.load_tables()
-    guesser = views.FastapiGuesser()
-    test_object = interro.Test(
-        loader_object.tables[loader_object.test_type + '_voc'],
-        words,
-        guesser,
-        loader_object.tables[loader_object.test_type + '_perf'],
-        loader_object.tables[loader_object.test_type + '_words_count']
-    )
-    test_object.set_interro_df()
-    return loader_object, test_object
 
 
 @app.get("/interro-question-guest/{words}/{count}/{score}", response_class=HTMLResponse)
@@ -601,7 +598,7 @@ def data_page(request: Request, user_name):
 async def create_word(data: dict, user_name):
     """Save the word in the database."""
     cred_checker.check_credentials(user_name)
-    db_handler = data_handler.MariaDBHandler('version', 'web_local', LANGUAGE)
+    db_handler = data_handler.MariaDBHandler(user_name, 'version', 'web_local', LANGUAGE)
     english = data['english']
     french = data['french']
     if db_handler.create([english, french]) is True:

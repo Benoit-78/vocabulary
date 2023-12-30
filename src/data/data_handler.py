@@ -1,5 +1,6 @@
 """
-    Methods for CRUD operations.
+    Main purpose:
+        Methods for CRUD operations.
 """
 
 import json
@@ -115,10 +116,11 @@ class MariaDBHandler():
     """
     Provide with all methods necessary to interact with MariaDB database.
     """
-    def __init__(self, test_type: str, mode: str, language_1: str):
+    def __init__(self, user_name: str, test_type: str, mode: str, language_1: str):
         if test_type not in ['version', 'theme']:
             logger.error(f"Test type {test_type} incorrect, \
             should be either version or theme.")
+        self.user_name
         self.test_type = test_type
         self.os_sep = utils.get_os_separator()
         self.mode = mode
@@ -141,8 +143,8 @@ class MariaDBHandler():
         """Connect to vocabulary database if credentials are correct."""
         cred = self.get_database_cred()
         self.config = {
-            'user': cred['users']['user_1']['name'],
-            'password': cred['users']['user_1']['password'],
+            'user': self.user_name,
+            'password': cred['users'][self.user_name],
             'database': self.language_1.lower(),
             'port': cred['port']
         }
@@ -153,6 +155,24 @@ class MariaDBHandler():
             self.config['host'] = cred['host'][self.mode]
         self.connection = mariadb.connect(**self.config)
         self.cursor = self.connection.cursor()
+
+    def get_db_cursor_root(self):
+        """Connect to the MariaDB server with root credentials"""
+        cred = db_handler.get_database_cred()
+        connection_config = {
+            'user': 'root',
+            'password': cred['users']['root'],
+            'database': self.language_1.lower(),
+            'port': cred['port']
+        }
+        if self.mode not in HOSTS:
+            logger.warning(f"Mode: {self.mode}")
+            logger.error(f"Mode should be in {HOSTS}")
+        else:
+            self.config['host'] = cred['host'][self.mode]
+        connection = mariadb.connect(**connection_config)
+        cursor = connection.cursor()
+        return connection, cursor
 
     def get_database_cols(self):
         """Get table columns."""
@@ -305,3 +325,32 @@ class MariaDBHandler():
         english = word_series[word_series.columns[0]]
         native = word_series[word_series.columns[1]]
         return english, native
+
+    # User level
+    def create_user(self):
+        """Create user and database"""
+        connection, cursor = self.get_db_cursor_root()
+        try:
+            cursor.execute(f"CREATE USER '{self.user_name}'@'%' IDENTIFIED BY '{self.user_password}'")
+            connection.commit()
+            logger.success(f"User '{self.user_name}' created successfully.")
+        except mysql.connector.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+
+    # Database level
+    def create_database(self, db_name):
+        """Create a database with the given database name"""
+        connection, cursor = self.get_db_cursor_root()
+        try:
+            cursor.execute(f"CREATE DATABASE {db_name}")
+            cursor.execute(f"GRANT ALL PRIVILEGES ON {db_name}.* TO '{self.user_name}'@'%'")
+            connection.commit()
+            logger.success(f"Database '{db_name}' created successfully for user '{self.user_name}'.")
+        except mysql.connector.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()

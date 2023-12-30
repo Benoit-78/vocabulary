@@ -15,7 +15,13 @@ def cli_main():
     user = interro.CliUser()
     user.get_settings()
     # Load data
-    data_handler_ = data_handler.MariaDBHandler(user.settings.type, 'cli', 'Zhongwen')
+    user_name = 'benoit'
+    data_handler_ = data_handler.MariaDBHandler(
+        user_name,
+        user.settings.type,
+        'cli',
+        'Zhongwen'
+    )
     loader = interro.Loader(
         user.settings.rattraps,
         data_handler_

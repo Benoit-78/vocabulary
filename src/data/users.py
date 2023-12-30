@@ -15,7 +15,6 @@ from loguru import logger
 class CredChecker():
     """Class dedicated to the credentials checking process."""
     def __init__(self):
-        """"""
         self.name = ""
         self.password = ""
 
@@ -107,11 +106,15 @@ class UserAccount(Account):
     def __init__(self, user_name, user_password):
         self.user_name = user_name
         self.user_passsword = user_password
+        self.db_handler = MariaDBHandler(
+            self.user_name,
+            test_type='version',
+            mode='web_local',
+            language_1='english'
+        )
 
     def create(self):
-        """
-        Create a user account and triggers the creation of the user's database.
-        """
+        """Add the user to the credentials json file."""
         return None
 
     def log_in(self):
