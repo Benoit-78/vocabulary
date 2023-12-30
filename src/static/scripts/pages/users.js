@@ -1,3 +1,4 @@
+
 function goToUserSpace(userName) {
     var encodedUserName = encodeURIComponent(userName)
     window.location.href = "/user-space/" + encodedUserName;
@@ -7,7 +8,7 @@ function goToUserSpace(userName) {
 function signIn() {
     var inputName = document.getElementById("input1").value;
     var inputPassword = document.getElementById("input2").value;
-    fetch("/check-input-creds", {
+    fetch("/authenticate", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({

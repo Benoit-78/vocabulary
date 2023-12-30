@@ -8,45 +8,66 @@
 from abc import ABC, abstractmethod
 
 from fastapi import HTTPException
+from loguru import logger
 
 
 
-def check_input_name(input_name):
-    """Check if the input name belongs to the users list."""
-    if input_name in ['benoit', 'Donald Trump', 'Caesar']:
-        return True
-    else:
-        return False
+class CredChecker():
+    """Class dedicated to the credentials checking process."""
+    def __init__(self):
+        """"""
+        self.name = ""
+        self.password = ""
 
+    def check_input_name(self):
+        """Check if the input name belongs to the users list."""
+        if self.name in ['benoit', 'Donald Trump', 'Caesar']:
+            return True
+        else:
+            return False
 
-def check_input_password(input_name, input_password):
-    """Check if the input password is correct."""
-    secrets = {
-        'benoit': "vive la vie",
-        'Donald Trump': "Make America Great Again",
-        'Caesar': "Veni, vidi, vici"
-    }
-    if input_password == secrets[input_name]:
-        return True
-    else:
-        return False
+    def check_input_password(self):
+        """Check if the input password is correct."""
+        secrets = {
+            'benoit': "vive la vie",
+            'Donald Trump': "Make America Great Again",
+            'Caesar': "Veni, vidi, vici"
+        }
+        if self.password == secrets[self.name]:
+            return True
+        else:
+            return False
 
-
-def check_credentials(input_name, input_password):
-    """Validate user credentials."""
-    if not check_input_name(input_name):
+    def flag_incorrect_user_name(self):
+        """
+        Raise exception if unknown user name, and redirect to sign-in page.
+        """
         raise HTTPException(
             status_code=303,
-            detail="Unknown user name",
-            headers={"Location": "/sign-in"}
-        )
-    if not check_input_password(input_name, input_password):
-        raise HTTPException(
-            status_code=303,
-            detail="Wrong password",
+            detail=f"Unknown user name: {self.name}.",
             headers={"Location": "/sign-in"}
         )
 
+    def flag_incorrect_user_password(self):
+        """
+        Raise exception if wrong password, and redirect to sign-in page.
+        """
+        raise HTTPException(
+            status_code=303,
+            detail=f"Wrong password {self.password} for user {self.name}.",
+            headers={"Location": "/sign-in"}
+        )
+
+    def check_credentials(self, name_to_check):
+        """Validate user credentials."""
+        if name_to_check != self.name:
+            self.flag_incorrect_user_name()
+        if not self.check_input_name():
+            self.flag_incorrect_user_name()
+        if self.password in [None, ""]:
+            self.flag_incorrect_user_password()
+        if not self.check_input_password():
+            self.flag_incorrect_user_password()
 
 
 

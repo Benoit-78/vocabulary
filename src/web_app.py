@@ -26,7 +26,7 @@ LANGUAGE = 'english'
 test = None
 loader = None
 flag_data_updated = None
-
+cred_checker = users.CredChecker()
 
 # CSS files
 app.mount(
@@ -43,7 +43,7 @@ templates = Jinja2Templates(
 
 
 # ==================================================
-#  W E L C O M E
+#  W E L C O M E   P A G E
 # ==================================================
 @app.get("/", response_class=HTMLResponse)
 def welcome_page(request: Request):
@@ -62,7 +62,7 @@ def sign_in(request: Request):
     return templates.TemplateResponse(
         "user/sign_in.html",
         {
-            "request": request,
+            "request": request
         }
     )
 
@@ -94,20 +94,18 @@ def get_help(request: Request):
 #  U S E R   S I G N - I N
 # ==================================================
 
-@app.post("/check-input-creds")
-async def check_input_creds(creds: dict):
+@app.post("/authenticate")
+async def authenticate(creds: dict):
     """Acquire the user settings for one interro."""
-    global user_password
-    input_name = creds['input_name']
-    input_password = creds['input_password']
-    users.check_credentials(input_name, input_password)
-    user_name = input_name
-    user_password = input_password
+    # global cred_checker
+    cred_checker.name = creds['input_name']
+    cred_checker.password = creds['input_password']
+    cred_checker.check_credentials(creds['input_name'])
     return JSONResponse(
         content=
         {
             "message": "User credentials validated successfully",
-            "userName": user_name
+            "userName": cred_checker.name
         }
     )
 
@@ -115,6 +113,8 @@ async def check_input_creds(creds: dict):
 @app.get("/user-space/{user_name}", response_class=HTMLResponse)
 def user_main_page(request: Request, user_name):
     """Call the base page of user space"""
+    # global cred_checker
+    cred_checker.check_credentials(user_name)
     return templates.TemplateResponse(
         "user/user_space.html",
         {
@@ -131,8 +131,7 @@ def user_main_page(request: Request, user_name):
 @app.get("/interro-settings/{user_name}", response_class=HTMLResponse)
 def interro_settings(request: Request, user_name):
     """Call the page that gets the user settings for one interro."""
-    global user_password
-    users.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     return templates.TemplateResponse(
         "user/interro_settings.html",
         {
@@ -187,9 +186,8 @@ def load_interro_question(
     count=None,
     score=None):
     """Call the page that asks the user the meaning of a word"""
-    global user_password
-    users.check_credentials(user_name, user_password)
-    # Instantiation
+    cred_checker.check_credentials(user_name)
+    global test
     try:
         count = int(count)
     except NameError:
@@ -228,8 +226,7 @@ def load_interro_answer(
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
     """
-    global user_password
-    users.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     count = int(count)
     global test
     index = test.interro_df.index[count - 1]
@@ -253,9 +250,10 @@ def load_interro_answer(
     )
 
 
-@app.post("/user-answer")
-async def get_user_response(data: dict):
+@app.post("/user-answer/{user_name}")
+async def get_user_response(data: dict, user_name):
     """Acquire the user decision: was his answer right or wrong."""
+    cred_checker.check_credentials(user_name)
     global test
     score = data.get('score')
     if data["answer"] == 'Yes':
@@ -287,9 +285,7 @@ def propose_rattraps(
     count: int,
     score: int):
     """Load a page that proposes the user to take a rattraps, or leave the test."""
-    # Credential check
-    global user_password
-    users.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     global test
     # Enregistrer les résultats
     global flag_data_updated
@@ -333,9 +329,7 @@ def end_interro(
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performances.
     """
-    # Credential check
-    global user_password
-    users.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     # Execution
     global flag_data_updated
     if flag_data_updated is False:
@@ -591,6 +585,7 @@ def end_interro_guest(
 @app.get("/database/{user_name}", response_class=HTMLResponse)
 def data_page(request: Request, user_name):
     """Base page for data input by the user."""
+    cred_checker.check_credentials(user_name)
     title = "Here you can add words to your database."
     return templates.TemplateResponse(
         "user/database_add_word.html",
@@ -605,6 +600,7 @@ def data_page(request: Request, user_name):
 @app.post("/create-word/{user_name}")
 async def create_word(data: dict, user_name):
     """Save the word in the database."""
+    cred_checker.check_credentials(user_name)
     db_handler = data_handler.MariaDBHandler('version', 'web_local', LANGUAGE)
     english = data['english']
     french = data['french']
@@ -627,8 +623,7 @@ async def create_word(data: dict, user_name):
 @app.get("/dashboard/{user_name}", response_class=HTMLResponse)
 def graphs_page(request: Request, user_name):
     """Load the main page for performances visualization"""
-    global user_password
-    users.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     graphs = feed_dashboard.load_graphs()
     return templates.TemplateResponse(
         "user/dashboard.html",
@@ -650,8 +645,7 @@ def graphs_page(request: Request, user_name):
 @app.get("/user-settings/{user_name}", response_class=HTMLResponse)
 def settings_page(request: Request, user_name):
     """Load the main page for settings."""
-    global user_password
-    users.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     return templates.TemplateResponse(
         "user/settings.html",
         {

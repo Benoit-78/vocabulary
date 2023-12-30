@@ -8,7 +8,7 @@ document.addEventListener(
 
 
 function sendUserSettings(userName, testType, numWords) {
-    fetch("/user-settings", {
+    fetch(`/user-settings/${userName}`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -51,7 +51,7 @@ function showTranslation(userName, numWords, count, score) {
 
 
 function sendUserAnswer(userName, answer, count, numWords, score, content_box1, content_box2) {
-    fetch("/user-answer", {
+    fetch(`/user-answer/${userName}`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({

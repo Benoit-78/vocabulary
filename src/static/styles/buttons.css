@@ -39,3 +39,29 @@
 .rattraps_button {
     font-size: 20px;
 }
+
+
+
+/* --------------------------------- */
+/*   L I S T   O F   B U T T O N S   */
+/* --------------------------------- */
+
+.button-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button-list button {
+    width: 100%;
+    margin-bottom: 10px;
+    background-color: rgba(0, 128, 255, 0.5); /* Semi-transparent blue color */
+    padding: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.button-list button:hover {
+    background-color: rgba(0, 128, 255, 0.8);
+}
