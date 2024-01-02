@@ -345,10 +345,10 @@ class MariaDBHandler():
         """Create a database with the given database name"""
         connection, cursor = self.get_db_cursor_root()
         try:
-            cursor.execute(f"CREATE DATABASE {db_name}")
-            cursor.execute(f"GRANT ALL PRIVILEGES ON {db_name}.* TO '{self.user_name}'@'%'")
+            cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name}")
+            cursor.execute(f"GRANT ALL PRIVILEGES ON {self.user_name}_{db_name}.* TO '{self.user_name}'@'%'")
             connection.commit()
-            logger.success(f"Database '{db_name}' created successfully for user '{self.user_name}'.")
+            logger.success(f"Database '{self.user_name}_{db_name}' created successfully.")
         except mysql.connector.Error as err:
             logger.error(err)
         finally:

@@ -22,7 +22,6 @@ from src.data import users
 
 
 app = FastAPI()
-LANGUAGE = 'english'
 GUEST_USER_NAME = 'benoit'
 test = None
 loader = None
@@ -165,7 +164,7 @@ async def save_interro_settings(settings: dict, user_name):
 
 def load_test(user_name, test_type, words):
     """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(user_name, test_type, 'web_local', LANGUAGE)
+    db_handler = data_handler.MariaDBHandler(user_name, test_type, 'web_local', 'english')
     loader_ = interro.Loader(0, db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
@@ -598,7 +597,7 @@ def data_page(request: Request, user_name):
 async def create_word(data: dict, user_name):
     """Save the word in the database."""
     cred_checker.check_credentials(user_name)
-    db_handler = data_handler.MariaDBHandler(user_name, 'version', 'web_local', LANGUAGE)
+    db_handler = data_handler.MariaDBHandler(user_name, 'version', 'web_local', 'english')
     english = data['english']
     french = data['french']
     if db_handler.create([english, french]) is True:
