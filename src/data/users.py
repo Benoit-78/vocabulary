@@ -11,7 +11,6 @@ from fastapi import HTTPException
 from loguru import logger
 
 
-
 class CredChecker():
     """Class dedicated to the credentials checking process."""
     def __init__(self):
@@ -99,10 +98,11 @@ class Account(ABC):
 
 
 
-
 class UserAccount(Account):
-    """Class dedicated to user accounts management."""
-
+    """
+    Interface between web_app API and database handlers,
+    such as Controller, Definer, and Manipulator.
+    """
     def __init__(self, user_name, user_password):
         self.user_name = user_name
         self.user_passsword = user_password
@@ -113,7 +113,7 @@ class UserAccount(Account):
             language_1='english'
         )
 
-    def create(self):
+    def create_user(self):
         """Add the user to the credentials json file."""
         return None
 
@@ -125,22 +125,22 @@ class UserAccount(Account):
         """Enable the user to log out of his account."""
         return None
 
+    def update_user_name(self):
+        """Change the name of the user."""
+        return None
+
+    def update_user_password(self):
+        """Change the password of the user."""
+        return None
+
+    def delete_user(self):
+        """Delete the user account."""
+        return None
+
     def add_word(self):
         """Add a couple of words to the user's database."""
         return None
 
     def remove_word(self):
         """Remove a couple of words from the user's database."""
-        return None
-
-    def update_name(self):
-        """Change the name of the user."""
-        return None
-
-    def update_password(self):
-        """Change the password of the user."""
-        return None
-
-    def delete(self):
-        """Delete the user account."""
         return None

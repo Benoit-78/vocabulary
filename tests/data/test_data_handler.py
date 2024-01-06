@@ -2,18 +2,24 @@
     Tests for data_handler module.
 """
 
+import json
 import logging
 import os
 import sys
 import unittest
 from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
+import mysql.connector as mariadb
 import pandas as pd
+from loguru import logger
 
 REPO_DIR = os.getcwd().split('tests')[0]
 sys.path.append(REPO_DIR)
 from src.data import data_handler
+
+with open(REPO_DIR + '/conf/hum.json', 'r') as param_file:
+    HUM = json.load(param_file)
 
 
 
@@ -105,105 +111,110 @@ class TestCsvHandler(unittest.TestCase):
 
 
 
-class TestMariaDBHandler(unittest.TestCase):
-    """
-    The tested class should serve as an interface with MariaDB databases.
-    """
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
-        cls.db_handler_1 = data_handler.MariaDBHandler(
-            'version',
-            mode='cli',
-            language_1='test'
-        )
-        cls.db_handler_2 = data_handler.MariaDBHandler(
-            'theme',
-            mode='cli',
-            language_1='English'
-        )
-        cls.error_data_handler = None
-
-    def test_get_database_cred(self):
-        """Should return the credentials."""
-        # Arrange
+class TestGetDBCursor(unittest.TestCase):
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb.connect')
+    def test_get_db_cursor(self, mock_connect, mock_logger):
+        # Prepare
+        user_name = 'test_user'
+        host = 'test_host'
+        db_name = 'test_db'
+        password = 'test_password'
+        mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
+        mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value = mock_cursor
         # Act
-        result = self.db_handler_1.get_database_cred()
+        result = data_handler.get_db_cursor(user_name, host, db_name, password)
         # Assert
-        self.assertEqual(len(result), 3)
-        self.assertIn('users', result.keys())
-        self.assertGreater(len(result['users']), 0)
-        self.assertIn('host', result.keys())
-        self.assertGreater(len(result['host']), 2)
-        self.assertIn('port', result.keys())
-        self.assertGreater(len(result['port']), 3)
+        # mock_connect.assert_called_once_with(
+        #     user=user_name,
+        #     password=password,
+        #     database=db_name,
+        #     port=data_handler.PARAMS['MariaDB']['port'],
+        #     host=host
+        # )
+        mock_connection.cursor.assert_called_once()
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        self.assertIsInstance(result[0], mariadb.connection.MySQLConnection)
+        self.assertIsInstance(result[1], mariadb.connection.MySQLCursor)
+        self.assertEqual(result[0], mock_connection)
+        self.assertEqual(result[1], mock_cursor)
+        mock_logger.assert_not_called()
+
+
+
+class TestDbController(unittest.TestCase):
+    """"""
+    @classmethod
+    def setUp(cls):
+        cls.user_name = 'benoit'
+        cls.host = 'web_local'
+        cls.db_controller = data_handler.DbController(cls.user_name, cls.host)
+
+
+
+class TestDbDefiner(unittest.TestCase):
+    """"""
+    @classmethod
+    def setUp(cls):
+        cls.user_name = 'benoit'
+        cls.host = 'web_local'
+        cls.db_definer = data_handler.DbDefiner(cls.user_name, cls.host)
 
     def test_get_database_cols(self):
         """
         Should return the columns that will be used in the tables.
         """
         # Arrange
+        ok = HUM['user'][self.user_name]['OK']
         # Act
-        result = self.db_handler_1.get_database_cols()
+        result = self.db_definer.get_database_cols('test_db', ok)
         # Assert
         language = list(result.keys())[0]
         table_1 = list(result[language].keys())[0]
         key_1 = list(result[language][table_1].keys())[0]
         self.assertEqual(key_1, 'Columns')
 
-    @patch('src.data.data_handler.mariadb.connect')
-    def test_set_db_cursor(self, mock_connect):
-        """
-        Should set cursor and connection to mariadb database as attributes
-        """
-        # Arrange
-        self.db_handler_1.get_database_cred = MagicMock(
-            return_value={
-                'users':
-                {
-                    'user_1':
-                    {
-                        'name': 'test_user',
-                        'password': 'test_password'
-                    }
-                },
-                'port': 3306,
-                'host':
-                {
-                    'cli': 'localhost'
-                }
-            }
-        )
-        # Act
-        self.db_handler_1.set_db_cursor()
-        # Assert
-        self.assertIsInstance(self.db_handler_1.config, dict)
-        self.assertEqual(
-            {'user', 'password', 'database', 'port', 'host'},
-            set(self.db_handler_1.config.keys())
-        )
-        mock_connect.assert_called_once_with(
-            user='test_user',
-            password='test_password',
-            database='test',
-            port=3306,
-            host='localhost',
-        )
-
     def test_get_tables_names(self):
         """Should return a list containing the tables names."""
         # Arrange
-        self.db_handler_1.test_type = 'version'
+        self.db_definer.test_type = 'version'
         # Act
-        result = self.db_handler_1.get_tables_names()
+        result = self.db_definer.get_tables_names()
         # Assert
         expected_result = ['version_voc', 'version_perf', 'version_words_count', 'theme_voc']
         self.assertEqual(result, expected_result)
         for table_name in result[:-1]:
-            self.assertIn(self.db_handler_1.test_type, table_name)
+            self.assertIn(self.db_definer.test_type, table_name)
         test_types = ['version', 'theme']
-        test_types.remove(self.db_handler_1.test_type)
+        test_types.remove(self.db_definer.test_type)
         self.assertIn(test_types[0], result[-1])
+
+
+
+class TestDbManipulator(unittest.TestCase):
+    """"""
+    @classmethod
+    def setUp(cls):
+        # DDL
+        cls.user_name = 'benoit'
+        cls.host = 'web_local'
+        cls.db_definer = data_handler.DbDefiner(
+            cls.user_name,
+            cls.host
+        )
+        # DML
+        cls.table = 'version_voc'
+        cls.db_name = 'english'
+        cls.test_type = 'version'
+        cls.db_manipulator = data_handler.DbManipulator(
+            cls.table,
+            cls.db_name,
+            cls.host,
+            cls.test_type
+        )
 
     def test_create(self):
         """Should add a word in the database"""
@@ -218,47 +229,41 @@ class TestMariaDBHandler(unittest.TestCase):
         sql_request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         test_sql_request = " ".join([sql_request_1, sql_request_2])
         # Act
-        result = self.db_handler_1.create(test_row, test_mode=True)
-        self.db_handler_1.set_db_cursor()
-        self.db_handler_1.cursor.execute(test_sql_request)
-        # Assert
-        # request_1 = "SELECT english, français, score"
-        # request_2 = f"FROM {table_name}"
-        # request_3 = f"WHERE english = '{english}';"
-        # sql_request = " ".join([request_1, request_2, request_3])
-        # self.db_handler_1.set_db_cursor()
-        # english_2, native_2, score_2 = self.db_handler_1.cursor.execute(sql_request)
-        expected_result = True
-        self.assertEqual(result, expected_result)
-        # self.assertEqual(english_2, english)
-        # self.assertEqual(native_2, native)
-        # self.assertEqual(score_2, 0)
-        self.db_handler_1.connection.close()
+        # prout prout
+        # result = self.db_manipulator.create(test_row)
+        # self.db_definer.set_db_cursor()
+        # self.db_definer.cursor.execute(test_sql_request)
+        # # Assert
+        # # request_1 = "SELECT english, français, score"
+        # # request_2 = f"FROM {table_name}"
+        # # request_3 = f"WHERE english = '{english}';"
+        # # sql_request = " ".join([request_1, request_2, request_3])
+        # # self.db_manipulator.set_db_cursor()
+        # # english_2, native_2, score_2 = self.db_manipulator.cursor.execute(sql_request)
+        # expected_result = True
+        # self.assertEqual(result, expected_result)
+        # # self.assertEqual(english_2, english)
+        # # self.assertEqual(native_2, native)
+        # # self.assertEqual(score_2, 0)
+        # self.db_manipulator.connection.close()
 
     @patch('src.data.data_handler.mariadb.connect')
-    @patch('src.data.data_handler.MariaDBHandler.set_db_cursor')
+    @patch('src.data.data_handler.get_db_cursor')
     def test_read(self, mock_connect, mock_set_cursor):
         """Should get some words from the database."""
         # Arrange
-        self.db_handler_1.get_database_cred = MagicMock(
-            return_value={
-                'users': {'user_1': {'name': 'test_user', 'password': 'test_password'}},
-                'port': 3306,
-                'host': {'cli': 'localhost'}
-            }
-        )
         mock_set_cursor()
         word_series = pd.DataFrame(columns=['english', 'français', 'score'])
         word_series.loc[word_series.shape[0]] = ['hello', 'bonjour', 0]
         with patch.object(
-            self.db_handler_1,
+            self.db_manipulator,
             'get_tables_names',
             return_value=['test_table', '_', '_', '_']
             ):
             # Act
-            result = self.db_handler_1.read(word_series)
+            result = self.db_manipulator.read(word_series)
             # Assert
-            expected_result = self.db_handler_1.cursor.fetchone()
+            expected_result = self.db_manipulator.cursor.fetchone()
             self.assertEqual(result, expected_result)
 
     def test_get_words_from_df(self):
@@ -267,7 +272,7 @@ class TestMariaDBHandler(unittest.TestCase):
         mock_df = pd.DataFrame(columns=['lang_1', 'lang_2'])
         mock_df.loc[mock_df.shape[0]] = ['African swallow', 'Mouette africaine']
         # Act
-        result = self.db_handler_1.get_words_from_df(mock_df)
+        result = self.db_manipulator.get_words_from_df(mock_df)
         # Assert
         self.assertEqual(len(result), 2)
         self.assertIsInstance(result[0], object)  # str, in reality

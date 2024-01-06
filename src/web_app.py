@@ -14,12 +14,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-from src import interro
-from src import views
+from src import interro, views
 from src.dashboard import feed_dashboard
-from src.data import data_handler
-from src.data import users
-
+from src.data import data_handler, users
 
 app = FastAPI()
 GUEST_USER_NAME = 'benoit'
@@ -115,6 +112,7 @@ def user_main_page(request: Request, user_name):
     """Call the base page of user space"""
     # global cred_checker
     cred_checker.check_credentials(user_name)
+    db_handler = data_handler.MariaDBHandler(user_name, 'web_local')
     return templates.TemplateResponse(
         "user/user_space.html",
         {
@@ -128,6 +126,35 @@ def user_main_page(request: Request, user_name):
 # ==================================================
 #  I N T E R R O   U S E R
 # ==================================================
+@app.get("/choose-database/{user_name}", response_class=HTMLResponse)
+def  choose_database(request: Request, user_name):
+    """
+    Ask the user to choose a database on which he will pass an interroooooo!!!
+    """
+    return templates.TemplateResponse(
+        "user/choose_database.html",
+        {
+            "message": "Choose a database, right now.",
+            "userName": user_name
+        }
+    )
+
+
+
+@app.post("/check-connection-to-database/{user_name}/{db_name}")
+async def save_interro_settings(settings: dict, user_name, db_name):
+    """Acquire the database chosen by the user."""
+    db_handler = data_handler.MariaDBHandler(user_name, 'web_local')
+    db_handler.set_db_cursor(db_name)
+    return JSONResponse(
+        content=
+        {
+            "message": "User settings stored successfully."
+        }
+    )
+    db_handler.set_db_cursor()
+
+
 @app.get("/interro-settings/{user_name}", response_class=HTMLResponse)
 def interro_settings(request: Request, user_name):
     """Call the page that gets the user settings for one interro."""
@@ -164,7 +191,8 @@ async def save_interro_settings(settings: dict, user_name):
 
 def load_test(user_name, test_type, words):
     """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(user_name, test_type, 'web_local', 'english')
+    db_handler = data_handler.MariaDBHandler(user_name, 'web_local')
+    db_handler.set_test_type(test_type)
     loader_ = interro.Loader(0, db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()

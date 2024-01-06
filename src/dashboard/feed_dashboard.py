@@ -20,7 +20,6 @@ sys.path.append(APP_PATH)
 from src.data.data_handler import MariaDBHandler
 
 
-
 class WordsGraph(ABC):
     """Abstract class for creating and saving user-specific graphs."""
     def __init__(self, db_handler):

@@ -92,47 +92,32 @@ class TestLoader(unittest.TestCase):
     def setUpClass(cls):
         """Run once before all tests."""
         # Arrange
-        cls.user_1 = interro.CliUser()
-        cls.user_2 = interro.CliUser()
-        cls.user_1.parse_arguments(['-t', 'version'])
-        cls.user_2.parse_arguments(['-t', 'theme'])
-        cls.data_handler_1_2 = data_handler.MariaDBHandler(
-            cls.user_1.settings.type,
-            'cli',
-            'English'
+        cls.user = interro.CliUser()
+        cls.user.parse_arguments(['-t', 'version'])
+        cls.data_manipulator = data_handler.DbManipulator(
+            user_name='test_user',
+            db_name='test_db',
+            host='test_host',
+            test_type='test_type'
         )
-        cls.data_handler_2_2 = data_handler.MariaDBHandler(
-            cls.user_2.settings.type,
-            'cli',
-            'Zhongwen'
-        )
-        cls.loader_1_1 = None
-        cls.loader_1_2 = None
-        cls.loader_2_1 = None
-        cls.loader_2_2 = None
+        cls.loader = None
 
     def test_load_tables(self):
         """Input should be a dataframe, and it should be added a query column"""
         # Arrange
         # Act
-        self.loader_1_2 = interro.Loader(
-            self.user_1.settings.rattraps,
-            self.data_handler_1_2
-        )
-        self.loader_2_2 = interro.Loader(
-            self.user_2.settings.rattraps,
-            self.data_handler_2_2
+        self.loader = interro.Loader(
+            self.user.settings.rattraps,
+            self.data_manipulator
         )
         # Assert
-        for loader in [self.loader_1_2, self.loader_2_2]:
-            logger.debug(loader)
-            for table in loader.tables.values():
-                self.assertIn('Date', list(table.columns))
-                self.assertIn('Query', list(table.columns))
-                self.assertEqual(table[table.columns[0]].dtype, object)
-                self.assertEqual(table[table.columns[1]].dtype, object)
-                self.assertEqual(table['Taux'].dtype, np.float64)
-                self.assertGreater(table.shape[0], 1)
+        for table in self.loader.tables.values():
+            self.assertIn('creation_date', list(table.columns))
+            self.assertIn('query', list(table.columns))
+            self.assertEqual(table[table.columns[0]].dtype, object)
+            self.assertEqual(table[table.columns[1]].dtype, object)
+            self.assertEqual(table['taux'].dtype, np.float64)
+            self.assertGreater(table.shape[0], 1)
 
 
 
@@ -145,26 +130,16 @@ class TestTest(unittest.TestCase):
     def setUpClass(cls):
         """Run once before all tests."""
         cls.user_1 = interro.CliUser()
-        cls.user_2 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.user_2.parse_arguments(['-t', 'theme'])
-        cls.data_handler_1 = data_handler.MariaDBHandler(
-            cls.user_1.settings.type,
-            'cli',
-            'English'
-        )
-        cls.data_handler_2 = data_handler.MariaDBHandler(
-            cls.user_2.settings.type,
-            'cli',
-            'Zhongwen'
+        cls.data_handler_1 = data_handler.DbManipulator(
+            user_name='test_user',
+            db_name='test_db',
+            host='test_host',
+            test_type='test_type'
         )
         cls.loader_1 = interro.Loader(
             cls.user_1.settings.rattraps,
             cls.data_handler_1
-        )
-        cls.loader_2 = interro.Loader(
-            cls.user_2.settings.rattraps,
-            cls.data_handler_2
         )
 
     def setUp(self):
@@ -394,6 +369,8 @@ class TestTest(unittest.TestCase):
         mock_ask_series_of_guesses.assert_called_once()
         mock_set_interro_df.assert_called_once()
 
+
+
 class TestRattrap(unittest.TestCase):
     """Tests on Rattrap class methods."""
 
@@ -412,15 +389,19 @@ class TestUpdater(unittest.TestCase):
         rattraps = 1
         cls.user_1 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.data_handler_1 = data_handler.CsvHandler(
-            cls.user_1.settings.type
+        cls.data_handler_1 = data_handler.DbManipulator(
+            user_name='test_user',
+            db_name='test_db',
+            host='test_host',
+            test_type=cls.user_1.settings.type
         )
         cls.loader_1 = interro.Loader(rattraps, cls.data_handler_1)
-        cls.loader_1.load_tables()
+        password = '1234'
+        cls.loader_1.load_tables(password)
 
     def setUp(self):
         """Runs before each test"""
-        words_df = pd.DataFrame(columns=['English', 'Français'])
+        words_df = pd.DataFrame(columns=['english', 'français'])
         words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
         words_df.loc[words_df.shape[0]] = [
             'Do you want to dance with me?',
@@ -436,11 +417,11 @@ class TestUpdater(unittest.TestCase):
         words_df.loc[words_df.shape[0]] = ['Eight', 'Huit']
         words_df.loc[words_df.shape[0]] = ['Nine', 'Neuf']
         words_df.loc[words_df.shape[0]] = ['Ten', 'Dix']
-        words_df['Query'] = [0] * words_df.shape[0]
-        words_df['Nb'] = [0] * words_df.shape[0]
-        words_df['Score'] = [0] * words_df.shape[0]
-        words_df['Taux'] = [0] * words_df.shape[0]
-        words_df['Bad_word'] = [0] * words_df.shape[0]
+        words_df['query'] = [0] * words_df.shape[0]
+        words_df['nb'] = [0] * words_df.shape[0]
+        words_df['score'] = [0] * words_df.shape[0]
+        words_df['taux'] = [0] * words_df.shape[0]
+        words_df['bad_word'] = [0] * words_df.shape[0]
         words_df['img_good'] = [0] * words_df.shape[0]
         words = 10
         self.guesser = views_local.CliGuesser()
@@ -464,7 +445,7 @@ class TestUpdater(unittest.TestCase):
     def test_copy_good_words(self):
         """Should copy the well good words in the output table."""
         # Arrange
-        good_words_df = pd.DataFrame(columns=['English', 'Français', 'Date'])
+        good_words_df = pd.DataFrame(columns=['english', 'français', 'creation_date'])
         good_words_df.loc[good_words_df.shape[0]] = ['One', 'Un', '2023-01-01']
         good_words_df.loc[good_words_df.shape[0]] = ['Two', 'Deux', '2023-02-01']
         good_words_df.loc[good_words_df.shape[0]] = ['Three', 'Trois', '2023-03-01']

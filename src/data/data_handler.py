@@ -20,6 +20,9 @@ from src import utils
 
 HOSTS = ['cli', 'web_local', 'container']
 
+with open(REPO_DIR + '/conf/data.json', 'r') as param_file:
+    PARAMS = json.load(param_file)
+
 
 
 class CsvHandler():
@@ -112,75 +115,103 @@ class CsvHandler():
 
 
 
-class MariaDBHandler():
-    """
-    Provide with all methods necessary to interact with MariaDB database.
-    """
-    def __init__(self, user_name: str, test_type: str, mode: str, language_1: str):
+def get_db_cursor(user_name, host, db_name, password):
+    """Connect to vocabulary database if credentials are correct."""
+    connection_config = {
+        'user': user_name,
+        'password': password,
+        'database': db_name,
+        'port': PARAMS['MariaDB']['port']
+    }
+    if host not in HOSTS:
+        logger.warning(f"host: {host}")
+        logger.error(f"host should be in {HOSTS}")
+    else:
+        connection_config['host'] = PARAMS['host'][host]
+    connection = mariadb.connect(**connection_config)
+    cursor = connection.cursor()
+    return connection, cursor
+
+
+
+class DbController():
+    """Manage access and transactions"""
+    def __init__(self, user_name, host):
+        self.user_name = user_name
+        self.user_password = ''
+        self.host = host
+
+    def create_user(self):
+        """Create user and database"""
+        ok = PARAMS['MariaDB']['root_password']
+        connection, cursor = get_db_cursor('root', self.host, 'root', password)
+        try:
+            cursor.execute(f"CREATE USER '{self.user_name}'@'%' IDENTIFIED BY '{self.user_password}'")
+            connection.commit()
+            logger.success(f"User '{self.user_name}' created successfully.")
+        except mysql.connector.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+
+    def grant_privileges(self, db_name):
+        """Grant privileges to the user on the given database"""
+        connection, cursor = get_db_cursor('root', self.host, 'root', password)
+        cursor.execute(f"GRANT ALL PRIVILEGES ON {self.user_name}_{db_name}.* TO '{self.user_name}'@'%'")
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+
+
+class DbDefiner():
+    """Define database structure"""
+    def __init__(self, user_name, host):
+        self.user_name = user_name
+        self.host = host
+        self.db_name = None
+        self.test_type = ''
+
+    def create_database(self, db_name):
+        """Create a database with the given database name"""
+        db_controller = DbController(self.user_name, self.host)
+        connection, cursor = get_db_connection()
+        try:
+            self.cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name}")
+            connection.commit()
+            logger.success(f"Database '{self.user_name}_{db_name}' created successfully.")
+            db_controller.grant_privileges(db_name)
+            logger.success(f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'.")
+        except mysql.connector.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+
+    def set_test_type(self, test_type):
         if test_type not in ['version', 'theme']:
             logger.error(f"Test type {test_type} incorrect, \
             should be either version or theme.")
-        self.user_name
         self.test_type = test_type
-        self.os_sep = utils.get_os_separator()
-        self.mode = mode
-        self.language_1 = language_1
-        self.config = {}
-        self.connection = None
-        self.cursor = None
 
-    # Common operations
-    def get_database_cred(self):
-        """
-        Get credentials necessary for connection with vocabulary database.
-        """
-        cred_path = self.os_sep.join([REPO_DIR, 'conf', 'cred.json'])
-        with open(cred_path, 'rb') as cred_file:
-            cred = json.load(cred_file)
-        return cred
-
-    def set_db_cursor(self):
-        """Connect to vocabulary database if credentials are correct."""
-        cred = self.get_database_cred()
-        self.config = {
-            'user': self.user_name,
-            'password': cred['users'][self.user_name],
-            'database': self.language_1.lower(),
-            'port': cred['port']
-        }
-        if self.mode not in HOSTS:
-            logger.warning(f"Mode: {self.mode}")
-            logger.error(f"Mode should be in {HOSTS}")
-        else:
-            self.config['host'] = cred['host'][self.mode]
-        self.connection = mariadb.connect(**self.config)
-        self.cursor = self.connection.cursor()
-
-    def get_db_cursor_root(self):
-        """Connect to the MariaDB server with root credentials"""
-        cred = db_handler.get_database_cred()
-        connection_config = {
-            'user': 'root',
-            'password': cred['users']['root'],
-            'database': self.language_1.lower(),
-            'port': cred['port']
-        }
-        if self.mode not in HOSTS:
-            logger.warning(f"Mode: {self.mode}")
-            logger.error(f"Mode should be in {HOSTS}")
-        else:
-            self.config['host'] = cred['host'][self.mode]
-        connection = mariadb.connect(**connection_config)
-        cursor = connection.cursor()
-        return connection, cursor
-
-    def get_database_cols(self):
+    def get_database_cols(self, db_name, password):
         """Get table columns."""
-        if os.getcwd().endswith('tests'):
-            os.chdir('..')
-        col_path = self.os_sep.join([os.getcwd(), 'conf', 'columns.json'])
-        with open(col_path, 'rb') as col_file:
-            cols = json.load(col_file)
+        connection, cursor = get_db_cursor(self.user_name, self.host, db_name, password)
+        try:
+            cursor.execute(f"USE {db_name};")
+            cursor.execute("SHOW TABLES;")
+            tables = list(cursor.fetchall())
+            cols_dict = {}
+            for table in tables:
+                cursor.execute(f"SHOW COLUMNS FROM {table_name};")
+                cols_dict[table] = list(cursor.fetchall())
+        except mysql.connector.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        logger.debug(f"Columns: \n{cols}")
         return cols
 
     def get_tables_names(self) -> List[str]:
@@ -197,32 +228,113 @@ class MariaDBHandler():
             raise ValueError
         return [voc_table, perf_table, word_cnt_table, output_table]
 
-    # Table-level operations
-    def get_tables(self):
+
+
+class DbManipulator():
+    """Working with data"""
+    def __init__(self, user_name, db_name, host, test_type):
+        self.user_name = user_name
+        self.db_name = db_name
+        self.host = host
+        self.test_type = test_type
+        self.db_definer = DbDefiner(self.user_name, self.host)
+
+    def get_tables(self, password):
         """Load the different tables necessary to the app."""
-        self.set_db_cursor()
-        cols = self.get_database_cols()
-        tables_names = self.get_tables_names()
+        connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
+        cols = self.db_definer.get_database_cols(self.db_name, password)
+        tables_names = self.db_definer.get_tables_names()
         tables = {}
         for table_name in tables_names:
             sql_request = f"SELECT * FROM {table_name}"
-            self.cursor.execute(sql_request)
+            cursor.execute(sql_request)
             tables[table_name] = pd.DataFrame(
-                columns=cols[self.language_1][table_name]["Columns"],
-                data=self.cursor.fetchall()
+                columns=cols[self.db_name][table_name]["Columns"],
+                data=cursor.fetchall()
             )
             index_col = tables[table_name].columns[0]
             tables[table_name] = tables[table_name].set_index(index_col)
         # Special case of output table
         tables['output'] = tables[tables_names[-1]]
         tables.pop(tables_names[-1])
-        self.cursor.close()
-        self.connection.close()
+        cursor.close()
+        connection.close()
         return tables
 
-    def save_table(self, table_name: str, table: pd.DataFrame):
+    def create(self, row: list, password):
+        """Add a word to the table"""
+        # Create request string
+        today_date = datetime.today().date()
+        table_name = self.language_1 + '.' + 'version_voc'
+        english = row[0]
+        native = row[1]
+        request_1 = f"INSERT INTO {table_name} \
+            (english, français, creation_date, nb, score, taux)"
+        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
+        sql_request = " ".join([request_1, request_2])
+        # Execute request
+        connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
+        cursor.execute(sql_request)
+        cursor.close()
+        connection.close()
+        return True
+
+    def read(self, word_series: pd.DataFrame, password):
+        """Read the given word"""
+        # Create request string
+        table_name, _, _, _ = self.get_tables_names()
+        english, native = self.get_words_from_df(word_series)
+        request_1 = "SELECT english, français, score"
+        request_2 = f"FROM {table_name}"
+        request_3 = f"WHERE english = '{english}';"
+        sql_request = " ".join([request_1, request_2, request_3])
+        # Execute request
+        connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
+        english, native, score = cursor.execute(sql_request)
+        cursor.close()
+        connection.close()
+        return english, native, score
+
+    def update(self, word_series: pd.DataFrame, new_nb, new_score, password):
+        """Update statistics on the given word"""
+        # Create request string
+        table_name, _, _, _ = self.get_tables_names()
+        english, _ = self.get_words_from_df(word_series)
+        request_1 = f"UPDATE {table_name}"
+        request_2 = f"SET nb = {new_nb}, score = {new_score}"
+        request_3 = f"WHERE english = {english};"
+        sql_request = " ".join([request_1, request_2, request_3])
+        # Execute request
+        connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
+        cursor.execute(sql_request)
+        cursor.close()
+        connection.close()
+        return True
+
+    def delete(self, word_series: pd.DataFrame, password):
+        """Delete a word from table."""
+        # Create request string
+        table_name, _, _, _ = self.get_tables_names()
+        english, _ = self.get_words_from_df(word_series)
+        request_1 = f"DELETE FROM {table_name}"
+        request_2 = f"WHERE english = {english}"
+        sql_request = " ".join([request_1, request_2])
+        # Execute request
+        connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
+        cursor.execute(sql_request)
+        cursor.close()
+        connection.close()
+        return True
+
+    def get_words_from_df(self, word_series: pd.DataFrame):
+        """Common method used by all 4 CRUD operations"""
+        english = word_series[word_series.columns[0]]
+        native = word_series[word_series.columns[1]]
+        return english, native
+
+    def save_table(self, table_name: str, table: pd.DataFrame, password):
         """Save given table."""
-        self.set_db_cursor()
+        connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
         cols = self.get_database_cols()
         if table_name == 'output':
             if self.test_type == 'version':
@@ -233,9 +345,9 @@ class MariaDBHandler():
         engine = create_engine(
             ''.join([
                 "mysql+pymysql",
-                "://", self.config['user'],
-                ':', self.config['password'],
-                '@', self.config['host'],
+                "://", self.user_name,
+                ':', self.password,
+                '@', self.host,
                 '/', self.language_1.lower()
             ])
         )
@@ -246,111 +358,5 @@ class MariaDBHandler():
             method='multi',
             index=False
         )
-        self.cursor.close()
-        self.connection.close()
-
-    # Row-level operations
-    def create(self, row: list, test_mode=False):
-        """Add a word to the table"""
-        # Create request string
-        today_date = datetime.today().date()
-        if test_mode:
-            table_name = 'test_table'
-        else:
-            table_name = self.language_1 + '.' + 'version_voc'
-        english = row[0]
-        native = row[1]
-        request_1 = f"INSERT INTO {table_name} \
-            (english, français, creation_date, nb, score, taux)"
-        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
-        sql_request = " ".join([request_1, request_2])
-        # Execute request
-        self.set_db_cursor()
-        self.cursor.execute(sql_request)
-        self.connection.close()
-        return True
-
-    def read(self, word_series: pd.DataFrame):
-        """Read the given word"""
-        # Create request string
-        table_name, _, _, _ = self.get_tables_names()
-        english, native = self.get_words_from_df(word_series)
-        request_1 = "SELECT english, français, score"
-        request_2 = f"FROM {table_name}"
-        request_3 = f"WHERE english = '{english}';"
-        sql_request = " ".join([request_1, request_2, request_3])
-        # Execute request
-        self.set_db_cursor()
-        english, native, score = self.cursor.execute(sql_request)
-        # self.cursor.execute(sql_request)
-        # result = self.cursor.fetchone()
-        # if result:
-        #     english, native, score = result
-        # else:
-        #     english, native, score = None, None, None
-        self.connection.close()
-        return english, native, score
-
-    def update(self, word_series: pd.DataFrame, new_nb, new_score):
-        """Update statistics on the given word"""
-        # Create request string
-        table_name, _, _, _ = self.get_tables_names()
-        english, _ = self.get_words_from_df(word_series)
-        request_1 = f"UPDATE {table_name}"
-        request_2 = f"SET nb = {new_nb}, score = {new_score}"
-        request_3 = f"WHERE english = {english};"
-        sql_request = " ".join([request_1, request_2, request_3])
-        # Execute request
-        self.set_db_cursor()
-        self.cursor.execute(sql_request)
-        self.connection.close()
-        return True
-
-    def delete(self, word_series: pd.DataFrame):
-        """Delete a word from table."""
-        # Create request string
-        table_name, _, _, _ = self.get_tables_names()
-        english, _ = self.get_words_from_df(word_series)
-        request_1 = f"DELETE FROM {table_name}"
-        request_2 = f"WHERE english = {english}"
-        sql_request = " ".join([request_1, request_2])
-        # Execute request
-        self.set_db_cursor()
-        self.cursor.execute(sql_request)
-        self.connection.close()
-        return True
-
-    def get_words_from_df(self, word_series: pd.DataFrame):
-        """Common method used by all 4 CRUD operations"""
-        english = word_series[word_series.columns[0]]
-        native = word_series[word_series.columns[1]]
-        return english, native
-
-    # User level
-    def create_user(self):
-        """Create user and database"""
-        connection, cursor = self.get_db_cursor_root()
-        try:
-            cursor.execute(f"CREATE USER '{self.user_name}'@'%' IDENTIFIED BY '{self.user_password}'")
-            connection.commit()
-            logger.success(f"User '{self.user_name}' created successfully.")
-        except mysql.connector.Error as err:
-            logger.error(err)
-        finally:
-            cursor.close()
-            connection.close()
-
-    # Database level
-    def create_database(self, db_name):
-        """Create a database with the given database name"""
-        connection, cursor = self.get_db_cursor_root()
-        try:
-            cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name}")
-            cursor.execute(f"GRANT ALL PRIVILEGES ON {self.user_name}_{db_name}.* TO '{self.user_name}'@'%'")
-            connection.commit()
-            logger.success(f"Database '{self.user_name}_{db_name}' created successfully.")
-        except mysql.connector.Error as err:
-            logger.error(err)
-        finally:
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection.close()

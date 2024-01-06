@@ -2,9 +2,9 @@
     Extract column names from vocabulary.sql and report them in cred.json
 """
 
+import json
 import os
 import sys
-import json
 
 from loguru import logger
 
@@ -18,6 +18,7 @@ sys.path.append(os.path.dirname(app_dir))
 
 
 from src import utils
+
 OS_SEP = utils.get_os_separator()
 
 
