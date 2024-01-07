@@ -8,6 +8,7 @@
 """
 
 import argparse
+import json
 import os
 import random
 import sys
@@ -19,8 +20,8 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-repo_dir = os.getcwd().split('src')[0]
-sys.path.append(repo_dir)
+REPO_DIR = os.getcwd().split('src')[0]
+sys.path.append(REPO_DIR)
 from src import utils
 
 

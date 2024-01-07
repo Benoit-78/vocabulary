@@ -224,28 +224,28 @@ class TestDbManipulator(unittest.TestCase):
         table_name = 'test_table'
         english = test_row[0]
         native = test_row[1]
+        password = '1234'
         sql_request_1 = f"INSERT INTO {table_name} \
             (english, français, creation_date, nb, score, taux)"
         sql_request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         test_sql_request = " ".join([sql_request_1, sql_request_2])
         # Act
-        # prout prout
-        # result = self.db_manipulator.create(test_row)
-        # self.db_definer.set_db_cursor()
-        # self.db_definer.cursor.execute(test_sql_request)
-        # # Assert
-        # # request_1 = "SELECT english, français, score"
-        # # request_2 = f"FROM {table_name}"
-        # # request_3 = f"WHERE english = '{english}';"
-        # # sql_request = " ".join([request_1, request_2, request_3])
-        # # self.db_manipulator.set_db_cursor()
-        # # english_2, native_2, score_2 = self.db_manipulator.cursor.execute(sql_request)
-        # expected_result = True
-        # self.assertEqual(result, expected_result)
-        # # self.assertEqual(english_2, english)
-        # # self.assertEqual(native_2, native)
-        # # self.assertEqual(score_2, 0)
-        # self.db_manipulator.connection.close()
+        result = self.db_manipulator.create(test_row, password)
+        self.db_definer.set_db_cursor()
+        self.db_definer.cursor.execute(test_sql_request)
+        # Assert
+        request_1 = "SELECT english, français, score"
+        request_2 = f"FROM {table_name}"
+        request_3 = f"WHERE english = '{english}';"
+        sql_request = " ".join([request_1, request_2, request_3])
+        self.db_manipulator.set_db_cursor()
+        english_2, native_2, score_2 = self.db_manipulator.cursor.execute(sql_request)
+        expected_result = True
+        self.assertEqual(result, expected_result)
+        self.assertEqual(english_2, english)
+        self.assertEqual(native_2, native)
+        self.assertEqual(score_2, 0)
+        self.db_manipulator.connection.close()
 
     @patch('src.data.data_handler.mariadb.connect')
     @patch('src.data.data_handler.get_db_cursor')
@@ -255,13 +255,14 @@ class TestDbManipulator(unittest.TestCase):
         mock_set_cursor()
         word_series = pd.DataFrame(columns=['english', 'français', 'score'])
         word_series.loc[word_series.shape[0]] = ['hello', 'bonjour', 0]
+        password = 'test_password'
         with patch.object(
-            self.db_manipulator,
+            self.db_manipulator.db_definer,
             'get_tables_names',
             return_value=['test_table', '_', '_', '_']
             ):
             # Act
-            result = self.db_manipulator.read(word_series)
+            result = self.db_manipulator.read(word_series, password)
             # Assert
             expected_result = self.db_manipulator.cursor.fetchone()
             self.assertEqual(result, expected_result)

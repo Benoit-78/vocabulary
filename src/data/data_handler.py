@@ -282,7 +282,7 @@ class DbManipulator():
     def read(self, word_series: pd.DataFrame, password):
         """Read the given word"""
         # Create request string
-        table_name, _, _, _ = self.get_tables_names()
+        table_name, _, _, _ = self.db_definer.get_tables_names()
         english, native = self.get_words_from_df(word_series)
         request_1 = "SELECT english, français, score"
         request_2 = f"FROM {table_name}"
@@ -298,7 +298,7 @@ class DbManipulator():
     def update(self, word_series: pd.DataFrame, new_nb, new_score, password):
         """Update statistics on the given word"""
         # Create request string
-        table_name, _, _, _ = self.get_tables_names()
+        table_name, _, _, _ = self.db_definer.get_tables_names()
         english, _ = self.get_words_from_df(word_series)
         request_1 = f"UPDATE {table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
@@ -314,7 +314,7 @@ class DbManipulator():
     def delete(self, word_series: pd.DataFrame, password):
         """Delete a word from table."""
         # Create request string
-        table_name, _, _, _ = self.get_tables_names()
+        table_name, _, _, _ = self.db_definer.get_tables_names()
         english, _ = self.get_words_from_df(word_series)
         request_1 = f"DELETE FROM {table_name}"
         request_2 = f"WHERE english = {english}"
