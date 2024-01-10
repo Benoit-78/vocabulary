@@ -136,29 +136,27 @@ def get_db_cursor(user_name, host, db_name, password):
 
 class DbController():
     """Manage access and transactions"""
-    def __init__(self, user_name, host):
-        self.user_name = user_name
-        self.user_password = ''
+    def __init__(self, host):
         self.host = host
 
-    def create_user(self):
-        """Create user and database"""
-        ok = PARAMS['MariaDB']['root_password']
-        connection, cursor = get_db_cursor('root', self.host, 'root', password)
+    def create_user(self, root_password, user_name, user_password):
+        """Create user"""
+        connection, cursor = get_db_cursor('root', self.host, 'root', root_password)
         try:
-            cursor.execute(f"CREATE USER '{self.user_name}'@'%' IDENTIFIED BY '{self.user_password}'")
+            cursor.execute(f"CREATE USER '{user_name}'@'%' IDENTIFIED BY '{user_password}';")
             connection.commit()
-            logger.success(f"User '{self.user_name}' created successfully.")
+            logger.success(f"User '{user_name}' created successfully.")
         except mysql.connector.Error as err:
             logger.error(err)
         finally:
             cursor.close()
             connection.close()
+        return True
 
-    def grant_privileges(self, db_name):
+    def grant_all_privileges(self, root_password, , user_name, db_name):
         """Grant privileges to the user on the given database"""
         connection, cursor = get_db_cursor('root', self.host, 'root', password)
-        cursor.execute(f"GRANT ALL PRIVILEGES ON {self.user_name}_{db_name}.* TO '{self.user_name}'@'%'")
+        cursor.execute(f"GRANT ALL PRIVILEGES ON {user_name}_{db_name}.* TO '{user_name}'@'%'")
         connection.commit()
         cursor.close()
         connection.close()
@@ -175,13 +173,13 @@ class DbDefiner():
 
     def create_database(self, db_name):
         """Create a database with the given database name"""
-        db_controller = DbController(self.user_name, self.host)
+        db_controller = DbController(self.host)
         connection, cursor = get_db_connection()
         try:
             self.cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name}")
             connection.commit()
             logger.success(f"Database '{self.user_name}_{db_name}' created successfully.")
-            db_controller.grant_privileges(db_name)
+            db_controller.grant_all_privileges(db_name)
             logger.success(f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'.")
         except mysql.connector.Error as err:
             logger.error(err)
@@ -200,19 +198,26 @@ class DbDefiner():
         connection, cursor = get_db_cursor(self.user_name, self.host, db_name, password)
         try:
             cursor.execute(f"USE {db_name};")
+            # db_name = list(cursor.fetchall())
+            logger.debug(f"Database: {db_name}")
             cursor.execute("SHOW TABLES;")
             tables = list(cursor.fetchall())
+            # tables = [table[0] for table in cursor.fetchall()]
+            logger.debug(f"Tables: {tables}")
             cols_dict = {}
-            for table in tables:
+            for table_name in tables:
+                logger.debug(f"Table: {table_name}")
                 cursor.execute(f"SHOW COLUMNS FROM {table_name};")
-                cols_dict[table] = list(cursor.fetchall())
-        except mysql.connector.Error as err:
+                columns = list(cursor.fetchall())
+                logger.debug(f"Columns: {columns}")
+                cols_dict[table_name] = columns
+                logger.debug(f"Columns: {cols_dict}")
+        except mariadb.Error as err:
             logger.error(err)
         finally:
             cursor.close()
             connection.close()
-        logger.debug(f"Columns: \n{cols}")
-        return cols
+        return cols_dict
 
     def get_tables_names(self) -> List[str]:
         """Get version or theme table according to the test type."""
@@ -261,19 +266,20 @@ class DbManipulator():
         connection.close()
         return tables
 
-    def create(self, row: list, password):
+    def insert_word(self, row: list, password):
         """Add a word to the table"""
         # Create request string
         today_date = datetime.today().date()
-        table_name = self.language_1 + '.' + 'version_voc'
+        table_name = self.db_name + '.' + 'version_voc'
         english = row[0]
         native = row[1]
-        request_1 = f"INSERT INTO {table_name} \
-            (english, français, creation_date, nb, score, taux)"
+        request_1 = f"INSERT INTO {table_name} (english, français, creation_date, nb, score, taux)"
         request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2])
         # Execute request
-        connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
+        connection, cursor = get_db_cursor(
+            self.user_name, self.host, self.db_name, password
+        )
         cursor.execute(sql_request)
         cursor.close()
         connection.close()
@@ -282,6 +288,7 @@ class DbManipulator():
     def read(self, word_series: pd.DataFrame, password):
         """Read the given word"""
         # Create request string
+        self.db_definer.set_test_type(self.test_type)
         table_name, _, _, _ = self.db_definer.get_tables_names()
         english, native = self.get_words_from_df(word_series)
         request_1 = "SELECT english, français, score"
@@ -290,7 +297,7 @@ class DbManipulator():
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
         connection, cursor = get_db_cursor(self.user_name, self.host, self.db_name, password)
-        english, native, score = cursor.execute(sql_request)
+        english, native, score = cursor.execute(sql_request)[0]
         cursor.close()
         connection.close()
         return english, native, score
@@ -328,8 +335,8 @@ class DbManipulator():
 
     def get_words_from_df(self, word_series: pd.DataFrame):
         """Common method used by all 4 CRUD operations"""
-        english = word_series[word_series.columns[0]]
-        native = word_series[word_series.columns[1]]
+        english = word_series[word_series.columns[0]][0]
+        native = word_series[word_series.columns[1]][0]
         return english, native
 
     def save_table(self, table_name: str, table: pd.DataFrame, password):
@@ -341,14 +348,14 @@ class DbManipulator():
                 table_name = 'theme_voc'
             elif self.test_type == 'theme':
                 table_name = 'archives'
-        table = table[cols[self.language_1][table_name]["Columns"]]
+        table = table[cols[self.db_name][table_name]["Columns"]]
         engine = create_engine(
             ''.join([
                 "mysql+pymysql",
                 "://", self.user_name,
-                ':', self.password,
+                ':', password,
                 '@', self.host,
-                '/', self.language_1.lower()
+                '/', self.db_name.lower()
             ])
         )
         table.to_sql(

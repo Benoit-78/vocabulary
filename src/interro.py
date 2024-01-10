@@ -320,7 +320,7 @@ class Updater():
         self.interro.words_df = self.interro.words_df[
             self.interro.words_df['taux'] < self.interro.words_df['img_good']
         ]
-        self.interro.words_df.drop('img_good', axis=1, inplace=True)
+        self.interro.words_df = self.interro.words_df.drop('img_good', axis=1)
 
     def move_good_words(self):
         """Transfer the well-good words in an ouput table, and save this."""
