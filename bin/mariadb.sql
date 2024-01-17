@@ -25,6 +25,24 @@ GRANT ALL PRIVILEGES ON {new_database_name}.* TO 'benoit'@'localhost'
 
 GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO 'benoit'@'localhost';
 
+SHOW ENGINES;
+
+SHOW ERRORS;
+
+-- Hosts
+SELECT host, statements, statement_avg_latency, table_scans, file_ios, file_io_latency, total_connections, unique_users, total_memory_allocated
+FROM sys.host_summary;
+
+-- Users
+SELECT * FROM sys.memory_by_user_by_current_bytes;
+
+SELECT user, statements, statement_avg_latency, table_scans, file_ios, file_io_latency, total_connections, unique_hosts, total_memory_allocated
+FROM sys.user_summary;
+
+-- Queries
+SELECT query, db, exec_count, total_latency, last_seen FROM sys.statements_with_sorting
+ORDER BY exec_count DESC
+LIMIT 10;
 
 
 ------------------------------
@@ -69,16 +87,16 @@ SELECT * FROM column_1, column_2;
 INSERT INTO `theme_perf` (`id_test`, `test_date`, `test`) VALUES (2, '2022-10-29', 83);
 
 LOAD DATA INFILE '/path/data.txt' INTO TABLE your_table
-FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
-(column1, column2, @percentage_variable)
-SET percentage = CAST(@percentage_variable AS SIGNED);
+    FIELDS TERMINATED BY ','
+    LINES TERMINATED BY '\n'
+    (column1, column2, @percentage_variable)
+    SET percentage = CAST(@percentage_variable AS SIGNED);
 
 
 
-------------
--- Others --
-------------
+-------------------------------
+-- MariaDB-specific commands --
+------------------------------
 USE english;
 
 SOURCE english.sql;

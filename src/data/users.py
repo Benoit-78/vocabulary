@@ -113,8 +113,14 @@ class UserAccount(Account):
             language_1='english'
         )
 
-    def create_user(self):
-        """Add the user to the credentials json file."""
+    def create(self):
+        """
+        Acquire name and password, and store them in the credentials.
+        """
+        return None
+
+    def delete(self):
+        """Delete the user account."""
         return None
 
     def log_in(self):
@@ -125,16 +131,20 @@ class UserAccount(Account):
         """Enable the user to log out of his account."""
         return None
 
-    def update_user_name(self):
+    def update_name(self):
         """Change the name of the user."""
         return None
 
-    def update_user_password(self):
+    def update_password(self):
         """Change the password of the user."""
         return None
 
-    def delete_user(self):
-        """Delete the user account."""
+    def add_database(self):
+        """Add a database to the user's space."""
+        return None
+
+    def remove_database(self):
+        """Remove a database from the user's space."""
         return None
 
     def add_word(self):
