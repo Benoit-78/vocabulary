@@ -7,7 +7,7 @@
 import json
 import os
 import sys
-from abc import ABC, abstractmethod
+from abc import ABC
 from datetime import datetime
 from typing import Dict, List
 
@@ -22,7 +22,7 @@ from src import utils
 
 HOSTS = ['cli', 'web_local', 'container']
 
-with open(REPO_DIR + '/conf/data.json', 'r') as param_file:
+with open(REPO_DIR + '/conf/data.json', 'rb') as param_file:
     PARAMS = json.load(param_file)
 
 
@@ -155,14 +155,14 @@ class DbController(DbInterface):
 
     def create_user(self, root_password, user_name, user_password):
         """Create user"""
-        connection, cursor = self.get_db_cursor('root', self.host, 'root', root_password)
+        connection, cursor = self.get_db_cursor('root', 'root', root_password)
         result = None
         try:
             cursor.execute(f"CREATE USER '{user_name}'@'%' IDENTIFIED BY '{user_password}';")
             connection.commit()
             logger.success(f"User '{user_name}' created successfully.")
             result = True
-        except mysql.connector.Error as err:
+        except mariadb.Error as err:
             logger.error(err)
             result = False
         finally:
@@ -172,13 +172,13 @@ class DbController(DbInterface):
 
     def grant_all_privileges(self, root_password, user_name, db_name):
         """Grant privileges to the user on the given database"""
-        connection, cursor = self.get_db_cursor('root', self.host, 'root', root_password)
+        connection, cursor = self.get_db_cursor('root', 'root', root_password)
         result = None
         try:
             cursor.execute(f"GRANT ALL PRIVILEGES ON {user_name}_{db_name}.* TO '{user_name}'@'%';")
             connection.commit()
             result = True
-        except:
+        except mariadb.Error as err:
             logger.error(err)
             result = False
         finally:
@@ -192,7 +192,7 @@ class DbDefiner(DbInterface):
     """
     Define database structure.
     """
-    def __init__(self, user_name, host):
+    def __init__(self, host, user_name):
         super().__init__(host)
         self.user_name = user_name
         self.db_name = None
@@ -200,14 +200,16 @@ class DbDefiner(DbInterface):
     def create_database(self, db_name, root_password, password):
         """Create a database with the given database name"""
         db_controller = DbController(self.host)
-        connection, cursor = self.get_db_cursor(self.user_name, self.host, db_name, password)
+        connection, cursor = self.get_db_cursor(self.user_name, db_name, password)
         result = None
         try:
             cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
             connection.commit()
             logger.success(f"Database '{self.user_name}_{db_name}' created.")
             db_controller.grant_all_privileges(root_password, self.user_name, db_name)
-            logger.success(f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'.")
+            logger.success(
+                f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'."
+            )
             result = True
         except mariadb.Error as err:
             logger.error(err)
@@ -219,7 +221,7 @@ class DbDefiner(DbInterface):
 
     def get_database_cols(self, db_name, password):
         """Get table columns."""
-        connection, cursor = self.get_db_cursor(self.user_name, self.host, db_name, password)
+        connection, cursor = self.get_db_cursor(self.user_name, db_name, password)
         try:
             cursor.execute(f"USE {db_name};")
             cursor.execute("SHOW TABLES;")
@@ -256,14 +258,17 @@ class DbManipulator(DbInterface):
     """
     Working with data.
     """
-    def __init__(self, user_name, db_name, host, test_type):
+    def __init__(self, host, user_name, db_name, test_type):
         super().__init__(host)
         self.user_name = user_name
         self.db_name = db_name
-        self.db_definer = DbDefiner(self.user_name, self.host)
+        self.db_definer = DbDefiner(self.host, self.user_name)
         self.set_test_type(test_type)
 
     def set_test_type(self, test_type):
+        """
+        Set the test type attribute.
+        """
         if test_type not in ['version', 'theme']:
             logger.error(f"Test type {test_type} incorrect, \
             should be either version or theme.")
@@ -272,7 +277,7 @@ class DbManipulator(DbInterface):
     def get_tables(self, password):
         """Load the different tables necessary to the app."""
         connection, cursor = self.get_db_cursor(
-            self.user_name, self.host, self.db_name, password
+            self.user_name, self.db_name, password
         )
         cols = self.db_definer.get_database_cols(self.db_name, password)
         tables_names = list(cols.keys())
@@ -305,7 +310,7 @@ class DbManipulator(DbInterface):
         sql_request = " ".join([request_1, request_2])
         # Execute request
         connection, cursor = self.get_db_cursor(
-            self.user_name, self.host, self.db_name, password
+            self.user_name, self.db_name, password
         )
         cursor.execute(sql_request)
         cursor.close()
@@ -321,7 +326,7 @@ class DbManipulator(DbInterface):
         request_3 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
-        connection, cursor = self.get_db_cursor(self.user_name, self.host, self.db_name, password)
+        connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
         english, native, score = cursor.execute(sql_request)[0]
         cursor.close()
         connection.close()
@@ -336,7 +341,7 @@ class DbManipulator(DbInterface):
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         # Execute request
-        connection, cursor = self.get_db_cursor(self.user_name, self.host, self.db_name, password)
+        connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
         cursor.execute(sql_request)
         cursor.close()
         connection.close()
@@ -350,7 +355,7 @@ class DbManipulator(DbInterface):
         request_2 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2])
         # Execute request
-        connection, cursor = self.get_db_cursor(self.user_name, self.host, self.db_name, password)
+        connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
         cursor.execute(sql_request)
         cursor.close()
         connection.close()
@@ -359,7 +364,7 @@ class DbManipulator(DbInterface):
     def save_table(self, password, table_name: str, table: pd.DataFrame):
         """Save given table."""
         connection, cursor = self.get_db_cursor(
-            self.user_name, self.host, self.db_name, password
+            self.user_name, self.db_name, password
         )
         cols = self.db_definer.get_database_cols(self.db_name, password)
         if table_name == 'output':

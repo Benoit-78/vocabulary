@@ -95,7 +95,7 @@ def get_help(request: Request):
 @app.post("/authenticate")
 async def authenticate(creds: dict):
     """Acquire the user settings for one interro."""
-    # global cred_checker
+    global cred_checker
     cred_checker.name = creds['input_name']
     cred_checker.password = creds['input_password']
     cred_checker.check_credentials(creds['input_name'])
@@ -111,9 +111,8 @@ async def authenticate(creds: dict):
 @app.get("/user-space/{user_name}", response_class=HTMLResponse)
 def user_main_page(request: Request, user_name):
     """Call the base page of user space"""
-    # global cred_checker
+    global cred_checker
     cred_checker.check_credentials(user_name)
-    db_handler = data_handler.MariaDBHandler(user_name, 'web_local')
     return templates.TemplateResponse(
         "user/user_space.html",
         {
@@ -143,17 +142,16 @@ def  choose_database(request: Request, user_name):
 
 
 @app.post("/check-connection-to-database/{user_name}/{db_name}")
-async def save_interro_settings(settings: dict, user_name, db_name):
+async def check_db_connection(settings: dict, user_name, db_name):
     """Acquire the database chosen by the user."""
-    db_handler = data_handler.MariaDBHandler(user_name, 'web_local')
-    db_handler.set_db_cursor(db_name)
+    db_handler = data_handler.DbDefiner('web_local', user_name)
+    connection, cursor = db_handler.get_db_cursor(db_name)
     return JSONResponse(
         content=
         {
-            "message": "User settings stored successfully."
+            "message": "Connection to database established successfully.",
         }
     )
-    db_handler.set_db_cursor()
 
 
 @app.get("/interro-settings/{user_name}", response_class=HTMLResponse)
@@ -169,13 +167,14 @@ def interro_settings(request: Request, user_name):
     )
 
 
-@app.post("/save-interro-settings/{user_name}")
+@app.post("/save-interro-settings/{user_name}/{db_name}}")
 async def save_interro_settings(settings: dict, user_name):
     """Acquire the user settings for one interro."""
     global loader
     global test
     loader, test = load_test(
         user_name,
+        db_name,
         settings["testType"].lower(),
         settings["numWords"]
     )
@@ -190,16 +189,21 @@ async def save_interro_settings(settings: dict, user_name):
     )
 
 
-def load_test(user_name, test_type, words):
+def load_test(user_name, db_name, test_type, test_length):
     """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(user_name, 'web_local')
+    db_handler = data_handler.DbManipulator(
+        host='web_local',
+        user_name=user_name,
+        db_name=db_name,
+        test_type=test_type,
+    )
     db_handler.set_test_type(test_type)
     loader_ = interro.Loader(0, db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
     test_ = interro.Test(
         loader_.tables[loader_.test_type + '_voc'],
-        words,
+        test_length,
         guesser,
         loader_.tables[loader_.test_type + '_perf'],
         loader_.tables[loader_.test_type + '_words_count']
@@ -381,7 +385,7 @@ def end_interro(
 
 
 @app.get("/sign-out/{user_name}", response_class=HTMLResponse)
-def sign_in(request: Request):
+def sign_out(request: Request):
     """Deconnect the user and return to welcome page."""
     global cred_checker
     cred_checker = users.CredChecker()
@@ -399,7 +403,6 @@ def sign_in(request: Request):
 # The guest is able to do some tests, but nothing more.
 #     - this page must NOT contain pages like settings, add word, ...
 #     - a guest should not access the 'root' page, even by accident.
-
 @app.get("/guest-not-allowed", response_class=HTMLResponse)
 def guest_not_allowed(request: Request):
     """
@@ -440,7 +443,7 @@ async def save_interro_settings_guest(settings: dict):
     return JSONResponse(
         content=
         {
-            "message": "User settings stored successfully."
+            "message": "Guest user settings stored successfully."
         }
     )
 
@@ -626,10 +629,15 @@ def data_page(request: Request, user_name):
 async def create_word(data: dict, user_name):
     """Save the word in the database."""
     cred_checker.check_credentials(user_name)
-    db_handler = data_handler.MariaDBHandler(user_name, 'version', 'web_local', 'english')
+    db_handler = data_handler.DBManipulator(
+        'web_local',
+        user_name,
+        'english'
+        'version',
+    )
     english = data['english']
     french = data['french']
-    if db_handler.create([english, french]) is True:
+    if db_handler.insert_word([english, french]) is True:
         message = "Word stored successfully."
     else:
         message = "Error with the storing of the word."

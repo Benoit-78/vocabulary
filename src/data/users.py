@@ -58,12 +58,16 @@ class CredChecker():
 
     def check_credentials(self, name_to_check):
         """Validate user credentials."""
+        # Input name is different from the user name.
         if name_to_check != self.name:
             self.flag_incorrect_user_name()
+        # Given user name is not in the list of users.
         if not self.check_input_name():
             self.flag_incorrect_user_name()
+        # Input password is empty or sneaky.
         if self.password in [None, ""]:
             self.flag_incorrect_user_password()
+        # Input password is different from the user password.
         if not self.check_input_password():
             self.flag_incorrect_user_password()
 

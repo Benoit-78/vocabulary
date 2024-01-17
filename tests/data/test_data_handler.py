@@ -166,7 +166,6 @@ class TestDbController(unittest.TestCase):
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once_with(
             'root',
-            self.db_controller.host,
             'root',
             self.root_password
         )
@@ -197,7 +196,6 @@ class TestDbController(unittest.TestCase):
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once_with(
             'root',
-            self.db_controller.host,
             'root',
             self.root_password
         )
@@ -217,7 +215,7 @@ class TestDbDefiner(unittest.TestCase):
         cls.user_name = 'benoit'
         cls.host = 'web_local'
         cls.password = 'test_password'
-        cls.db_definer = data_handler.DbDefiner(cls.user_name, cls.host)
+        cls.db_definer = data_handler.DbDefiner(cls.host, cls.user_name)
 
     @patch('src.data.data_handler.DbDefiner.get_db_cursor')
     @patch('src.data.data_handler.DbController')
@@ -235,7 +233,6 @@ class TestDbDefiner(unittest.TestCase):
         # Assert
         mock_get_db_cursor.assert_called_once_with(
             self.user_name,
-            self.host,
             db_name,
             password
         )
@@ -279,7 +276,6 @@ class TestDbDefiner(unittest.TestCase):
         # Assertions
         mock_get_db_cursor.assert_called_once_with(
             self.db_definer.user_name,
-            self.db_definer.host,
             db_name,
             self.password
         )
@@ -319,19 +315,16 @@ class TestDbManipulator(unittest.TestCase):
         # Data definition
         cls.user_name = 'benoit'
         cls.host = 'web_local'
-        cls.db_definer = data_handler.DbDefiner(
-            cls.user_name,
-            cls.host
-        )
+        cls.db_definer = data_handler.DbDefiner(cls.host, cls.user_name)
         # Data manipulation
         cls.table_name = 'version_voc'
         cls.db_name = 'english'
         cls.test_type = 'version'
         cls.password = 'test_password'
         cls.db_manipulator = data_handler.DbManipulator(
+            cls.host,
             cls.user_name,
             cls.db_name,
-            cls.host,
             cls.test_type
         )
         cls.words_df = pd.DataFrame({
@@ -376,7 +369,6 @@ class TestDbManipulator(unittest.TestCase):
         self.assertIn('output', list(result.keys()))
         mock_get_db_cursor.assert_called_once_with(
             self.db_manipulator.user_name,
-            self.db_manipulator.host,
             self.db_manipulator.db_name,
             password
         )
@@ -397,7 +389,6 @@ class TestDbManipulator(unittest.TestCase):
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once_with(
             self.db_manipulator.user_name,
-            self.db_manipulator.host,
             self.db_manipulator.db_name,
             self.password
         )
@@ -424,7 +415,6 @@ class TestDbManipulator(unittest.TestCase):
         # Assert
         mock_get_db_cursor.assert_called_once_with(
             self.db_manipulator.user_name,
-            self.db_manipulator.host,
             self.db_manipulator.db_name,
             self.password
         )
@@ -506,7 +496,6 @@ class TestDbManipulator(unittest.TestCase):
         # Assert
         mock_get_db_cursor.assert_called_once_with(
             self.db_manipulator.user_name,
-            self.db_manipulator.host,
             self.db_manipulator.db_name,
             password
         )
