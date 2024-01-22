@@ -5,10 +5,19 @@
         Users management
 """
 
+import os
+import sys
 from abc import ABC, abstractmethod
 
 from fastapi import HTTPException
 from loguru import logger
+
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
+
+from src.data.data_handler import DbManipulator
+
 
 
 class CredChecker():
@@ -110,11 +119,11 @@ class UserAccount(Account):
     def __init__(self, user_name, user_password):
         self.user_name = user_name
         self.user_passsword = user_password
-        self.db_handler = MariaDBHandler(
-            self.user_name,
+        self.db_handler = DbManipulator(
+            host='web_local',
+            user_name=self.user_name,
+            db_name='english',
             test_type='version',
-            mode='web_local',
-            language_1='english'
         )
 
     def create(self):

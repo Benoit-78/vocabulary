@@ -20,7 +20,8 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-REPO_DIR = os.getcwd().split('src')[0]
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 from src import utils
 

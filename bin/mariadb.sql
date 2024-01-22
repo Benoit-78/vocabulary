@@ -15,13 +15,15 @@
 
 SELECT host, user, password FROM mysql.user;
 
-CREATE USER 'benoit'@'localhost' IDENTIFIED BY '<db_password>';
+CREATE USER 'guest'@'localhost' IDENTIFIED BY '<db_password>';
 
 ALTER USER 'benoit'@'localhost' IDENTIFIED BY '<db_password>';
 
-SHOW GRANTS FOR 'benoit'@'localhost';
+SHOW GRANTS FOR 'guest'@'localhost';
 
-GRANT ALL PRIVILEGES ON {new_database_name}.* TO 'benoit'@'localhost'
+GRANT ALL PRIVILEGES ON vocabulary.* TO 'guest'@'localhost';
+
+REVOKE ALL PRIVILEGES ON `vocabulary`.* FROM `guest`@`localhost`;
 
 GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO 'benoit'@'localhost';
 
@@ -52,7 +54,7 @@ LIMIT 10;
 -- Ex: CREATE, ALTER, DROP
 
 -- Databases
-CREATE DATABASE db_name;
+CREATE DATABASE vocabulary;
 
 DROP DATABASE <database_name>;
 

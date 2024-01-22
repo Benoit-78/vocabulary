@@ -7,6 +7,10 @@
         Vocabulary application in its FastAPI version.
 """
 
+import json
+import os
+import sys
+
 import pandas as pd
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -15,16 +19,27 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
+
 from src import interro, views
 from src.dashboard import feed_dashboard
 from src.data import data_handler, users
 
 app = FastAPI()
-GUEST_USER_NAME = 'benoit'
+GUEST_USER_NAME = 'guest'
+GUEST_DB_NAME = 'vocabulary'
 test = None
 loader = None
 flag_data_updated = None
 cred_checker = users.CredChecker()
+
+with open('conf/hum.json', 'r') as json_file:
+    HUM = json.load(json_file)
+
+with open('conf/data.json', 'r') as json_file:
+    DATA = json.load(json_file)
 
 # CSS files
 app.mount(
@@ -140,7 +155,6 @@ def  choose_database(request: Request, user_name):
     )
 
 
-
 @app.post("/check-connection-to-database/{user_name}/{db_name}")
 async def check_db_connection(settings: dict, user_name, db_name):
     """Acquire the database chosen by the user."""
@@ -168,15 +182,17 @@ def interro_settings(request: Request, user_name):
 
 
 @app.post("/save-interro-settings/{user_name}/{db_name}}")
-async def save_interro_settings(settings: dict, user_name):
+async def save_interro_settings(settings: dict, user_name, db_name):
     """Acquire the user settings for one interro."""
     global loader
     global test
+    password = 'mais_quel_est_le_password'
     loader, test = load_test(
         user_name,
         db_name,
         settings["testType"].lower(),
-        settings["numWords"]
+        settings["numWords"],
+        password
     )
     logger.info("User data loaded")
     global flag_data_updated
@@ -189,7 +205,7 @@ async def save_interro_settings(settings: dict, user_name):
     )
 
 
-def load_test(user_name, db_name, test_type, test_length):
+def load_test(user_name, db_name, test_type, test_length, password):
     """Load the interroooo!"""
     db_handler = data_handler.DbManipulator(
         host='web_local',
@@ -199,7 +215,7 @@ def load_test(user_name, db_name, test_type, test_length):
     )
     db_handler.set_test_type(test_type)
     loader_ = interro.Loader(0, db_handler)
-    loader_.load_tables()
+    loader_.load_tables(password)
     guesser = views.FastapiGuesser()
     test_ = interro.Test(
         loader_.tables[loader_.test_type + '_voc'],
@@ -208,6 +224,7 @@ def load_test(user_name, db_name, test_type, test_length):
         loader_.tables[loader_.test_type + '_perf'],
         loader_.tables[loader_.test_type + '_words_count']
     )
+    logger.debug(f"Test created: {test_}")
     test_.set_interro_df()
     return loader_, test_
 
@@ -397,11 +414,12 @@ def sign_out(request: Request):
     )
 
 
+
 # ==================================================
 # G U E S T
 # ==================================================
 # The guest is able to do some tests, but nothing more.
-#     - this page must NOT contain pages like settings, add word, ...
+#     - this page should NOT contain pages like settings, add word, ...
 #     - a guest should not access the 'root' page, even by accident.
 @app.get("/guest-not-allowed", response_class=HTMLResponse)
 def guest_not_allowed(request: Request):
@@ -427,15 +445,17 @@ def interro_settings_guest(request: Request):
     )
 
 
-@app.post("/save-interro-settings-guest")
+@app.post("/interro-settings-guest")
 async def save_interro_settings_guest(settings: dict):
     """Acquire the user settings for one interro."""
     global loader
     global test
     loader, test = load_test(
-        GUEST_USER_NAME,
-        settings["testType"].lower(),
-        settings["numWords"]
+        user_name='guest',
+        db_name=HUM['user']['guest']['databases'][0],
+        test_type=settings["testType"].lower(),
+        test_length=settings["numWords"],
+        password=HUM['user']['guest']['OK']
     )
     logger.info("User data loaded")
     global flag_data_updated
@@ -464,6 +484,7 @@ def load_interro_question_guest(
         score = int(score)
     except NameError:
         score = 0
+    global test
     progress_percent = int(count / int(words) * 100)
     index = test.interro_df.index[count]
     english = test.interro_df.loc[index][0]
@@ -670,6 +691,7 @@ def graphs_page(request: Request, user_name):
             "userName": user_name
         }
     )
+
 
 
 # ==================================================
