@@ -8,6 +8,7 @@
 """
 
 import argparse
+import json
 import os
 import random
 import sys
@@ -19,14 +20,10 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-repo_dir = os.getcwd().split('src')[0]
-sys.path.append(repo_dir)
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
 from src import utils
-
-STEEP_GOOD = -1.25
-ORD_GOOD = 112.5
-STEEP_BAD = 2.5
-ORD_BAD = -125
 
 
 
@@ -92,9 +89,9 @@ class Loader():
         self.tables = {}
         self.output_table = ''
 
-    def load_tables(self):
+    def load_tables(self, password):
         """Return the tables necessary for the interro to run"""
-        self.tables = self.data_handler.get_tables()
+        self.tables = self.data_handler.get_tables(password)
         voc = self.test_type + '_voc'
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]
         self.tables[voc] = self.tables[voc].sort_values(
@@ -283,10 +280,23 @@ class Updater():
         self.loader = loader
         self.interro = interro
         self.good_words_df = pd.DataFrame()
+        self.criteria = {}
+        self.set_criteria()
+
+    def set_criteria(self):
+        """
+        Upload the dictionnary of criteria.
+        By the way, can you say 'criteria' three times in a row?
+        """
+        with open(REPO_DIR + '/conf/interro.json', 'r') as file:
+            self.criteria = json.load(file)
+        self.criteria = self.criteria['interro']
 
     def set_good_words(self):
         """Identify the words that have been sufficiently guessed."""
-        self.interro.words_df['img_good'] = ORD_GOOD + STEEP_GOOD * self.interro.words_df['nb']
+        ord_good = self.criteria['ORD_GOOD']
+        steep_good = self.criteria['STEEP_GOOD']
+        self.interro.words_df['img_good'] = ord_good + steep_good * self.interro.words_df['nb']
         self.good_words_df = self.interro.words_df[
             self.interro.words_df['taux'] >= self.interro.words_df['img_good']
         ]
@@ -311,7 +321,7 @@ class Updater():
         self.interro.words_df = self.interro.words_df[
             self.interro.words_df['taux'] < self.interro.words_df['img_good']
         ]
-        self.interro.words_df.drop('img_good', axis=1, inplace=True)
+        self.interro.words_df = self.interro.words_df.drop('img_good', axis=1)
 
     def move_good_words(self):
         """Transfer the well-good words in an ouput table, and save this."""
@@ -332,7 +342,9 @@ class Updater():
         3) Flag the words having a worst score as their bad_image, as bad words.
         4) Drop the img_bad column.
         """
-        self.interro.words_df['img_bad'] = ORD_BAD + STEEP_BAD * self.interro.words_df['nb']
+        ord_bad = self.criteria['ORD_BAD']
+        steep_bad = self.criteria['STEEP_BAD']
+        self.interro.words_df['img_bad'] = ord_bad + steep_bad * self.interro.words_df['nb']
         self.interro.words_df['bad_word'] = np.where(
             self.interro.words_df['taux'] < self.interro.words_df['img_bad'], 1, 0
         )

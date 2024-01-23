@@ -14,17 +14,17 @@ import plotly.express as px
 import plotly.io as pio
 from loguru import logger
 
-APP_DIR = 'vocabulary'
-APP_PATH = os.getcwd().split(APP_DIR)[0] + APP_DIR
-sys.path.append(APP_PATH)
-from src.data.data_handler import MariaDBHandler
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
+from src.data.data_handler import DbManipulator
 
 
 
 class WordsGraph(ABC):
     """Abstract class for creating and saving user-specific graphs."""
     def __init__(self, db_handler):
-        """Constructor should get a database handler, such as MariaDBHandler"""
+        """Constructor should get a database handler"""
         self.db_handler = db_handler
         self.data = pd.DataFrame()
 
@@ -287,17 +287,17 @@ def load_graphs():
     """Load the user's graphs"""
     html_graphs = []
     # Version
-    data_handler = MariaDBHandler(
-        test_type='version',
-        mode='web_local',
-        language_1='english'
+    data_manipulator = DbManipulator(
+        host='web_local',
+        db_name='english',
+        test_type='version'
     )
     # Instanciate
-    graph_1 = WordsGraph1(data_handler)
-    graph_2 = WordsGraph2(data_handler)
-    graph_3 = WordsGraph3(data_handler)
-    graph_4 = WordsGraph4(data_handler)
-    graph_5 = WordsGraph5(data_handler)
+    graph_1 = WordsGraph1(data_manipulator)
+    graph_2 = WordsGraph2(data_manipulator)
+    graph_3 = WordsGraph3(data_manipulator)
+    graph_4 = WordsGraph4(data_manipulator)
+    graph_5 = WordsGraph5(data_manipulator)
     # Create graphs
     graph_1_html = graph_1.create()
     graph_2_html = graph_2.create()

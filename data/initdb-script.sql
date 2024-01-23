@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS voc (
 	id_word INT AUTO_INCREMENT PRIMARY KEY,
 	tests_flow TINYTEXT, -- version -> theme | theme -> version
 	test_type TINYTEXT, -- version | theme
-    English CHAR,
-    Français CHAR,
+    english CHAR,
+    français CHAR,
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,

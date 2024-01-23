@@ -5,17 +5,24 @@
         Users management
 """
 
+import os
+import sys
 from abc import ABC, abstractmethod
 
 from fastapi import HTTPException
 from loguru import logger
+
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
+
+from src.data.data_handler import DbManipulator
 
 
 
 class CredChecker():
     """Class dedicated to the credentials checking process."""
     def __init__(self):
-        """"""
         self.name = ""
         self.password = ""
 
@@ -60,12 +67,16 @@ class CredChecker():
 
     def check_credentials(self, name_to_check):
         """Validate user credentials."""
+        # Input name is different from the user name.
         if name_to_check != self.name:
             self.flag_incorrect_user_name()
+        # Given user name is not in the list of users.
         if not self.check_input_name():
             self.flag_incorrect_user_name()
+        # Input password is empty or sneaky.
         if self.password in [None, ""]:
             self.flag_incorrect_user_password()
+        # Input password is different from the user password.
         if not self.check_input_password():
             self.flag_incorrect_user_password()
 
@@ -100,18 +111,29 @@ class Account(ABC):
 
 
 
-
 class UserAccount(Account):
-    """Class dedicated to user accounts management."""
-
+    """
+    Interface between web_app API and database handlers,
+    such as Controller, Definer, and Manipulator.
+    """
     def __init__(self, user_name, user_password):
         self.user_name = user_name
         self.user_passsword = user_password
+        self.db_handler = DbManipulator(
+            host='web_local',
+            user_name=self.user_name,
+            db_name='english',
+            test_type='version',
+        )
 
     def create(self):
         """
-        Create a user account and triggers the creation of the user's database.
+        Acquire name and password, and store them in the credentials.
         """
+        return None
+
+    def delete(self):
+        """Delete the user account."""
         return None
 
     def log_in(self):
@@ -122,14 +144,6 @@ class UserAccount(Account):
         """Enable the user to log out of his account."""
         return None
 
-    def add_word(self):
-        """Add a couple of words to the user's database."""
-        return None
-
-    def remove_word(self):
-        """Remove a couple of words from the user's database."""
-        return None
-
     def update_name(self):
         """Change the name of the user."""
         return None
@@ -138,6 +152,18 @@ class UserAccount(Account):
         """Change the password of the user."""
         return None
 
-    def delete(self):
-        """Delete the user account."""
+    def add_database(self):
+        """Add a database to the user's space."""
+        return None
+
+    def remove_database(self):
+        """Remove a database from the user's space."""
+        return None
+
+    def add_word(self):
+        """Add a couple of words to the user's database."""
+        return None
+
+    def remove_word(self):
+        """Remove a couple of words from the user's database."""
         return None

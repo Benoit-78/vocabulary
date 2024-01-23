@@ -1,10 +1,13 @@
 """
-    Methods for CRUD operations.
+    Main purpose:
+        Sort of an Object-Relational Mapping tool.
+        Focuses on Data Control, Data Definition & Data Manipulation.
 """
 
 import json
 import os
 import sys
+from abc import ABC
 from datetime import datetime
 from typing import Dict, List
 
@@ -19,10 +22,15 @@ from src import utils
 
 HOSTS = ['cli', 'web_local', 'container']
 
+with open(REPO_DIR + '/conf/data.json', 'rb') as param_file:
+    PARAMS = json.load(param_file)
+
 
 
 class CsvHandler():
-    """Provide with all methods necessary to interact with csv files."""
+    """
+    Provide with all methods necessary to interact with csv files.
+    """
     def __init__(self, test_type: str):
         self.test_type = test_type
         self.os_sep = utils.get_os_separator()
@@ -94,129 +102,317 @@ class CsvHandler():
         )
 
     # Row-level operations
-    def create(self, word, table):
+    def insert_word(self, word, table):
         """Add a word to the table."""
 
-    def read(self, word, table):
+    def read_word(self, word, table):
         """Read the given word."""
 
-    def update(self, word, table):
+    def update_word(self, word, table):
         """Update statistics on the given word."""
 
-    def delete(self, word, table):
+    def delete_word(self, word, table):
         """Delete the given word in the given table."""
 
-    def transfer(self, word, table):
+    def transfer_word(self, word, table):
         """Copy a word from its original table to the output table (theme or archive)."""
 
 
 
-class MariaDBHandler():
+class DbInterface(ABC):
     """
-    Provide with all methods necessary to interact with MariaDB database.
+    Abstract class that provides with a method to connect to a database.
+    All methods invoked by the user should provide with a host name.
     """
-    def __init__(self, test_type: str, mode: str, language_1: str):
+    def __init__(self, host):
+        self.host = host
+
+    def get_db_cursor(self, user_name, db_name, password):
+        """Connect to vocabulary database if credentials are correct."""
+        # logger.debug(f"user_name: {user_name}")
+        # logger.debug(f"db_name: {db_name}")
+        # logger.debug(f"password: {password}")
+        connection_config = {
+            'user': user_name,
+            'password': password,
+            'database': db_name,
+            'port': PARAMS['MariaDB']['port']
+        }
+        if self.host not in HOSTS:
+            logger.warning(f"host: {self.host}")
+            logger.error(f"host should be in {HOSTS}")
+        else:
+            connection_config['host'] = PARAMS['host'][self.host]
+        # logger.debug(f"host: {PARAMS['host'][self.host]}")
+        connection = mariadb.connect(**connection_config)
+        cursor = connection.cursor()
+        return connection, cursor
+
+
+
+class DbController(DbInterface):
+    """
+    Manage access and transactions.
+    """
+    def __init__(self, host):
+        super().__init__(host)
+
+    def create_user(self, root_password, user_name, user_password):
+        """Create user"""
+        connection, cursor = self.get_db_cursor('root', 'root', root_password)
+        result = None
+        try:
+            cursor.execute(f"CREATE USER '{user_name}'@'%' IDENTIFIED BY '{user_password}';")
+            connection.commit()
+            logger.success(f"User '{user_name}' created successfully.")
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+    def grant_all_privileges(self, root_password, user_name, db_name):
+        """Grant privileges to the user on the given database"""
+        connection, cursor = self.get_db_cursor('root', 'root', root_password)
+        result = None
+        try:
+            cursor.execute(f"GRANT ALL PRIVILEGES ON {user_name}_{db_name}.* TO '{user_name}'@'%';")
+            connection.commit()
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+
+
+class DbDefiner(DbInterface):
+    """
+    Define database structure.
+    """
+    def __init__(self, host, user_name):
+        super().__init__(host)
+        self.user_name = user_name
+        self.db_name = None
+
+    def create_database(self, db_name, root_password, password):
+        """Create a database with the given database name"""
+        db_controller = DbController(self.host)
+        connection, cursor = self.get_db_cursor(self.user_name, db_name, password)
+        result = None
+        try:
+            cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
+            connection.commit()
+            logger.success(f"Database '{self.user_name}_{db_name}' created.")
+            db_controller.grant_all_privileges(root_password, self.user_name, db_name)
+            logger.success(
+                f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'."
+            )
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+    def get_database_cols(self, db_name, password):
+        """Get table columns."""
+        connection, cursor = self.get_db_cursor(self.user_name, db_name, password)
+        try:
+            cursor.execute(f"USE {db_name};")
+            cursor.execute("SHOW TABLES;")
+            tables = list(cursor.fetchall())
+            cols_dict = {}
+            for table_name in tables:
+                if isinstance(table_name, tuple):
+                    true_table_name = table_name[0]
+                elif isinstance(table_name, str):
+                    true_table_name = table_name
+                cursor.execute(f"SHOW COLUMNS FROM {true_table_name};")
+                columns = list(cursor.fetchall())
+                columns = self.rectify_this_strange_result(columns)
+                cols_dict[true_table_name] = columns
+        except mariadb.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        return cols_dict
+
+    def rectify_this_strange_result(self, result):
+        """
+        Correct the result of the 'SHOW COLUMNS FROM table_name' request.
+        """
+        if isinstance(result[0], tuple):
+            result = [col[0] for col in result]
+        elif isinstance(result[0], str):
+            pass
+        return result
+
+    def get_tables_names(self, test_type) -> List[str]:
+        """Get version or theme table according to the test type."""
+        test_types = ['version', 'theme']
+        if test_type in test_types:
+            voc_table = test_type + '_voc'
+            perf_table = test_type + '_perf'
+            word_cnt_table = test_type + '_words_count'
+            test_types.remove(test_type)
+            output_table = test_types[0] + '_voc'
+        else:
+            logger.error(f"Wrong test_type argument: {test_type}")
+            raise ValueError
+        return [voc_table, perf_table, word_cnt_table, output_table]
+
+
+
+class DbManipulator(DbInterface):
+    """
+    Working with data.
+    """
+    def __init__(self, host, user_name, db_name, test_type):
+        super().__init__(host)
+        self.user_name = user_name
+        self.db_name = db_name
+        self.db_definer = DbDefiner(self.host, self.user_name)
+        self.set_test_type(test_type)
+
+    def set_test_type(self, test_type):
+        """
+        Set the test type attribute.
+        """
         if test_type not in ['version', 'theme']:
             logger.error(f"Test type {test_type} incorrect, \
             should be either version or theme.")
         self.test_type = test_type
-        self.os_sep = utils.get_os_separator()
-        self.mode = mode
-        self.language_1 = language_1
-        self.config = {}
-        self.connection = None
-        self.cursor = None
 
-    # Common operations
-    def get_database_cred(self):
-        """
-        Get credentials necessary for connection with vocabulary database.
-        """
-        cred_path = self.os_sep.join([REPO_DIR, 'conf', 'cred.json'])
-        with open(cred_path, 'rb') as cred_file:
-            cred = json.load(cred_file)
-        return cred
-
-    def set_db_cursor(self):
-        """Connect to vocabulary database if credentials are correct."""
-        cred = self.get_database_cred()
-        self.config = {
-            'user': cred['users']['user_1']['name'],
-            'password': cred['users']['user_1']['password'],
-            'database': self.language_1.lower(),
-            'port': cred['port']
-        }
-        if self.mode not in HOSTS:
-            logger.warning(f"Mode: {self.mode}")
-            logger.error(f"Mode should be in {HOSTS}")
-        else:
-            self.config['host'] = cred['host'][self.mode]
-        self.connection = mariadb.connect(**self.config)
-        self.cursor = self.connection.cursor()
-
-    def get_database_cols(self):
-        """Get table columns."""
-        if os.getcwd().endswith('tests'):
-            os.chdir('..')
-        col_path = self.os_sep.join([os.getcwd(), 'conf', 'columns.json'])
-        with open(col_path, 'rb') as col_file:
-            cols = json.load(col_file)
-        return cols
-
-    def get_tables_names(self) -> List[str]:
-        """Get version or theme table according to the test type."""
-        test_types = ['version', 'theme']
-        if self.test_type in test_types:
-            voc_table = self.test_type + '_voc'
-            perf_table = self.test_type + '_perf'
-            word_cnt_table = self.test_type + '_words_count'
-            test_types.remove(self.test_type)
-            output_table = test_types[0] + '_voc'
-        else:
-            logger.error(f"Wrong test_type argument: {self.test_type}")
-            raise ValueError
-        return [voc_table, perf_table, word_cnt_table, output_table]
-
-    # Table-level operations
-    def get_tables(self):
+    def get_tables(self, password):
         """Load the different tables necessary to the app."""
-        self.set_db_cursor()
-        cols = self.get_database_cols()
-        tables_names = self.get_tables_names()
+        connection, cursor = self.get_db_cursor(
+            self.user_name, self.db_name, password
+        )
+        cols = self.db_definer.get_database_cols(self.db_name, password)
+        tables_names = list(cols.keys())
         tables = {}
         for table_name in tables_names:
             sql_request = f"SELECT * FROM {table_name}"
-            self.cursor.execute(sql_request)
+            cursor.execute(sql_request)
             tables[table_name] = pd.DataFrame(
-                columns=cols[self.language_1][table_name]["Columns"],
-                data=self.cursor.fetchall()
+                columns=cols[table_name],
+                data=cursor.fetchall()
             )
             index_col = tables[table_name].columns[0]
             tables[table_name] = tables[table_name].set_index(index_col)
         # Special case of output table
-        tables['output'] = tables[tables_names[-1]]
-        tables.pop(tables_names[-1])
-        self.cursor.close()
-        self.connection.close()
+        output_table = self.get_output_table()
+        tables['output'] = tables[output_table]
+        tables.pop(output_table)
+        cursor.close()
+        connection.close()
         return tables
 
-    def save_table(self, table_name: str, table: pd.DataFrame):
+    def get_output_table(self):
+        """
+        Rename the output name according to the test type.
+        """
+        if self.test_type == 'version':
+            output_table = 'theme_voc'
+        elif self.test_type == 'theme':
+            output_table = 'archives'
+        else:
+            logger.error(f"Wrong test_type argument: {self.test_type}")
+            raise SystemExit
+        return output_table
+
+    def insert_word(self, password, row: list):
+        """Add a word to the table"""
+        # Create request string
+        today_date = datetime.today().date()
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        english = row[0]
+        native = row[1]
+        request_1 = f"INSERT INTO {words_table_name} (english, français, creation_date, nb, score, taux)"
+        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
+        sql_request = " ".join([request_1, request_2])
+        # Execute request
+        connection, cursor = self.get_db_cursor(
+            self.user_name, self.db_name, password
+        )
+        cursor.execute(sql_request)
+        cursor.close()
+        connection.close()
+        return True
+
+    def read_word(self, password, english: str):
+        """Read the given word"""
+        # Create request string
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        request_1 = "SELECT english, français, score"
+        request_2 = f"FROM {words_table_name}"
+        request_3 = f"WHERE english = '{english}';"
+        sql_request = " ".join([request_1, request_2, request_3])
+        # Execute request
+        connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
+        english, native, score = cursor.execute(sql_request)[0]
+        cursor.close()
+        connection.close()
+        return english, native, score
+
+    def update_word(self, password, english: str, new_nb, new_score):
+        """Update statistics on the given word"""
+        # Create request string
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        request_1 = f"UPDATE {words_table_name}"
+        request_2 = f"SET nb = {new_nb}, score = {new_score}"
+        request_3 = f"WHERE english = {english};"
+        sql_request = " ".join([request_1, request_2, request_3])
+        # Execute request
+        connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
+        cursor.execute(sql_request)
+        cursor.close()
+        connection.close()
+        return True
+
+    def delete_word(self, password, english):
+        """Delete a word from the words table of the instance database."""
+        # Create request string
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        request_1 = f"DELETE FROM {words_table_name}"
+        request_2 = f"WHERE english = {english};"
+        sql_request = " ".join([request_1, request_2])
+        # Execute request
+        connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
+        cursor.execute(sql_request)
+        cursor.close()
+        connection.close()
+        return True
+
+    def save_table(self, password, table_name: str, table: pd.DataFrame):
         """Save given table."""
-        self.set_db_cursor()
-        cols = self.get_database_cols()
+        connection, cursor = self.get_db_cursor(
+            self.user_name, self.db_name, password
+        )
+        cols = self.db_definer.get_database_cols(self.db_name, password)
         if table_name == 'output':
             if self.test_type == 'version':
                 table_name = 'theme_voc'
             elif self.test_type == 'theme':
                 table_name = 'archives'
-        table = table[cols[self.language_1][table_name]["Columns"]]
+        table = table[cols[table_name]]
         engine = create_engine(
             ''.join([
                 "mysql+pymysql",
-                "://", self.config['user'],
-                ':', self.config['password'],
-                '@', self.config['host'],
-                '/', self.language_1.lower()
+                "://", self.user_name,
+                ':', password,
+                '@', self.host,
+                '/', self.db_name.lower()
             ])
         )
         table.to_sql(
@@ -226,82 +422,5 @@ class MariaDBHandler():
             method='multi',
             index=False
         )
-        self.cursor.close()
-        self.connection.close()
-
-    # Row-level operations
-    def create(self, row: list, test_mode=False):
-        """Add a word to the table"""
-        # Create request string
-        today_date = datetime.today().date()
-        if test_mode:
-            table_name = 'test_table'
-        else:
-            table_name = self.language_1 + '.' + 'version_voc'
-        english = row[0]
-        native = row[1]
-        request_1 = f"INSERT INTO {table_name} \
-            (english, français, creation_date, nb, score, taux)"
-        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
-        sql_request = " ".join([request_1, request_2])
-        # Execute request
-        self.set_db_cursor()
-        self.cursor.execute(sql_request)
-        self.connection.close()
-        return True
-
-    def read(self, word_series: pd.DataFrame):
-        """Read the given word"""
-        # Create request string
-        table_name, _, _, _ = self.get_tables_names()
-        english, native = self.get_words_from_df(word_series)
-        request_1 = "SELECT english, français, score"
-        request_2 = f"FROM {table_name}"
-        request_3 = f"WHERE english = '{english}';"
-        sql_request = " ".join([request_1, request_2, request_3])
-        # Execute request
-        self.set_db_cursor()
-        english, native, score = self.cursor.execute(sql_request)
-        # self.cursor.execute(sql_request)
-        # result = self.cursor.fetchone()
-        # if result:
-        #     english, native, score = result
-        # else:
-        #     english, native, score = None, None, None
-        self.connection.close()
-        return english, native, score
-
-    def update(self, word_series: pd.DataFrame, new_nb, new_score):
-        """Update statistics on the given word"""
-        # Create request string
-        table_name, _, _, _ = self.get_tables_names()
-        english, _ = self.get_words_from_df(word_series)
-        request_1 = f"UPDATE {table_name}"
-        request_2 = f"SET nb = {new_nb}, score = {new_score}"
-        request_3 = f"WHERE english = {english};"
-        sql_request = " ".join([request_1, request_2, request_3])
-        # Execute request
-        self.set_db_cursor()
-        self.cursor.execute(sql_request)
-        self.connection.close()
-        return True
-
-    def delete(self, word_series: pd.DataFrame):
-        """Delete a word from table."""
-        # Create request string
-        table_name, _, _, _ = self.get_tables_names()
-        english, _ = self.get_words_from_df(word_series)
-        request_1 = f"DELETE FROM {table_name}"
-        request_2 = f"WHERE english = {english}"
-        sql_request = " ".join([request_1, request_2])
-        # Execute request
-        self.set_db_cursor()
-        self.cursor.execute(sql_request)
-        self.connection.close()
-        return True
-
-    def get_words_from_df(self, word_series: pd.DataFrame):
-        """Common method used by all 4 CRUD operations"""
-        english = word_series[word_series.columns[0]]
-        native = word_series[word_series.columns[1]]
-        return english, native
+        cursor.close()
+        connection.close()

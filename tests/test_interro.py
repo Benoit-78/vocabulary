@@ -92,47 +92,32 @@ class TestLoader(unittest.TestCase):
     def setUpClass(cls):
         """Run once before all tests."""
         # Arrange
-        cls.user_1 = interro.CliUser()
-        cls.user_2 = interro.CliUser()
-        cls.user_1.parse_arguments(['-t', 'version'])
-        cls.user_2.parse_arguments(['-t', 'theme'])
-        cls.data_handler_1_2 = data_handler.MariaDBHandler(
-            cls.user_1.settings.type,
-            'cli',
-            'English'
+        cls.user = interro.CliUser()
+        cls.user.parse_arguments(['-t', 'version'])
+        cls.data_manipulator = data_handler.DbManipulator(
+            user_name='test_user',
+            db_name='test_db',
+            host='test_host',
+            test_type='test_type'
         )
-        cls.data_handler_2_2 = data_handler.MariaDBHandler(
-            cls.user_2.settings.type,
-            'cli',
-            'Zhongwen'
-        )
-        cls.loader_1_1 = None
-        cls.loader_1_2 = None
-        cls.loader_2_1 = None
-        cls.loader_2_2 = None
+        cls.loader = None
 
     def test_load_tables(self):
         """Input should be a dataframe, and it should be added a query column"""
         # Arrange
         # Act
-        self.loader_1_2 = interro.Loader(
-            self.user_1.settings.rattraps,
-            self.data_handler_1_2
-        )
-        self.loader_2_2 = interro.Loader(
-            self.user_2.settings.rattraps,
-            self.data_handler_2_2
+        self.loader = interro.Loader(
+            self.user.settings.rattraps,
+            self.data_manipulator
         )
         # Assert
-        for loader in [self.loader_1_2, self.loader_2_2]:
-            logger.debug(loader)
-            for table in loader.tables.values():
-                self.assertIn('Date', list(table.columns))
-                self.assertIn('Query', list(table.columns))
-                self.assertEqual(table[table.columns[0]].dtype, object)
-                self.assertEqual(table[table.columns[1]].dtype, object)
-                self.assertEqual(table['Taux'].dtype, np.float64)
-                self.assertGreater(table.shape[0], 1)
+        for table in self.loader.tables.values():
+            self.assertIn('creation_date', list(table.columns))
+            self.assertIn('query', list(table.columns))
+            self.assertEqual(table[table.columns[0]].dtype, object)
+            self.assertEqual(table[table.columns[1]].dtype, object)
+            self.assertEqual(table['taux'].dtype, np.float64)
+            self.assertGreater(table.shape[0], 1)
 
 
 
@@ -145,53 +130,45 @@ class TestTest(unittest.TestCase):
     def setUpClass(cls):
         """Run once before all tests."""
         cls.user_1 = interro.CliUser()
-        cls.user_2 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.user_2.parse_arguments(['-t', 'theme'])
-        cls.data_handler_1 = data_handler.MariaDBHandler(
-            cls.user_1.settings.type,
-            'cli',
-            'English'
-        )
-        cls.data_handler_2 = data_handler.MariaDBHandler(
-            cls.user_2.settings.type,
-            'cli',
-            'Zhongwen'
+        cls.data_handler_1 = data_handler.DbManipulator(
+            user_name='test_user',
+            db_name='test_db',
+            host='test_host',
+            test_type='test_type'
         )
         cls.loader_1 = interro.Loader(
             cls.user_1.settings.rattraps,
             cls.data_handler_1
         )
-        cls.loader_2 = interro.Loader(
-            cls.user_2.settings.rattraps,
-            cls.data_handler_2
-        )
 
     def setUp(self):
-        words_df = pd.DataFrame(columns=['English', 'Français'])
-        words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
-        words_df.loc[words_df.shape[0]] = [
-            'Do you want to dance with me?',
-            'M\'accorderiez-vous cette danse ?'
-        ]
-        words_df.loc[words_df.shape[0]] = ['One', 'Un']
-        words_df.loc[words_df.shape[0]] = ['Two', 'Deux']
-        words_df.loc[words_df.shape[0]] = ['Three', 'Trois']
-        words_df.loc[words_df.shape[0]] = ['Four', 'Quatre']
-        words_df.loc[words_df.shape[0]] = ['Cinq', 'Cinq']
-        words_df.loc[words_df.shape[0]] = ['Six', 'Six']
-        words_df.loc[words_df.shape[0]] = ['Seven', 'Sept']
-        words_df.loc[words_df.shape[0]] = ['Eight', 'Huit']
-        words_df.loc[words_df.shape[0]] = ['Nine', 'Neuf']
-        words_df.loc[words_df.shape[0]] = ['Ten', 'Dix']
-        words_df['Query'] = [0] * words_df.shape[0]
-        words_df['Nb'] = [0] * words_df.shape[0]
-        words_df['Score'] = [0] * words_df.shape[0]
-        words_df['Taux'] = [0] * words_df.shape[0]
-        words_df['Bad_word'] = [0] * words_df.shape[0]
-        words = words_df.shape[0] //  2
+        df = pd.DataFrame(columns=['english', 'français'])
+        df.loc[df.shape[0]] = ['Hello', 'Bonjour']
+        df.loc[df.shape[0]] = ['One', 'Un']
+        df.loc[df.shape[0]] = ['Two', 'Deux']
+        df.loc[df.shape[0]] = ['Three', 'Trois']
+        df.loc[df.shape[0]] = ['Four', 'Quatre']
+        df.loc[df.shape[0]] = ['Cinq', 'Cinq']
+        df.loc[df.shape[0]] = ['Six', 'Six']
+        df.loc[df.shape[0]] = ['Seven', 'Sept']
+        df.loc[df.shape[0]] = ['Eight', 'Huit']
+        df.loc[df.shape[0]] = ['Nine', 'Neuf']
+        df.loc[df.shape[0]] = ['Ten', 'Dix']
+        df['query'] = [0] * df.shape[0]
+        df['nb'] = [0] * df.shape[0]
+        df['score'] = [0] * df.shape[0]
+        df['taux'] = [0] * df.shape[0]
+        df['bad_word'] = [0] * df.shape[0]
+        self.loader_1.tables = {}
+        words = df.shape[0] //  2
+        self.loader_1.tables['version_voc'] = df
         guesser = views_local.CliGuesser()
-        self.interro_1 = interro.Test(words_df, words, guesser)
+        self.interro_1 = interro.Test(
+            self.loader_1.tables['version_voc'],
+            words,
+            guesser
+        )
         self.interro_1.step = 1
 
     def test_set_row(self):
@@ -242,7 +219,7 @@ class TestTest(unittest.TestCase):
         """
         # Arrange
         former_index = self.interro_1.index
-        self.interro_1.words_df['Query'] = [0] * self.interro_1.words_df.shape[0]
+        self.interro_1.words_df['query'] = [0] * self.interro_1.words_df.shape[0]
         self.interro_1.words_df['bad_word'] = [0] * self.interro_1.words_df.shape[0]
         # Act
         next_index = self.interro_1.get_another_index()
@@ -250,7 +227,7 @@ class TestTest(unittest.TestCase):
         self.assertIsInstance(next_index, int)
         self.assertGreater(next_index, 0)
         self.assertLess(next_index, self.interro_1.words_df.shape[0])
-        self.assertEqual(self.interro_1.words_df['Query'].loc[next_index], 1)
+        self.assertEqual(self.interro_1.words_df['query'].loc[next_index], 1)
         if next_index != 1: # Case where the first next_index falls on 1
             self.assertNotEqual(former_index, next_index)
 
@@ -258,7 +235,7 @@ class TestTest(unittest.TestCase):
         """Bad words should be asked twice as much as other words."""
         # Arrange
         self.interro_1.step = 7
-        self.interro_1.words_df['Query'] = [0] * self.interro_1.words_df.shape[0]
+        self.interro_1.words_df['query'] = [0] * self.interro_1.words_df.shape[0]
         self.interro_1.words_df['bad_word'] = [0] * self.interro_1.words_df.shape[0]
         former_index = self.interro_1.index
         logger.debug(f"former_index: {former_index}")
@@ -269,7 +246,7 @@ class TestTest(unittest.TestCase):
         self.assertIsInstance(next_index, int)
         self.assertGreater(next_index, 0)
         self.assertLess(next_index, self.interro_1.words_df.shape[0])
-        self.assertEqual(self.interro_1.words_df['Query'].loc[next_index], 1)
+        self.assertEqual(self.interro_1.words_df['query'].loc[next_index], 1)
         if next_index != 1: # Case where the first next_index falls on 1
             self.assertNotEqual(former_index, next_index)
 
@@ -280,7 +257,7 @@ class TestTest(unittest.TestCase):
         So the index search method should be called once.
         """
         # Arrange
-        self.interro_1.words_df['Bad_word'] = [1] * self.interro_1.words_df.shape[0]
+        self.interro_1.words_df['bad_word'] = [1] * self.interro_1.words_df.shape[0]
         # Act
         next_index = self.interro_1.get_next_index()
         # Assert
@@ -295,7 +272,7 @@ class TestTest(unittest.TestCase):
         So the index search method should be called twice.
         """
         # Arrange
-        self.interro_1.words_df['Bad_word'] = [0] * self.interro_1.words_df.shape[0]
+        self.interro_1.words_df['bad_word'] = [0] * self.interro_1.words_df.shape[0]
         # Act
         next_index = self.interro_1.get_next_index()
         # Assert
@@ -325,10 +302,10 @@ class TestTest(unittest.TestCase):
         self.interro_1.update_voc_df(word_guessed)
         new_row = self.interro_1.words_df.loc[self.interro_1.index]
         # Assert
-        self.assertEqual(new_row['Nb'], old_row['Nb'] + 1)
-        self.assertEqual(new_row['Score'], old_row['Score'] + 1)
-        self.assertGreater(new_row['Taux'], old_row['Taux'])
-        self.assertEqual(new_row['Query'], old_row['Query'] + 1)
+        self.assertEqual(new_row['nb'], old_row['nb'] + 1)
+        self.assertEqual(new_row['score'], old_row['score'] + 1)
+        self.assertGreater(new_row['taux'], old_row['taux'])
+        self.assertEqual(new_row['query'], old_row['query'] + 1)
 
     def test_update_voc_df_failure(self):
         """
@@ -342,10 +319,10 @@ class TestTest(unittest.TestCase):
         self.interro_1.update_voc_df(word_guessed)
         new_row = self.interro_1.words_df.loc[self.interro_1.index]
         # Assert
-        self.assertEqual(new_row['Nb'], old_row['Nb'] + 1)
-        self.assertEqual(new_row['Score'], old_row['Score'] - 1)
-        self.assertLess(new_row['Taux'], old_row['Taux'])
-        self.assertEqual(new_row['Query'], old_row['Query'] + 1)
+        self.assertEqual(new_row['nb'], old_row['nb'] + 1)
+        self.assertEqual(new_row['score'], old_row['score'] - 1)
+        self.assertLess(new_row['taux'], old_row['taux'])
+        self.assertEqual(new_row['query'], old_row['query'] + 1)
 
     @patch('src.interro.Test.update_voc_df')
     @patch('src.interro.Test.update_faults_df')
@@ -394,6 +371,8 @@ class TestTest(unittest.TestCase):
         mock_ask_series_of_guesses.assert_called_once()
         mock_set_interro_df.assert_called_once()
 
+
+
 class TestRattrap(unittest.TestCase):
     """Tests on Rattrap class methods."""
 
@@ -412,40 +391,86 @@ class TestUpdater(unittest.TestCase):
         rattraps = 1
         cls.user_1 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.data_handler_1 = data_handler.CsvHandler(
-            cls.user_1.settings.type
+        cls.data_handler_1 = data_handler.DbManipulator(
+            user_name='test_user',
+            db_name='test_db',
+            host='test_host',
+            test_type=cls.user_1.settings.type
         )
         cls.loader_1 = interro.Loader(rattraps, cls.data_handler_1)
-        cls.loader_1.load_tables()
+        cls.loader_1.tables = {
+            'version_voc': pd.DataFrame(
+                columns=[
+                    'id_word',
+                    'english',
+                    'français',
+                    'creation_date',
+                    'nb',
+                    'score',
+                    'taux'
+                ]
+            ),
+            'version_perf': pd.DataFrame(
+                columns=[
+                    'id_test',
+                    'test_date',
+                    'test'
+                ]
+            ),
+            'version_words_count': pd.DataFrame(
+                columns=[
+                    'id_test',
+                    'test_date',
+                    'words_count'
+                ]
+            ),
+            'output': pd.DataFrame(
+                columns=[
+                    'id_word',
+                    'english',
+                    'français',
+                    'creation_date',
+                    'nb',
+                    'score',
+                    'taux'
+                ]
+            )
+        }
 
     def setUp(self):
         """Runs before each test"""
-        words_df = pd.DataFrame(columns=['English', 'Français'])
-        words_df.loc[words_df.shape[0]] = ['Hello', 'Bonjour']
-        words_df.loc[words_df.shape[0]] = [
-            'Do you want to dance with me?',
-            'M\'accorderiez-vous cette danse ?'
-        ]
-        words_df.loc[words_df.shape[0]] = ['One', 'Un']
-        words_df.loc[words_df.shape[0]] = ['Two', 'Deux']
-        words_df.loc[words_df.shape[0]] = ['Three', 'Trois']
-        words_df.loc[words_df.shape[0]] = ['Four', 'Quatre']
-        words_df.loc[words_df.shape[0]] = ['Cinq', 'Cinq']
-        words_df.loc[words_df.shape[0]] = ['Six', 'Six']
-        words_df.loc[words_df.shape[0]] = ['Seven', 'Sept']
-        words_df.loc[words_df.shape[0]] = ['Eight', 'Huit']
-        words_df.loc[words_df.shape[0]] = ['Nine', 'Neuf']
-        words_df.loc[words_df.shape[0]] = ['Ten', 'Dix']
-        words_df['Query'] = [0] * words_df.shape[0]
-        words_df['Nb'] = [0] * words_df.shape[0]
-        words_df['Score'] = [0] * words_df.shape[0]
-        words_df['Taux'] = [0] * words_df.shape[0]
-        words_df['Bad_word'] = [0] * words_df.shape[0]
-        words_df['img_good'] = [0] * words_df.shape[0]
+        df = pd.DataFrame(columns=['english', 'français'])
+        df.loc[df.shape[0]] = ['Hello', 'Bonjour']
+        df.loc[df.shape[0]] = ['One', 'Un']
+        df.loc[df.shape[0]] = ['Two', 'Deux']
+        df.loc[df.shape[0]] = ['Three', 'Trois']
+        df.loc[df.shape[0]] = ['Four', 'Quatre']
+        df.loc[df.shape[0]] = ['Cinq', 'Cinq']
+        df.loc[df.shape[0]] = ['Six', 'Six']
+        df.loc[df.shape[0]] = ['Seven', 'Sept']
+        df.loc[df.shape[0]] = ['Eight', 'Huit']
+        df.loc[df.shape[0]] = ['Nine', 'Neuf']
+        df.loc[df.shape[0]] = ['Ten', 'Dix']
+        df['query'] = [0] * df.shape[0]
+        df['nb'] = [0] * df.shape[0]
+        df['score'] = [0] * df.shape[0]
+        df['taux'] = [0] * df.shape[0]
+        df['bad_word'] = [0] * df.shape[0]
+        df['img_good'] = [0] * df.shape[0]
+        self.loader_1.tables['version_voc'] = df
         words = 10
         self.guesser = views_local.CliGuesser()
-        self.interro_1 = interro.Test(words_df, words, self.guesser)
-        self.updater_1 = interro.Updater(self.loader_1, self.interro_1)
+        self.interro_1 = interro.Test(
+            self.loader_1.tables['version_voc'],
+            words,
+            self.guesser,
+            self.loader_1.tables['version_perf'],
+            self.loader_1.tables['version_words_count']
+        )
+        self.updater_1 = interro.Updater(
+            self.loader_1,
+            self.interro_1
+        )
 
     def test_set_good_words(self):
         """Should flag the words that have been guessed sufficiently enough."""
@@ -464,7 +489,7 @@ class TestUpdater(unittest.TestCase):
     def test_copy_good_words(self):
         """Should copy the well good words in the output table."""
         # Arrange
-        good_words_df = pd.DataFrame(columns=['English', 'Français', 'Date'])
+        good_words_df = pd.DataFrame(columns=['english', 'français', 'creation_date'])
         good_words_df.loc[good_words_df.shape[0]] = ['One', 'Un', '2023-01-01']
         good_words_df.loc[good_words_df.shape[0]] = ['Two', 'Deux', '2023-02-01']
         good_words_df.loc[good_words_df.shape[0]] = ['Three', 'Trois', '2023-03-01']
@@ -520,14 +545,16 @@ class TestUpdater(unittest.TestCase):
         self.updater_1.flag_bad_words()
         new_length, new_width = self.updater_1.interro.words_df.shape
         first_word = self.updater_1.interro.words_df.iloc[0]
-        img_bad = interro.ORD_BAD + interro.STEEP_BAD * first_word['Nb']
+        ord_bad = self.updater_1.criteria['ORD_BAD']
+        steep_bad = self.updater_1.criteria['STEEP_BAD']
+        img_bad = ord_bad + steep_bad * first_word['nb']
         # Assert
         self.assertLessEqual(new_length, old_length)
         self.assertEqual(new_width, old_width)
-        if first_word['Bad_word'] == 1:
-            self.assertLess(first_word['Taux'], img_bad) # strictly less
-        elif first_word['Bad_word'] == 0:
-            self.assertGreaterEqual(first_word['Taux'], img_bad) # greater or equal
+        if first_word['bad_word'] == 1:
+            self.assertLess(first_word['taux'], img_bad) # strictly less
+        elif first_word['bad_word'] == 0:
+            self.assertGreaterEqual(first_word['taux'], img_bad) # greater or equal
 
     def test_save_words(self):
         """Prepare the words table for saving, and save it."""
@@ -548,7 +575,7 @@ class TestUpdater(unittest.TestCase):
         """Save performances for further analysis."""
         # Arrange
         self.updater_1.loader.data_handler.save_table = MagicMock()
-        perf_df = pd.DataFrame(columns=['Date', 'Test'])
+        perf_df = pd.DataFrame(columns=['test_date', 'test'])
         perf_df.loc[perf_df.shape[0]] = ["2022-01-01", 65]
         perf_df.loc[perf_df.shape[0]] = ["2022-02-01", 75]
         perf_df.loc[perf_df.shape[0]] = ["2022-03-01", 85]
@@ -560,6 +587,7 @@ class TestUpdater(unittest.TestCase):
         new_shape = self.updater_1.interro.perf_df.shape
         # Assert
         self.assertEqual(new_shape[0], old_shape[0] + 1)
+        logger.debug(f"Columns: {self.updater_1.interro.perf_df.columns}")
         self.assertEqual(new_shape[1], old_shape[1] + 1)
         self.updater_1.loader.data_handler.save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_perf',
@@ -568,14 +596,14 @@ class TestUpdater(unittest.TestCase):
         last_perf = self.updater_1.interro.perf_df.loc[
             self.updater_1.interro.perf_df.shape[0] - 1
         ]
-        last_perf = last_perf['Test']
+        last_perf = last_perf['test']
         self.assertEqual(last_perf, self.updater_1.interro.perf)
 
     def test_save_words_count(self):
         """Save the number of words recorded on the current date."""
         # Arrange
         self.updater_1.loader.data_handler.save_table = MagicMock()
-        word_cnt_df = pd.DataFrame(columns=['Date', 'Words_count'])
+        word_cnt_df = pd.DataFrame(columns=['test_date', 'words_count'])
         word_cnt_df.loc[word_cnt_df.shape[0]] = ["2022-01-01", 1876]
         word_cnt_df.loc[word_cnt_df.shape[0]] = ["2022-02-01", 2341]
         self.updater_1.interro.word_cnt_df = word_cnt_df
@@ -593,7 +621,7 @@ class TestUpdater(unittest.TestCase):
         last_count = self.updater_1.interro.word_cnt_df.loc[
             self.updater_1.interro.word_cnt_df.shape[0] - 1
         ]
-        last_count = last_count['Words_count']
+        last_count = last_count['words_count']
         self.assertEqual(last_count, self.updater_1.interro.words_df.shape[0])
 
     @patch.object(interro.Updater, 'move_good_words')

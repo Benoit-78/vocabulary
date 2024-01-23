@@ -8,7 +8,7 @@ document.addEventListener(
 
 
 function sendUserSettings(testType, numWords) {
-    fetch("/user-settings-guest", {
+    fetch("/interro-settings-guest", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({

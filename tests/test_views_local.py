@@ -54,12 +54,12 @@ class TestCliGuesser(unittest.TestCase):
             mock_print.assert_called_with("Interruption by user")
             mock_exit.assert_called_once()
 
-    # @patch('tkinter.messagebox.showinfo', return_value=True)
-    # def test_guess_word(self, mock_showinfo):
-    #     # Arrange
-    #     i = 1
-    #     words = 2
-    #     # Act
-    #     result = self.guesser.guess_word(self.row, i, words)
-    #     # Assert
-    #     self.assertIsInstance(result, bool)
+    @patch('tkinter.messagebox.showinfo', return_value=True)
+    def test_guess_word(self, mock_showinfo):
+        # Arrange
+        i = 1
+        words = 2
+        # Act
+        result = self.guesser.guess_word(self.row, i, words)
+        # Assert
+        self.assertIsInstance(result, bool)

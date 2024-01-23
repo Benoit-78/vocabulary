@@ -7,7 +7,7 @@ conf/*
 data/__pycache__/*
 divers/*
 doc/*
-env/*
+voc/*
 htmlcov/*
 mgmt/*
 src/data/__pycache__/*

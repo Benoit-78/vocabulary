@@ -7,26 +7,39 @@
         Vocabulary application in its FastAPI version.
 """
 
+import json
+import os
+import sys
+
 import pandas as pd
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-from src import interro
-from src import views
-from src.dashboard import feed_dashboard
-from src.data import data_handler
-from src.data import users
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
 
+from src import interro, views
+from src.dashboard import feed_dashboard
+from src.data import data_handler, users
 
 app = FastAPI()
-LANGUAGE = 'english'
+GUEST_USER_NAME = 'guest'
+GUEST_DB_NAME = 'vocabulary'
 test = None
 loader = None
 flag_data_updated = None
 cred_checker = users.CredChecker()
+
+with open('conf/hum.json', 'r') as json_file:
+    HUM = json.load(json_file)
+
+with open('conf/data.json', 'r') as json_file:
+    DATA = json.load(json_file)
 
 # CSS files
 app.mount(
@@ -97,7 +110,7 @@ def get_help(request: Request):
 @app.post("/authenticate")
 async def authenticate(creds: dict):
     """Acquire the user settings for one interro."""
-    # global cred_checker
+    global cred_checker
     cred_checker.name = creds['input_name']
     cred_checker.password = creds['input_password']
     cred_checker.check_credentials(creds['input_name'])
@@ -113,7 +126,7 @@ async def authenticate(creds: dict):
 @app.get("/user-space/{user_name}", response_class=HTMLResponse)
 def user_main_page(request: Request, user_name):
     """Call the base page of user space"""
-    # global cred_checker
+    global cred_checker
     cred_checker.check_credentials(user_name)
     return templates.TemplateResponse(
         "user/user_space.html",
@@ -128,6 +141,33 @@ def user_main_page(request: Request, user_name):
 # ==================================================
 #  I N T E R R O   U S E R
 # ==================================================
+@app.get("/choose-database/{user_name}", response_class=HTMLResponse)
+def  choose_database(request: Request, user_name):
+    """
+    Ask the user to choose a database on which he will pass an interroooooo!!!
+    """
+    return templates.TemplateResponse(
+        "user/choose_database.html",
+        {
+            "message": "Choose a database, right now.",
+            "userName": user_name
+        }
+    )
+
+
+@app.post("/check-connection-to-database/{user_name}/{db_name}")
+async def check_db_connection(settings: dict, user_name, db_name):
+    """Acquire the database chosen by the user."""
+    db_handler = data_handler.DbDefiner('web_local', user_name)
+    connection, cursor = db_handler.get_db_cursor(db_name)
+    return JSONResponse(
+        content=
+        {
+            "message": "Connection to database established successfully.",
+        }
+    )
+
+
 @app.get("/interro-settings/{user_name}", response_class=HTMLResponse)
 def interro_settings(request: Request, user_name):
     """Call the page that gets the user settings for one interro."""
@@ -141,14 +181,18 @@ def interro_settings(request: Request, user_name):
     )
 
 
-@app.post("/user-settings")
-async def get_user_settings(settings: dict):
+@app.post("/save-interro-settings/{user_name}/{db_name}}")
+async def save_interro_settings(settings: dict, user_name, db_name):
     """Acquire the user settings for one interro."""
     global loader
     global test
+    password = 'mais_quel_est_le_password'
     loader, test = load_test(
+        user_name,
+        db_name,
         settings["testType"].lower(),
-        settings["numWords"]
+        settings["numWords"],
+        password
     )
     logger.info("User data loaded")
     global flag_data_updated
@@ -161,19 +205,27 @@ async def get_user_settings(settings: dict):
     )
 
 
-def load_test(test_type, words):
+def load_test(user_name, db_name, test_type, test_length, password):
     """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(test_type, 'web_local', LANGUAGE)
+    db_handler = data_handler.DbManipulator(
+        host='web_local',
+        user_name=user_name,
+        db_name=db_name,
+        test_type=test_type,
+    )
+    db_handler.set_test_type(test_type)
     loader_ = interro.Loader(0, db_handler)
-    loader_.load_tables()
+    loader_.load_tables(password)
     guesser = views.FastapiGuesser()
+    logger.debug(f"Table names: {loader_.tables.keys()}")
     test_ = interro.Test(
         loader_.tables[loader_.test_type + '_voc'],
-        words,
+        test_length,
         guesser,
         loader_.tables[loader_.test_type + '_perf'],
         loader_.tables[loader_.test_type + '_words_count']
     )
+    logger.debug(f"Test created: {test_}")
     test_.set_interro_df()
     return loader_, test_
 
@@ -350,15 +402,26 @@ def end_interro(
     )
 
 
+@app.get("/sign-out/{user_name}", response_class=HTMLResponse)
+def sign_out(request: Request):
+    """Deconnect the user and return to welcome page."""
+    global cred_checker
+    cred_checker = users.CredChecker()
+    return templates.TemplateResponse(
+        "welcome.html",
+        {
+            "request": request
+        }
+    )
+
+
 
 # ==================================================
 # G U E S T
 # ==================================================
 # The guest is able to do some tests, but nothing more.
-#     - this page must NOT contain pages like settings, add word, ...
+#     - this page should NOT contain pages like settings, add word, ...
 #     - a guest should not access the 'root' page, even by accident.
-
-
 @app.get("/guest-not-allowed", response_class=HTMLResponse)
 def guest_not_allowed(request: Request):
     """
@@ -383,14 +446,17 @@ def interro_settings_guest(request: Request):
     )
 
 
-@app.post("/user-settings-guest")
-async def get_user_settings_guest(settings: dict):
+@app.post("/interro-settings-guest")
+async def save_interro_settings_guest(settings: dict):
     """Acquire the user settings for one interro."""
     global loader
     global test
     loader, test = load_test(
-        settings["testType"].lower(),
-        settings["numWords"]
+        user_name='guest',
+        db_name=HUM['user']['guest']['databases'][0],
+        test_type=settings["testType"].lower(),
+        test_length=settings["numWords"],
+        password=HUM['user']['guest']['OK']
     )
     logger.info("User data loaded")
     global flag_data_updated
@@ -398,26 +464,9 @@ async def get_user_settings_guest(settings: dict):
     return JSONResponse(
         content=
         {
-            "message": "User settings stored successfully."
+            "message": "Guest user settings stored successfully."
         }
     )
-
-
-def load_test_guest(test_type, words):
-    """Load the interroooo!"""
-    db_handler = data_handler.MariaDBHandler(test_type, 'web_local', LANGUAGE)
-    loader_object = interro.Loader(0, db_handler)
-    loader_object.load_tables()
-    guesser = views.FastapiGuesser()
-    test_object = interro.Test(
-        loader_object.tables[loader_object.test_type + '_voc'],
-        words,
-        guesser,
-        loader_object.tables[loader_object.test_type + '_perf'],
-        loader_object.tables[loader_object.test_type + '_words_count']
-    )
-    test_object.set_interro_df()
-    return loader_object, test_object
 
 
 @app.get("/interro-question-guest/{words}/{count}/{score}", response_class=HTMLResponse)
@@ -436,6 +485,7 @@ def load_interro_question_guest(
         score = int(score)
     except NameError:
         score = 0
+    global test
     progress_percent = int(count / int(words) * 100)
     index = test.interro_df.index[count]
     english = test.interro_df.loc[index][0]
@@ -518,19 +568,21 @@ def propose_rattraps_guest(
     words: int,
     count: int,
     score: int):
-    """Load a page that proposes the user to take a rattraps, or leave the test."""
+    """
+    Load a page that proposes the user to take a rattraps, or leave the test.
+    """
     global test
     # Enregistrer les résultats
-    global flag_data_updated
-    if flag_data_updated is False:
-        global loader
-        test.compute_success_rate()
-        updater = interro.Updater(loader, test)
-        updater.update_data()
-        logger.info("Guest data updated.")
-        flag_data_updated = True
-    else:
-        logger.info("Guest data not updated yet.")
+    # global flag_data_updated
+    # if flag_data_updated is False:
+    #     global loader
+    #     test.compute_success_rate()
+    #     updater = interro.Updater(loader, test)
+    #     updater.update_data()
+    #     logger.info("Guest data updated.")
+    #     flag_data_updated = True
+    # else:
+    #     logger.info("Guest data not updated yet.")
     # Réinitialisation
     new_count = 0
     new_score = 0
@@ -560,14 +612,14 @@ def end_interro_guest(
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performance.
     """
-    global flag_data_updated
-    if flag_data_updated is False:
-        global loader
-        global test
-        test.compute_success_rate()
-        updater = interro.Updater(loader, test)
-        updater.update_data()
-        logger.info("Guest data updated.")
+    # global flag_data_updated
+    # if flag_data_updated is False:
+    #     global loader
+    #     global test
+    #     test.compute_success_rate()
+    #     updater = interro.Updater(loader, test)
+    #     updater.update_data()
+    #     logger.info("Guest data updated.")
     return templates.TemplateResponse(
         "guest/interro_end.html",
         {
@@ -601,10 +653,15 @@ def data_page(request: Request, user_name):
 async def create_word(data: dict, user_name):
     """Save the word in the database."""
     cred_checker.check_credentials(user_name)
-    db_handler = data_handler.MariaDBHandler('version', 'web_local', LANGUAGE)
+    db_handler = data_handler.DBManipulator(
+        'web_local',
+        user_name,
+        'english'
+        'version',
+    )
     english = data['english']
     french = data['french']
-    if db_handler.create([english, french]) is True:
+    if db_handler.insert_word([english, french]) is True:
         message = "Word stored successfully."
     else:
         message = "Error with the storing of the word."
@@ -637,6 +694,7 @@ def graphs_page(request: Request, user_name):
             "userName": user_name
         }
     )
+
 
 
 # ==================================================

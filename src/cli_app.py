@@ -4,9 +4,16 @@
     Main purpose: vocabulary application in its CLI version.
 """
 
-import interro
-import views_local
-from data import data_handler
+import os
+import sys
+
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
+
+from src import interro
+from src import views_local
+from src.data import data_handler
 
 
 def cli_main():
@@ -15,7 +22,13 @@ def cli_main():
     user = interro.CliUser()
     user.get_settings()
     # Load data
-    data_handler_ = data_handler.MariaDBHandler(user.settings.type, 'cli', 'Zhongwen')
+    user_name = 'benoit'
+    data_handler_ = data_handler.MariaDBHandler(
+        user_name,
+        user.settings.type,
+        'cli',
+        'Zhongwen'
+    )
     loader = interro.Loader(
         user.settings.rattraps,
         data_handler_

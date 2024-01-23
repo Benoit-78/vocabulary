@@ -24,6 +24,15 @@ aws iam list-attached-role-policies \
 
 
 
+# ==============================================
+#  S 3
+# ==============================================
+aws s3 rm s3://vocabulary-benito/vocabulary/logs \
+    --recursive
+aws s3 rm s3://vocabulary-benito/vocabulary/bin/aws_commands.sh
+
+
+
 # ===========================================
 #  E C 2
 # ===========================================
@@ -93,14 +102,32 @@ aws ec2 associate-address \
 # Check the Access Control List
 # Actions -> Monitor and troubleshoot -> Get system log
 # Why does an elastic IP address need an internet gateway, and a standard IP address does not?
-# How can I know if my instance is on a private or public network?
-# -> IP like 10.*.*.* : private
-# -> IP like 172.*.*.* : public
+# IP like 10.*.*.* : private
+# IP like 172.*.*.* : public
+
+aws ec2 terminate-instances \
+    --instance-ids <instance-id>
+
+aws ec2 release-address \
+    --allocation-id <alloc-id>
 
 
 
 # ==============================================
-#  P A C K A G E S
+#  E C R
+# ==============================================
+aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 098964451146.dkr.ecr.eu-west-3.amazonaws.com
+# docker build -t vocabulary .
+docker-compose build
+docker tag vocabulary_web:latest public.ecr.aws/e8w4p1y9/vocabulary_compose:latest
+#docker tag vocabulary_web:latest 098964451146.dkr.ecr.eu-west-3.amazonaws.com/vocabulary_web:latest
+#docker push 098964451146.dkr.ecr.eu-west-3.amazonaws.com/vocabulary_compose:latest
+docker push public.ecr.aws/e8w4p1y9/vocabulary_compose:latest
+
+
+
+# ==============================================
+#  S Y S T E M   P A C K A G E S
 # ==============================================
 sudo apt-get update -y
 sudo apt-get install -y awscli
@@ -149,55 +176,5 @@ server {
 sudo ln -s /etc/nginx/sites-available/vocabulary_app.com /etc/nginx/sites-enabled/
 sudo service nginx restart
 
-
-
-# ==============================================
-#  M A R I A   D B
-# ==============================================
-cd ~/vocabulary/data
-sudo mariadb
-SOURCE english.sql;
-SOURCE zhongwen.sql;
-SELECT user, host FROM mysql.user;
-SHOW GRANTS FOR 'benito'@'localhost';
-ALTER USER 'benito'@'localhost' IDENTIFIED BY '<database_password>';
-
-
-# ==============================================
-#  T R O U B L E S H O O T I N G
-# ==============================================
-
-# ----- S3 -----
-aws s3 rm s3://vocabulary-benito/vocabulary/logs \
-    --recursive
-aws s3 rm s3://vocabulary-benito/vocabulary/bin/aws_commands.sh
-
-# ----- Nginx -----
 sudo service nginx status
 sudo tail -f /var/log/nginx/error.log
-
-
-
-# ==============================================
-#  E C R
-# ==============================================
-aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 098964451146.dkr.ecr.eu-west-3.amazonaws.com
-# docker build -t vocabulary .
-docker-compose build
-docker tag vocabulary_web:latest public.ecr.aws/e8w4p1y9/vocabulary_compose:latest
-#docker tag vocabulary_web:latest 098964451146.dkr.ecr.eu-west-3.amazonaws.com/vocabulary_web:latest
-#docker push 098964451146.dkr.ecr.eu-west-3.amazonaws.com/vocabulary_compose:latest
-docker push public.ecr.aws/e8w4p1y9/vocabulary_compose:latest
-
-
-
-# ==============================================
-#  E N D   O F   L I F E
-# ==============================================
-aws ec2 terminate-instances \
-    --instance-ids <instance-id>
-
-aws ec2 release-address \
-    --allocation-id <alloc-id>
-
-

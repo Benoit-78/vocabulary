@@ -62,8 +62,13 @@ aws s3 cp \
 # Depuis Fedora à l'EC2
 scp -r -i \
     conf/voc_ssh_key_1.pem \
-    /home/benoit/Documents/vocabulary/src/ \
+    /home/benoit/projects/vocabulary/src/ \
     ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/
+
+scp -r -i \
+    conf/voc_ssh_key_1.pem \
+    /home/benoit/projects/vocabulary/conf/interro.json \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/
 
 
 
