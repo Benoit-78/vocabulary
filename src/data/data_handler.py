@@ -129,10 +129,9 @@ class DbInterface(ABC):
 
     def get_db_cursor(self, user_name, db_name, password):
         """Connect to vocabulary database if credentials are correct."""
-        logger.debug(f"user_name: {user_name}")
-        logger.debug(f"db_name: {db_name}")
-        logger.debug(f"password: {password}")
-        logger.debug(f"port: {PARAMS['MariaDB']['port']}")
+        # logger.debug(f"user_name: {user_name}")
+        # logger.debug(f"db_name: {db_name}")
+        # logger.debug(f"password: {password}")
         connection_config = {
             'user': user_name,
             'password': password,
@@ -144,7 +143,7 @@ class DbInterface(ABC):
             logger.error(f"host should be in {HOSTS}")
         else:
             connection_config['host'] = PARAMS['host'][self.host]
-        logger.debug(f"host: {PARAMS['host'][self.host]}")
+        # logger.debug(f"host: {PARAMS['host'][self.host]}")
         connection = mariadb.connect(**connection_config)
         cursor = connection.cursor()
         return connection, cursor
@@ -233,15 +232,30 @@ class DbDefiner(DbInterface):
             tables = list(cursor.fetchall())
             cols_dict = {}
             for table_name in tables:
-                cursor.execute(f"SHOW COLUMNS FROM {table_name};")
+                if isinstance(table_name, tuple):
+                    true_table_name = table_name[0]
+                elif isinstance(table_name, str):
+                    true_table_name = table_name
+                cursor.execute(f"SHOW COLUMNS FROM {true_table_name};")
                 columns = list(cursor.fetchall())
-                cols_dict[table_name] = columns
+                columns = self.rectify_this_strange_result(columns)
+                cols_dict[true_table_name] = columns
         except mariadb.Error as err:
             logger.error(err)
         finally:
             cursor.close()
             connection.close()
         return cols_dict
+
+    def rectify_this_strange_result(self, result):
+        """
+        Correct the result of the 'SHOW COLUMNS FROM table_name' request.
+        """
+        if isinstance(result[0], tuple):
+            result = [col[0] for col in result]
+        elif isinstance(result[0], str):
+            pass
+        return result
 
     def get_tables_names(self, test_type) -> List[str]:
         """Get version or theme table according to the test type."""
@@ -297,11 +311,25 @@ class DbManipulator(DbInterface):
             index_col = tables[table_name].columns[0]
             tables[table_name] = tables[table_name].set_index(index_col)
         # Special case of output table
-        tables['output'] = tables[tables_names[-1]]
-        tables.pop(tables_names[-1])
+        output_table = self.get_output_table()
+        tables['output'] = tables[output_table]
+        tables.pop(output_table)
         cursor.close()
         connection.close()
         return tables
+
+    def get_output_table(self):
+        """
+        Rename the output name according to the test type.
+        """
+        if self.test_type == 'version':
+            output_table = 'theme_voc'
+        elif self.test_type == 'theme':
+            output_table = 'archives'
+        else:
+            logger.error(f"Wrong test_type argument: {self.test_type}")
+            raise SystemExit
+        return output_table
 
     def insert_word(self, password, row: list):
         """Add a word to the table"""

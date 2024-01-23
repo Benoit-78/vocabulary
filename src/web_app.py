@@ -217,6 +217,7 @@ def load_test(user_name, db_name, test_type, test_length, password):
     loader_ = interro.Loader(0, db_handler)
     loader_.load_tables(password)
     guesser = views.FastapiGuesser()
+    logger.debug(f"Table names: {loader_.tables.keys()}")
     test_ = interro.Test(
         loader_.tables[loader_.test_type + '_voc'],
         test_length,
@@ -567,19 +568,21 @@ def propose_rattraps_guest(
     words: int,
     count: int,
     score: int):
-    """Load a page that proposes the user to take a rattraps, or leave the test."""
+    """
+    Load a page that proposes the user to take a rattraps, or leave the test.
+    """
     global test
     # Enregistrer les résultats
-    global flag_data_updated
-    if flag_data_updated is False:
-        global loader
-        test.compute_success_rate()
-        updater = interro.Updater(loader, test)
-        updater.update_data()
-        logger.info("Guest data updated.")
-        flag_data_updated = True
-    else:
-        logger.info("Guest data not updated yet.")
+    # global flag_data_updated
+    # if flag_data_updated is False:
+    #     global loader
+    #     test.compute_success_rate()
+    #     updater = interro.Updater(loader, test)
+    #     updater.update_data()
+    #     logger.info("Guest data updated.")
+    #     flag_data_updated = True
+    # else:
+    #     logger.info("Guest data not updated yet.")
     # Réinitialisation
     new_count = 0
     new_score = 0
@@ -609,14 +612,14 @@ def end_interro_guest(
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performance.
     """
-    global flag_data_updated
-    if flag_data_updated is False:
-        global loader
-        global test
-        test.compute_success_rate()
-        updater = interro.Updater(loader, test)
-        updater.update_data()
-        logger.info("Guest data updated.")
+    # global flag_data_updated
+    # if flag_data_updated is False:
+    #     global loader
+    #     global test
+    #     test.compute_success_rate()
+    #     updater = interro.Updater(loader, test)
+    #     updater.update_data()
+    #     logger.info("Guest data updated.")
     return templates.TemplateResponse(
         "guest/interro_end.html",
         {
