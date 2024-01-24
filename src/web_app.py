@@ -12,9 +12,9 @@ import os
 import sys
 
 import pandas as pd
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Depends, HTTPException, Request, Response, status
+from fastapi.responses import HTMLResponse, JSONResponse
+# from fastapi.session import Session
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
@@ -56,8 +56,38 @@ templates = Jinja2Templates(
 
 
 # ==================================================
+#  UNIQUE SESSION
+# ==================================================
+# def get_session(request: Request):
+#     """
+#     Return the session object.
+#     """
+#     return Session(request=request)
+
+# @app.get("/")
+# async def read_item(session: Session = Depends(get_session)):
+#     # Check the session for user-specific data
+#     user_data = session.get("user_data", None)
+#     if not user_data:
+#         # Initialize user-specific data
+#         user_data = initialize_user_data()
+#         session["user_data"] = user_data
+#     logger.debug(f"Session: {session}")
+#     logger.debug(f"User data: {user_data}")
+#     # return {"message": "Hello World", "user_data": user_data}
+#     return templates.TemplateResponse(
+#         "welcome.html",
+#         {
+#             "request": request,
+#         }
+#     )
+
+
+
+# ==================================================
 #  W E L C O M E   P A G E
 # ==================================================
+
 @app.get("/", response_class=HTMLResponse)
 def welcome_page(request: Request):
     """Call the welcome page"""
@@ -74,6 +104,17 @@ def sign_in(request: Request):
     """Call the sign-in page"""
     return templates.TemplateResponse(
         "user/sign_in.html",
+        {
+            "request": request
+        }
+    )
+
+
+@app.get("/create-account", response_class=HTMLResponse)
+def sign_in(request: Request):
+    """Call the create account page"""
+    return templates.TemplateResponse(
+        "user/create_account.html",
         {
             "request": request
         }
@@ -106,8 +147,36 @@ def get_help(request: Request):
 # ==================================================
 #  U S E R   S I G N - I N
 # ==================================================
+@app.post("/create-account")
+async def create_account(creds: dict):
+    """Acquire the user settings for one interro."""
+    # A lot of things to do
+    user_account = UserAccount(creds['input_name'], creds['input_password'])
+    logger.debug(f"user_account instanciated: {user_account}")
+    return JSONResponse(
+        content=
+        {
+            "message": "User credentials created successfully",
+            "userName": cred_checker.name
+        }
+    )
 
-@app.post("/authenticate")
+
+@app.get("/create-database/{user_name}", response_class=HTMLResponse)
+def user_main_page(request: Request, user_name):
+    """Call the base page of user space"""
+    global cred_checker
+    cred_checker.check_credentials(user_name)
+    return templates.TemplateResponse(
+        "user/create_database.html",
+        {
+            "request": request,
+            "userName": user_name
+        }
+    )
+
+
+@app.post("/authenticate-user")
 async def authenticate(creds: dict):
     """Acquire the user settings for one interro."""
     global cred_checker
@@ -572,17 +641,6 @@ def propose_rattraps_guest(
     Load a page that proposes the user to take a rattraps, or leave the test.
     """
     global test
-    # Enregistrer les résultats
-    # global flag_data_updated
-    # if flag_data_updated is False:
-    #     global loader
-    #     test.compute_success_rate()
-    #     updater = interro.Updater(loader, test)
-    #     updater.update_data()
-    #     logger.info("Guest data updated.")
-    #     flag_data_updated = True
-    # else:
-    #     logger.info("Guest data not updated yet.")
     # Réinitialisation
     new_count = 0
     new_score = 0
@@ -612,14 +670,6 @@ def end_interro_guest(
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performance.
     """
-    # global flag_data_updated
-    # if flag_data_updated is False:
-    #     global loader
-    #     global test
-    #     test.compute_success_rate()
-    #     updater = interro.Updater(loader, test)
-    #     updater.update_data()
-    #     logger.info("Guest data updated.")
     return templates.TemplateResponse(
         "guest/interro_end.html",
         {

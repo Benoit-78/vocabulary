@@ -98,8 +98,17 @@ pip install -r requirements.txt
 #  R U N
 # =======================
 cd ~/vocabulary
-uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
+# DEV
+uvicorn src.web_app:app \
+    --port 8080 \
+    --host 0.0.0.0 \
+    --reload
 
+# PROD
+uvicorn src.web_app:app \
+    --port 8080 \
+    --host 0.0.0.0 \
+    --workers 3
 
 
 # ==============================================
