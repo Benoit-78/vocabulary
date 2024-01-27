@@ -12,7 +12,7 @@ import os
 import sys
 
 import pandas as pd
-from fastapi import FastAPI, Cookie, Depends, HTTPException, Request, Response, status
+from fastapi import FastAPI, Query, Depends, HTTPException, Request, Response, status
 from fastapi.responses import HTMLResponse, JSONResponse
 # from fastapi.session import Session
 from fastapi.staticfiles import StaticFiles
@@ -112,11 +112,14 @@ def sign_in(request: Request):
 
 @app.get("/create-account", response_class=HTMLResponse)
 def sign_in(request: Request):
-    """Call the create account page"""
+    """
+    Call the create account page
+    """
     return templates.TemplateResponse(
         "user/create_account.html",
         {
-            "request": request
+            "request": request,
+            "errorMessage": ""
         }
     )
 
@@ -147,45 +150,68 @@ def get_help(request: Request):
 # ==================================================
 #  U S E R   S P A C E
 # ==================================================
-@app.post("/create-account")
+@app.post("/create-user-account")
 async def create_account(creds: dict):
     """
-    Acquire the user settings for one interro.
+    Create the user account if the given user name does not exist yet.
     """
     # A lot of things to do
     user_account = users.UserAccount(creds['input_name'], creds['input_password'])
-    logger.debug(f"user_account instanciated: {user_account}")
-    return JSONResponse(
-        content=
-        {
-            "message": "User account created successfully",
-            "userName": user_account.user_name
-        }
-    )
+    result = user_account.create_account()
+    if result == 1:
+        return templates.TemplateResponse(
+            "user/create_account.html",
+            {
+                "request": request,
+                "errorMessage": "User name already exists."
+            }
+        )
+    elif result == 0:
+        return JSONResponse(
+            content=
+            {
+                "message": "User account created successfully",
+                "userName": user_account.user_name
+            }
+        )
 
 
 @app.post("/authenticate-user")
 async def authenticate(creds: dict):
-    """Acquire the user settings for one interro."""
+    """
+    Acquire the user settings for one interro.
+    """
     global cred_checker
-    cred_checker.name = creds['input_name']
-    cred_checker.password = creds['input_password']
-    cred_checker.check_credentials(creds['input_name'])
+    cred_checker.check_credentials(
+        creds['input_name'],
+        creds['input_password']
+    )
     return JSONResponse(
-        content=
-        {
+        content={
             "message": "User credentials validated successfully",
-            "userName": cred_checker.name
+            "userName": creds['input_name'],
+            "userPassword": creds['input_password']
         }
     )
 
 
 @app.get("/user-space", response_class=HTMLResponse)
-def user_main_page(request: Request, user_name: str = Cookie(default=None)):
-    """Call the base page of user space"""
-    global cred_checker
+def user_main_page(
+    request: Request,
+    user_name: str = Query(None, alias="userName"),
+    user_password: str = Query(None, alias="userPassword")
+    ):
+    """
+    Call the base page of user space
+    """
     if user_name:
-        cred_checker.check_credentials(user_name)
+        cred_checker.check_credentials(user_name, user_password)
+    else:
+        logger.error("No user name found in cookies.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No user name found in cookies."
+        )
     return templates.TemplateResponse(
         "user/user_space.html",
         {
@@ -198,7 +224,7 @@ def user_main_page(request: Request, user_name: str = Cookie(default=None)):
 @app.get("/sign-out/{user_name}", response_class=HTMLResponse)
 def sign_out(request: Request):
     """
-    Deconnect the user and return to welcome page.
+    Deconnect the user and return to the welcome page.
     """
     global cred_checker
     cred_checker = users.CredChecker()

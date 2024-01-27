@@ -129,9 +129,10 @@ class DbInterface(ABC):
 
     def get_db_cursor(self, user_name, db_name, password):
         """Connect to vocabulary database if credentials are correct."""
-        # logger.debug(f"user_name: {user_name}")
-        # logger.debug(f"db_name: {db_name}")
-        # logger.debug(f"password: {password}")
+        logger.debug(f"user_name: {user_name}")
+        logger.debug(f"db_name: {db_name}")
+        logger.debug(f"password: {password}")
+        logger.debug(f"port: {PARAMS['MariaDB']['port']}")
         connection_config = {
             'user': user_name,
             'password': password,
@@ -143,7 +144,7 @@ class DbInterface(ABC):
             logger.error(f"host should be in {HOSTS}")
         else:
             connection_config['host'] = PARAMS['host'][self.host]
-        # logger.debug(f"host: {PARAMS['host'][self.host]}")
+        logger.debug(f"host: {PARAMS['host'][self.host]}")
         connection = mariadb.connect(**connection_config)
         cursor = connection.cursor()
         return connection, cursor
@@ -159,7 +160,7 @@ class DbController(DbInterface):
 
     def create_user(self, root_password, user_name, user_password):
         """Create user"""
-        connection, cursor = self.get_db_cursor('root', 'root', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
             cursor.execute(f"CREATE USER '{user_name}'@'%' IDENTIFIED BY '{user_password}';")
@@ -190,6 +191,19 @@ class DbController(DbInterface):
             connection.close()
         return result
 
+    def get_users_list(self, root_password):
+        """Get list of users"""
+        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        users_list = []
+        try:
+            cursor.execute("SELECT User FROM mysql.user;")
+            users_list = [user[0] for user in cursor.fetchall()]
+        except mariadb.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        return users_list
 
 
 class DbDefiner(DbInterface):

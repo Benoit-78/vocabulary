@@ -15,11 +15,11 @@
 
 SELECT host, user, password FROM mysql.user;
 
-CREATE USER 'guest'@'localhost' IDENTIFIED BY '<db_password>';
+CREATE USER 'root'@'localhost' IDENTIFIED BY '<db_password>';
 
-ALTER USER 'benoit'@'localhost' IDENTIFIED BY '<db_password>';
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'IBM-vocabulary7';
 
-SHOW GRANTS FOR 'guest'@'localhost';
+SHOW GRANTS FOR 'root'@'localhost';
 
 GRANT ALL PRIVILEGES ON vocabulary.* TO 'guest'@'localhost';
 

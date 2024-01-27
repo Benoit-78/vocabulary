@@ -23,6 +23,10 @@
                 <input type="text" id="content_box2" name="content_box2">
             </div>
         </div>
+        <div class="row"></div>
+            <div class="flag-box">
+                <label for="input3">{{ errorMessage }}</label>
+            </div>
         <div class="row">
             <button class="button" onclick="createAccount(`{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">Create account</button>
         </div>
