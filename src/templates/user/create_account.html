@@ -14,17 +14,17 @@
         <div class="row">
             <div class="flag-box">
                 <label for="input1">User name</label>
-                <input type="text" id="input1" name="input1">
+                <input type="text" id="content_box1" name="content_box1">
             </div>
         </div>
         <div class="row"></div>
             <div class="flag-box">
                 <label for="input2">Password</label>
-                <input type="text" id="input2" name="input2">
+                <input type="text" id="content_box2" name="content_box2">
             </div>
         </div>
         <div class="row">
-            <button class="button" onclick="createAccount()">Create account</button>
+            <button class="button" onclick="createAccount(`{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">Create account</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>

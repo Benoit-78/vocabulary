@@ -282,11 +282,12 @@ class DbManipulator(DbInterface):
         self.user_name = user_name
         self.db_name = db_name
         self.db_definer = DbDefiner(self.host, self.user_name)
-        self.set_test_type(test_type)
+        self.test_type = ''
+        self.check_test_type(test_type)
 
-    def set_test_type(self, test_type):
+    def check_test_type(self, test_type):
         """
-        Set the test type attribute.
+        Check the test type attribute.
         """
         if test_type not in ['version', 'theme']:
             logger.error(f"Test type {test_type} incorrect, \
@@ -294,7 +295,9 @@ class DbManipulator(DbInterface):
         self.test_type = test_type
 
     def get_tables(self, password):
-        """Load the different tables necessary to the app."""
+        """
+        Load the different tables necessary to the app.
+        """
         connection, cursor = self.get_db_cursor(
             self.user_name, self.db_name, password
         )
@@ -395,7 +398,9 @@ class DbManipulator(DbInterface):
         return True
 
     def save_table(self, password, table_name: str, table: pd.DataFrame):
-        """Save given table."""
+        """
+        Save given table.
+        """
         connection, cursor = self.get_db_cursor(
             self.user_name, self.db_name, password
         )

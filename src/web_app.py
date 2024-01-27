@@ -12,7 +12,7 @@ import os
 import sys
 
 import pandas as pd
-from fastapi import FastAPI, Depends, HTTPException, Request, Response, status
+from fastapi import FastAPI, Cookie, Depends, HTTPException, Request, Response, status
 from fastapi.responses import HTMLResponse, JSONResponse
 # from fastapi.session import Session
 from fastapi.staticfiles import StaticFiles
@@ -145,33 +145,21 @@ def get_help(request: Request):
 
 
 # ==================================================
-#  U S E R   S I G N - I N
+#  U S E R   S P A C E
 # ==================================================
 @app.post("/create-account")
 async def create_account(creds: dict):
-    """Acquire the user settings for one interro."""
+    """
+    Acquire the user settings for one interro.
+    """
     # A lot of things to do
-    user_account = UserAccount(creds['input_name'], creds['input_password'])
+    user_account = users.UserAccount(creds['input_name'], creds['input_password'])
     logger.debug(f"user_account instanciated: {user_account}")
     return JSONResponse(
         content=
         {
-            "message": "User credentials created successfully",
-            "userName": cred_checker.name
-        }
-    )
-
-
-@app.get("/create-database/{user_name}", response_class=HTMLResponse)
-def user_main_page(request: Request, user_name):
-    """Call the base page of user space"""
-    global cred_checker
-    cred_checker.check_credentials(user_name)
-    return templates.TemplateResponse(
-        "user/create_database.html",
-        {
-            "request": request,
-            "userName": user_name
+            "message": "User account created successfully",
+            "userName": user_account.user_name
         }
     )
 
@@ -192,11 +180,12 @@ async def authenticate(creds: dict):
     )
 
 
-@app.get("/user-space/{user_name}", response_class=HTMLResponse)
-def user_main_page(request: Request, user_name):
+@app.get("/user-space", response_class=HTMLResponse)
+def user_main_page(request: Request, user_name: str = Cookie(default=None)):
     """Call the base page of user space"""
     global cred_checker
-    cred_checker.check_credentials(user_name)
+    if user_name:
+        cred_checker.check_credentials(user_name)
     return templates.TemplateResponse(
         "user/user_space.html",
         {
@@ -205,6 +194,20 @@ def user_main_page(request: Request, user_name):
         }
     )
 
+
+@app.get("/sign-out/{user_name}", response_class=HTMLResponse)
+def sign_out(request: Request):
+    """
+    Deconnect the user and return to welcome page.
+    """
+    global cred_checker
+    cred_checker = users.CredChecker()
+    return templates.TemplateResponse(
+        "welcome.html",
+        {
+            "request": request
+        }
+    )
 
 
 # ==================================================
@@ -226,7 +229,9 @@ def  choose_database(request: Request, user_name):
 
 @app.post("/check-connection-to-database/{user_name}/{db_name}")
 async def check_db_connection(settings: dict, user_name, db_name):
-    """Acquire the database chosen by the user."""
+    """
+    Acquire the database chosen by the user.
+    """
     db_handler = data_handler.DbDefiner('web_local', user_name)
     connection, cursor = db_handler.get_db_cursor(db_name)
     return JSONResponse(
@@ -282,7 +287,7 @@ def load_test(user_name, db_name, test_type, test_length, password):
         db_name=db_name,
         test_type=test_type,
     )
-    db_handler.set_test_type(test_type)
+    db_handler.check_test_type(test_type)
     loader_ = interro.Loader(0, db_handler)
     loader_.load_tables(password)
     guesser = views.FastapiGuesser()
@@ -467,19 +472,6 @@ def end_interro(
             "score": score,
             "numWords": words,
             "userName": user_name
-        }
-    )
-
-
-@app.get("/sign-out/{user_name}", response_class=HTMLResponse)
-def sign_out(request: Request):
-    """Deconnect the user and return to welcome page."""
-    global cred_checker
-    cred_checker = users.CredChecker()
-    return templates.TemplateResponse(
-        "welcome.html",
-        {
-            "request": request
         }
     )
 
@@ -684,6 +676,22 @@ def end_interro_guest(
 # ==================================================
 #  D A T A B A S E
 # ==================================================
+@app.get("/create-database", response_class=HTMLResponse)
+def user_main_page(request: Request, user_name):
+    """
+    Call the base page of user space.
+    """
+    global cred_checker
+    cred_checker.check_credentials(user_name)
+    return templates.TemplateResponse(
+        "user/create_database.html",
+        {
+            "request": request,
+            "userName": user_name
+        }
+    )
+
+
 @app.get("/database/{user_name}", response_class=HTMLResponse)
 def data_page(request: Request, user_name):
     """Base page for data input by the user."""

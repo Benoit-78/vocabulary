@@ -1,7 +1,7 @@
 
 function createAccount() {
-    var inputName = document.getElementById("input1").value;
-    var inputPassword = document.getElementById("input2").value;
+    var inputName = document.getElementById("content_box1").value;
+    var inputPassword = document.getElementById("content_box2").value;
     fetch("/create-account", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -12,8 +12,11 @@ function createAccount() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data && data.message === "User credentials created successfully") {
-            window.location.href = `/create-database/${data.userName}`;
+        if (data && data.message === "User account created successfully") {
+            // Use sessionStorage to store userName
+            sessionStorage.setItem('userName', data.userName);
+            // Redirect to user-space with userName as a query parameter
+            window.location.href = `/user-space?userName=${data.userName}`;
         } else {
             console.error("Unable to create user account");
         }
@@ -25,8 +28,8 @@ function createAccount() {
 
 
 function signIn() {
-    var inputName = document.getElementById("input1").value;
-    var inputPassword = document.getElementById("input2").value;
+    var inputName = document.getElementById("content_box1").value;
+    var inputPassword = document.getElementById("content_box2").value;
     fetch("/authenticate-user", {
         method: "POST",
         headers: {"Content-Type": "application/json"},

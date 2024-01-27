@@ -88,13 +88,12 @@ class Account(ABC):
     - developer
         o architect
         o developer
-        o devops
         o tester
+        o ops
     - customer (paid version)
     - user (free version)
     - guest
     """
-
     @abstractmethod
     def log_in(self):
         """
@@ -152,7 +151,7 @@ class UserAccount(Account):
         """Change the password of the user."""
         return None
 
-    def add_database(self):
+    def create_database(self):
         """Add a database to the user's space."""
         return None
 
@@ -160,7 +159,7 @@ class UserAccount(Account):
         """Remove a database from the user's space."""
         return None
 
-    def add_word(self):
+    def insert_word(self):
         """Add a couple of words to the user's database."""
         return None
 
