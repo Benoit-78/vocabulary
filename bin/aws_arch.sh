@@ -143,6 +143,72 @@ sudo apt-get install -y nginx
 
 
 # ==============================================
+#  MAKE THE APP AVAILABLE
+# ==============================================
+# Create a hosted zone
+aws route53 create-hosted-zone \
+    --name vocabulary-app.com \
+    --caller-reference $(date +%s) \
+    --query 'HostedZone.{Id:Id}' \
+    --output text
+
+# Create an Application Load Balancer
+aws elbv2 create-load-balancer \
+    --name vocabulary-lb \
+    --subnets subnet-0e199c3602e3ff025 subnet-057a87ac7a13cf0fe \
+    --security-groups sg-0ee3fc8193e601c90 \
+    --scheme internet-facing \
+    --output json
+
+# Create a target group
+aws elbv2 create-target-group \
+    --name vocabulary-tg \
+    --protocol HTTP \
+    --port 80 \
+    --vpc-id vpc-0a7070d446d46681b \
+    --output json
+
+# Create an HTTP listener
+aws elbv2 create-listener \
+    --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-3:098964451146:loadbalancer/app/vocabulary-lb/5f3a61e3ac69c794 \
+    --protocol HTTP \
+    --port 80 \
+    --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:eu-west-3:098964451146:targetgroup/vocabulary-tg/0575f75560cffcc6 \
+    --output json
+
+# Create an HTTPS listener
+aws elbv2 create-listener \
+    --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-3:098964451146:loadbalancer/app/vocabulary-lb/5f3a61e3ac69c794 \
+    --protocol HTTPS \
+    --port 443 \
+    --certificates CertificateArn=arn:aws:acm:eu-west-3:098964451146:certificate/debcc9b7-3bb5-4c87-b319-fcdd9123536d \
+    --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:eu-west-3:098964451146:targetgroup/vocabulary-tg/0575f75560cffcc6 \
+    --output json
+
+# Create a Route53 record pointing to the ALB
+aws route53 change-resource-record-sets \
+    --hosted-zone-id Z07747923RSGBESFDLWVX \
+    --change-batch '{
+        "Changes": [
+            {
+                "Action": "CREATE",
+                "ResourceRecordSet": {
+                    "Name": "www.vocabulary-app.com",
+                    "Type": "CNAME",
+                    "TTL": 300,
+                    "ResourceRecords": [
+                        {
+                            "Value": "vocabulary-lb-1646646983.eu-west-3.elb.amazonaws.com"
+                        }
+                    ]
+                }
+            }
+        ]
+    }'
+
+
+
+# ==============================================
 #  N G I N X
 # ==============================================
 sudo nano /etc/nginx/sites-available/vocabulary_app.com

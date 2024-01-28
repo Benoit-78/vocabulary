@@ -27,7 +27,15 @@ from src import interro, views
 from src.dashboard import feed_dashboard
 from src.data import data_handler, users
 
-app = FastAPI()
+app = FastAPI(
+    title="vocabulary",
+    docs_url="/docs",
+    redoc_url=None,
+    servers=[{
+        # "url": "https://vocabulary-app.com"
+        "url": "https://www.vocabulary-app.com"
+    }],
+)
 GUEST_USER_NAME = 'guest'
 GUEST_DB_NAME = 'vocabulary'
 test = None
@@ -151,19 +159,21 @@ def get_help(request: Request):
 #  U S E R   S P A C E
 # ==================================================
 @app.post("/create-user-account")
-async def create_account(creds: dict):
+async def create_account(request: Request, creds: dict):
     """
     Create the user account if the given user name does not exist yet.
     """
     # A lot of things to do
     user_account = users.UserAccount(creds['input_name'], creds['input_password'])
+    logger.debug(f"User account: {user_account}")
     result = user_account.create_account()
+    logger.debug(f"Result: {result}")
     if result == 1:
-        return templates.TemplateResponse(
-            "user/create_account.html",
+        return JSONResponse(
+            content=
             {
-                "request": request,
-                "errorMessage": "User name already exists."
+                "message": "User name not available.",
+                "userName": user_account.user_name
             }
         )
     elif result == 0:

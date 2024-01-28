@@ -154,7 +154,6 @@ class UserAccount(Account):
         """
         account_exists = self.check_if_account_exists()
         if account_exists:
-            logger.warning(f"User name {self.user_name} already exists.")
             return 1
         db_handler = DbController(host='web_local')
         with open("conf/hum.json", "r") as hum_file:
@@ -179,7 +178,7 @@ class UserAccount(Account):
             logger.error(f"User name {self.user_name} already exists.")
             return True
         else:
-            logger.success(f"User name {self.user_name} does not exist.")
+            logger.success(f"User name {self.user_name} is available.")
             return False
 
     def delete(self):

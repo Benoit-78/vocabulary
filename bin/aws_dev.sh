@@ -104,7 +104,6 @@ uvicorn src.web_app:app \
     --host 0.0.0.0 \
     --reload
 
-# PROD
 uvicorn src.web_app:app \
     --port 8080 \
     --host 0.0.0.0 \

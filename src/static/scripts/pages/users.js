@@ -17,6 +17,9 @@ function createAccount() {
             sessionStorage.setItem('userName', data.userName);
             // Redirect to user-space with userName as a query parameter
             window.location.href = `/user-space?userName=${data.userName}?userPassword=${data.userPassword}`;
+        } else if (data && data.message === "User name not available") {
+            // Redirect to create-account route
+            window.location.href = "/create-account";
         } else {
             console.error("Unable to create user account");
         }
