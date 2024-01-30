@@ -32,8 +32,8 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url=None,
     servers=[{
-        # "url": "https://vocabulary-app.com"
-        "url": "https://www.vocabulary-app.com"
+        "url": "https://vocabulary-app.com"
+        # "url": "https://www.vocabulary-app.com"
     }],
 )
 GUEST_USER_NAME = 'guest'
@@ -181,7 +181,8 @@ async def create_account(request: Request, creds: dict):
             content=
             {
                 "message": "User account created successfully",
-                "userName": user_account.user_name
+                "userName": user_account.user_name,
+                "userPassword": user_account.user_password
             }
         )
 
@@ -208,12 +209,13 @@ async def authenticate(creds: dict):
 @app.get("/user-space", response_class=HTMLResponse)
 def user_main_page(
     request: Request,
-    user_name: str = Query(None, alias="userName"),
-    user_password: str = Query(None, alias="userPassword")
+    query: str = Query(None, alias="userName")
     ):
     """
     Call the base page of user space
     """
+    user_name = query.split('?')[0]
+    user_password = query.split('?')[1].split('=')[1]
     if user_name:
         cred_checker.check_credentials(user_name, user_password)
     else:

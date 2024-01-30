@@ -166,7 +166,7 @@ class TestDbController(unittest.TestCase):
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once_with(
             'root',
-            'root',
+            'mysql',
             self.root_password
         )
         request_1 = f"CREATE USER '{self.user_name}'@'%'"

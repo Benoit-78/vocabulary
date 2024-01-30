@@ -44,8 +44,10 @@ function signIn() {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "User credentials validated successfully") {
-            window.location.href = `/user-space/${data.userName}`;
+            window.location.href = `/user-space?userName=${data.userName}?userPassword=${data.userPassword}`;
         } else {
+            // Redirect to sign-in route
+            window.location.href = "/sign-in";
             console.error("Invalid credentials");
         }
     })

@@ -22,7 +22,14 @@ aws iam attach-role-policy \
 aws iam list-attached-role-policies \
     --role-name vocabulary_read_on_bucket
 
+aws iam attach-role-policy \
+    --role-name logger \
+    --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
 
+# Set the IAM role for the ALB
+aws elbv2 set-load-balancer-attributes \
+    --load-balancer-arn your-alb-arn \
+    --attributes Key=access_logs.s3.enabled,Value=true Key=access_logs.s3.bucket,Value=vocabulary-benito Key=access_logs.s3.prefix,Value=alb-logs/
 
 # ==============================================
 #  S 3
@@ -31,7 +38,23 @@ aws s3 rm s3://vocabulary-benito/vocabulary/logs \
     --recursive
 aws s3 rm s3://vocabulary-benito/vocabulary/bin/aws_commands.sh
 
+echo '{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "elasticloadbalancing.amazonaws.com"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::vocabulary-benito/logs*"
+    }
+  ]
+}' > conf/s3/bucket-policy.json
 
+aws s3api put-bucket-policy \
+    --bucket vocabulary-benito \
+    --policy file://conf/s3/bucket-policy.json
 
 # ===========================================
 #  E C 2
@@ -159,6 +182,14 @@ aws elbv2 create-load-balancer \
     --security-groups sg-0ee3fc8193e601c90 \
     --scheme internet-facing \
     --output json
+
+aws elbv2 modify-load-balancer-attributes \
+    --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-3:098964451146:loadbalancer/app/vocabulary-lb/5f3a61e3ac69c794 \
+    --attributes Key=access_logs.s3.enabled,Value=true Key=access_logs.s3.bucket,Value=bucket-name Key=access_logs.s3.prefix,Value=prefix Key=deletion_protection.enabled,Value=true
+
+# Access Load Balancer logs
+aws elbv2 describe-load-balancers \
+    --names vocabulary-lb
 
 # Create a target group
 aws elbv2 create-target-group \

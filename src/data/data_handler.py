@@ -129,10 +129,10 @@ class DbInterface(ABC):
 
     def get_db_cursor(self, user_name, db_name, password):
         """Connect to vocabulary database if credentials are correct."""
-        logger.debug(f"user_name: {user_name}")
-        logger.debug(f"db_name: {db_name}")
-        logger.debug(f"password: {password}")
-        logger.debug(f"port: {PARAMS['MariaDB']['port']}")
+        # logger.debug(f"user_name: {user_name}")
+        # logger.debug(f"db_name: {db_name}")
+        # logger.debug(f"password: {password}")
+        # logger.debug(f"port: {PARAMS['MariaDB']['port']}")
         connection_config = {
             'user': user_name,
             'password': password,
@@ -144,7 +144,7 @@ class DbInterface(ABC):
             logger.error(f"host should be in {HOSTS}")
         else:
             connection_config['host'] = PARAMS['host'][self.host]
-        logger.debug(f"host: {PARAMS['host'][self.host]}")
+        # logger.debug(f"host: {PARAMS['host'][self.host]}")
         connection = mariadb.connect(**connection_config)
         cursor = connection.cursor()
         return connection, cursor

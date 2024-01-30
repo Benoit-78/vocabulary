@@ -30,7 +30,7 @@ class CredChecker():
             host='web_local'
         )
 
-    def check_input_name(self):
+    def check_input_name(self, name_to_check):
         """Check if the input name belongs to the users list."""
         with open("conf/hum.json", "r") as hum_file:
             hum_dict = json.load(hum_file)
@@ -38,7 +38,7 @@ class CredChecker():
         users_list = self.db_controller.get_users_list(
             hum_pwd
         )
-        if self.name in users_list:
+        if name_to_check in users_list:
             return True
         else:
             return False
@@ -55,23 +55,23 @@ class CredChecker():
         else:
             return False
 
-    def flag_incorrect_user_name(self):
+    def flag_incorrect_user_name(self, name_to_check):
         """
         Raise exception if unknown user name, and redirect to sign-in page.
         """
         raise HTTPException(
             status_code=303,
-            detail=f"Unknown user name: {self.name}.",
+            detail=f"Unknown user name: {name_to_check}.",
             headers={"Location": "/sign-in"}
         )
 
-    def flag_incorrect_user_password(self):
+    def flag_incorrect_user_password(self, name_to_check, input_pwd):
         """
         Raise exception if wrong password, and redirect to sign-in page.
         """
         raise HTTPException(
             status_code=303,
-            detail=f"Wrong password {self.password} for user {self.name}.",
+            detail=f"Wrong password {input_pwd} for user {name_to_check}.",
             headers={"Location": "/sign-in"}
         )
 
@@ -80,7 +80,7 @@ class CredChecker():
         if name_to_check in [None, ""]:
             logger.warning(f"Input name is empty or somewhat sneaky.")
             self.flag_incorrect_user_name()
-        if not self.check_input_name():
+        if not self.check_input_name(name_to_check):
             logger.warning(f"Input name {name_to_check} unknown.")
             self.flag_incorrect_user_name()
         logger.success(f"User name {name_to_check} valid.")
@@ -89,17 +89,17 @@ class CredChecker():
         """Validate user password."""
         if password_to_check in [None, ""]:
             logger.warning(f"Input password is empty or somewhat sneaky.")
-            self.flag_incorrect_user_password()
+            self.flag_incorrect_user_password(name_to_check, password_to_check)
         if not self.check_input_password(name_to_check, password_to_check):
             logger.warning(f"Input password '{password_to_check}' incorrect.")
-            self.flag_incorrect_user_password()
+            self.flag_incorrect_user_password(name_to_check, password_to_check)
         logger.success(f"Password valid.")
 
     def check_credentials(self, name_to_check, password_to_check):
         """Validate user credentials."""
         self.check_user_name(name_to_check)
         self.check_password(name_to_check, password_to_check)
-        logger.success(f"User authorized.")
+        logger.success(f"Access granted.")
 
 
 
