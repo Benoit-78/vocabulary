@@ -63,7 +63,7 @@ aws s3 cp \
 scp -r -i \
     conf/voc_ssh_key_1.pem \
     /home/benoit/projects/vocabulary/src/ \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/ && cl
 
 scp -r -i \
     conf/voc_ssh_key_1.pem \
@@ -98,8 +98,16 @@ pip install -r requirements.txt
 #  R U N
 # =======================
 cd ~/vocabulary
-uvicorn src.web_app:app --reload --port 8080 --host 0.0.0.0
+# DEV
+uvicorn src.web_app:app \
+    --port 8080 \
+    --host 0.0.0.0 \
+    --reload
 
+uvicorn src.web_app:app \
+    --port 8080 \
+    --host 0.0.0.0 \
+    --workers 3
 
 
 # ==============================================

@@ -166,7 +166,7 @@ class TestDbController(unittest.TestCase):
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once_with(
             'root',
-            'root',
+            'mysql',
             self.root_password
         )
         request_1 = f"CREATE USER '{self.user_name}'@'%'"
@@ -283,11 +283,18 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.execute.assert_any_call("SHOW TABLES;")
         mock_cursor.execute.assert_any_call("SHOW COLUMNS FROM table1;")
         mock_cursor.execute.assert_any_call("SHOW COLUMNS FROM table2;")
+        # self.assertEqual(
+        #     result,
+        #     {
+        #         'table1': [('col1', 'type1'), ('col2', 'type2')],
+        #         'table2': [('col3', 'type3'), ('col4', 'type4')]
+        #     }
+        # )
         self.assertEqual(
             result,
             {
-                'table1': [('col1', 'type1'), ('col2', 'type2')],
-                'table2': [('col3', 'type3'), ('col4', 'type4')]
+                'table1': ['col1', 'col2'],
+                'table2': ['col3', 'col4']
             }
         )
 
@@ -333,11 +340,11 @@ class TestDbManipulator(unittest.TestCase):
             'score': [42]
         })
 
-    def test_set_test_type(self):
+    def test_check_test_type(self):
         """"""
         # Arrange
         # Act
-        self.db_manipulator.set_test_type(('version'))
+        self.db_manipulator.check_test_type(('version'))
         # Assert
         self.assertIsInstance(self.db_manipulator.test_type, str)
         self.assertIn(self.db_manipulator.test_type, ['version', 'theme'])

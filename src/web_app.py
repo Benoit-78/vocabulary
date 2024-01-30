@@ -12,9 +12,9 @@ import os
 import sys
 
 import pandas as pd
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Query, Depends, HTTPException, Request, Response, status
+from fastapi.responses import HTMLResponse, JSONResponse
+# from fastapi.session import Session
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
@@ -27,7 +27,15 @@ from src import interro, views
 from src.dashboard import feed_dashboard
 from src.data import data_handler, users
 
-app = FastAPI()
+app = FastAPI(
+    title="vocabulary",
+    docs_url="/docs",
+    redoc_url=None,
+    servers=[{
+        "url": "https://vocabulary-app.com"
+        # "url": "https://www.vocabulary-app.com"
+    }],
+)
 GUEST_USER_NAME = 'guest'
 GUEST_DB_NAME = 'vocabulary'
 test = None
@@ -56,8 +64,38 @@ templates = Jinja2Templates(
 
 
 # ==================================================
+#  UNIQUE SESSION
+# ==================================================
+# def get_session(request: Request):
+#     """
+#     Return the session object.
+#     """
+#     return Session(request=request)
+
+# @app.get("/")
+# async def read_item(session: Session = Depends(get_session)):
+#     # Check the session for user-specific data
+#     user_data = session.get("user_data", None)
+#     if not user_data:
+#         # Initialize user-specific data
+#         user_data = initialize_user_data()
+#         session["user_data"] = user_data
+#     logger.debug(f"Session: {session}")
+#     logger.debug(f"User data: {user_data}")
+#     # return {"message": "Hello World", "user_data": user_data}
+#     return templates.TemplateResponse(
+#         "welcome.html",
+#         {
+#             "request": request,
+#         }
+#     )
+
+
+
+# ==================================================
 #  W E L C O M E   P A G E
 # ==================================================
+
 @app.get("/", response_class=HTMLResponse)
 def welcome_page(request: Request):
     """Call the welcome page"""
@@ -76,6 +114,20 @@ def sign_in(request: Request):
         "user/sign_in.html",
         {
             "request": request
+        }
+    )
+
+
+@app.get("/create-account", response_class=HTMLResponse)
+def sign_in(request: Request):
+    """
+    Call the create account page
+    """
+    return templates.TemplateResponse(
+        "user/create_account.html",
+        {
+            "request": request,
+            "errorMessage": ""
         }
     )
 
@@ -104,30 +156,74 @@ def get_help(request: Request):
 
 
 # ==================================================
-#  U S E R   S I G N - I N
+#  U S E R   S P A C E
 # ==================================================
+@app.post("/create-user-account")
+async def create_account(request: Request, creds: dict):
+    """
+    Create the user account if the given user name does not exist yet.
+    """
+    # A lot of things to do
+    user_account = users.UserAccount(creds['input_name'], creds['input_password'])
+    logger.debug(f"User account: {user_account}")
+    result = user_account.create_account()
+    logger.debug(f"Result: {result}")
+    if result == 1:
+        return JSONResponse(
+            content=
+            {
+                "message": "User name not available.",
+                "userName": user_account.user_name
+            }
+        )
+    elif result == 0:
+        return JSONResponse(
+            content=
+            {
+                "message": "User account created successfully",
+                "userName": user_account.user_name,
+                "userPassword": user_account.user_password
+            }
+        )
 
-@app.post("/authenticate")
+
+@app.post("/authenticate-user")
 async def authenticate(creds: dict):
-    """Acquire the user settings for one interro."""
+    """
+    Acquire the user settings for one interro.
+    """
     global cred_checker
-    cred_checker.name = creds['input_name']
-    cred_checker.password = creds['input_password']
-    cred_checker.check_credentials(creds['input_name'])
+    cred_checker.check_credentials(
+        creds['input_name'],
+        creds['input_password']
+    )
     return JSONResponse(
-        content=
-        {
+        content={
             "message": "User credentials validated successfully",
-            "userName": cred_checker.name
+            "userName": creds['input_name'],
+            "userPassword": creds['input_password']
         }
     )
 
 
-@app.get("/user-space/{user_name}", response_class=HTMLResponse)
-def user_main_page(request: Request, user_name):
-    """Call the base page of user space"""
-    global cred_checker
-    cred_checker.check_credentials(user_name)
+@app.get("/user-space", response_class=HTMLResponse)
+def user_main_page(
+    request: Request,
+    query: str = Query(None, alias="userName")
+    ):
+    """
+    Call the base page of user space
+    """
+    user_name = query.split('?')[0]
+    user_password = query.split('?')[1].split('=')[1]
+    if user_name:
+        cred_checker.check_credentials(user_name, user_password)
+    else:
+        logger.error("No user name found in cookies.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No user name found in cookies."
+        )
     return templates.TemplateResponse(
         "user/user_space.html",
         {
@@ -136,6 +232,20 @@ def user_main_page(request: Request, user_name):
         }
     )
 
+
+@app.get("/sign-out/{user_name}", response_class=HTMLResponse)
+def sign_out(request: Request):
+    """
+    Deconnect the user and return to the welcome page.
+    """
+    global cred_checker
+    cred_checker = users.CredChecker()
+    return templates.TemplateResponse(
+        "welcome.html",
+        {
+            "request": request
+        }
+    )
 
 
 # ==================================================
@@ -157,7 +267,9 @@ def  choose_database(request: Request, user_name):
 
 @app.post("/check-connection-to-database/{user_name}/{db_name}")
 async def check_db_connection(settings: dict, user_name, db_name):
-    """Acquire the database chosen by the user."""
+    """
+    Acquire the database chosen by the user.
+    """
     db_handler = data_handler.DbDefiner('web_local', user_name)
     connection, cursor = db_handler.get_db_cursor(db_name)
     return JSONResponse(
@@ -213,7 +325,7 @@ def load_test(user_name, db_name, test_type, test_length, password):
         db_name=db_name,
         test_type=test_type,
     )
-    db_handler.set_test_type(test_type)
+    db_handler.check_test_type(test_type)
     loader_ = interro.Loader(0, db_handler)
     loader_.load_tables(password)
     guesser = views.FastapiGuesser()
@@ -402,19 +514,6 @@ def end_interro(
     )
 
 
-@app.get("/sign-out/{user_name}", response_class=HTMLResponse)
-def sign_out(request: Request):
-    """Deconnect the user and return to welcome page."""
-    global cred_checker
-    cred_checker = users.CredChecker()
-    return templates.TemplateResponse(
-        "welcome.html",
-        {
-            "request": request
-        }
-    )
-
-
 
 # ==================================================
 # G U E S T
@@ -572,17 +671,6 @@ def propose_rattraps_guest(
     Load a page that proposes the user to take a rattraps, or leave the test.
     """
     global test
-    # Enregistrer les résultats
-    # global flag_data_updated
-    # if flag_data_updated is False:
-    #     global loader
-    #     test.compute_success_rate()
-    #     updater = interro.Updater(loader, test)
-    #     updater.update_data()
-    #     logger.info("Guest data updated.")
-    #     flag_data_updated = True
-    # else:
-    #     logger.info("Guest data not updated yet.")
     # Réinitialisation
     new_count = 0
     new_score = 0
@@ -612,14 +700,6 @@ def end_interro_guest(
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performance.
     """
-    # global flag_data_updated
-    # if flag_data_updated is False:
-    #     global loader
-    #     global test
-    #     test.compute_success_rate()
-    #     updater = interro.Updater(loader, test)
-    #     updater.update_data()
-    #     logger.info("Guest data updated.")
     return templates.TemplateResponse(
         "guest/interro_end.html",
         {
@@ -634,6 +714,22 @@ def end_interro_guest(
 # ==================================================
 #  D A T A B A S E
 # ==================================================
+@app.get("/create-database", response_class=HTMLResponse)
+def user_main_page(request: Request, user_name):
+    """
+    Call the base page of user space.
+    """
+    global cred_checker
+    cred_checker.check_credentials(user_name)
+    return templates.TemplateResponse(
+        "user/create_database.html",
+        {
+            "request": request,
+            "userName": user_name
+        }
+    )
+
+
 @app.get("/database/{user_name}", response_class=HTMLResponse)
 def data_page(request: Request, user_name):
     """Base page for data input by the user."""

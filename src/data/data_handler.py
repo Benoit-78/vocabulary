@@ -132,6 +132,7 @@ class DbInterface(ABC):
         # logger.debug(f"user_name: {user_name}")
         # logger.debug(f"db_name: {db_name}")
         # logger.debug(f"password: {password}")
+        # logger.debug(f"port: {PARAMS['MariaDB']['port']}")
         connection_config = {
             'user': user_name,
             'password': password,
@@ -159,7 +160,7 @@ class DbController(DbInterface):
 
     def create_user(self, root_password, user_name, user_password):
         """Create user"""
-        connection, cursor = self.get_db_cursor('root', 'root', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
             cursor.execute(f"CREATE USER '{user_name}'@'%' IDENTIFIED BY '{user_password}';")
@@ -190,6 +191,19 @@ class DbController(DbInterface):
             connection.close()
         return result
 
+    def get_users_list(self, root_password):
+        """Get list of users"""
+        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        users_list = []
+        try:
+            cursor.execute("SELECT User FROM mysql.user;")
+            users_list = [user[0] for user in cursor.fetchall()]
+        except mariadb.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        return users_list
 
 
 class DbDefiner(DbInterface):
@@ -282,11 +296,12 @@ class DbManipulator(DbInterface):
         self.user_name = user_name
         self.db_name = db_name
         self.db_definer = DbDefiner(self.host, self.user_name)
-        self.set_test_type(test_type)
+        self.test_type = ''
+        self.check_test_type(test_type)
 
-    def set_test_type(self, test_type):
+    def check_test_type(self, test_type):
         """
-        Set the test type attribute.
+        Check the test type attribute.
         """
         if test_type not in ['version', 'theme']:
             logger.error(f"Test type {test_type} incorrect, \
@@ -294,7 +309,9 @@ class DbManipulator(DbInterface):
         self.test_type = test_type
 
     def get_tables(self, password):
-        """Load the different tables necessary to the app."""
+        """
+        Load the different tables necessary to the app.
+        """
         connection, cursor = self.get_db_cursor(
             self.user_name, self.db_name, password
         )
@@ -395,7 +412,9 @@ class DbManipulator(DbInterface):
         return True
 
     def save_table(self, password, table_name: str, table: pd.DataFrame):
-        """Save given table."""
+        """
+        Save given table.
+        """
         connection, cursor = self.get_db_cursor(
             self.user_name, self.db_name, password
         )

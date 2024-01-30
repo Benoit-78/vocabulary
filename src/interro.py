@@ -80,9 +80,13 @@ class CliUser():
 
 
 class Loader():
-    """Data loader"""
+    """
+    Data loader.
+    """
     def __init__(self, rattraps, data_handler_):
-        """Must be done in the same session than the interroooo is launched"""
+        """
+        Must be done in the same session than the interroooo is launched.
+        """
         self.test_type = data_handler_.test_type
         self.rattraps = rattraps
         self.data_handler = data_handler_
@@ -90,7 +94,9 @@ class Loader():
         self.output_table = ''
 
     def load_tables(self, password):
-        """Return the tables necessary for the interro to run"""
+        """
+        Return the tables necessary for the interro to run.
+        """
         self.tables = self.data_handler.get_tables(password)
         voc = self.test_type + '_voc'
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]
@@ -110,7 +116,9 @@ class Loader():
 
 
 class Interro(ABC):
-    """Abstract class for interrooooo!!!! !!! !"""
+    """
+    Abstract class for interrooooo!!!! !!! !
+    """
     def __init__(self, words_df_: pd.DataFrame, words: int, guesser):
         self.words_df = words_df_
         self.words = words
@@ -137,7 +145,9 @@ class Interro(ABC):
 
 
 class Test(Interro):
-    """First round"""
+    """
+    First round!
+    """
     def __init__(self, words_df_, words: int, guesser, perf_df_=None, words_cnt_df=None):
         super().__init__(words_df_, int(words), guesser)
         self.perf_df = perf_df_
@@ -240,7 +250,9 @@ class Test(Interro):
 
 
 class Rattrap(Interro):
-    """Rattrapage !!!"""
+    """
+    Rattrapage !!!
+    """
     def __init__(
         self,
         faults_df_: pd.DataFrame,
@@ -275,7 +287,9 @@ class Rattrap(Interro):
 
 
 class Updater():
-    """Update tables."""
+    """
+    Update tables.
+    """
     def __init__(self, loader: Loader, interro: Interro):
         self.loader = loader
         self.interro = interro
@@ -283,6 +297,7 @@ class Updater():
         self.criteria = {}
         self.set_criteria()
 
+    # Business logic
     def set_criteria(self):
         """
         Upload the dictionnary of criteria.

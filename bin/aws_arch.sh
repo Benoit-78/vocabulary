@@ -22,7 +22,14 @@ aws iam attach-role-policy \
 aws iam list-attached-role-policies \
     --role-name vocabulary_read_on_bucket
 
+aws iam attach-role-policy \
+    --role-name logger \
+    --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
 
+# Set the IAM role for the ALB
+aws elbv2 set-load-balancer-attributes \
+    --load-balancer-arn your-alb-arn \
+    --attributes Key=access_logs.s3.enabled,Value=true Key=access_logs.s3.bucket,Value=vocabulary-benito Key=access_logs.s3.prefix,Value=alb-logs/
 
 # ==============================================
 #  S 3
@@ -31,7 +38,23 @@ aws s3 rm s3://vocabulary-benito/vocabulary/logs \
     --recursive
 aws s3 rm s3://vocabulary-benito/vocabulary/bin/aws_commands.sh
 
+echo '{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "elasticloadbalancing.amazonaws.com"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::vocabulary-benito/logs*"
+    }
+  ]
+}' > conf/s3/bucket-policy.json
 
+aws s3api put-bucket-policy \
+    --bucket vocabulary-benito \
+    --policy file://conf/s3/bucket-policy.json
 
 # ===========================================
 #  E C 2
@@ -139,6 +162,80 @@ sudo apt-get install -y python3-pip
 sudo apt-get install -y python3-venv
 sudo apt-get install -y uvicorn
 sudo apt-get install -y nginx
+
+
+
+# ==============================================
+#  MAKE THE APP AVAILABLE
+# ==============================================
+# Create a hosted zone
+aws route53 create-hosted-zone \
+    --name vocabulary-app.com \
+    --caller-reference $(date +%s) \
+    --query 'HostedZone.{Id:Id}' \
+    --output text
+
+# Create an Application Load Balancer
+aws elbv2 create-load-balancer \
+    --name vocabulary-lb \
+    --subnets subnet-0e199c3602e3ff025 subnet-057a87ac7a13cf0fe \
+    --security-groups sg-0ee3fc8193e601c90 \
+    --scheme internet-facing \
+    --output json
+
+aws elbv2 modify-load-balancer-attributes \
+    --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-3:098964451146:loadbalancer/app/vocabulary-lb/5f3a61e3ac69c794 \
+    --attributes Key=access_logs.s3.enabled,Value=true Key=access_logs.s3.bucket,Value=bucket-name Key=access_logs.s3.prefix,Value=prefix Key=deletion_protection.enabled,Value=true
+
+# Access Load Balancer logs
+aws elbv2 describe-load-balancers \
+    --names vocabulary-lb
+
+# Create a target group
+aws elbv2 create-target-group \
+    --name vocabulary-tg \
+    --protocol HTTP \
+    --port 80 \
+    --vpc-id vpc-0a7070d446d46681b \
+    --output json
+
+# Create an HTTP listener
+aws elbv2 create-listener \
+    --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-3:098964451146:loadbalancer/app/vocabulary-lb/5f3a61e3ac69c794 \
+    --protocol HTTP \
+    --port 80 \
+    --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:eu-west-3:098964451146:targetgroup/vocabulary-tg/0575f75560cffcc6 \
+    --output json
+
+# Create an HTTPS listener
+aws elbv2 create-listener \
+    --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-3:098964451146:loadbalancer/app/vocabulary-lb/5f3a61e3ac69c794 \
+    --protocol HTTPS \
+    --port 443 \
+    --certificates CertificateArn=arn:aws:acm:eu-west-3:098964451146:certificate/debcc9b7-3bb5-4c87-b319-fcdd9123536d \
+    --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:eu-west-3:098964451146:targetgroup/vocabulary-tg/0575f75560cffcc6 \
+    --output json
+
+# Create a Route53 record pointing to the ALB
+aws route53 change-resource-record-sets \
+    --hosted-zone-id Z07747923RSGBESFDLWVX \
+    --change-batch '{
+        "Changes": [
+            {
+                "Action": "CREATE",
+                "ResourceRecordSet": {
+                    "Name": "www.vocabulary-app.com",
+                    "Type": "CNAME",
+                    "TTL": 300,
+                    "ResourceRecords": [
+                        {
+                            "Value": "vocabulary-lb-1646646983.eu-west-3.elb.amazonaws.com"
+                        }
+                    ]
+                }
+            }
+        ]
+    }'
 
 
 
