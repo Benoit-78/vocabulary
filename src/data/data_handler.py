@@ -153,7 +153,7 @@ class DbInterface(ABC):
 
 class DbController(DbInterface):
     """
-    Manage access and transactions.
+    Manage access.
     """
     def __init__(self, host):
         super().__init__(host)
@@ -206,6 +206,7 @@ class DbController(DbInterface):
         return users_list
 
 
+
 class DbDefiner(DbInterface):
     """
     Define database structure.
@@ -218,7 +219,7 @@ class DbDefiner(DbInterface):
     def create_database(self, db_name, root_password, password):
         """Create a database with the given database name"""
         db_controller = DbController(self.host)
-        connection, cursor = self.get_db_cursor(self.user_name, db_name, password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
             cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
@@ -236,6 +237,17 @@ class DbDefiner(DbInterface):
             cursor.close()
             connection.close()
         return result
+
+    def get_user_databases(self, root_password, password):
+        """
+        Get the list of databases for the user.
+        """
+        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        cursor.execute(f"SHOW DATABASES LIKE '{self.user_name}_%';")
+        databases = [db[0] for db in cursor.fetchall()]
+        cursor.close()
+        connection.close()
+        return databases
 
     def get_database_cols(self, db_name, password):
         """Get table columns."""

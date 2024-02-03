@@ -17,7 +17,7 @@ REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
-from src.data.data_handler import DbManipulator, DbController
+from src.data.data_handler import DbController, DbDefiner, DbManipulator 
 
 
 
@@ -83,23 +83,22 @@ class CredChecker():
         if not self.check_input_name(name_to_check):
             logger.warning(f"Input name {name_to_check} unknown.")
             self.flag_incorrect_user_name()
-        logger.success(f"User name {name_to_check} valid.")
 
     def check_password(self, name_to_check, password_to_check):
         """Validate user password."""
         if password_to_check in [None, ""]:
             logger.warning(f"Input password is empty or somewhat sneaky.")
             self.flag_incorrect_user_password(name_to_check, password_to_check)
-        if not self.check_input_password(name_to_check, password_to_check):
-            logger.warning(f"Input password '{password_to_check}' incorrect.")
-            self.flag_incorrect_user_password(name_to_check, password_to_check)
-        logger.success(f"Password valid.")
+        # if not self.check_input_password(name_to_check, password_to_check):
+        #     logger.warning(f"Input password '{password_to_check}' incorrect.")
+        #     self.flag_incorrect_user_password(name_to_check, password_to_check)
+        # logger.success(f"Password valid.")
 
     def check_credentials(self, name_to_check, password_to_check):
         """Validate user credentials."""
         self.check_user_name(name_to_check)
         self.check_password(name_to_check, password_to_check)
-        logger.success(f"Access granted.")
+        logger.success(f"Access granted for {name_to_check}.")
 
 
 
@@ -109,11 +108,7 @@ class Account(ABC):
     - guest
     - user (free version)
     - customer (paid version)
-    - developer
-        o architect
-        o developer
-        o tester
-        o ops
+    - developer : architect, developer, tester and ops
     """
     def __init__(self):
         self.account_types = [
@@ -146,15 +141,17 @@ class UserAccount(Account):
     """
     def __init__(self, user_name, user_password):
         self.user_name = user_name
-        self.user_passsword = user_password
+        self.user_password = user_password
 
-    def create_account(self, type_of_account='user'):
+    def create_account(self):
         """
         Acquire name and password, and store them in the credentials.
         """
+        # Bad path
         account_exists = self.check_if_account_exists()
         if account_exists:
             return 1
+        # Happy path
         db_handler = DbController(host='web_local')
         with open("conf/hum.json", "r") as hum_file:
             hum_dict = json.load(hum_file)
@@ -162,7 +159,7 @@ class UserAccount(Account):
         db_handler.create_user(
             root_password=hum_pwd,
             user_name=self.user_name,
-            user_password=self.user_passsword
+            user_password=self.user_password
         )
         return 0
 
@@ -211,11 +208,41 @@ class UserAccount(Account):
         """
         return None
 
-    def create_database(self):
+    def create_database(self, db_name):
         """
         Add a database to the user's space.
         """
-        return None
+        # Bad path
+        account_exists = self.check_if_database_exists(db_name)
+        if account_exists:
+            return 1
+        # Create database
+        db_handler = DbDefiner('web_local', self.user_name)
+        with open("conf/hum.json", "r") as hum_file:
+            hum_dict = json.load(hum_file)
+        hum_pwd = hum_dict['user']['root']['OK']
+        db_handler.create_database(
+            db_name,
+            hum_pwd,
+            self.user_password
+        )
+        return 0
+
+    def check_if_database_exists(self, db_name):
+        """
+        Check if the user's database already exists.
+        """
+        db_handler = DbDefiner('web_local', self.user_name)
+        with open("conf/hum.json", "r") as hum_file:
+            hum_dict = json.load(hum_file)
+        hum_pwd = hum_dict['user']['root']['OK']
+        db_names = db_handler.get_user_databases(hum_pwd, self.user_password)
+        if db_name in db_names:
+            logger.error(f"Database name {db_name} already exists.")
+            return True
+        else:
+            logger.success(f"Database name {db_name} is available.")
+            return False
 
     def remove_database(self):
         """

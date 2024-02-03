@@ -228,7 +228,8 @@ def user_main_page(
         "user/user_space.html",
         {
             "request": request,
-            "userName": user_name
+            "userName": user_name,
+            "userPassword": user_password
         }
     )
 
@@ -238,7 +239,6 @@ def sign_out(request: Request):
     """
     Deconnect the user and return to the welcome page.
     """
-    global cred_checker
     cred_checker = users.CredChecker()
     return templates.TemplateResponse(
         "welcome.html",
@@ -714,25 +714,73 @@ def end_interro_guest(
 # ==================================================
 #  D A T A B A S E
 # ==================================================
-@app.get("/create-database", response_class=HTMLResponse)
-def user_main_page(request: Request, user_name):
+@app.get("/user-databases", response_class=HTMLResponse)
+def user_databases(
+    request: Request,
+    query: str = Query(None, alias="userName")
+    ):
     """
-    Call the base page of user space.
+    Call the base page of user databases.
     """
-    global cred_checker
-    cred_checker.check_credentials(user_name)
+    # Authenticate user
+    user_name = query.split('?')[0]
+    user_password = query.split('?')[1].split('=')[1]
+    if user_name:
+        cred_checker.check_credentials(user_name, user_password)
+    else:
+        logger.error("User name not found.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User name not found."
+        )
+    # Launch database creation page
     return templates.TemplateResponse(
         "user/create_database.html",
         {
             "request": request,
-            "userName": user_name
+            "userName": user_name,
+            "userPassword": user_password
         }
     )
 
 
-@app.get("/database/{user_name}", response_class=HTMLResponse)
+@app.post("/create-database")
+async def create_database(data: dict):
+    """Save the word in the database."""
+    logger.debug(f"Data: {data}")
+    # Authenticate user
+    user_name = data['usr']
+    user_password = data['pwd']
+    cred_checker = users.CredChecker()
+    cred_checker.check_credentials(user_name, user_password)
+    # Create database
+    db_name = data['db_name']
+    user_account = users.UserAccount(user_name, user_password)
+    result = user_account.create_database(db_name)
+    logger.debug(f"Result: {result}")
+    if result == 1:
+        return JSONResponse(
+            content=
+            {
+                "message": "Database name not available.",
+                "databaseName": db_name
+            }
+        )
+    elif result == 0:
+        return JSONResponse(
+            content=
+            {
+                "message": "Database created successfully.",
+                "userName": user_account.user_name,
+                "userPassword": user_account.user_password
+            }
+        )
+
+
+@app.get("/database", response_class=HTMLResponse)
 def data_page(request: Request, user_name):
     """Base page for data input by the user."""
+    cred_checker = users.CredChecker()
     cred_checker.check_credentials(user_name)
     title = "Here you can add words to your database."
     return templates.TemplateResponse(

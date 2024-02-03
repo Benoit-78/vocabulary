@@ -57,7 +57,49 @@ function signIn() {
 }
 
 
-function goToUserSpace(userName) {
-    var encodedUserName = encodeURIComponent(userName)
-    window.location.href = "/user-space/" + encodedUserName;
+function goToUserSpace(userName, userPassword) {
+    window.location.href = `/user-space?userName=${userName}?userPassword=${userPassword}`;
 }
+
+function goToUserDatabases(userName, userPassword) {
+    window.location.href = `/user-databases?userName=${userName}?userPassword=${userPassword}`;
+}
+
+
+function createDatabase(userName, userPassword) {
+    var databaseName = document.getElementById("databaseName").value;
+    fetch("/create-database", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            usr: userName,
+            pwd: userPassword,
+            db_name: databaseName
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.message === "Database created successfully.") {
+            window.location.href = `/interro-settings/${userName}`;
+        } else {
+            // Redirect to sign-in route
+            window.location.href = `/user-space?userName=${userName}?userPassword=${userPassword}`;
+            console.error("Invalid credentials");
+        }
+    })
+    .catch(error => {
+        console.error("", error);
+    });
+}
+
+
+var databaseNames = ["Database1", "Database2", "Database3"];
+// Get the select element
+var selectMenu = document.getElementById("menu");
+// Dynamically add options based on the database names
+databaseNames.forEach(function(name) {
+    var option = document.createElement("option");
+    option.value = name;
+    option.text = name;
+    selectMenu.add(option);
+});

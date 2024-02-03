@@ -5,6 +5,8 @@
     <title>Vocabulary</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/root.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
 </head>
 
 <body>
@@ -12,7 +14,7 @@
         <h1>Welcome {{ userName }}!</h1>
         <div class="button-list">
             <button onclick="window.location.href='/interro-settings/{{ userName }}'">Interroooo !!!</button>
-            <button onclick="window.location.href='/database/{{ userName }}'">Add a word</button>
+            <button onclick="goToUserDatabases(`{{ userName }}`, `{{ userPassword }}`)">Create a database</button>
             <button onclick="window.location.href='/dashboard/{{ userName }}'">Dashboard</button>
             <button onclick="window.location.href='/user-settings/{{ userName }}'">Settings</button>
             <button onclick="window.location.href='/sign-out/{{ userName }}'">Sign-out</button>

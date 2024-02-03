@@ -5,6 +5,7 @@
         <title>Add a word</title>
         <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
         <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
         <script type="text/javascript" src="/static/scripts/main.js"></script>
         <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
     </head>
@@ -13,22 +14,20 @@
     <div class="container">
         <div class="row">
             <div>
-                <label for="input1">User name</label>
-                <input type="text" id="content_box1" name="content_box1">
+                <label for="input2">Choose an existing database</label>
+                <select id="menu">
+                    <!-- Options will be dynamically added here using JavaScript -->
+                </select>
             </div>
-        </div>
-        <div class="row"></div>
-            <div>
-                <label for="input2">Password</label>
-                <input type="text" id="content_box2" name="content_box2">
-            </div>
-        </div>
+
         <div class="row">
-            <button class="button" onclick="signIn(`{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">Sign in</button>
+            <button class="button" onclick="chooseDatabase(`{{ selected_database|safe }}`)">Choose database</button>
         </div>
+
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace()">Quit</button>
         </div>
     </div>
 </body>
+
 </html>
