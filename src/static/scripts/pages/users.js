@@ -80,11 +80,12 @@ function createDatabase(userName, userPassword) {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "Database created successfully.") {
-            window.location.href = `/interro-settings/${userName}`;
+            window.location.href = `/fill_database?userName=${userName}?userPassword=${userPassword}?databaseName=${databaseName}`;
+        } else if (data && data.message === "Database name not available.") {
+            window.location.href = `/user-databases?userName=${userName}?userPassword=${userPassword}`;
+            console.error("Database name not available");
         } else {
-            // Redirect to sign-in route
-            window.location.href = `/user-space?userName=${userName}?userPassword=${userPassword}`;
-            console.error("Invalid credentials");
+            console.error("Error with the database creation");
         }
     })
     .catch(error => {

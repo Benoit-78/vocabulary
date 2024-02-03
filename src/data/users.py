@@ -221,12 +221,15 @@ class UserAccount(Account):
         with open("conf/hum.json", "r") as hum_file:
             hum_dict = json.load(hum_file)
         hum_pwd = hum_dict['user']['root']['OK']
-        db_handler.create_database(
+        db_created = db_handler.create_database(
             db_name,
             hum_pwd,
             self.user_password
         )
-        return 0
+        if db_created:
+            return 0
+        else:
+            return 1
 
     def check_if_database_exists(self, db_name):
         """
@@ -250,11 +253,21 @@ class UserAccount(Account):
         """
         return None
 
-    def insert_word(self):
+    def insert_word(self, db_name, foreign, native):
         """
         Add a couple of words to the user's database.
         """
-        return None
+        db_handler = DbManipulator(
+            'web_local',    
+            self.user_name,
+            db_name,
+            'version',
+        )
+        result = db_handler.insert_word(
+            self.user_password,
+            [foreign, native]
+        )
+        return 0
 
     def remove_word(self):
         """

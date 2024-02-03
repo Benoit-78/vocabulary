@@ -177,7 +177,7 @@ class DbController(DbInterface):
 
     def grant_all_privileges(self, root_password, user_name, db_name):
         """Grant privileges to the user on the given database"""
-        connection, cursor = self.get_db_cursor('root', 'root', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
             cursor.execute(f"GRANT ALL PRIVILEGES ON {user_name}_{db_name}.* TO '{user_name}'@'%';")
@@ -217,18 +217,23 @@ class DbDefiner(DbInterface):
         self.db_name = None
 
     def create_database(self, db_name, root_password, password):
-        """Create a database with the given database name"""
+        """
+        Create a database with the given database name
+        """
         db_controller = DbController(self.host)
         connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
             cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
             connection.commit()
-            logger.success(f"Database '{self.user_name}_{db_name}' created.")
             db_controller.grant_all_privileges(root_password, self.user_name, db_name)
             logger.success(
                 f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'."
             )
+            tables_created = self.create_seven_tables(db_name, root_password, password)
+            if not tables_created:
+                logger.error(f"Error with the creation of tables for {db_name}.")
+                result = False
             result = True
         except mariadb.Error as err:
             logger.error(err)
@@ -248,6 +253,45 @@ class DbDefiner(DbInterface):
         cursor.close()
         connection.close()
         return databases
+
+    def create_seven_tables(self, db_name, root_password, password):
+        """
+        Create the seven tables necessary to the app.
+        """
+        sql_db_name = f"{self.user_name}_{db_name}"
+        connection, cursor = self.get_db_cursor(self.user_name, sql_db_name, password)
+        try:
+            cursor.execute(f"USE {self.user_name}_{db_name};")
+            cursor.execute(
+                "CREATE TABLE version_voc (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+            )
+            cursor.execute(
+                "CREATE TABLE version_perf (date DATE, score INT, taux INT);"
+            )
+            cursor.execute(
+                "CREATE TABLE version_words_count (date DATE, nb INT);"
+            )
+            cursor.execute(
+                "CREATE TABLE theme_voc (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+            )
+            cursor.execute(
+                "CREATE TABLE theme_perf (date DATE, score INT, taux INT);"
+            )
+            cursor.execute(
+                "CREATE TABLE theme_words_count (date DATE, nb INT);"
+            )
+            cursor.execute(
+                "CREATE TABLE archives (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+            )
+            connection.commit()
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
 
     def get_database_cols(self, db_name, password):
         """Get table columns."""
@@ -362,22 +406,23 @@ class DbManipulator(DbInterface):
 
     def insert_word(self, password, row: list):
         """Add a word to the table"""
+        sql_db_name = f"{self.user_name}_{self.db_name}"
+        connection, cursor = self.get_db_cursor(self.user_name, sql_db_name, password)
         # Create request string
         today_date = datetime.today().date()
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
         native = row[1]
-        request_1 = f"INSERT INTO {words_table_name} (english, français, creation_date, nb, score, taux)"
+        request_1 = f"INSERT INTO {sql_db_name}.{words_table_name} (english, français, creation_date, nb, score, taux)"
         request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2])
+        logger.debug(sql_request)
         # Execute request
-        connection, cursor = self.get_db_cursor(
-            self.user_name, self.db_name, password
-        )
         cursor.execute(sql_request)
+        logger.debug('Word inserted.')
         cursor.close()
         connection.close()
-        return True
+        return 0
 
     def read_word(self, password, english: str):
         """Read the given word"""

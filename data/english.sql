@@ -74,31 +74,6 @@ CREATE TABLE IF NOT EXISTS archive (
     français CHAR(255)
 );
 
----------------------------
---  N E W   T A B L E S  --
----------------------------
--- Intérêt : id_test unique
-CREATE TABLE IF NOT EXISTS tests (
-	id_test INT AUTO_INCREMENT PRIMARY KEY,
-	tests_flow TINYTEXT, -- version -> theme | theme -> version
-	test_type TINYTEXT, -- version | theme
-    test_date DATE,
-    test_perf TINYINT,
-	words_count SMALLINT);
-
-
--- Intérêt : id_word unique
-CREATE TABLE IF NOT EXISTS voc (
-	id_word INT AUTO_INCREMENT PRIMARY KEY,
-	tests_flow TINYTEXT, -- version -> theme | theme -> version
-	test_type TINYTEXT, -- version | theme
-    english CHAR,
-    français CHAR,
-	creation_date DATE,
-	nb TINYINT,
-	score TINYINT,
-	taux TINYINT);
-
 
 
 ------------------------------------------

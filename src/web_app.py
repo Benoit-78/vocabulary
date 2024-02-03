@@ -31,10 +31,7 @@ app = FastAPI(
     title="vocabulary",
     docs_url="/docs",
     redoc_url=None,
-    servers=[{
-        "url": "https://vocabulary-app.com"
-        # "url": "https://www.vocabulary-app.com"
-    }],
+    servers=[{"url": "https://www.vocabulary-app.com"}],
 )
 GUEST_USER_NAME = 'guest'
 GUEST_DB_NAME = 'vocabulary'
@@ -251,20 +248,6 @@ def sign_out(request: Request):
 # ==================================================
 #  I N T E R R O   U S E R
 # ==================================================
-@app.get("/choose-database/{user_name}", response_class=HTMLResponse)
-def  choose_database(request: Request, user_name):
-    """
-    Ask the user to choose a database on which he will pass an interroooooo!!!
-    """
-    return templates.TemplateResponse(
-        "user/choose_database.html",
-        {
-            "message": "Choose a database, right now.",
-            "userName": user_name
-        }
-    )
-
-
 @app.post("/check-connection-to-database/{user_name}/{db_name}")
 async def check_db_connection(settings: dict, user_name, db_name):
     """
@@ -280,15 +263,30 @@ async def check_db_connection(settings: dict, user_name, db_name):
     )
 
 
-@app.get("/interro-settings/{user_name}", response_class=HTMLResponse)
-def interro_settings(request: Request, user_name):
+@app.get("/interro-settings", response_class=HTMLResponse)
+def interro_settings(
+    request: Request,
+    query: str = Query(None, alias="userName")
+    ):
     """Call the page that gets the user settings for one interro."""
-    cred_checker.check_credentials(user_name)
+    # Authenticate user
+    user_name = query.split('?')[0]
+    user_password = query.split('?')[1].split('=')[1]
+    if user_name:
+        cred_checker.check_credentials(user_name, user_password)
+    else:
+        logger.error("User name not found.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User name not found."
+        )
+    # Load settings page
     return templates.TemplateResponse(
         "user/interro_settings.html",
         {
             "request": request,
-            "userName": user_name
+            "userName": user_name,
+            "userPassword": user_password
         }
     )
 
@@ -735,7 +733,7 @@ def user_databases(
         )
     # Launch database creation page
     return templates.TemplateResponse(
-        "user/create_database.html",
+        "user/databases.html",
         {
             "request": request,
             "userName": user_name,
@@ -747,7 +745,6 @@ def user_databases(
 @app.post("/create-database")
 async def create_database(data: dict):
     """Save the word in the database."""
-    logger.debug(f"Data: {data}")
     # Authenticate user
     user_name = data['usr']
     user_password = data['pwd']
@@ -757,7 +754,6 @@ async def create_database(data: dict):
     db_name = data['db_name']
     user_account = users.UserAccount(user_name, user_password)
     result = user_account.create_database(db_name)
-    logger.debug(f"Result: {result}")
     if result == 1:
         return JSONResponse(
             content=
@@ -777,44 +773,56 @@ async def create_database(data: dict):
         )
 
 
-@app.get("/database", response_class=HTMLResponse)
-def data_page(request: Request, user_name):
-    """Base page for data input by the user."""
-    cred_checker = users.CredChecker()
-    cred_checker.check_credentials(user_name)
+@app.get("/fill_database", response_class=HTMLResponse)
+def data_page(
+    request: Request,
+    query: str = Query(None, alias="userName")
+    ):
+    """
+    Base page for data input by the user.
+    """
+    # Authenticate user
+    user_name = query.split('?')[0]
+    user_password = query.split('?')[1].split('=')[1]
+    db_name = query.split('?')[2].split('=')[1]
+    if user_name:
+        cred_checker.check_credentials(user_name, user_password)
+    else:
+        logger.error("User name not found.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User name not found."
+        )
+    # Load database page
     title = "Here you can add words to your database."
     return templates.TemplateResponse(
-        "user/database_add_word.html",
+        "user/fill_database.html",
         {
             "request": request,
             "title": title,
-            "userName": user_name
+            "userName": user_name,
+            "userPassword": user_password,
+            "databaseName": db_name
         }
     )
 
 
-@app.post("/create-word/{user_name}")
-async def create_word(data: dict, user_name):
+@app.post("/create-word")
+async def create_word(data: dict):
     """Save the word in the database."""
-    cred_checker.check_credentials(user_name)
-    db_handler = data_handler.DBManipulator(
-        'web_local',
-        user_name,
-        'english'
-        'version',
-    )
-    english = data['english']
-    french = data['french']
-    if db_handler.insert_word([english, french]) is True:
-        message = "Word stored successfully."
-    else:
-        message = "Error with the storing of the word."
-    return JSONResponse(
-        content=
-        {
-            "message": message
-        }
-    )
+    # Authenticate user
+    user_name = data['usr']
+    user_password = data['pwd']
+    cred_checker = users.CredChecker()
+    cred_checker.check_credentials(user_name, user_password)
+    # Add the word
+    db_name = data['db_name']
+    user_account = users.UserAccount(user_name, user_password)
+    result = user_account.insert_word(db_name, data['foreign'], data['native'])
+    if result == 1:
+        return JSONResponse(content={"message": "Error with the word creation."})
+    elif result == 0:
+        return JSONResponse(content={"message": "Word created successfully."})
 
 
 

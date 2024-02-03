@@ -11,7 +11,11 @@
     </head>
 
 <body>
+
     <div class="container">
+
+        <!-- ------------------------------------------------- -->
+
         <div class="row">
             <div>
                 <label for="input2">Choose an existing database</label>
@@ -24,10 +28,33 @@
             <button class="button" onclick="chooseDatabase(`{{ selected_database|safe }}`)">Choose database</button>
         </div>
 
+        <!-- ------------------------------------------------- -->
+
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace()">Quit</button>
+            <div>
+                <label for="input1">Create a new database</label>
+                <input type="text" id="databaseName" name="databaseName">
+            </div>
         </div>
+
+        <div class="row">
+            <button class="button" onclick="createDatabase(`{{ userName }}`, `{{ userPassword }}`)">Create database</button>
+        </div>
+
+        <!-- ------------------------------------------------- -->
+
+        <div class="row">
+            <div>
+                <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`, `{{ userPassword }}`)">Quit</button>
+        </div>
+
     </div>
+
 </body>
 
 </html>
