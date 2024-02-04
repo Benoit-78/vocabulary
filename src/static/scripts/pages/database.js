@@ -1,25 +1,28 @@
 
 
-function createWord(userName) {
-    var english = document.getElementById("input1").value;
-    var french = document.getElementById("input2").value;
+function createWord(userName, userPassword, databaseName) {
+    var foreign = document.getElementById("input1").value;
+    var native = document.getElementById("input2").value;
     fetch("/create-word", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-            english: english,
-            french: french
+            usr: userName,
+            pwd: userPassword,
+            db_name: databaseName,
+            foreign: foreign,
+            native: native
         }),
     })
     .then(answer => answer.json())
-    .then(proposeInput(userName))
+    .then(data => {
+        if (data && data.message === "Word created successfully.") {
+            window.location.href = `/fill_database?userName=${userName}?userPassword=${userPassword}?databaseName=${databaseName}`;
+        } else {
+            console.error("Error with the word creation.");
+        }
+    })
     .catch(error => {
         console.error("Error sending user answer:", error);
     });
-}
-
-
-function proposeInput(userName) {
-    var encodedUserName = encodeURIComponent(userName)
-    window.location.href = "/database/" + encodedUserName;
 }

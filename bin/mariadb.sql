@@ -2,9 +2,9 @@
 -----------------------
 -- BASH INSTRUCTIONS --
 -----------------------
--- cd ~/vocabulary/data
--- sudo mariadb
-
+cd ~/vocabulary/data
+sudo mariadb
+sudo systemctl restart mariadb
 
 
 ---------------------------
@@ -13,38 +13,29 @@
 -- Manage access and transactions
 -- Ex: GRANT, REVOKE, COMMIT, ROLLBACK
 
-SELECT host, user, password FROM mysql.user;
-
+-- root user
 CREATE USER 'root'@'localhost' IDENTIFIED BY '<db_password>';
 
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'IBM-vocabulary7';
+ALTER USER 'usr'@'%' IDENTIFIED BY 'pwd';
 
-SHOW GRANTS FOR 'root'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY 'IBM-vocabulary7' WITH GRANT OPTION;
 
+
+-- guests
 GRANT ALL PRIVILEGES ON vocabulary.* TO 'guest'@'localhost';
 
 REVOKE ALL PRIVILEGES ON `vocabulary`.* FROM `guest`@`localhost`;
 
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO 'benoit'@'localhost';
 
-SHOW ENGINES;
+-- users
+GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO '<user-name>'@'localhost';
 
-SHOW ERRORS;
+DROP USER 'usr'@'%';
+DROP USER 'usr'@'localhost';
 
--- Hosts
-SELECT host, statements, statement_avg_latency, table_scans, file_ios, file_io_latency, total_connections, unique_users, total_memory_allocated
-FROM sys.host_summary;
+-- Very very useful
+FLUSH PRIVILEGES;
 
--- Users
-SELECT * FROM sys.memory_by_user_by_current_bytes;
-
-SELECT user, statements, statement_avg_latency, table_scans, file_ios, file_io_latency, total_connections, unique_hosts, total_memory_allocated
-FROM sys.user_summary;
-
--- Queries
-SELECT query, db, exec_count, total_latency, last_seen FROM sys.statements_with_sorting
-ORDER BY exec_count DESC
-LIMIT 10;
 
 
 ------------------------------
@@ -58,8 +49,6 @@ CREATE DATABASE vocabulary;
 
 DROP DATABASE <database_name>;
 
-SHOW DATABASES;
-
 -- Tables
 CREATE TABLE IF NOT EXISTS theme_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
@@ -68,12 +57,6 @@ CREATE TABLE IF NOT EXISTS theme_perf (
 
 RENAME TABLE zhongwen.theme_perf TO benoit_zhongwen.theme_perf;
 
-SHOW TABLES;
-
-DESCRIBE version_voc;
-
-SHOW COLUMNS FROM version_voc;
-
 
 
 --------------------------------
@@ -81,9 +64,6 @@ SHOW COLUMNS FROM version_voc;
 --------------------------------
 -- Working with data
 -- Ex: SELECT, INSERT, UPDATE, DELETE
-
--- Read
-SELECT * FROM column_1, column_2;
 
 -- Write
 INSERT INTO `theme_perf` (`id_test`, `test_date`, `test`) VALUES (2, '2022-10-29', 83);
@@ -96,9 +76,4 @@ LOAD DATA INFILE '/path/data.txt' INTO TABLE your_table
 
 
 
--------------------------------
--- MariaDB-specific commands --
-------------------------------
-USE english;
 
-SOURCE english.sql;

@@ -9,7 +9,7 @@ aws configure
 #  D A T A   &   S O U R C E   C O D E
 # ========================================
 aws s3 sync \
-    /home/benoit/Documents/vocabulary \
+    /home/benoit/projects/vocabulary \
     s3://vocabulary-benito/vocabulary \
     --exclude ".pytest_cache/*" \
     --exclude ".vscode/*" \
@@ -51,15 +51,17 @@ aws s3 sync \
     --delete \
     --debug
 
-aws s3 cp \
-    /home/benoit/Documents/vocabulary/src/web_app.py \
-    s3://vocabulary-benito/vocabulary/src/web_app.py
+# local -> S3
+aws s3 cp -r \
+    /home/benoit/projects/vocabulary/ \
+    s3://vocabulary-benito/vocabulary/
 
+# S3 -> EC2
 aws s3 cp \
     s3://vocabulary-benito/vocabulary/src/web_app.py \
     /home/ubuntu/vocabulary/src/web_app.py
 
-# Depuis Fedora à l'EC2
+# local -> EC2
 scp -r -i \
     conf/voc_ssh_key_1.pem \
     /home/benoit/projects/vocabulary/src/ \
@@ -67,14 +69,17 @@ scp -r -i \
 
 scp -r -i \
     conf/voc_ssh_key_1.pem \
-    /home/benoit/projects/vocabulary/conf/interro.json \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/
-
+    /home/benoit/projects/vocabulary/conf/data.json \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/ && cl
 
 
 # =======================
 #  C O N N E C T
 # =======================
+aws ec2 start-instances \
+    --instance-ids i-03fae8b09bdb0587f \
+    --region eu-west-3
+
 # Use '-' in the IP address, not '.'
 ssh -i  \
     conf/voc_ssh_key_1.pem \
@@ -114,3 +119,12 @@ uvicorn src.web_app:app \
 #  T R O U B L E S H O O T I N G
 # ==============================================
 pkill uvicorn
+
+
+
+# ==============================================
+#  E N D   O F   L I F E
+# ==============================================
+aws ec2 stop-instances \
+    --instance-ids i-03fae8b09bdb0587f \
+    --region eu-west-3

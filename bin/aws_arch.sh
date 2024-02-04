@@ -61,23 +61,53 @@ aws s3api put-bucket-policy \
 # ===========================================
 
 # ----- Security groups -----
+# ALB
+aws ec2 create-security-group \
+    --group-name YourALBSecurityGroup \
+    --description "ALB Security Group" \
+    --vpc-id YourVpcId
+
+grep GroupId
+
+aws ec2 describe-security-groups --group-ids <alb-sg-id>
+
+aws ec2 authorize-security-group-ingress \
+    --group-id <alb-sg-id> \
+    --protocol tcp \
+    --port 80 \
+    --cidr 0.0.0.0/0
+
+aws ec2 authorize-security-group-ingress \
+    --group-id <alb-sg-id> \
+    --protocol tcp \
+    --port 443 \
+    --cidr 0.0.0.0/0
+
+# Instances
 aws ec2 create-security-group \
     --group-name vocabulary-sg \
     --description "Allows users to access the application" \
     --vpc-id vpc-0011e2cd73034beb9
 
-grep "GroupId"
+aws ec2 authorize-security-group-ingress \
+    --group-id <inst-sg-id> \
+    --protocol tcp \
+    --port 22 \
+    --cidr <IP-address>/32
 
-aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 22 --cidr 88.161.167.12/32
-aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 8080 --cidr 0.0.0.0/0
-aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 80 --cidr 0.0.0.0/0
-aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 443 --cidr 0.0.0.0/0
-aws ec2 authorize-security-group-ingress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
-aws ec2 authorize-security-group-egress --group-id sg-08ebad99d1b1b98b6 --protocol tcp --port 3306 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress \
+    --group-id <inst-sg-id> \
+    --protocol tcp \
+    --port 80 \
+    --source-security-group <alb-sg-id>
+
+aws ec2 authorize-security-group-ingress \
+    --group-id <inst-sg-id> \
+    --protocol tcp \
+    --port 443 \
+    --source-security-group <alb-sg-id>
 
 
-aws ec2 describe-security-groups \
-    --group-ids sg-08ebad99d1b1b98b6
 
 # ----- Key pair -----
 aws ec2 create-key-pair \
@@ -198,6 +228,11 @@ aws elbv2 create-target-group \
     --port 80 \
     --vpc-id vpc-0a7070d446d46681b \
     --output json
+
+# Register Targets (Instances) with the Target Group:
+aws elbv2 register-targets \
+    --target-group-arn YourTargetGroupArn \
+    --targets Id=i-xxxxxxxx Id=i-yyyyyyyy
 
 # Create an HTTP listener
 aws elbv2 create-listener \
