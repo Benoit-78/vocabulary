@@ -20,10 +20,9 @@ REPO_DIR = os.getcwd().split('src')[0]
 sys.path.append(REPO_DIR)
 from src import utils
 
-HOSTS = ['cli', 'web_local', 'container']
-
 with open(REPO_DIR + '/conf/data.json', 'rb') as param_file:
     PARAMS = json.load(param_file)
+HOSTS = PARAMS['host'].keys()
 
 
 
@@ -155,17 +154,16 @@ class DbController(DbInterface):
     """
     Manage access.
     """
-    def __init__(self, host):
-        super().__init__(host)
-
     def create_user(self, root_password, user_name, user_password):
-        """Create user"""
+        """
+        Create user.
+        """
         connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
-            cursor.execute(f"CREATE USER '{user_name}'@'%' IDENTIFIED BY '{user_password}';")
+            cursor.execute(f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';")
             connection.commit()
-            logger.success(f"User '{user_name}' created successfully.")
+            logger.success(f"User '{user_name}' created successfully on {self.host}.")
             result = True
         except mariadb.Error as err:
             logger.error(err)
@@ -175,12 +173,16 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def grant_all_privileges(self, root_password, user_name, db_name):
-        """Grant privileges to the user on the given database"""
+    def grant_privileges(self, root_password, user_name, db_name):
+        """
+        Grant privileges to the user on the given database.
+        """
         connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
-            cursor.execute(f"GRANT ALL PRIVILEGES ON {user_name}_{db_name}.* TO '{user_name}'@'%';")
+            request_1 = "GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON "
+            request_2 = f"{user_name}_{db_name}.* TO '{user_name}'@'{self.host}';"
+            cursor.execute(request_1 + request_2)
             connection.commit()
             result = True
         except mariadb.Error as err:
@@ -192,12 +194,19 @@ class DbController(DbInterface):
         return result
 
     def get_users_list(self, root_password):
-        """Get list of users"""
+        """
+        Get list of users.
+        Keep in mind that the user is first created on '%' and then on 'localhost'.
+        """
         connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         users_list = []
         try:
-            cursor.execute("SELECT User FROM mysql.user;")
-            users_list = [user[0] for user in cursor.fetchall()]
+            cursor.execute("SELECT User, Host FROM mysql.user;")
+            result = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            df = pd.DataFrame(result, columns=columns)
+            df = df[df['Host'] == self.host]
+            users_list = df['User'].tolist()
         except mariadb.Error as err:
             logger.error(err)
         finally:
@@ -226,7 +235,7 @@ class DbDefiner(DbInterface):
         try:
             cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
             connection.commit()
-            db_controller.grant_all_privileges(root_password, self.user_name, db_name)
+            db_controller.grant_privileges(root_password, self.user_name, db_name)
             logger.success(
                 f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'."
             )
@@ -405,20 +414,22 @@ class DbManipulator(DbInterface):
         return output_table
 
     def insert_word(self, password, row: list):
-        """Add a word to the table"""
+        """
+        Add a word to the table.
+        """
         sql_db_name = f"{self.user_name}_{self.db_name}"
         connection, cursor = self.get_db_cursor(self.user_name, sql_db_name, password)
         # Create request string
-        today_date = datetime.today().date()
+        today_str = str(datetime.today().date())
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
         native = row[1]
-        request_1 = f"INSERT INTO {sql_db_name}.{words_table_name} (english, français, creation_date, nb, score, taux)"
-        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
-        sql_request = " ".join([request_1, request_2])
-        logger.debug(sql_request)
+        request_1 = f"INSERT INTO {sql_db_name}.{words_table_name} (english, français, creation_date, nb, score, taux) "
+        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
+        logger.debug(request_1 + request_2)
         # Execute request
-        cursor.execute(sql_request)
+        cursor.execute(request_1 + request_2)
+        connection.commit()
         logger.debug('Word inserted.')
         cursor.close()
         connection.close()
@@ -435,6 +446,7 @@ class DbManipulator(DbInterface):
         # Execute request
         connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
         english, native, score = cursor.execute(sql_request)[0]
+        connection.commit()
         cursor.close()
         connection.close()
         return english, native, score
@@ -450,6 +462,7 @@ class DbManipulator(DbInterface):
         # Execute request
         connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
         cursor.execute(sql_request)
+        connection.commit()
         cursor.close()
         connection.close()
         return True
@@ -464,6 +477,7 @@ class DbManipulator(DbInterface):
         # Execute request
         connection, cursor = self.get_db_cursor(self.user_name, self.db_name, password)
         cursor.execute(sql_request)
+        connection.commit()
         cursor.close()
         connection.close()
         return True

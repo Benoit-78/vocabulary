@@ -30,6 +30,8 @@ REVOKE ALL PRIVILEGES ON `vocabulary`.* FROM `guest`@`localhost`;
 -- users
 GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO '<user-name>'@'localhost';
 
+DROP USER 'usr'@'%';
+DROP USER 'usr'@'localhost';
 
 -- Very very useful
 FLUSH PRIVILEGES;

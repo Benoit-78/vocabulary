@@ -9,7 +9,7 @@ aws configure
 #  D A T A   &   S O U R C E   C O D E
 # ========================================
 aws s3 sync \
-    /home/benoit/Documents/vocabulary \
+    /home/benoit/projects/vocabulary \
     s3://vocabulary-benito/vocabulary \
     --exclude ".pytest_cache/*" \
     --exclude ".vscode/*" \
@@ -52,9 +52,9 @@ aws s3 sync \
     --debug
 
 # local -> S3
-aws s3 cp \
-    /home/benoit/Documents/vocabulary/src/web_app.py \
-    s3://vocabulary-benito/vocabulary/src/web_app.py
+aws s3 cp -r \
+    /home/benoit/projects/vocabulary/ \
+    s3://vocabulary-benito/vocabulary/
 
 # S3 -> EC2
 aws s3 cp \
@@ -67,6 +67,10 @@ scp -r -i \
     /home/benoit/projects/vocabulary/src/ \
     ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/ && cl
 
+scp -r -i \
+    conf/voc_ssh_key_1.pem \
+    /home/benoit/projects/vocabulary/conf/data.json \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/ && cl
 
 
 # =======================

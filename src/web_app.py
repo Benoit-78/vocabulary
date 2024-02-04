@@ -162,9 +162,7 @@ async def create_account(request: Request, creds: dict):
     """
     # A lot of things to do
     user_account = users.UserAccount(creds['input_name'], creds['input_password'])
-    logger.debug(f"User account: {user_account}")
     result = user_account.create_account()
-    logger.debug(f"Result: {result}")
     if result == 1:
         return JSONResponse(
             content=
@@ -253,7 +251,7 @@ async def check_db_connection(settings: dict, user_name, db_name):
     """
     Acquire the database chosen by the user.
     """
-    db_handler = data_handler.DbDefiner('web_local', user_name)
+    db_handler = data_handler.DbDefiner('localhost', user_name)
     connection, cursor = db_handler.get_db_cursor(db_name)
     return JSONResponse(
         content=
@@ -318,7 +316,7 @@ async def save_interro_settings(settings: dict, user_name, db_name):
 def load_test(user_name, db_name, test_type, test_length, password):
     """Load the interroooo!"""
     db_handler = data_handler.DbManipulator(
-        host='web_local',
+        host='localhost',
         user_name=user_name,
         db_name=db_name,
         test_type=test_type,

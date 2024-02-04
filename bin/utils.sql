@@ -49,9 +49,6 @@ SHOW COLUMNS FROM version_voc;
 -- Working with data
 -- Ex: SELECT, INSERT, UPDATE, DELETE
 
--- Read
-SELECT * FROM column_1, column_2;
-
 
 
 -------------------------------
@@ -60,3 +57,5 @@ SELECT * FROM column_1, column_2;
 USE english;
 
 SOURCE english.sql;
+
+system clear;

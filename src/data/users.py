@@ -27,7 +27,7 @@ class CredChecker():
         self.name = ""
         self.password = ""
         self.db_controller = DbController(
-            host='web_local'
+            host='localhost'
         )
 
     def check_input_name(self, name_to_check):
@@ -147,35 +147,36 @@ class UserAccount(Account):
         """
         Acquire name and password, and store them in the credentials.
         """
-        # Bad path
-        account_exists = self.check_if_account_exists()
-        if account_exists:
-            return 1
-        # Happy path
-        db_handler = DbController(host='web_local')
+        # Prepare
         with open("conf/hum.json", "r") as hum_file:
             hum_dict = json.load(hum_file)
         hum_pwd = hum_dict['user']['root']['OK']
-        db_handler.create_user(
-            root_password=hum_pwd,
-            user_name=self.user_name,
-            user_password=self.user_password
-        )
+        # Create user on localhost
+        for host in ['localhost']:  # '%' has been removed from the list
+            account_exists = self.check_if_account_exists(host)
+            if account_exists:
+                return 1
+            db_controller = DbController(host=host)
+            db_controller.create_user(
+                root_password=hum_pwd,
+                user_name=self.user_name,
+                user_password=self.user_password
+            )
         return 0
 
-    def check_if_account_exists(self):
-        db_handler = DbController(host='web_local')
+    def check_if_account_exists(self, host):
+        db_controller = DbController(host=host)
         with open("conf/hum.json", "r") as hum_file:
             hum_dict = json.load(hum_file)
         hum_pwd = hum_dict['user']['root']['OK']
-        users_list = db_handler.get_users_list(
+        users_list = db_controller.get_users_list(
             hum_pwd
         )
         if self.user_name in users_list:
-            logger.error(f"User name {self.user_name} already exists.")
+            logger.error(f"User name '{self.user_name}' already exists.")
             return True
         else:
-            logger.success(f"User name {self.user_name} is available.")
+            logger.success(f"User name '{self.user_name}' is available.")
             return False
 
     def delete(self):
@@ -217,57 +218,71 @@ class UserAccount(Account):
         if account_exists:
             return 1
         # Create database
-        db_handler = DbDefiner('web_local', self.user_name)
         with open("conf/hum.json", "r") as hum_file:
             hum_dict = json.load(hum_file)
         hum_pwd = hum_dict['user']['root']['OK']
-        db_created = db_handler.create_database(
-            db_name,
-            hum_pwd,
-            self.user_password
-        )
-        if db_created:
-            return 0
-        else:
-            return 1
+        for host in ['localhost']:  # '%' has been removed from the list
+            db_definer = DbDefiner(host, self.user_name)
+            db_created = db_definer.create_database(
+                db_name,
+                hum_pwd,
+                self.user_password
+            )
+            if db_created:
+                return 0
+            else:
+                return 1
 
     def check_if_database_exists(self, db_name):
         """
         Check if the user's database already exists.
         """
-        db_handler = DbDefiner('web_local', self.user_name)
         with open("conf/hum.json", "r") as hum_file:
             hum_dict = json.load(hum_file)
         hum_pwd = hum_dict['user']['root']['OK']
-        db_names = db_handler.get_user_databases(hum_pwd, self.user_password)
-        if db_name in db_names:
-            logger.error(f"Database name {db_name} already exists.")
-            return True
-        else:
-            logger.success(f"Database name {db_name} is available.")
-            return False
+        for host in ['localhost']:  # '%' has been removed from the list
+            db_definer = DbDefiner('localhost', self.user_name)
+            db_names = db_definer.get_user_databases(hum_pwd, self.user_password)
+            if db_name in db_names:
+                logger.error(f"Database name {db_name} already exists.")
+                return True
+            else:
+                logger.success(f"Database name {db_name} is available.")
+                return False
+
+    def rename_database(self, old_name, new_name):
+        """
+        Change the name of the user's database.
+        """
+        # Copy the database
+        # Transfer the privileges to the new database
+        # Remove the old database
+        return None
 
     def remove_database(self):
         """
         Remove a database from the user's space.
         """
+        # Remove database
+        # Remove privileges of the user on the database (they're not removed automatically)
         return None
 
     def insert_word(self, db_name, foreign, native):
         """
         Add a couple of words to the user's database.
         """
-        db_handler = DbManipulator(
-            'web_local',    
-            self.user_name,
-            db_name,
-            'version',
-        )
-        result = db_handler.insert_word(
-            self.user_password,
-            [foreign, native]
-        )
-        return 0
+        for host in ['localhost']:  # '%' has been removed from the list
+            db_manipulator = DbManipulator(
+                'localhost',    
+                self.user_name,
+                db_name,
+                'version',
+            )
+            result = db_manipulator.insert_word(
+                self.user_password,
+                [foreign, native]
+            )
+            return 0
 
     def remove_word(self):
         """
