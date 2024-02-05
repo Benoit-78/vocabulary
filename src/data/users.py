@@ -79,10 +79,10 @@ class CredChecker():
         """Validate user name."""
         if name_to_check in [None, ""]:
             logger.warning(f"Input name is empty or somewhat sneaky.")
-            self.flag_incorrect_user_name()
+            self.flag_incorrect_user_name(name_to_check)
         if not self.check_input_name(name_to_check):
             logger.warning(f"Input name {name_to_check} unknown.")
-            self.flag_incorrect_user_name()
+            self.flag_incorrect_user_name(name_to_check)
 
     def check_password(self, name_to_check, password_to_check):
         """Validate user password."""
@@ -224,14 +224,27 @@ class UserAccount(Account):
         for host in ['localhost']:  # '%' has been removed from the list
             db_definer = DbDefiner(host, self.user_name)
             db_created = db_definer.create_database(
-                db_name,
                 hum_pwd,
-                self.user_password
+                self.user_password,
+                db_name
             )
-            if db_created:
-                return 0
-            else:
+            if not db_created:
                 return 1
+            db_controller = DbController(host)
+            db_controller.grant_privileges(
+                hum_pwd,
+                self.user_name,
+                db_name
+            )
+            tables_created = db_definer.create_seven_tables(
+                hum_pwd,
+                self.user_password,
+                db_name
+            )
+            if not tables_created:
+                logger.error(f"Error with the creation of tables for {db_name}.")
+                return 1
+            return 0
 
     def check_if_database_exists(self, db_name):
         """
@@ -243,7 +256,8 @@ class UserAccount(Account):
         for host in ['localhost']:  # '%' has been removed from the list
             db_definer = DbDefiner('localhost', self.user_name)
             db_names = db_definer.get_user_databases(hum_pwd, self.user_password)
-            if db_name in db_names:
+            sql_db_name = self.user_name + '_' + db_name
+            if sql_db_name in db_names:
                 logger.error(f"Database name {db_name} already exists.")
                 return True
             else:
