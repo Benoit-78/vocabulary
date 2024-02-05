@@ -6,14 +6,15 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/root.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/interro.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/database.js"></script>
 </head>
 
 <body>
     <div class="container">
         <h1>Welcome {{ userName }}!</h1>
         <div class="button-list">
-            <button onclick="window.location.href='/interro-settings/{{ userName }}'">Interroooo !!!</button>
+            <button onclick="goToInterroSettings(`{{ userName }}`, `{{ userPassword }}`)">Interroooo !!!</button>
             <button onclick="goToUserDatabases(`{{ userName }}`, `{{ userPassword }}`)">Databases</button>
             <button onclick="window.location.href='/dashboard/{{ userName }}'">Dashboard</button>
             <button onclick="window.location.href='/user-settings/{{ userName }}'">Settings</button>

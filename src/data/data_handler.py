@@ -184,6 +184,9 @@ class DbController(DbInterface):
             request_2 = f"{user_name}_{db_name}.* TO '{user_name}'@'{self.host}';"
             cursor.execute(request_1 + request_2)
             connection.commit()
+            logger.success(
+                f"User '{user_name}' granted access to '{user_name}_{db_name}'."
+            )
             result = True
         except mariadb.Error as err:
             logger.error(err)
@@ -225,24 +228,15 @@ class DbDefiner(DbInterface):
         self.user_name = user_name
         self.db_name = None
 
-    def create_database(self, db_name, root_password, password):
+    def create_database(self, root_password, password, db_name):
         """
         Create a database with the given database name
         """
-        db_controller = DbController(self.host)
         connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
         result = None
         try:
             cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
             connection.commit()
-            db_controller.grant_privileges(root_password, self.user_name, db_name)
-            logger.success(
-                f"User '{self.user_name}' granted access to '{self.user_name}_{db_name}'."
-            )
-            tables_created = self.create_seven_tables(db_name, root_password, password)
-            if not tables_created:
-                logger.error(f"Error with the creation of tables for {db_name}.")
-                result = False
             result = True
         except mariadb.Error as err:
             logger.error(err)
@@ -263,7 +257,7 @@ class DbDefiner(DbInterface):
         connection.close()
         return databases
 
-    def create_seven_tables(self, db_name, root_password, password):
+    def create_seven_tables(self, root_password, password, db_name):
         """
         Create the seven tables necessary to the app.
         """

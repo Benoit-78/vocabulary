@@ -1,3 +1,4 @@
+
 document.addEventListener(
     "DOMContentLoaded",
     function () {
@@ -5,6 +6,11 @@ document.addEventListener(
         progressBar.style.width = `${progressBar}%`;
     }
 );
+
+
+function goToInterroSettings(userName, userPassword) {
+    window.location.href = `/interro-settings?userName=${userName}?userPassword=${userPassword}`;
+}
 
 
 function sendUserSettings(userName, testType, numWords) {
