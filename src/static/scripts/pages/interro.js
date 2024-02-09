@@ -32,12 +32,14 @@ function sendUserSettings(userName, testType, numWords) {
 }
 
 
-function startTest(userName, numWords) {
-    var encodedUserName = encodeURIComponent(userName)
-    numWords = parseInt(numWords, 10);
+function startTest(userName, userPassword, numWords) {
+    total = parseInt(numWords, 10);
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
+        count = 0;
+        score = 0;
         window.location.href = `/interro-question/${encodedUserName}/${numWords}/0/0`;
+        window.location.href = `/interro-question?userName=${userName}?userPassword=${userPassword}?total=${total}?count=${count}?score=${score}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
