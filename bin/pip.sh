@@ -5,7 +5,7 @@
 # A shell script created on Windows may not work properly on Linux.
 # Here are the commands to make it work on Linux:
 # sudo apt-get install dos2unix
-# dos2unix -b set_pip_environment.sh
+# dos2unix -b pip.sh
 # If dos2unix cannot be installed, then create an empty shell file in Linux,
 # then copy-paste the content of the Windows file in the Linux file.
 # --------------------------------------------------------------------------------

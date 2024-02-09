@@ -28,21 +28,6 @@ cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 
-@interro_router.post("/check-connection-to-database/{user_name}/{db_name}")
-async def check_db_connection(settings: dict, user_name, db_name):
-    """
-    Acquire the database chosen by the user.
-    """
-    db_handler = data_handler.DbDefiner('localhost', user_name)
-    connection, cursor = db_handler.get_db_cursor(db_name)
-    return JSONResponse(
-        content=
-        {
-            "message": "Connection to database established successfully.",
-        }
-    )
-
-
 @interro_router.get("/interro-settings", response_class=HTMLResponse)
 def interro_settings(
     request: Request,
@@ -71,39 +56,29 @@ def interro_settings(
     )
 
 
-@interro_router.post("/save-interro-settings/{user_name}/{db_name}}")
-async def save_interro_settings(settings: dict, user_name, db_name):
-    """Acquire the user settings for one interro."""
-    global loader
-    global test
-    password = 'mais_quel_est_le_password'
-    loader, test = interro_utils.load_test(
-        user_name,
-        db_name,
-        settings["testType"].lower(),
-        settings["numWords"],
-        password
-    )
-    logger.info("User data loaded")
-    global flag_data_updated
-    flag_data_updated = False
-    return JSONResponse(
-        content=
-        {
-            "message": "User settings stored successfully."
-        }
-    )
-
-
-@interro_router.get("/interro-question/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
+@interro_router.get("/interro-question", response_class=HTMLResponse)
 def load_interro_question(
     request: Request,
-    user_name,
-    words: int,
-    count=None,
-    score=None):
+    query: str = Query(None, alias="userName")
+    ):
     """Call the page that asks the user the meaning of a word"""
-    cred_checker.check_credentials(user_name)
+    # Authenticate user
+    user_name = query.split('?')[0]
+    user_password = query.split('?')[1].split('=')[1]
+    if user_name:
+        cred_checker.check_credentials(user_name, user_password
+        )
+    else:
+        logger.error("User name not found.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User name not found."
+        )
+    # Load question page
+    words = query.split('?')[2].split('=')[1]
+    count = query.split('?')[3].split('=')[1]
+    score = query.split('?')[4].split('=')[1]
+    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     global test
     try:
         count = int(count)
@@ -265,4 +240,3 @@ def end_interro(
             "userName": user_name
         }
     )
-
