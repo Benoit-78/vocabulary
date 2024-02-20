@@ -23,7 +23,8 @@ from loguru import logger
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
-from src import utils
+
+from src.utils.data import complete_columns
 
 
 
@@ -318,7 +319,7 @@ class Updater():
 
     def copy_good_words(self):
         """Copy the well-good words in the next step table."""
-        self.good_words_df = utils.complete_columns(
+        self.good_words_df = complete_columns(
             self.loader.tables['output'],
             self.good_words_df
         )

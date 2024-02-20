@@ -16,9 +16,11 @@ import pandas as pd
 from loguru import logger
 from sqlalchemy import create_engine
 
-REPO_DIR = os.getcwd().split('src')[0]
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
-from src import utils
+
+from src.utils.os import get_os_separator
 
 with open(REPO_DIR + '/conf/data.json', 'rb') as param_file:
     PARAMS = json.load(param_file)
@@ -32,7 +34,7 @@ class CsvHandler():
     """
     def __init__(self, test_type: str):
         self.test_type = test_type
-        self.os_sep = utils.get_os_separator()
+        self.os_sep = get_os_separator()
         self.paths = {}
         self.tables = {}
 

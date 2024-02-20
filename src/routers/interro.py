@@ -28,6 +28,36 @@ cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 
+
+class AppContext:
+    def __init__(
+        self,
+        user_name,
+        user_password,
+        words=0,
+        count=0,
+        score=0,
+        progress_percent=0,
+        english="",
+        french=""
+        ):
+        self.usr = user_name
+        self.pwd = user_password
+        self.test = interro_utils.Interro()
+        self.words = words
+        self.count = count
+        self.score = score
+        self.progress_percent = progress_percent
+        self.english = english
+        self.french = french
+        self.flag_data_updated = False
+        self.loader = data_handler.Loader()
+
+
+app_context = AppContext(var1_value, var2_value, var3_value)
+
+
+
 @interro_router.get("/interro-settings", response_class=HTMLResponse)
 def interro_settings(
     request: Request,
@@ -61,7 +91,9 @@ def load_interro_question(
     request: Request,
     query: str = Query(None, alias="userName")
     ):
-    """Call the page that asks the user the meaning of a word"""
+    """
+    Call the page that asks the user the meaning of a word.
+    """
     # Authenticate user
     user_name = query.split('?')[0]
     user_password = query.split('?')[1].split('=')[1]
@@ -175,7 +207,8 @@ def propose_rattraps(
     user_name,
     words: int,
     count: int,
-    score: int):
+    score: int
+    ):
     """Load a page that proposes the user to take a rattraps, or leave the test."""
     cred_checker.check_credentials(user_name)
     global test
@@ -191,8 +224,6 @@ def propose_rattraps(
     else:
         logger.info("User data not updated yet.")
     # Réinitialisation
-    new_count = 0
-    new_score = 0
     new_words = test.faults_df.shape[0]
     test.interro_df = test.faults_df
     test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
@@ -204,9 +235,9 @@ def propose_rattraps(
             "score": score,
             "numWords": words,
             "count": count,
-            "newScore": new_score,
+            "newScore": 0,
             "newWords": new_words,
-            "newCount": new_count
+            "newCount": 0
         }
     )
 
