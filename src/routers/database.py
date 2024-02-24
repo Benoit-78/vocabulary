@@ -19,121 +19,76 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from src.data import users
+from src.api import database as database_api
 
-database_router = APIRouter()
+database_router = APIRouter(prefix='/database')
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 
-@database_router.get("/user-databases", response_class=HTMLResponse)
+@database_router.get("/list-databases", response_class=HTMLResponse)
 def user_databases(
     request: Request,
-    query: str = Query(None, alias="userName")
+    user_name: str = Query(None, alias="userName"),
+    user_password: str = Query(None, alias="userPassword"),
     ):
     """
     Call the base page of user databases.
     """
-    # Authenticate user
-    user_name = query.split('?')[0]
-    user_password = query.split('?')[1].split('=')[1]
-    if user_name:
-        cred_checker.check_credentials(user_name, user_password)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    # Launch database creation page
-    return templates.TemplateResponse(
-        "user/databases.html",
-        {
-            "request": request,
-            "userName": user_name,
-            "userPassword": user_password
-        }
-    )
+    request_dict = database_api.get_user_databases(request, user_name, user_password)
+    return templates.TemplateResponse("user/databases.html", request_dict)
 
 
 @database_router.post("/create-database")
 async def create_database(data: dict):
-    """Save the word in the database."""
-    # Authenticate user
-    user_name = data['usr']
-    user_password = data['pwd']
-    cred_checker = users.CredChecker()
-    cred_checker.check_credentials(user_name, user_password)
-    # Create database
-    db_name = data['db_name']
-    user_account = users.UserAccount(user_name, user_password)
-    result = user_account.create_database(db_name)
-    if result == 1:
-        return JSONResponse(
-            content=
-            {
-                "message": "Database name not available.",
-                "databaseName": db_name
-            }
-        )
-    elif result == 0:
-        return JSONResponse(
-            content=
-            {
-                "message": "Database created successfully.",
-                "userName": user_account.user_name,
-                "userPassword": user_account.user_password
-            }
-        )
+    """
+    Create a database.
+    """
+    json_response = database_api.create_database(data)
+    return json_response
+
+
+@database_router.post("/choose-database")
+async def choose_database(data: dict):
+    """
+    Choose a database.
+    """
+    json_response = database_api.choose_database(data)
+    return json_response
 
 
 @database_router.get("/fill_database", response_class=HTMLResponse)
 def data_page(
     request: Request,
-    query: str = Query(None, alias="userName")
+    user_name: str = Query(None, alias="userName"),
+    user_password: str = Query(None, alias="userPassword"),
+    db_name: str = Query(None, alias="databaseName"),
     ):
     """
     Base page for data input by the user.
     """
-    # Authenticate user
-    user_name = query.split('?')[0]
-    user_password = query.split('?')[1].split('=')[1]
-    db_name = query.split('?')[2].split('=')[1]
-    if user_name:
-        cred_checker.check_credentials(user_name, user_password)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    # Load database page
-    title = "Here you can add words to your database."
-    return templates.TemplateResponse(
-        "user/fill_database.html",
-        {
-            "request": request,
-            "title": title,
-            "userName": user_name,
-            "userPassword": user_password,
-            "databaseName": db_name
-        }
+    request_dict = database_api.fill_database(
+        request,
+        user_name,
+        user_password,
+        db_name
     )
+    return templates.TemplateResponse("user/fill_database.html", request_dict)
 
 
-@database_router.post("/create-word")
+@database_router.post("/add-word")
 async def create_word(data: dict):
     """Save the word in the database."""
     # Authenticate user
     user_name = data['usr']
     user_password = data['pwd']
-    cred_checker = users.CredChecker()
     cred_checker.check_credentials(user_name, user_password)
     # Add the word
     db_name = data['db_name']
     user_account = users.UserAccount(user_name, user_password)
     result = user_account.insert_word(db_name, data['foreign'], data['native'])
     if result == 1:
-        return JSONResponse(content={"message": "Error with the word creation."})
-    elif result == 0:
-        return JSONResponse(content={"message": "Word created successfully."})
-
+        json_response = JSONResponse(content={"message": "Error with the word creation."})
+    if result == 0:
+        json_response =  JSONResponse(content={"message": "Word added successfully."})
+    return json_response

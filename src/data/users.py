@@ -9,6 +9,7 @@ import json
 import os
 import sys
 from abc import ABC, abstractmethod
+from dotenv import load_dotenv
 
 from fastapi import HTTPException
 from loguru import logger
@@ -19,6 +20,9 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src.data.data_handler import DbController, DbDefiner, DbManipulator 
+
+load_dotenv()
+DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
 
 
 
@@ -136,6 +140,7 @@ class UserAccount(Account):
     such as Controller, Definer, and Manipulator.
     """
     def __init__(self, user_name, user_password):
+        super().__init__()
         self.user_name = user_name
         self.user_password = user_password
 
@@ -201,13 +206,10 @@ class UserAccount(Account):
         if account_exists:
             return 1
         # Create database
-        with open("conf/hum.json", "r") as hum_file:
-            hum_dict = json.load(hum_file)
-        hum_pwd = hum_dict['user']['root']['OK']
         for host in ['localhost']:  # '%' has been removed from the list
             db_definer = DbDefiner(host, self.user_name)
             db_created = db_definer.create_database(
-                hum_pwd,
+                DB_ROOT_PWD,
                 self.user_password,
                 db_name
             )
@@ -225,19 +227,15 @@ class UserAccount(Account):
         """
         Check if the user's database already exists.
         """
-        with open("conf/hum.json", "r") as hum_file:
-            hum_dict = json.load(hum_file)
-        hum_pwd = hum_dict['user']['root']['OK']
         for host in ['localhost']:  # '%' has been removed from the list
-            db_definer = DbDefiner('localhost', self.user_name)
-            db_names = db_definer.get_user_databases(hum_pwd, self.user_password)
+            db_definer = DbDefiner(host, self.user_name)
+            db_names = db_definer.get_user_databases(DB_ROOT_PWD, self.user_password)
             sql_db_name = self.user_name + '_' + db_name
             if sql_db_name in db_names:
                 logger.error(f"Database name {db_name} already exists.")
                 return True
-            else:
-                logger.success(f"Database name {db_name} is available.")
-                return False
+            logger.success(f"Database name {db_name} is available.")
+            return False
 
     def rename_database(self, old_name, new_name):
         """
