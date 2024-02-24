@@ -8,11 +8,16 @@ import os
 import sys
 import unittest
 from datetime import datetime
+from dotenv import load_dotenv
 from unittest.mock import MagicMock, patch
 
 import mysql.connector as mariadb
 import pandas as pd
 from loguru import logger
+
+load_dotenv()
+
+DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -151,7 +156,7 @@ class TestDbController(unittest.TestCase):
     def setUp(cls):
         cls.host = '%'
         cls.db_controller = data_handler.DbController(cls.host)
-        cls.root_password = 'test_root_password'
+        cls.root_password = DB_ROOT_PWD
         cls.user_name = 'test_user'
 
     @patch('src.data.data_handler.DbController.get_db_cursor')
@@ -163,7 +168,7 @@ class TestDbController(unittest.TestCase):
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         user_password = 'test_user_password'
         # Act
-        result = self.db_controller.create_user(self.root_password, self.user_name, user_password)
+        result = self.db_controller.create_user(self.user_name, user_password)
         # Assert
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once_with(
@@ -171,12 +176,23 @@ class TestDbController(unittest.TestCase):
             'mysql',
             self.root_password
         )
+        # Request 1
         request_1 = f"CREATE USER '{self.user_name}'@'%'"
         request_2 = f"IDENTIFIED BY '{user_password}';"
-        sql_request = " ".join([request_1, request_2])
-        mock_cursor.execute.assert_called_once_with(sql_request)
+        sql_request_1 = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_with(sql_request_1)
+        # Request 2
+        sql_request_2 = f"GRANT SELECT ON common.* TO '{user_name}'@'{self.host}';"
+        mock_cursor.execute.assert_called_with(sql_request_2)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
+        #
+        # expected_calls = [
+        #     ("CREATE USER 'test_user'@'localhost' IDENTIFIED BY 'test_password';",),
+        #     ("GRANT SELECT ON common.* TO 'test_user'@'localhost';",),
+        # ]
+        # for call_args in expected_calls:
+        #     self.assertIn(MagicMock(call_args), self.db_mock.cursor().execute.call_args_list)
 
     @patch('src.data.data_handler.DbController.get_db_cursor')
     def test_grant_privileges(self, mock_get_db_cursor):
@@ -189,11 +205,7 @@ class TestDbController(unittest.TestCase):
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         db_name = 'test_database_name'
         # Act
-        result = self.db_controller.grant_privileges(
-            self.root_password,
-            self.user_name,
-            db_name
-        )
+        result = self.db_controller.grant_privileges(self.user_name, db_name)
         # Assert
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once_with(

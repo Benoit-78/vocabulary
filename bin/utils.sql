@@ -3,9 +3,11 @@
 ---------------------------
 -- Manage access
 
-SELECT host, user, password FROM mysql.user;
+SELECT host, user password FROM mysql.user;
 
 SHOW GRANTS FOR 'root'@'localhost';
+
+SELECT User FROM mysql.db WHERE Db = 'mysql';
 
 SHOW ENGINES;
 

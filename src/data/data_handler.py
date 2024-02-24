@@ -9,6 +9,7 @@ import os
 import sys
 from abc import ABC
 from datetime import datetime
+from dotenv import load_dotenv
 from typing import Dict, List
 
 import mysql.connector as mariadb
@@ -16,6 +17,9 @@ import pandas as pd
 from loguru import logger
 from sqlalchemy import create_engine
 
+load_dotenv()
+
+DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
@@ -156,14 +160,32 @@ class DbController(DbInterface):
     """
     Manage access.
     """
-    def create_user(self, root_password, user_name, user_password):
+    def create_user(self, user_name, user_password):
         """
         Create user.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         result = None
         try:
             cursor.execute(f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';")
+            connection.commit()
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+    def grant_privileges_on_common_database(self, user_name):
+        """
+        Grant the new user access to the common database.
+        """
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        result = None
+        try:
+            cursor.execute(f"GRANT SELECT ON common.* TO '{user_name}'@'{self.host}';")
             connection.commit()
             logger.success(f"User '{user_name}' created successfully on {self.host}.")
             result = True
@@ -175,11 +197,11 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def grant_privileges(self, root_password, user_name, db_name):
+    def grant_privileges(self, user_name, db_name):
         """
         Grant privileges to the user on the given database.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         result = None
         try:
             request_1 = "GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON "
@@ -198,12 +220,12 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def get_users_list(self, root_password):
+    def get_users_list(self):
         """
         Get list of users.
         Keep in mind that the user is first created on '%' and then on 'localhost'.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         users_list = []
         try:
             cursor.execute("SELECT User, Host FROM mysql.user;")
@@ -259,7 +281,7 @@ class DbDefiner(DbInterface):
         connection.close()
         return databases
 
-    def create_seven_tables(self, root_password, password, db_name):
+    def create_seven_tables(self, password, db_name):
         """
         Create the seven tables necessary to the app.
         """

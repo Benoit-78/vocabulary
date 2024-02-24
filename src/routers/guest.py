@@ -24,13 +24,14 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from src.data import users
-from src.utils import interro
+from src.api import interro
 
 guest_router = APIRouter()
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 with open('conf/hum.json', 'r') as json_file:
     HUM = json.load(json_file)
+
 
 @guest_router.get("/guest-not-allowed", response_class=HTMLResponse)
 def guest_not_allowed(request: Request):
@@ -61,7 +62,7 @@ async def save_interro_settings_guest(settings: dict):
     """Acquire the user settings for one interro."""
     global loader
     global test
-    loader, test = interro_utils.load_test(
+    loader, test = interro.load_test(
         user_name='guest',
         db_name=HUM['user']['guest']['databases'][0],
         test_type=settings["testType"].lower(),

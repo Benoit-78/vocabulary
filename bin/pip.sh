@@ -114,6 +114,8 @@ pip install pydantic==2.3.0
 echo "# -------------------------"
 pip install pydantic_core==2.6.3
 echo "# -------------------------"
+pip install python-dotenv==1.0.1
+echo "# -------------------------"
 
 # Continuous integration
 pip install isort==5.12.0

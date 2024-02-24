@@ -2,7 +2,7 @@
     Creation date:
         4th February 2024
     Main purpose:
-        Gathers API routes dedicated to user interooooo !!!!!
+        Gathers API routes dedicated to user interooooo!!!!!
 """
 
 import os
@@ -10,52 +10,22 @@ import sys
 
 import pandas as pd
 from loguru import logger
-from fastapi import Query, HTTPException, Request, status
+from fastapi import Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
+if REPO_DIR not in sys.path:
+    sys.path.append(REPO_DIR)
 
-from src import interro, views
-from src.utils import interro as interro_utils
-from src.data import users, data_handler
+from src.api import interro
+from src.data import users
 
 interro_router = APIRouter()
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
-
-
-
-class AppContext:
-    def __init__(
-        self,
-        user_name,
-        user_password,
-        words=0,
-        count=0,
-        score=0,
-        progress_percent=0,
-        english="",
-        french=""
-        ):
-        self.usr = user_name
-        self.pwd = user_password
-        self.test = interro_utils.Interro()
-        self.words = words
-        self.count = count
-        self.score = score
-        self.progress_percent = progress_percent
-        self.english = english
-        self.french = french
-        self.flag_data_updated = False
-        self.loader = data_handler.Loader()
-
-
-app_context = AppContext(var1_value, var2_value, var3_value)
-
 
 
 @interro_router.get("/interro-settings", response_class=HTMLResponse)
@@ -63,26 +33,13 @@ def interro_settings(
     request: Request,
     query: str = Query(None, alias="userName")
     ):
-    """Call the page that gets the user settings for one interro."""
-    # Authenticate user
-    user_name = query.split('?')[0]
-    user_password = query.split('?')[1].split('=')[1]
-    if user_name:
-        cred_checker.check_credentials(user_name, user_password)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    # Load settings page
+    """
+    Call the page that gets the user settings for one interro.
+    """
+    request_dict = interro.load_interro_settings(request, query)
     return templates.TemplateResponse(
         "user/interro_settings.html",
-        {
-            "request": request,
-            "userName": user_name,
-            "userPassword": user_password
-        }
+        request_dict
     )
 
 
@@ -94,48 +51,10 @@ def load_interro_question(
     """
     Call the page that asks the user the meaning of a word.
     """
-    # Authenticate user
-    user_name = query.split('?')[0]
-    user_password = query.split('?')[1].split('=')[1]
-    if user_name:
-        cred_checker.check_credentials(user_name, user_password
-        )
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    # Load question page
-    words = query.split('?')[2].split('=')[1]
-    count = query.split('?')[3].split('=')[1]
-    score = query.split('?')[4].split('=')[1]
-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    global test
-    try:
-        count = int(count)
-    except NameError:
-        count = 0
-    try:
-        score = int(score)
-    except NameError:
-        score = 0
-    progress_percent = int(count / int(words) * 100)
-    index = test.interro_df.index[count]
-    english = test.interro_df.loc[index][0]
-    english = english.replace("'", "\'")
-    count += 1
+    request_dict = interro.get_interro_question(request, query)
     return templates.TemplateResponse(
         "user/interro_question.html",
-        {
-            "request": request,
-            "userName": user_name,
-            "numWords": words,
-            "count": count,
-            "score": score,
-            "progressPercent": progress_percent,
-            "content_box1": english
-        }
+        request_dict
     )
 
 

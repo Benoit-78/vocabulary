@@ -33,7 +33,7 @@ function createAccount() {
 function signIn() {
     var inputName = document.getElementById("content_box1").value;
     var inputPassword = document.getElementById("content_box2").value;
-    fetch("/authenticate-user", {
+    fetch("/user/authenticate-user", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -44,7 +44,7 @@ function signIn() {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "User credentials validated successfully") {
-            window.location.href = `/user-space?userName=${data.userName}?userPassword=${data.userPassword}`;
+            window.location.href = `/user/user-space?userName=${data.userName}&userPassword=${data.userPassword}`;
         } else {
             // Redirect to sign-in route
             window.location.href = "/sign-in";
@@ -57,18 +57,16 @@ function signIn() {
 }
 
 
-function goToUserSpace(userName, userPassword) {
-    window.location.href = `/user-space?userName=${userName}?userPassword=${userPassword}`;
+function goToUserDashboards(userName, userPassword) {
+    window.location.href = `/user/user-dashboards?userName=${userName}&userPassword=${userPassword}`;
 }
 
 
-var databaseNames = ["Database1", "Database2", "Database3"];
-// Get the select element
-var selectMenu = document.getElementById("menu");
-// Dynamically add options based on the database names
-databaseNames.forEach(function(name) {
-    var option = document.createElement("option");
-    option.value = name;
-    option.text = name;
-    selectMenu.add(option);
-});
+function goToUserSettings(userName, userPassword) {
+    window.location.href = `/user/user-settings?userName=${userName}&userPassword=${userPassword}`;
+}
+
+
+function goToUserSpace(userName, userPassword) {
+    window.location.href = `/user/user-space?userName=${userName}&userPassword=${userPassword}`;
+}

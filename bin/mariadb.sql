@@ -33,6 +33,9 @@ GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO '<user-name>'@'local
 DROP USER 'usr'@'%';
 DROP USER 'usr'@'localhost';
 
+-- common
+GRANT SELECT ON common.* TO '%'@'%';
+
 -- Very very useful
 FLUSH PRIVILEGES;
 
@@ -45,7 +48,7 @@ FLUSH PRIVILEGES;
 -- Ex: CREATE, ALTER, DROP
 
 -- Databases
-CREATE DATABASE vocabulary;
+CREATE DATABASE common;
 
 DROP DATABASE <database_name>;
 
