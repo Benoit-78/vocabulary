@@ -9,22 +9,39 @@ document.addEventListener(
 
 
 function goToInterroSettings(userName, userPassword) {
-    window.location.href = `/interro-settings?userName=${userName}?userPassword=${userPassword}`;
-}
-
-
-function sendUserSettings(userName, testType, numWords) {
-    fetch(`/user-settings/${userName}`, {
+    fetch(`/interro/interro-settings`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
+            userName: userName,
+            userPassword: userPassword
+        }),
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.body.innerHTML = data;
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+
+function sendUserSettings(userName, userPassword, databaseName, testType, numWords) {
+    fetch(`/user/user-settings`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            userName: userName,
+            userPassword: userPassword,
+            databaseName: databaseName,
             testType: testType,
             numWords: numWords
         }),
     })
     .then(answer => answer.json())
     .then(data => {
-        startTest(userName, numWords)
+        startTest(userName, userPassword, databaseName, testType, numWords)
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
@@ -32,14 +49,23 @@ function sendUserSettings(userName, testType, numWords) {
 }
 
 
-function startTest(userName, userPassword, numWords) {
+function startTest(userName, userPassword, databaseName, testType, numWords) {
     total = parseInt(numWords, 10);
-    // Check if the conversion was successful
     if (!isNaN(numWords)) {
-        count = 0;
-        score = 0;
-        window.location.href = `/interro-question/${encodedUserName}/${numWords}/0/0`;
-        window.location.href = `/interro-question?userName=${userName}?userPassword=${userPassword}?total=${total}?count=${count}?score=${score}`;
+        // Check if the conversion was successful
+        const params = {
+            userName: {userName},
+            userPassword: {userPassword},
+            databaseName: {databaseName},
+            testType: {testType},
+            total: {total},
+            count: 0,
+            score: 0,
+        };
+        // Create a new URLSearchParams object and append each parameter
+        const searchParams = new URLSearchParams(params);
+        // Construct the URL with the parameters
+        window.location.href = `/interro/interro-question?${searchParams.toString()}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }

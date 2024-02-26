@@ -55,10 +55,20 @@ def user_main_page(
 def settings_page(
     request: Request,
     user_name: str = Query(None, alias="userName"),
-    user_password: str = Query(None, alias="userPassword")
+    user_password: str = Query(None, alias="userPassword"),
+    db_name: str = Query(None, alias="dbName"),
+    test_type: str = Query(None, alias="testType"),
+    total_words: str = Query(None, alias="numWords")
     ): 
     """Load the main page for settings."""
-    request_dict = user_api.get_user_settings(request, user_name, user_password)
+    request_dict = user_api.get_user_settings(
+        request,
+        user_name,
+        user_password,
+        db_name,
+        test_type,
+        total_words
+    )
     return templates.TemplateResponse("user/settings.html", request_dict)
 
 

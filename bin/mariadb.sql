@@ -16,7 +16,7 @@ sudo systemctl restart mariadb
 -- root user
 CREATE USER 'root'@'localhost' IDENTIFIED BY '<db_password>';
 
-ALTER USER 'usr'@'%' IDENTIFIED BY 'pwd';
+ALTER USER 'usr'@'localhost' IDENTIFIED BY 'pwd';
 
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY 'IBM-vocabulary7' WITH GRANT OPTION;
 

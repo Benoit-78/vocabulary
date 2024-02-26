@@ -20,7 +20,7 @@ sys.path.append(REPO_DIR)
 from src.api import dashboard as dashboard_api
 from src.data import users
 
-dashboard_router = APIRouter()
+dashboard_router = APIRouter(prefix='/dashboard')
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
@@ -29,8 +29,14 @@ templates = Jinja2Templates(directory="src/templates")
 def graphs_page(
     request: Request,
     user_name: str = Query(None, alias="userName"),
-    user_password: str = Query(None, alias="userPassword")
+    user_password: str = Query(None, alias="userPassword"),
+    db_name: str = Query(None, alias="databaseName")
     ):
     """Load the main page for performances visualization"""
-    request_dict = dashboard_api.get_user_dashboards(request, user_name, user_password)
+    request_dict = dashboard_api.get_user_dashboards(
+        request,
+        user_name,
+        user_password,
+        db_name
+    )
     return templates.TemplateResponse("user/dashboard.html", request_dict)

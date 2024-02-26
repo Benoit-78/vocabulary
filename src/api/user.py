@@ -91,7 +91,7 @@ def get_user_main_page(request, user_name, user_password):
     return request_dict
 
 
-def get_user_settings(request, user_name, user_password):
+def get_user_settings(request, user_name, user_password, db_name, test_type, num_words):
     """
     Load the main page for settings.
     """
@@ -107,7 +107,10 @@ def get_user_settings(request, user_name, user_password):
     request_dict = {
         "request": request,
         "userName": user_name,
-        "userPassword": user_password
+        "userPassword": user_password,
+        "dbName": db_name,
+        "testType": test_type,
+        "numWords": num_words
     }
     return request_dict
 

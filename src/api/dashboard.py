@@ -25,11 +25,11 @@ from src.dashboard import feed_dashboard
 cred_checker = users.CredChecker()
 
 
-def get_user_dashboards(request, user_name, user_password):
+def get_user_dashboards(request, user_name, user_password, db_name):
     """
     Get the user dashboards.
     """
-    graphs = feed_dashboard.load_graphs()
+    graphs = feed_dashboard.load_graphs(user_name, user_password, db_name)
     request_dict = {
         "request": request,
         "graph_1": graphs[0],

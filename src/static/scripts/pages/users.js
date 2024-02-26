@@ -63,7 +63,12 @@ function goToUserDashboards(userName, userPassword) {
 
 
 function goToUserSettings(userName, userPassword) {
-    window.location.href = `/user/user-settings?userName=${userName}&userPassword=${userPassword}`;
+    const params = {
+        userName: {userName},
+        userPassword: {userPassword}
+    };
+    const searchParams = new URLSearchParams(params);
+    window.location.href = `/user/user-settings?${searchParams.toString()}`;
 }
 
 

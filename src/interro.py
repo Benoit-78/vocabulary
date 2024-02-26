@@ -100,6 +100,7 @@ class Loader():
         """
         self.tables = self.data_handler.get_tables(password)
         voc = self.test_type + '_voc'
+        self.tables[voc] = self.tables[voc].reset_index()
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]
         self.tables[voc] = self.tables[voc].sort_values(
             by='creation_date',
@@ -165,8 +166,6 @@ class Test(Interro):
         """The word must not have been already asked."""
         next_index = random.randint(1, self.words_df.shape[0] - 1)
         next_index = max(next_index, 1)
-        # logger.debug(f"words_df shape: {self.words_df.shape}")
-        # logger.debug(f"words_df head: \n{self.words_df.head()}")
         already_asked = self.words_df.loc[next_index, 'query'] == 1
         i = 0
         while already_asked and i < (self.words_df.shape[0] + 1):
