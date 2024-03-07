@@ -8,7 +8,7 @@ data/__pycache__/*
 divers/*
 doc/*
 logs/*
-voc/*
+venv/*
 htmlcov/*
 mgmt/*
 src/data/__pycache__/*

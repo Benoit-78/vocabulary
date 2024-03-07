@@ -35,7 +35,7 @@ def interro_settings(request: Request, input_dict: Dict[str, Any]):
     Call the page that gets the user settings for one interro.
     """
     request_dict = interro_api.load_interro_settings(request, input_dict)
-    return templates.TemplateResponse("user/interro_settings.html", request_dict)
+    return templates.TemplateResponse("interro/settings.html", request_dict)
 
 
 @interro_router.get("/interro-question", response_class=HTMLResponse)
@@ -62,7 +62,7 @@ def load_interro_question(
         count,
         score
     )
-    return templates.TemplateResponse("user/interro_question.html", request_dict)
+    return templates.TemplateResponse("interro/question.html", request_dict)
 
 
 @interro_router.get("/interro-answer", response_class=HTMLResponse)
@@ -96,7 +96,7 @@ def load_interro_answer(
         "content_box2": french
     }
     request_dict = interro_api.get_user_response(user_name)
-    return templates.TemplateResponse("user/interro_answer.html", request_dict)
+    return templates.TemplateResponse("interro/answer.html", request_dict)
 
 
 @interro_router.post("/user-answer/{user_name}")
@@ -153,7 +153,7 @@ def propose_rattraps(
     test.interro_df = test.faults_df
     test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
     return templates.TemplateResponse(
-        "user/rattraps_propose.html",
+        "interro/rattraps.html",
         {
             "request": request,
             "userName": user_name,
@@ -188,7 +188,7 @@ def end_interro(
         updater.update_data()
         logger.info("User data updated.")
     return templates.TemplateResponse(
-        "user/interro_end.html",
+        "interro/end.html",
         {
             "request": request,
             "score": score,

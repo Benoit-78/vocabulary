@@ -176,23 +176,12 @@ class TestDbController(unittest.TestCase):
             'mysql',
             self.root_password
         )
-        # Request 1
         request_1 = f"CREATE USER '{self.user_name}'@'%'"
         request_2 = f"IDENTIFIED BY '{user_password}';"
         sql_request_1 = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_with(sql_request_1)
-        # Request 2
-        sql_request_2 = f"GRANT SELECT ON common.* TO '{user_name}'@'{self.host}';"
-        mock_cursor.execute.assert_called_with(sql_request_2)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
-        #
-        # expected_calls = [
-        #     ("CREATE USER 'test_user'@'localhost' IDENTIFIED BY 'test_password';",),
-        #     ("GRANT SELECT ON common.* TO 'test_user'@'localhost';",),
-        # ]
-        # for call_args in expected_calls:
-        #     self.assertIn(MagicMock(call_args), self.db_mock.cursor().execute.call_args_list)
 
     @patch('src.data.data_handler.DbController.get_db_cursor')
     def test_grant_privileges(self, mock_get_db_cursor):

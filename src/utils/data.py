@@ -1,5 +1,6 @@
 """
-    Background functions for vocabulary program.
+    Main purpose:
+        Background functions for vocabulary program.
 """
 
 import pandas as pd

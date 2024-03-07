@@ -51,22 +51,19 @@ def create_account(creds):
     return json_response
 
 
-def authenticate_user(creds):
+def authenticate_user(input_dict):
     """
     Acquire the user credentials.
     """
-    cred_checker.check_credentials(
-        creds['input_name'],
-        creds['input_password']
-    )
-    json_response = JSONResponse(
-        content={
-            "message": "User credentials validated successfully",
-            "userName": creds['input_name'],
-            "userPassword": creds['input_password']
-        }
-    )
-    return json_response
+    input_name = input_dict.get('input_name')
+    input_password = input_dict.get('input_password')
+    cred_checker.check_credentials(input_name, input_password)
+    request_dict = {
+        "message": "User credentials validated successfully",
+        "userName": input_name,
+        "userPassword": input_password
+    }
+    return request_dict
 
 
 def get_user_main_page(request, user_name, user_password):

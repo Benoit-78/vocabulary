@@ -7,6 +7,7 @@
 
 import os
 import sys
+from typing import Dict, Any
 
 from loguru import logger
 from fastapi import Query, Request
@@ -33,11 +34,14 @@ async def create_account(creds: dict):
     return json_response
 
 
-@user_router.post("/authenticate-user")
-async def authenticate(creds: dict):
+@user_router.post("/authenticate-user", response_class=HTMLResponse)
+def authenticate(request: Request, input_dict: Dict[str, Any]):
     """Acquire the user settings for one interro."""
-    json_response = user_api.authenticate_user(creds)
-    return json_response
+    logger.debug(f"input_dict: {input_dict}")
+    request_dict = user_api.authenticate_user(input_dict)
+    request_dict['request'] = request
+    logger.debug(f"Request dict: {request_dict}")
+    return templates.TemplateResponse("user/user_space.html", request_dict)
 
 
 @user_router.get("/user-space", response_class=HTMLResponse)

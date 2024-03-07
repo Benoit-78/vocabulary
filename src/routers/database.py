@@ -73,7 +73,7 @@ def data_page(
         user_password,
         db_name
     )
-    return templates.TemplateResponse("user/fill_database.html", request_dict)
+    return templates.TemplateResponse("database/fill.html", request_dict)
 
 
 @database_router.post("/add-word")

@@ -103,7 +103,7 @@ def load_interro_question_guest(
     english = english.replace("'", "\'")
     count += 1
     return templates.TemplateResponse(
-        "guest/interro_question.html",
+        "guest/question.html",
         {
             "request": request,
             "numWords": words,
@@ -134,7 +134,7 @@ def load_interro_answer_guest(
     french = french.replace("'", "\'")
     progress_percent = int(count / int(words) * 100)
     return templates.TemplateResponse(
-        "guest/interro_answer.html",
+        "guest/answer.html",
         {
             "request": request,
             "numWords": words,
@@ -190,7 +190,7 @@ def propose_rattraps_guest(
     test.interro_df = test.faults_df
     test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
     return templates.TemplateResponse(
-        "guest/rattraps_propose.html",
+        "guest/rattraps.html",
         {
             "request": request,
             "score": score,
@@ -213,7 +213,7 @@ def end_interro_guest(
     or a blaming message depending on the performance.
     """
     return templates.TemplateResponse(
-        "guest/interro_end.html",
+        "guest/end.html",
         {
             "request": request,
             "score": score,
