@@ -47,10 +47,11 @@ def guest_not_allowed(request: Request):
 
 
 @guest_router.get("/interro-settings-guest", response_class=HTMLResponse)
-def interro_settings_guest(request: Request):
+def interro_settings_guest(request: Request, token):
     """Call the page that gets the user settings for one interro."""
+    logger.debug("Interro settings route called.")
     return templates.TemplateResponse(
-        "guest/interro_settings.html",
+        "guest/settings.html",
         {
             "request": request,
         }

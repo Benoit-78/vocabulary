@@ -52,6 +52,8 @@ echo "# INFO: Installing libraries..."
 # API
 pip install fastapi==0.103.0
 echo "# -------------------------"
+pip install fastapi-sessions==0.3.2
+echo "# -------------------------"
 pip install "python-jose[cryptography]"  # for JWT
 echo "# -------------------------"
 pip install "passlib[bcrypt]" ##################
