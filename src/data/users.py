@@ -31,9 +31,7 @@ class CredChecker():
     def __init__(self):
         self.name = ""
         self.password = ""
-        self.db_controller = DbController(
-            host='localhost'
-        )
+        self.db_controller = DbController()
 
     def check_input_name(self, name_to_check):
         """Check if the input name belongs to the users list."""

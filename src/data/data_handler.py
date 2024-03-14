@@ -6,6 +6,7 @@
 
 import json
 import os
+import socket
 import sys
 from abc import ABC
 from datetime import datetime
@@ -129,8 +130,8 @@ class DbInterface(ABC):
     Abstract class that provides with a method to connect to a database.
     All methods invoked by the user should provide with a host name.
     """
-    def __init__(self, host):
-        self.host = host
+    def __init__(self):
+        self.host = socket.gethostname()
 
     def get_db_cursor(self, user_name, db_name, password):
         """Connect to vocabulary database if credentials are correct."""
@@ -247,8 +248,8 @@ class DbDefiner(DbInterface):
     """
     Define database structure.
     """
-    def __init__(self, host, user_name):
-        super().__init__(host)
+    def __init__(self, user_name):
+        super().__init__()
         self.user_name = user_name
         self.db_name = None
 
@@ -374,11 +375,11 @@ class DbManipulator(DbInterface):
     """
     Working with data.
     """
-    def __init__(self, host, user_name, db_name, test_type):
-        super().__init__(host)
+    def __init__(self, user_name, db_name, test_type):
+        super().__init__()
         self.user_name = user_name
         self.db_name = db_name
-        self.db_definer = DbDefiner(self.host, self.user_name)
+        self.db_definer = DbDefiner(self.user_name)
         self.test_type = ''
         self.check_test_type(test_type)
 

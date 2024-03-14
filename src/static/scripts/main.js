@@ -4,16 +4,6 @@ function goToRoot() {
 }
 
 
-function interroGuest() {
-    fetch(`/token`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-    })
-    .then(response => response.json())
-    .then(data => {
-        window.location.href = `/interro-settings-guest?token=${data.access_token}`;
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+function interroGuest(token) {
+    window.location.href = `/guest/interro-settings-guest?token=${token}`;
 }

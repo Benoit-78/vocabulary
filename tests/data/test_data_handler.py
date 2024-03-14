@@ -2,9 +2,9 @@
     Tests for data_handler module.
 """
 
-import json
 import logging
 import os
+import socket
 import sys
 import unittest
 from datetime import datetime
@@ -121,14 +121,13 @@ class TestDbInterface(unittest.TestCase):
     def test_get_db_cursor(self, mock_connect, mock_logger):
         # Prepare
         user_name = 'test_user'
-        host = 'test_host'
         db_name = 'test_db'
         password = 'test_password'
         mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
         mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
         mock_connect.return_value = mock_connection
         mock_connection.cursor.return_value = mock_cursor
-        db_interface = data_handler.DbInterface(host)
+        db_interface = data_handler.DbInterface()
         # Act
         result = db_interface.get_db_cursor(user_name, db_name, password)
         # Assert
@@ -151,11 +150,14 @@ class TestDbInterface(unittest.TestCase):
 
 
 class TestDbController(unittest.TestCase):
-    """"""
+    """
+    Should provide all necessary methods to define:
+    - database access,
+    - authorization methods.
+    """
     @classmethod
     def setUp(cls):
-        cls.host = '%'
-        cls.db_controller = data_handler.DbController(cls.host)
+        cls.db_controller = data_handler.DbController()
         cls.root_password = DB_ROOT_PWD
         cls.user_name = 'test_user'
 
@@ -167,6 +169,7 @@ class TestDbController(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         user_password = 'test_user_password'
+        host = socket.gethostname()
         # Act
         result = self.db_controller.create_user(self.user_name, user_password)
         # Assert
@@ -176,7 +179,7 @@ class TestDbController(unittest.TestCase):
             'mysql',
             self.root_password
         )
-        request_1 = f"CREATE USER '{self.user_name}'@'%'"
+        request_1 = f"CREATE USER '{self.user_name}'@'{host}'"
         request_2 = f"IDENTIFIED BY '{user_password}';"
         sql_request_1 = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_with(sql_request_1)
@@ -193,6 +196,7 @@ class TestDbController(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         db_name = 'test_database_name'
+        host = socket.gethostname()
         # Act
         result = self.db_controller.grant_privileges(self.user_name, db_name)
         # Assert
@@ -203,7 +207,7 @@ class TestDbController(unittest.TestCase):
             self.root_password
         )
         request_1 = f"GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON {self.user_name}_{db_name}.*"
-        request_2 = f"TO '{self.user_name}'@'%';"
+        request_2 = f"TO '{self.user_name}'@'{host}';"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
         mock_cursor.close.assert_called_once()
@@ -212,13 +216,14 @@ class TestDbController(unittest.TestCase):
 
 
 class TestDbDefiner(unittest.TestCase):
-    """"""
+    """
+    Should provide all necessary methods to define data structure.
+    """
     @classmethod
     def setUpClass(cls):
         cls.user_name = 'benoit'
-        cls.host = 'web_local'
         cls.password = 'test_password'
-        cls.db_definer = data_handler.DbDefiner(cls.host, cls.user_name)
+        cls.db_definer = data_handler.DbDefiner(cls.user_name)
 
     @patch('src.data.data_handler.DbDefiner.get_db_cursor')
     def test_create_database(self, mock_get_db_cursor):
@@ -305,15 +310,13 @@ class TestDbManipulator(unittest.TestCase):
     def setUpClass(cls):
         # Data definition
         cls.user_name = 'benoit'
-        cls.host = 'web_local'
-        cls.db_definer = data_handler.DbDefiner(cls.host, cls.user_name)
+        cls.db_definer = data_handler.DbDefiner(cls.user_name)
         # Data manipulation
         cls.table_name = 'version_voc'
         cls.db_name = 'english'
         cls.test_type = 'version'
         cls.password = 'test_password'
         cls.db_manipulator = data_handler.DbManipulator(
-            cls.host,
             cls.user_name,
             cls.db_name,
             cls.test_type

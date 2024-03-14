@@ -13,22 +13,23 @@ import os
 import sys
 
 import pandas as pd
-from loguru import logger
-from fastapi import Query, HTTPException, Request, status
+from fastapi import Request, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
+from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from src.data import users
-from src.api import interro
+from src.api import interro, main
 
-guest_router = APIRouter()
+guest_router = APIRouter(prefix='/guest')
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
+
 with open('conf/hum.json', 'r') as json_file:
     HUM = json.load(json_file)
 
@@ -47,13 +48,16 @@ def guest_not_allowed(request: Request):
 
 
 @guest_router.get("/interro-settings-guest", response_class=HTMLResponse)
-def interro_settings_guest(request: Request, token):
-    """Call the page that gets the user settings for one interro."""
-    logger.debug("Interro settings route called.")
+def interro_settings_guest(request: Request, token: str = Depends(main.check_token)):
+    """
+    Call the page that gets the user settings for one interro.
+    """
+    logger.debug(f"Token at interro settings guest: \n{token}")
     return templates.TemplateResponse(
         "guest/settings.html",
         {
             "request": request,
+            "token": token
         }
     )
 
