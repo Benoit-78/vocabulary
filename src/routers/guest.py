@@ -55,7 +55,6 @@ def interro_settings_guest(
     """
     Call the page that gets the user settings for one interro.
     """
-    logger.debug(f"Token at interro settings guest: \n{token}")
     return templates.TemplateResponse(
         "guest/settings.html",
         {
@@ -73,17 +72,14 @@ async def save_interro_settings_guest(
     """
     Acquire the user settings for one interro.
     """
-    logger.debug(f"Token at save interro settings guest: \n{token}")
     loader, test = interro.load_test(
-        user_name='guest',
+        user_name='wh0Are_y0u',
         db_name=HUM['user']['guest']['databases'][0],
         test_type=settings['testType'].lower(),
         test_length=settings['numWords'],
         password=HUM['user']['guest']['OK']
     )
     logger.info("User data loaded")
-    # global flag_data_updated
-    # flag_data_updated = False
     return JSONResponse(
         content=
         {

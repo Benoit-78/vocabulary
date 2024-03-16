@@ -80,7 +80,7 @@ async def create_token(
     """
     Function to generate a token for a guest or an existing user.
     """
-    logger.debug(f"data dict: {data}")
+    # logger.debug(f"data dict: {data}")
     if data is None:
         data = create_guest_user_name()
     logger.debug(f"data dict: {data}")
@@ -141,7 +141,8 @@ def check_token(token: str):
         users_list = get_users_names()
         if username not in users_list:
             raise credentials_exception
-        return username
+        # return username
+        return token
     except JWTError as exc:
         # If there's any JWTError, raise credentials_exception
         raise credentials_exception from exc

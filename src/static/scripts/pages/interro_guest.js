@@ -8,9 +8,6 @@ document.addEventListener(
 
 
 function sendUserSettings(testType, numWords, token) {
-    console.log("testType:", testType);
-    console.log("numWords:", numWords);
-    console.log("token:", token);
     fetch(
         `/guest/save-interro-settings-guest?token=${token}`,
         {

@@ -134,7 +134,9 @@ class DbInterface(ABC):
         self.host = socket.gethostname()
 
     def get_db_cursor(self, user_name, db_name, password):
-        """Connect to vocabulary database if credentials are correct."""
+        """
+        Connect to vocabulary database if credentials are correct.
+        """
         # logger.debug(f"user_name: {user_name}")
         # logger.debug(f"db_name: {db_name}")
         # logger.debug(f"password: {password}")
