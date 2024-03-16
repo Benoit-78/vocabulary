@@ -9,13 +9,15 @@
 
 import os
 import random
-import sys
 from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
+from loguru import logger
+from passlib.context import CryptContext
+from pydantic import BaseModel
 
 from src.data.data_handler import DbController
 
@@ -28,9 +30,33 @@ users_dict = {
         "password": None,
     }
 }
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto"
+)
 
 
-async def get_users_names():
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
+
+
+
+class UserInDB(User):
+    hashed_password: str
+
+
+
+def get_users_names():
     """
     Function to get the list of users names.
     """
@@ -39,14 +65,26 @@ async def get_users_names():
     return users_list
 
 
+def create_guest_user_name():
+    """
+    Function to create a guest user name.
+    """
+    guest_user_name = f"guest_{random.randint(1, 1_000_000)}"
+    return {"sub": guest_user_name}
 
-async def generate_token(expires_delta: Optional[int] = None):
+
+async def create_token(
+        data: dict = None,
+        expires_delta: Optional[int] = None
+    ):
     """
-    Function to generate a token for a guest
+    Function to generate a token for a guest or an existing user.
     """
-    to_encode = {
-        "guest_id": random.randint(1, 1_000_000)
-    }
+    logger.debug(f"data dict: {data}")
+    if data is None:
+        data = create_guest_user_name()
+    logger.debug(f"data dict: {data}")
+    to_encode = data.copy()
     if expires_delta:
         expire = datetime.now() + timedelta(minutes=expires_delta)
     else:
@@ -60,9 +98,30 @@ async def generate_token(expires_delta: Optional[int] = None):
     return encoded_jwt
 
 
+def get_user(users_db, username: str):
+    if username in users_db:
+        user_dict = users_db[username]
+        return UserInDB(**user_dict)
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def authenticate_user(users_db, username: str, password: str):
+    user = get_user(users_db, username)
+    if not user:
+        return 'User name unknown'
+    if not verify_password(password, user.hashed_password):
+        return 'Password incorrect'
+    return user
+
+
 def check_token(token: str):
     """
     Function to check if a token is valid.
+    - if the user is a guest, return the token.
+    - if the user is logged in, returns the user name.
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -76,8 +135,9 @@ def check_token(token: str):
             algorithms=[ALGORITHM]
         )
         username: str = payload.get('sub')
-        if username is None:
-            return 'guest'
+        logger.debug(f"username at check_token: {username}")
+        if username.startswith('guest_'):
+            return token
         users_list = get_users_names()
         if username not in users_list:
             raise credentials_exception

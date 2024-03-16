@@ -24,7 +24,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from src.data import users
-from src.api import interro, main
+from src.api import authentication, interro
 
 guest_router = APIRouter(prefix='/guest')
 cred_checker = users.CredChecker()
@@ -34,21 +34,24 @@ with open('conf/hum.json', 'r') as json_file:
     HUM = json.load(json_file)
 
 
-@guest_router.get("/guest-not-allowed", response_class=HTMLResponse)
-def guest_not_allowed(request: Request):
-    """
-    Page used each time a guest tries to access a page he has not access to.
-    """
-    return templates.TemplateResponse(
-        "guest/guest_not_allowed.html",
-        {
-            "request": request,
-        }
-    )
+# @guest_router.get("/guest-not-allowed", response_class=HTMLResponse)
+# def guest_not_allowed(request: Request):
+#     """
+#     Page used each time a guest tries to access a page he has not access to.
+#     """
+#     return templates.TemplateResponse(
+#         "guest/propose_to_connect.html",
+#         {
+#             "request": request,
+#         }
+#     )
 
 
 @guest_router.get("/interro-settings-guest", response_class=HTMLResponse)
-def interro_settings_guest(request: Request, token: str = Depends(main.check_token)):
+def interro_settings_guest(
+        request: Request,
+        token: str = Depends(authentication.check_token)
+    ):
     """
     Call the page that gets the user settings for one interro.
     """
@@ -56,43 +59,53 @@ def interro_settings_guest(request: Request, token: str = Depends(main.check_tok
     return templates.TemplateResponse(
         "guest/settings.html",
         {
-            "request": request,
-            "token": token
+            'request': request,
+            'token': token
         }
     )
 
 
-@guest_router.post("/interro-settings-guest")
-async def save_interro_settings_guest(settings: dict):
-    """Acquire the user settings for one interro."""
-    global loader
-    global test
+@guest_router.post("/save-interro-settings-guest")
+async def save_interro_settings_guest(
+        settings: dict,
+        token: str = Depends(authentication.check_token)
+    ):
+    """
+    Acquire the user settings for one interro.
+    """
+    logger.debug(f"Token at save interro settings guest: \n{token}")
     loader, test = interro.load_test(
         user_name='guest',
         db_name=HUM['user']['guest']['databases'][0],
-        test_type=settings["testType"].lower(),
-        test_length=settings["numWords"],
+        test_type=settings['testType'].lower(),
+        test_length=settings['numWords'],
         password=HUM['user']['guest']['OK']
     )
     logger.info("User data loaded")
-    global flag_data_updated
-    flag_data_updated = False
+    # global flag_data_updated
+    # flag_data_updated = False
     return JSONResponse(
         content=
         {
-            "message": "Guest user settings stored successfully."
+            'message': "Guest user settings stored successfully.",
+            'token': token,
+            'loader': loader,
+            'test': test
         }
     )
 
 
 @guest_router.get("/interro-question-guest/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_question_guest(
-    request: Request,
-    words: int,
-    count=None,
-    score=None):
-    """Call the page that asks the user the meaning of a word"""
-    # Instantiation
+        request: Request,
+        words: int,
+        count=None,
+        score=None,
+        token: str = Depends(authentication.check_token)
+    ):
+    """
+    Call the page that asks the user the meaning of a word
+    """
     try:
         count = int(count)
     except NameError:
@@ -110,12 +123,13 @@ def load_interro_question_guest(
     return templates.TemplateResponse(
         "guest/question.html",
         {
-            "request": request,
-            "numWords": words,
-            "count": count,
-            "score": score,
-            "progressPercent": progress_percent,
-            "content_box1": english
+            'request': request,
+            'numWords': words,
+            'count': count,
+            'score': score,
+            'progressPercent': progress_percent,
+            'content_box1': english,
+            'token': token
         }
     )
 

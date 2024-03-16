@@ -26,7 +26,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
 from src.routers import user_router, interro_router, guest_router, database_router, dashboard_router
-from src.api import main
+from src.api import authentication
 
 app = FastAPI(
     title="vocabulary",
@@ -34,7 +34,10 @@ app = FastAPI(
     # servers=[{"url": "https://www.vocabulary-app.com"}],
 )
 # Sessions
-app.add_middleware(SessionMiddleware, secret_key=main.SECRET_KEY)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=authentication.SECRET_KEY
+)
 # Routers
 app.include_router(user_router)
 app.include_router(interro_router)
@@ -42,13 +45,17 @@ app.include_router(guest_router)
 app.include_router(database_router)
 app.include_router(dashboard_router)
 # CSS
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
+app.mount(
+    "/static",
+    StaticFiles(directory="src/static"),
+    name="static"
+)
 # HTML
 templates = Jinja2Templates(directory="src/templates")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def welcome_page(request: Request, token: str = Depends(main.generate_token)):
+async def welcome_page(request: Request, token: str = Depends(authentication.create_token)):
     """
     Call the welcome page and assign a token to the guest.
     """
@@ -77,7 +84,7 @@ async def welcome_page(request: Request, token: str = Depends(main.generate_toke
 
 
 @app.get("/protected")
-async def protected_route(current_user: dict = Depends(main.get_current_user)):
+async def protected_route(current_user: dict = Depends(authentication.get_current_user)):
     """
     Example protected route that requires a valid token
     """

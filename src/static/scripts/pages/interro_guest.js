@@ -7,18 +7,28 @@ document.addEventListener(
 );
 
 
-function sendUserSettings(testType, numWords) {
-    fetch("/interro-settings-guest", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            testType: testType,
-            numWords: numWords
-        }),
-    })
+function sendUserSettings(testType, numWords, token) {
+    console.log("testType:", testType);
+    console.log("numWords:", numWords);
+    console.log("token:", token);
+    fetch(
+        `/guest/save-interro-settings-guest?token=${token}`,
+        {
+            method: "POST",
+            headers:
+            {
+                "Content-Type": "application/json",
+                // "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                testType: testType,
+                numWords: numWords,
+            })
+        }
+    )
     .then(answer => answer.json())
     .then(data => {
-        startTest(numWords)
+        startTest(numWords, token, loader, test)
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
@@ -26,15 +36,22 @@ function sendUserSettings(testType, numWords) {
 }
 
 
-function startTest(numWords) {
+function startTest(numWords, token, loader, test) {
     numWords = parseInt(numWords, 10);
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
-        window.location.href = `/interro-question-guest/${numWords}/0/0`;
+        // const userId = getUserId(); // Function to retrieve user ID or username
+        // localStorage.setItem(`loader_${userId}`, JSON.stringify(loader));
+        // localStorage.setItem(`test_${userId}`, JSON.stringify(test));
+        window.location.href = `/guest/interro-question-guest/${numWords}/0/0?token=${token}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
 }
+
+// const userId = getUserId(); // Function to retrieve user ID or username
+// const loader = JSON.parse(localStorage.getItem(`loader_${userId}`));
+// const test = JSON.parse(localStorage.getItem(`test_${userId}`));
 
 
 function showTranslation(numWords, count, score) {

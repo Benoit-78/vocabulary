@@ -51,7 +51,6 @@ def load_interro_settings(request, creds: dict):
 def load_test(user_name, db_name, test_type, test_length, password):
     """Load the interroooo!"""
     db_handler = data_handler.DbManipulator(
-        host='localhost',
         user_name=user_name,
         db_name=db_name,
         test_type=test_type,
