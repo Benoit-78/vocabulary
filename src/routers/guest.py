@@ -9,10 +9,14 @@
 """
 
 import json
+import pickle
 import os
 import sys
 
+# import base64
+import logging
 import pandas as pd
+import redis
 from fastapi import Request, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
@@ -29,25 +33,17 @@ from src.api import authentication, interro
 guest_router = APIRouter(prefix='/guest')
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
+redis_db = redis.Redis(
+    host='localhost',
+    port=6379,
+    db=0
+)
 
 with open('conf/hum.json', 'r') as json_file:
     HUM = json.load(json_file)
 
 
-# @guest_router.get("/guest-not-allowed", response_class=HTMLResponse)
-# def guest_not_allowed(request: Request):
-#     """
-#     Page used each time a guest tries to access a page he has not access to.
-#     """
-#     return templates.TemplateResponse(
-#         "guest/propose_to_connect.html",
-#         {
-#             "request": request,
-#         }
-#     )
-
-
-@guest_router.get("/interro-settings-guest", response_class=HTMLResponse)
+@guest_router.get("/interro-settings", response_class=HTMLResponse)
 def interro_settings_guest(
         request: Request,
         token: str = Depends(authentication.check_token)
@@ -64,7 +60,7 @@ def interro_settings_guest(
     )
 
 
-@guest_router.post("/save-interro-settings-guest")
+@guest_router.post("/save-interro-settings")
 async def save_interro_settings_guest(
         settings: dict,
         token: str = Depends(authentication.check_token)
@@ -72,26 +68,27 @@ async def save_interro_settings_guest(
     """
     Acquire the user settings for one interro.
     """
-    loader, test = interro.load_test(
+    logger.info("Route called: /guest/save-interro-settings")
+    _, test = interro.load_test(
         user_name='wh0Are_y0u',
         db_name=HUM['user']['guest']['databases'][0],
         test_type=settings['testType'].lower(),
         test_length=settings['numWords'],
         password=HUM['user']['guest']['OK']
     )
-    logger.info("User data loaded")
-    return JSONResponse(
+    test = pickle.dumps(test)
+    redis_db.set(token, test)
+    response = JSONResponse(
         content=
         {
             'message': "Guest user settings stored successfully.",
-            'token': token,
-            'loader': loader,
-            'test': test
+            'token': token
         }
     )
+    return response
 
 
-@guest_router.get("/interro-question-guest/{words}/{count}/{score}", response_class=HTMLResponse)
+@guest_router.get("/interro-question/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_question_guest(
         request: Request,
         words: int,
@@ -110,10 +107,12 @@ def load_interro_question_guest(
         score = int(score)
     except NameError:
         score = 0
-    global test
+    pickelized_test = redis_db.get(token)
+    test = pickle.loads(pickelized_test)
     progress_percent = int(count / int(words) * 100)
     index = test.interro_df.index[count]
     english = test.interro_df.loc[index][0]
+    logger.debug(f"English: {english}")
     english = english.replace("'", "\'")
     count += 1
     return templates.TemplateResponse(
@@ -130,7 +129,7 @@ def load_interro_question_guest(
     )
 
 
-@guest_router.get("/interro-answer-guest/{words}/{count}/{score}", response_class=HTMLResponse)
+@guest_router.get("/interro-answer/{words}/{count}/{score}", response_class=HTMLResponse)
 def load_interro_answer_guest(
     request: Request,
     words: int,
@@ -162,7 +161,7 @@ def load_interro_answer_guest(
     )
 
 
-@guest_router.post("/user-answer-guest")
+@guest_router.post("/user-answer")
 async def get_user_response_guest(data: dict):
     """Acquire the user decision: was his answer right or wrong."""
     global test
@@ -188,7 +187,7 @@ async def get_user_response_guest(data: dict):
     )
 
 
-@guest_router.get("/propose-rattraps-guest/{words}/{count}/{score}", response_class=HTMLResponse)
+@guest_router.get("/propose-rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
 def propose_rattraps_guest(
     request: Request,
     words: int,
@@ -218,7 +217,7 @@ def propose_rattraps_guest(
     )
 
 
-@guest_router.get("/interro-end-guest/{words}/{score}", response_class=HTMLResponse)
+@guest_router.get("/interro-end/{words}/{score}", response_class=HTMLResponse)
 def end_interro_guest(
     request: Request,
     words: int,

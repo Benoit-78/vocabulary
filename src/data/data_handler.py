@@ -107,22 +107,6 @@ class CsvHandler():
             encoding='utf-8'
         )
 
-    # Row-level operations
-    def insert_word(self, word, table):
-        """Add a word to the table."""
-
-    def read_word(self, word, table):
-        """Read the given word."""
-
-    def update_word(self, word, table):
-        """Update statistics on the given word."""
-
-    def delete_word(self, word, table):
-        """Delete the given word in the given table."""
-
-    def transfer_word(self, word, table):
-        """Copy a word from its original table to the output table (theme or archive)."""
-
 
 
 class DbInterface(ABC):
@@ -255,7 +239,7 @@ class DbDefiner(DbInterface):
         self.user_name = user_name
         self.db_name = None
 
-    def create_database(self, root_password, password, db_name):
+    def create_database(self, root_password, db_name):
         """
         Create a database with the given database name
         """
@@ -273,7 +257,7 @@ class DbDefiner(DbInterface):
             connection.close()
         return result
 
-    def get_user_databases(self, root_password, password):
+    def get_user_databases(self, root_password):
         """
         Get the list of databases for the user.
         """
@@ -456,7 +440,9 @@ class DbManipulator(DbInterface):
         return 0
 
     def read_word(self, password, english: str):
-        """Read the given word"""
+        """
+        Read the given word
+        """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = "SELECT english, français, score"
@@ -472,7 +458,9 @@ class DbManipulator(DbInterface):
         return english, native, score
 
     def update_word(self, password, english: str, new_nb, new_score):
-        """Update statistics on the given word"""
+        """
+        Update statistics on the given word
+        """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = f"UPDATE {words_table_name}"
@@ -488,7 +476,9 @@ class DbManipulator(DbInterface):
         return True
 
     def delete_word(self, password, english):
-        """Delete a word from the words table of the instance database."""
+        """
+        Delete a word from the words table of the instance database.
+        """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = f"DELETE FROM {words_table_name}"

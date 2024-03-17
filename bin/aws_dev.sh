@@ -104,6 +104,8 @@ pip install -r requirements.txt
 # =======================
 cd ~/vocabulary
 # DEV
+redis-server
+
 uvicorn src.web_app:app \
     --port 8080 \
     --host 0.0.0.0 \

@@ -5,5 +5,5 @@ function goToRoot() {
 
 
 function interroGuest(token) {
-    window.location.href = `/guest/interro-settings-guest?token=${token}`;
+    window.location.href = `/guest/interro-settings?token=${token}`;
 }

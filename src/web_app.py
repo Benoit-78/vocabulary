@@ -8,9 +8,7 @@
 """
 
 import os
-import random
 import sys
-from typing import Optional
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -21,7 +19,7 @@ from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from loguru import logger
+# from loguru import logger
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
@@ -55,11 +53,13 @@ templates = Jinja2Templates(directory="src/templates")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def welcome_page(request: Request, token: str = Depends(authentication.create_token)):
+async def welcome_page(
+        request: Request,
+        token: str = Depends(authentication.create_token)
+    ):
     """
     Call the welcome page and assign a token to the guest.
     """
-    logger.debug(f"Token at root:\n{token}")
     return templates.TemplateResponse(
         "welcome.html",
         {
@@ -69,74 +69,70 @@ async def welcome_page(request: Request, token: str = Depends(authentication.cre
     )
 
 
-# @app.post("/token")
-# async def login_for_access_token():
-#     """
-#     Example login route that returns a token
-#     """
-#     logger.debug("Token route called")
-#     token_data = {"sub": "testuser"}
-#     result_dict = {
-#         "access_token": create_token(token_data),
-#         "token_type": "bearer"
-#     }
-#     return result_dict
-
-
-@app.get("/protected")
-async def protected_route(current_user: dict = Depends(authentication.get_current_user)):
-    """
-    Example protected route that requires a valid token
-    """
-    result_dict = {
-        "message": "You have access!",
-        "user": current_user
-    }
-    return result_dict
-
-
 @app.get("/sign-in", response_class=HTMLResponse)
-def sign_in(request: Request):
-    """Call the sign-in page"""
+def sign_in(
+        request: Request,
+        token: str = Depends(authentication.check_token)
+    ):
+    """
+    Call the sign-in page.
+    """
     return templates.TemplateResponse(
         "user/sign_in.html",
         {
-            "request": request
+            "request": request,
+            "token": token,
         }
     )
 
 
 @app.get("/create-account", response_class=HTMLResponse)
-def create_account(request: Request):
+def create_account(
+        request: Request,
+        token: str = Depends(authentication.check_token)
+    ):
     """
-    Call the create account page
+    Call the create account page.
     """
     return templates.TemplateResponse(
         "user/create_account.html",
         {
             "request": request,
-            "errorMessage": ""
+            "errorMessage": "",
+            'token': token
         }
     )
 
 
 @app.get("/about-the-app", response_class=HTMLResponse)
-def about_the_app(request: Request):
-    """Call the page that helps the user to get started."""
+def about_the_app(
+        request: Request,
+        token: str = Depends(authentication.check_token)
+    ):
+    """
+    Call the page that helps the user to get started.
+    """
     return templates.TemplateResponse(
         "about_the_app.html",
         {
             "request": request,
+            'token': token
         }
     )
 
 
 @app.get("/help", response_class=HTMLResponse)
-def get_help(request: Request):
-    """Help!"""
+def get_help(
+        request: Request,
+        token: str = Depends(authentication.check_token)
+    ):
+    """
+    Help!
+    """
     return templates.TemplateResponse(
         "help.html",
         {
             "request": request,
+            'token': token
         }
     )

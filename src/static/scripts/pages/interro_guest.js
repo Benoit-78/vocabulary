@@ -9,13 +9,12 @@ document.addEventListener(
 
 function sendUserSettings(testType, numWords, token) {
     fetch(
-        `/guest/save-interro-settings-guest?token=${token}`,
+        `/guest/save-interro-settings?token=${token}`,
         {
             method: "POST",
             headers:
             {
-                "Content-Type": "application/json",
-                // "Authorization": `Bearer ${token}`
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 testType: testType,
@@ -23,9 +22,14 @@ function sendUserSettings(testType, numWords, token) {
             })
         }
     )
-    .then(answer => answer.json())
+    .then(response => {
+        if (!response.ok) { // Check if the response status is NOK (outside the range 200-299)
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        startTest(numWords, token, loader, test)
+        startTest(numWords, token)
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
@@ -33,22 +37,16 @@ function sendUserSettings(testType, numWords, token) {
 }
 
 
-function startTest(numWords, token, loader, test) {
+function startTest(numWords, token) {
     numWords = parseInt(numWords, 10);
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
-        // const userId = getUserId(); // Function to retrieve user ID or username
-        // localStorage.setItem(`loader_${userId}`, JSON.stringify(loader));
-        // localStorage.setItem(`test_${userId}`, JSON.stringify(test));
-        window.location.href = `/guest/interro-question-guest/${numWords}/0/0?token=${token}`;
+        window.location.href = `/guest/interro-question/${numWords}/0/0?token=${token}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
 }
 
-// const userId = getUserId(); // Function to retrieve user ID or username
-// const loader = JSON.parse(localStorage.getItem(`loader_${userId}`));
-// const test = JSON.parse(localStorage.getItem(`test_${userId}`));
 
 
 function showTranslation(numWords, count, score) {
@@ -56,7 +54,7 @@ function showTranslation(numWords, count, score) {
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (!isNaN(numWords)) {
-        window.location.href = `/interro-answer-guest/${numWords}/${count}/${score}`;
+        window.location.href = `/interro-answer/${numWords}/${count}/${score}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
@@ -64,7 +62,7 @@ function showTranslation(numWords, count, score) {
 
 
 function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2) {
-    fetch("/user-answer-guest", {
+    fetch("/user-answer", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -96,7 +94,7 @@ function nextGuess(numWords, count, score) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
-    window.location.href = `/interro-question-guest/${numWords}/${count}/${score}`;
+    window.location.href = `/interro-question/${numWords}/${count}/${score}`;
 }
 
 
@@ -105,8 +103,8 @@ function endInterro(numWords, count, score) {
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (score === numWords) {
-        window.location.href = `/interro-end-guest/${numWords}/${score}`;
+        window.location.href = `/interro-end/${numWords}/${score}`;
     } else {
-        window.location.href = `/propose-rattraps-guest/${numWords}/${count}/${score}`;
+        window.location.href = `/propose-rattraps/${numWords}/${count}/${score}`;
     }
 }

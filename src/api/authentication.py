@@ -83,7 +83,6 @@ async def create_token(
     # logger.debug(f"data dict: {data}")
     if data is None:
         data = create_guest_user_name()
-    logger.debug(f"data dict: {data}")
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now() + timedelta(minutes=expires_delta)
