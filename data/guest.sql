@@ -1,4 +1,5 @@
 
+CREATE DATABASE english;
 USE vocabulary;
 
 
@@ -63,15 +64,15 @@ CREATE TABLE IF NOT EXISTS archive (
 ---------------------
 -- If through uvicorn: localhost
 -- If through a container: db
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO 'guest'@'localhost';
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_voc TO 'guest'@'localhost';
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_words_count TO 'guest'@'localhost';
+GRANT SELECT ON theme_perf TO 'wh0Are_y0u'@'localhost';
+GRANT SELECT ON theme_voc TO 'wh0Are_y0u'@'localhost';
+GRANT SELECT ON theme_words_count TO 'wh0Are_y0u'@'localhost';
 
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON version_perf TO 'guest'@'localhost';
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON version_voc TO 'guest'@'localhost';
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON version_words_count TO 'guest'@'localhost';
+GRANT SELECT ON version_perf TO 'wh0Are_y0u'@'localhost';
+GRANT SELECT ON version_voc TO 'wh0Are_y0u'@'localhost';
+GRANT SELECT ON version_words_count TO 'wh0Are_y0u'@'localhost';
 
-GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON archive TO 'guest'@'localhost';
+GRANT SELECT ON archive TO 'wh0Are_y0u'@'localhost';
 
 
 

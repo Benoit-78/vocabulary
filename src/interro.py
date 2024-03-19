@@ -23,12 +23,15 @@ from loguru import logger
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
-from src import utils
+
+from src.utils.data import complete_columns
 
 
 
 class CliUser():
-    """User who launchs the app through the CLI."""
+    """
+    User who launchs the app through the CLI.
+    """
     def __init__(self):
         self.settings = None
 
@@ -99,6 +102,7 @@ class Loader():
         """
         self.tables = self.data_handler.get_tables(password)
         voc = self.test_type + '_voc'
+        # self.tables[voc] = self.tables[voc].reset_index()
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]
         self.tables[voc] = self.tables[voc].sort_values(
             by='creation_date',
@@ -164,8 +168,6 @@ class Test(Interro):
         """The word must not have been already asked."""
         next_index = random.randint(1, self.words_df.shape[0] - 1)
         next_index = max(next_index, 1)
-        # logger.debug(f"words_df shape: {self.words_df.shape}")
-        # logger.debug(f"words_df head: \n{self.words_df.head()}")
         already_asked = self.words_df.loc[next_index, 'query'] == 1
         i = 0
         while already_asked and i < (self.words_df.shape[0] + 1):
@@ -318,7 +320,7 @@ class Updater():
 
     def copy_good_words(self):
         """Copy the well-good words in the next step table."""
-        self.good_words_df = utils.complete_columns(
+        self.good_words_df = complete_columns(
             self.loader.tables['output'],
             self.good_words_df
         )

@@ -13,8 +13,9 @@
 <body>
     <div class="container">
         <form>
+
             <div class="row">
-                <label for="test-type">Test type:</label>
+                <label for="test-type">Choose your database:</label>
             </div>
             <div class="row">
                 <select id="db_name" name="db_name" class="dropdown-container" required>
@@ -22,12 +23,17 @@
                     <option value="db_2">database_2</option>
                 </select>
             </div>
+
+            <div class="row">
+                <label for="test-type">Choose your test type:</label>
+            </div>
             <div class="row">
                 <select id="test-type" name="test-type" class="dropdown-container" required>
-                    <option value="Version">EN -> FR</option>
-                    <option value="Theme">FR -> EN</option>
+                    <option value="Version">Normal</option>
+                    <option value="Theme">Reverse</option>
                 </select>
             </div>
+
             <div class="row">
                 <label for="num-words">Number of words:</label>
             </div>
@@ -40,16 +46,19 @@
                     <option value="2">2</option>
                 </select>
             </div>
+
         </form>
         <div class="row">
             <button class="button" onclick="sendUserSettings(
                 `{{ userName }}`,
+                `{{ userPassword }}`,
+                document.getElementById('db_name').value,
                 document.getElementById('test-type').value,
                 document.getElementById('num-words').value
                 )">Start Test</button>
-        </div>
+        </div>EN -> FR
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`, `{{ userPassword }}`)">Quit</button>
         </div>
     </div>
 </body>

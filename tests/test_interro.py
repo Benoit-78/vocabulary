@@ -16,10 +16,13 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-REPO_DIR = os.getcwd().split('tests')[0]
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
+
 from src import interro, views_local
 from src.data import data_handler
+
 
 
 class TestParser(unittest.TestCase):
@@ -97,7 +100,6 @@ class TestLoader(unittest.TestCase):
         cls.data_manipulator = data_handler.DbManipulator(
             user_name='test_user',
             db_name='test_db',
-            host='test_host',
             test_type='test_type'
         )
         cls.loader = None
@@ -134,7 +136,6 @@ class TestTest(unittest.TestCase):
         cls.data_handler_1 = data_handler.DbManipulator(
             user_name='test_user',
             db_name='test_db',
-            host='test_host',
             test_type='test_type'
         )
         cls.loader_1 = interro.Loader(
@@ -394,7 +395,6 @@ class TestUpdater(unittest.TestCase):
         cls.data_handler_1 = data_handler.DbManipulator(
             user_name='test_user',
             db_name='test_db',
-            host='test_host',
             test_type=cls.user_1.settings.type
         )
         cls.loader_1 = interro.Loader(rattraps, cls.data_handler_1)

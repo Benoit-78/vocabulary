@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <title>Add a word</title>
-        <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-        <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-        <script type="text/javascript" src="/static/scripts/main.js"></script>
-        <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add a word</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
+</head>
 
 <body>
     <div class="container">
-        <div class="row">
-            <div>
-                <label for="input1">User name</label>
-                <input type="text" id="content_box1" name="content_box1">
+        <form onsubmit="return signIn()">
+            <div class="row">
+                <label for="inputName">User name</label>
+                <input type="text" id="inputName" name="inputName" required>
             </div>
-        </div>
-        <div class="row"></div>
-            <div>
-                <label for="input2">Password</label>
-                <input type="text" id="content_box2" name="content_box2">
+            <div class="row">
+                <label for="inputPassword">Password</label>
+                <input type="password" id="inputPassword" name="inputPassword" required>
             </div>
-        </div>
-        <div class="row">
-            <button class="button" onclick="signIn(`{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">Sign in</button>
-        </div>
+            <div class="row">
+                <button type="submit" class="button">Sign in</button>
+            </div>
+        </form>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
         </div>

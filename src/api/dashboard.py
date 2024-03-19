@@ -1,8 +1,10 @@
 """
     Creation date:
         16th December 2023
+    Creator:
+        B. Delorme
     Main purpose:
-
+        Hosts the functions of interro router.
 """
 
 import os
@@ -14,11 +16,34 @@ import plotly.express as px
 import plotly.io as pio
 from loguru import logger
 
+
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
+if REPO_DIR not in sys.path:
+    sys.path.append(REPO_DIR)
+
+from src.data import users
 from src.data.data_handler import DbManipulator
 
+cred_checker = users.CredChecker()
+
+
+def get_user_dashboards(request, user_name, user_password, db_name):
+    """
+    Get the user dashboards.
+    """
+    graphs = load_graphs(user_name, user_password, db_name)
+    request_dict = {
+        "request": request,
+        "graph_1": graphs[0],
+        "graph_2": graphs[1],
+        "graph_3": graphs[2],
+        "graph_4": graphs[3],
+        "graph_5": graphs[4],
+        "userName": user_name,
+        "userPassword": user_password
+    }
+    return request_dict
 
 
 class WordsGraph(ABC):
@@ -29,11 +54,11 @@ class WordsGraph(ABC):
         self.data = pd.DataFrame()
 
     @abstractmethod
-    def set_data(self):
+    def set_data(self, user_password):
         """Fetch the data that will feed the graph."""
 
     @abstractmethod
-    def create(self):
+    def create(self, user_password):
         """
         Display the data in a graph
         and return this graph as an html file.
@@ -45,28 +70,30 @@ class WordsGraph1(WordsGraph):
     """
     Graph that represents the evolution of test performance.
     """
-    def set_data(self):
+    def set_data(self, user_password):
         """See abstract method description"""
-        tables = self.db_handler.get_tables()
+        tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_perf'
         self.data = tables[voc_table_name]
 
     def correct_data(self):
         """Correct imprecisions or errors in the data"""
+        logger.debug(f"Columns: \n{self.data.columns}")
+        logger.debug(f"Data: \n{self.data}")
         self.data = self.data[self.data['test']<=100]
         self.data = self.data[self.data['test']>=0]
 
-    def create(self):
+    def create(self, user_password):
         """See abstract method description"""
-        self.set_data()
+        self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
             x=list(self.data['test_date']),
             y=list(self.data['test']),
             labels={'x': 'Test count', 'y': 'Success rate'},
             title='Graph 1',
-            render_mode='webgl',  # Use webgl for scattergl
-            template='plotly_dark'  # Set the template to 'plotly_dark' for a black background
+            render_mode='webgl',
+            template='plotly_dark'
         )
         fig.update_traces(
             marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
@@ -89,9 +116,9 @@ class WordsGraph2(WordsGraph):
     Graph that represents the success rate of each word
     in function of the number of times it has been asked.
     """
-    def set_data(self):
+    def set_data(self, user_password):
         """See abstract method description"""
-        tables = self.db_handler.get_tables()
+        tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_voc'
         voc_table = tables[voc_table_name]
         self.data = voc_table[[
@@ -105,9 +132,9 @@ class WordsGraph2(WordsGraph):
         self.data = self.data[self.data['taux']<=100]
         self.data = self.data[self.data['taux']>=-100]
 
-    def create(self):
+    def create(self, user_password):
         """See abstract method description"""
-        self.set_data()
+        self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
             x=list(self.data['nb']),
@@ -117,17 +144,29 @@ class WordsGraph2(WordsGraph):
                 'y': 'Success rate'
             },
             title='Graph 2',
-            render_mode='webgl',  # Use webgl for scattergl
-            template='plotly_dark'  # Set the template to 'plotly_dark' for a black background
+            render_mode='webgl',
+            template='plotly_dark'
         )
         fig.update_traces(
-            marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
-            selector=dict(mode='markers')
+            marker=dict(
+                color='orange',
+                size=5,
+                opacity=0.8,
+                line={
+                    'color': 'orange',
+                    'width':2
+                }
+            ),
+            selector={
+                'mode': 'markers'
+            }
         )
         fig.update_layout(
             plot_bgcolor='black',
             paper_bgcolor='black',
-            font=dict(color='white'),
+            font={
+                'color': 'white'
+            },
             width=450,
             height=500
         )
@@ -141,9 +180,9 @@ class WordsGraph3(WordsGraph):
     Graph that represents the success rate of each word
     in function of its date rank in the words table.
     """
-    def set_data(self):
+    def set_data(self, user_password):
         """See abstract method description"""
-        tables = self.db_handler.get_tables()
+        tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_voc'
         voc_table = tables[voc_table_name]
         self.data = voc_table[[
@@ -156,9 +195,9 @@ class WordsGraph3(WordsGraph):
         self.data = self.data[self.data['taux']<=100]
         self.data = self.data[self.data['taux']>=-100]
 
-    def create(self):
+    def create(self, user_password):
         """See abstract method description"""
-        self.set_data()
+        self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
             x=list(self.data.index),
@@ -168,8 +207,8 @@ class WordsGraph3(WordsGraph):
                 'y': 'Success rate'
             },
             title='Graph 3',
-            render_mode='webgl',  # Use webgl for scattergl
-            template='plotly_dark'  # Set the template to 'plotly_dark' for a black background
+            render_mode='webgl',
+            template='plotly_dark'
         )
         fig.update_traces(
             marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
@@ -192,9 +231,9 @@ class WordsGraph4(WordsGraph):
     Graph that represents the queries count of each word
     in function of its date rank in the words table.
     """
-    def set_data(self):
+    def set_data(self, user_password):
         """See abstract method description"""
-        tables = self.db_handler.get_tables()
+        tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_voc'
         voc_table = tables[voc_table_name]
         self.data = voc_table[[
@@ -206,9 +245,9 @@ class WordsGraph4(WordsGraph):
         """Correct imprecisions or errors in the data"""
         self.data = self.data[self.data['nb']>=0]
 
-    def create(self):
+    def create(self, user_password):
         """See abstract method description"""
-        self.set_data()
+        self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
             x=list(self.data.index),
@@ -218,8 +257,8 @@ class WordsGraph4(WordsGraph):
                 'y': 'Queries count'
             },
             title='Graph 4',
-            render_mode='webgl',  # Use webgl for scattergl
-            template='plotly_dark'  # Set the template to 'plotly_dark' for a black background
+            render_mode='webgl',
+            template='plotly_dark'
         )
         fig.update_traces(
             marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
@@ -242,9 +281,9 @@ class WordsGraph5(WordsGraph):
     Graph that represents the queries count of each word
     in function of its date rank in the words table.
     """
-    def set_data(self):
+    def set_data(self, user_password):
         """See abstract method description"""
-        tables = self.db_handler.get_tables()
+        tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_words_count'
         self.data = tables[voc_table_name]
 
@@ -252,9 +291,9 @@ class WordsGraph5(WordsGraph):
         """Correct imprecisions or errors in the data"""
         self.data = self.data[self.data['words_count']>=0]
 
-    def create(self):
+    def create(self, user_password):
         """See abstract method description"""
-        self.set_data()
+        self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
             x=list(self.data['test_date']),
@@ -264,8 +303,8 @@ class WordsGraph5(WordsGraph):
                 'y': 'Words count'
             },
             title='Graph 5',
-            render_mode='webgl',  # Use webgl for scattergl
-            template='plotly_dark'  # Set the template to 'plotly_dark' for a black background
+            render_mode='webgl',
+            template='plotly_dark'
         )
         fig.update_traces(
             marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
@@ -283,13 +322,13 @@ class WordsGraph5(WordsGraph):
 
 
 
-def load_graphs():
+def load_graphs(user_name, user_password, db_name):
     """Load the user's graphs"""
     html_graphs = []
     # Version
     data_manipulator = DbManipulator(
-        host='web_local',
-        db_name='english',
+        user_name=user_name,
+        db_name=db_name,
         test_type='version'
     )
     # Instanciate
@@ -299,11 +338,11 @@ def load_graphs():
     graph_4 = WordsGraph4(data_manipulator)
     graph_5 = WordsGraph5(data_manipulator)
     # Create graphs
-    graph_1_html = graph_1.create()
-    graph_2_html = graph_2.create()
-    graph_3_html = graph_3.create()
-    graph_4_html = graph_4.create()
-    graph_5_html = graph_5.create()
+    graph_1_html = graph_1.create(user_password)
+    graph_2_html = graph_2.create(user_password)
+    graph_3_html = graph_3.create(user_password)
+    graph_4_html = graph_4.create(user_password)
+    graph_5_html = graph_5.create(user_password)
     # Save graphs
     html_graphs.append(graph_1_html)
     html_graphs.append(graph_2_html)

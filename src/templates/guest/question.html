@@ -36,7 +36,9 @@
             </div>
         </div>
         <div class="row">
-            <button class="button middle_button" onclick="showTranslation({{ numWords }}, {{ count }}, {{ score }})">Show translation</button>
+            <button class="button middle_button" onclick="showTranslation(
+                {{ numWords }}, {{ count }}, {{ score }}, `{{ token }}`
+                )">Show translation</button>
         </div>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>

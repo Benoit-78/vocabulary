@@ -9,15 +9,20 @@ import json
 import os
 import sys
 from abc import ABC, abstractmethod
+from dotenv import load_dotenv
 
 from fastapi import HTTPException
 from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
+if REPO_DIR not in sys.path:
+    sys.path.append(REPO_DIR)
 
 from src.data.data_handler import DbController, DbDefiner, DbManipulator 
+
+load_dotenv()
+DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
 
 
 
@@ -26,29 +31,22 @@ class CredChecker():
     def __init__(self):
         self.name = ""
         self.password = ""
-        self.db_controller = DbController(
-            host='localhost'
-        )
+        self.db_controller = DbController()
 
     def check_input_name(self, name_to_check):
         """Check if the input name belongs to the users list."""
-        with open("conf/hum.json", "r") as hum_file:
-            hum_dict = json.load(hum_file)
-        hum_pwd = hum_dict['user']['root']['OK']
-        users_list = self.db_controller.get_users_list(
-            hum_pwd
-        )
+        users_list = self.db_controller.get_users_list()
         if name_to_check in users_list:
             return True
-        else:
-            return False
+        return False
 
     def check_input_password(self, user_name, password_to_check):
         """Check if the input password is correct."""
         secrets = {
             'benoit': "vive la vie",
             'Donald Trump': "Make America Great Again",
-            'Caesar': "Veni, vidi, vici"
+            'Caesar': "Veni, vidi, vici",
+            'usr': 'pwd'
         }
         if password_to_check == secrets[user_name]:
             return True
@@ -78,7 +76,7 @@ class CredChecker():
     def check_user_name(self, name_to_check):
         """Validate user name."""
         if name_to_check in [None, ""]:
-            logger.warning(f"Input name is empty or somewhat sneaky.")
+            logger.warning("Input name is empty or somewhat sneaky.")
             self.flag_incorrect_user_name(name_to_check)
         if not self.check_input_name(name_to_check):
             logger.warning(f"Input name {name_to_check} unknown.")
@@ -87,12 +85,12 @@ class CredChecker():
     def check_password(self, name_to_check, password_to_check):
         """Validate user password."""
         if password_to_check in [None, ""]:
-            logger.warning(f"Input password is empty or somewhat sneaky.")
+            logger.warning("Input password is empty or somewhat sneaky.")
             self.flag_incorrect_user_password(name_to_check, password_to_check)
-        # if not self.check_input_password(name_to_check, password_to_check):
-        #     logger.warning(f"Input password '{password_to_check}' incorrect.")
-        #     self.flag_incorrect_user_password(name_to_check, password_to_check)
-        # logger.success(f"Password valid.")
+        if not self.check_input_password(name_to_check, password_to_check):
+            logger.warning(f"Input password '{password_to_check}' incorrect.")
+            self.flag_incorrect_user_password(name_to_check, password_to_check)
+        logger.success("Password valid.")
 
     def check_credentials(self, name_to_check, password_to_check):
         """Validate user credentials."""
@@ -140,6 +138,7 @@ class UserAccount(Account):
     such as Controller, Definer, and Manipulator.
     """
     def __init__(self, user_name, user_password):
+        super().__init__()
         self.user_name = user_name
         self.user_password = user_password
 
@@ -147,31 +146,18 @@ class UserAccount(Account):
         """
         Acquire name and password, and store them in the credentials.
         """
-        # Prepare
-        with open("conf/hum.json", "r") as hum_file:
-            hum_dict = json.load(hum_file)
-        hum_pwd = hum_dict['user']['root']['OK']
-        # Create user on localhost
         for host in ['localhost']:  # '%' has been removed from the list
             account_exists = self.check_if_account_exists(host)
             if account_exists:
                 return 1
             db_controller = DbController(host=host)
-            db_controller.create_user(
-                root_password=hum_pwd,
-                user_name=self.user_name,
-                user_password=self.user_password
-            )
+            db_controller.create_user(self.user_name, self.user_password)
+            db_controller.grant_privileges_on_common_database(self.user_name)
         return 0
 
     def check_if_account_exists(self, host):
         db_controller = DbController(host=host)
-        with open("conf/hum.json", "r") as hum_file:
-            hum_dict = json.load(hum_file)
-        hum_pwd = hum_dict['user']['root']['OK']
-        users_list = db_controller.get_users_list(
-            hum_pwd
-        )
+        users_list = db_controller.get_users_list()
         if self.user_name in users_list:
             logger.error(f"User name '{self.user_name}' already exists.")
             return True
@@ -218,29 +204,18 @@ class UserAccount(Account):
         if account_exists:
             return 1
         # Create database
-        with open("conf/hum.json", "r") as hum_file:
-            hum_dict = json.load(hum_file)
-        hum_pwd = hum_dict['user']['root']['OK']
         for host in ['localhost']:  # '%' has been removed from the list
             db_definer = DbDefiner(host, self.user_name)
             db_created = db_definer.create_database(
-                hum_pwd,
+                DB_ROOT_PWD,
                 self.user_password,
                 db_name
             )
             if not db_created:
                 return 1
             db_controller = DbController(host)
-            db_controller.grant_privileges(
-                hum_pwd,
-                self.user_name,
-                db_name
-            )
-            tables_created = db_definer.create_seven_tables(
-                hum_pwd,
-                self.user_password,
-                db_name
-            )
+            db_controller.grant_privileges(self.user_name, db_name)
+            tables_created = db_definer.create_seven_tables(self.user_password, db_name)
             if not tables_created:
                 logger.error(f"Error with the creation of tables for {db_name}.")
                 return 1
@@ -250,19 +225,15 @@ class UserAccount(Account):
         """
         Check if the user's database already exists.
         """
-        with open("conf/hum.json", "r") as hum_file:
-            hum_dict = json.load(hum_file)
-        hum_pwd = hum_dict['user']['root']['OK']
         for host in ['localhost']:  # '%' has been removed from the list
-            db_definer = DbDefiner('localhost', self.user_name)
-            db_names = db_definer.get_user_databases(hum_pwd, self.user_password)
+            db_definer = DbDefiner(host, self.user_name)
+            db_names = db_definer.get_user_databases(DB_ROOT_PWD, self.user_password)
             sql_db_name = self.user_name + '_' + db_name
             if sql_db_name in db_names:
                 logger.error(f"Database name {db_name} already exists.")
                 return True
-            else:
-                logger.success(f"Database name {db_name} is available.")
-                return False
+            logger.success(f"Database name {db_name} is available.")
+            return False
 
     def rename_database(self, old_name, new_name):
         """

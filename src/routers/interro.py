@@ -2,7 +2,7 @@
     Creation date:
         4th February 2024
     Main purpose:
-        Gathers API routes dedicated to user interooooo !!!!!
+        Gathers API routes dedicated to user interooooo!!!!!
 """
 
 import os
@@ -10,104 +10,62 @@ import sys
 
 import pandas as pd
 from loguru import logger
-from fastapi import Query, HTTPException, Request, status
+from fastapi import Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
+from typing import Dict, Any
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
+if REPO_DIR not in sys.path:
+    sys.path.append(REPO_DIR)
 
-from src import interro, views
-from src.utils import interro as interro_utils
-from src.data import users, data_handler
+from src.api import interro as interro_api
+from src.data import users
 
-interro_router = APIRouter()
+interro_router = APIRouter(prefix='/interro')
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 
-@interro_router.get("/interro-settings", response_class=HTMLResponse)
-def interro_settings(
-    request: Request,
-    query: str = Query(None, alias="userName")
-    ):
-    """Call the page that gets the user settings for one interro."""
-    # Authenticate user
-    user_name = query.split('?')[0]
-    user_password = query.split('?')[1].split('=')[1]
-    if user_name:
-        cred_checker.check_credentials(user_name, user_password)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    # Load settings page
-    return templates.TemplateResponse(
-        "user/interro_settings.html",
-        {
-            "request": request,
-            "userName": user_name,
-            "userPassword": user_password
-        }
-    )
+@interro_router.post("/interro-settings", response_class=HTMLResponse)
+def interro_settings(request: Request, input_dict: Dict[str, Any]):
+    """
+    Call the page that gets the user settings for one interro.
+    """
+    request_dict = interro_api.load_interro_settings(request, input_dict)
+    return templates.TemplateResponse("interro/settings.html", request_dict)
 
 
 @interro_router.get("/interro-question", response_class=HTMLResponse)
 def load_interro_question(
     request: Request,
-    query: str = Query(None, alias="userName")
+    user_name: str = Query(None, alias="userName"),
+    user_password: str = Query(None, alias="userPassword"),
+    db_name: str = Query(None, alias="databaseName"),
+    test_type: str = Query(None, alias="testType"),
+    total: str = Query(None, alias="total"),
+    count: str = Query(None, alias="count"),
+    score: str = Query(None, alias="score")
     ):
-    """Call the page that asks the user the meaning of a word"""
-    # Authenticate user
-    user_name = query.split('?')[0]
-    user_password = query.split('?')[1].split('=')[1]
-    if user_name:
-        cred_checker.check_credentials(user_name, user_password
-        )
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    # Load question page
-    words = query.split('?')[2].split('=')[1]
-    count = query.split('?')[3].split('=')[1]
-    score = query.split('?')[4].split('=')[1]
-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    global test
-    try:
-        count = int(count)
-    except NameError:
-        count = 0
-    try:
-        score = int(score)
-    except NameError:
-        score = 0
-    progress_percent = int(count / int(words) * 100)
-    index = test.interro_df.index[count]
-    english = test.interro_df.loc[index][0]
-    english = english.replace("'", "\'")
-    count += 1
-    return templates.TemplateResponse(
-        "user/interro_question.html",
-        {
-            "request": request,
-            "userName": user_name,
-            "numWords": words,
-            "count": count,
-            "score": score,
-            "progressPercent": progress_percent,
-            "content_box1": english
-        }
+    """
+    Call the page that asks the user the meaning of a word.
+    """
+    request_dict = interro_api.get_interro_question(
+        request,
+        user_name,
+        user_password,
+        db_name,
+        test_type,
+        total,
+        count,
+        score
     )
+    return templates.TemplateResponse("interro/question.html", request_dict)
 
 
-@interro_router.get("/interro-answer/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
+@interro_router.get("/interro-answer", response_class=HTMLResponse)
 def load_interro_answer(
     request: Request,
     user_name,
@@ -127,19 +85,18 @@ def load_interro_answer(
     english = english.replace("'", "\'")
     french = french.replace("'", "\'")
     progress_percent = int(count / int(words) * 100)
-    return templates.TemplateResponse(
-        "user/interro_answer.html",
-        {
-            "request": request,
-            "userName": user_name,
-            "numWords": words,
-            "count": count,
-            "score": score,
-            "progressPercent": progress_percent,
-            "content_box1": english,
-            "content_box2": french,
-        }
-    )
+    request_dict = {
+        "request": request,
+        "userName": user_name,
+        "numWords": words,
+        "count": count,
+        "score": score,
+        "progressPercent": progress_percent,
+        "content_box1": english,
+        "content_box2": french
+    }
+    request_dict = interro_api.get_user_response(user_name)
+    return templates.TemplateResponse("interro/answer.html", request_dict)
 
 
 @interro_router.post("/user-answer/{user_name}")
@@ -175,7 +132,8 @@ def propose_rattraps(
     user_name,
     words: int,
     count: int,
-    score: int):
+    score: int
+    ):
     """Load a page that proposes the user to take a rattraps, or leave the test."""
     cred_checker.check_credentials(user_name)
     global test
@@ -191,22 +149,20 @@ def propose_rattraps(
     else:
         logger.info("User data not updated yet.")
     # Réinitialisation
-    new_count = 0
-    new_score = 0
     new_words = test.faults_df.shape[0]
     test.interro_df = test.faults_df
     test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
     return templates.TemplateResponse(
-        "user/rattraps_propose.html",
+        "interro/rattraps.html",
         {
             "request": request,
             "userName": user_name,
             "score": score,
             "numWords": words,
             "count": count,
-            "newScore": new_score,
+            "newScore": 0,
             "newWords": new_words,
-            "newCount": new_count
+            "newCount": 0
         }
     )
 
@@ -232,7 +188,7 @@ def end_interro(
         updater.update_data()
         logger.info("User data updated.")
     return templates.TemplateResponse(
-        "user/interro_end.html",
+        "interro/end.html",
         {
             "request": request,
             "score": score,

@@ -61,16 +61,6 @@ aws s3 cp \
     s3://vocabulary-benito/vocabulary/src/web_app.py \
     /home/ubuntu/vocabulary/src/web_app.py
 
-# local -> EC2
-scp -r -i \
-    conf/voc_ssh_key_1.pem \
-    /home/benoit/projects/vocabulary/src/ \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/ && cl
-
-scp -r -i \
-    conf/voc_ssh_key_1.pem \
-    /home/benoit/projects/vocabulary/conf/data.json \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/ && cl
 
 
 # =======================
@@ -84,6 +74,17 @@ aws ec2 start-instances \
 ssh -i  \
     conf/voc_ssh_key_1.pem \
     ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com
+
+# local -> EC2
+scp -r -i \
+    conf/voc_ssh_key_1.pem \
+    /home/benoit/projects/vocabulary/src/ \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/ && cl
+
+scp -r -i \
+    conf/voc_ssh_key_1.pem \
+    /home/benoit/projects/vocabulary/conf/hum.json \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/ && cl
 
 
 
@@ -104,15 +105,19 @@ pip install -r requirements.txt
 # =======================
 cd ~/vocabulary
 # DEV
+redis-server
+
 uvicorn src.web_app:app \
     --port 8080 \
     --host 0.0.0.0 \
     --reload
 
+# PROD ?
 uvicorn src.web_app:app \
     --port 8080 \
     --host 0.0.0.0 \
     --workers 3
+
 
 
 # ==============================================

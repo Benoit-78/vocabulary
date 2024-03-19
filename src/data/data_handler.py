@@ -6,9 +6,11 @@
 
 import json
 import os
+import socket
 import sys
 from abc import ABC
 from datetime import datetime
+from dotenv import load_dotenv
 from typing import Dict, List
 
 import mysql.connector as mariadb
@@ -16,9 +18,14 @@ import pandas as pd
 from loguru import logger
 from sqlalchemy import create_engine
 
-REPO_DIR = os.getcwd().split('src')[0]
+load_dotenv()
+
+DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
-from src import utils
+
+from src.utils.os import get_os_separator
 
 with open(REPO_DIR + '/conf/data.json', 'rb') as param_file:
     PARAMS = json.load(param_file)
@@ -32,7 +39,7 @@ class CsvHandler():
     """
     def __init__(self, test_type: str):
         self.test_type = test_type
-        self.os_sep = utils.get_os_separator()
+        self.os_sep = get_os_separator()
         self.paths = {}
         self.tables = {}
 
@@ -100,22 +107,6 @@ class CsvHandler():
             encoding='utf-8'
         )
 
-    # Row-level operations
-    def insert_word(self, word, table):
-        """Add a word to the table."""
-
-    def read_word(self, word, table):
-        """Read the given word."""
-
-    def update_word(self, word, table):
-        """Update statistics on the given word."""
-
-    def delete_word(self, word, table):
-        """Delete the given word in the given table."""
-
-    def transfer_word(self, word, table):
-        """Copy a word from its original table to the output table (theme or archive)."""
-
 
 
 class DbInterface(ABC):
@@ -123,11 +114,13 @@ class DbInterface(ABC):
     Abstract class that provides with a method to connect to a database.
     All methods invoked by the user should provide with a host name.
     """
-    def __init__(self, host):
-        self.host = host
+    def __init__(self):
+        self.host = socket.gethostname()
 
     def get_db_cursor(self, user_name, db_name, password):
-        """Connect to vocabulary database if credentials are correct."""
+        """
+        Connect to vocabulary database if credentials are correct.
+        # """
         # logger.debug(f"user_name: {user_name}")
         # logger.debug(f"db_name: {db_name}")
         # logger.debug(f"password: {password}")
@@ -154,14 +147,32 @@ class DbController(DbInterface):
     """
     Manage access.
     """
-    def create_user(self, root_password, user_name, user_password):
+    def create_user(self, user_name, user_password):
         """
         Create user.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         result = None
         try:
             cursor.execute(f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';")
+            connection.commit()
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+    def grant_privileges_on_common_database(self, user_name):
+        """
+        Grant the new user access to the common database.
+        """
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        result = None
+        try:
+            cursor.execute(f"GRANT SELECT ON common.* TO '{user_name}'@'{self.host}';")
             connection.commit()
             logger.success(f"User '{user_name}' created successfully on {self.host}.")
             result = True
@@ -173,11 +184,11 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def grant_privileges(self, root_password, user_name, db_name):
+    def grant_privileges(self, user_name, db_name):
         """
         Grant privileges to the user on the given database.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         result = None
         try:
             request_1 = "GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON "
@@ -196,12 +207,12 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def get_users_list(self, root_password):
+    def get_users_list(self):
         """
         Get list of users.
         Keep in mind that the user is first created on '%' and then on 'localhost'.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', root_password)
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         users_list = []
         try:
             cursor.execute("SELECT User, Host FROM mysql.user;")
@@ -223,12 +234,12 @@ class DbDefiner(DbInterface):
     """
     Define database structure.
     """
-    def __init__(self, host, user_name):
-        super().__init__(host)
+    def __init__(self, user_name):
+        super().__init__()
         self.user_name = user_name
         self.db_name = None
 
-    def create_database(self, root_password, password, db_name):
+    def create_database(self, root_password, db_name):
         """
         Create a database with the given database name
         """
@@ -246,7 +257,7 @@ class DbDefiner(DbInterface):
             connection.close()
         return result
 
-    def get_user_databases(self, root_password, password):
+    def get_user_databases(self, root_password):
         """
         Get the list of databases for the user.
         """
@@ -257,7 +268,7 @@ class DbDefiner(DbInterface):
         connection.close()
         return databases
 
-    def create_seven_tables(self, root_password, password, db_name):
+    def create_seven_tables(self, password, db_name):
         """
         Create the seven tables necessary to the app.
         """
@@ -297,7 +308,9 @@ class DbDefiner(DbInterface):
         return result
 
     def get_database_cols(self, db_name, password):
-        """Get table columns."""
+        """
+        Get table columns.
+        """
         connection, cursor = self.get_db_cursor(self.user_name, db_name, password)
         try:
             cursor.execute(f"USE {db_name};")
@@ -350,11 +363,11 @@ class DbManipulator(DbInterface):
     """
     Working with data.
     """
-    def __init__(self, host, user_name, db_name, test_type):
-        super().__init__(host)
+    def __init__(self, user_name, db_name, test_type):
+        super().__init__()
         self.user_name = user_name
         self.db_name = db_name
-        self.db_definer = DbDefiner(self.host, self.user_name)
+        self.db_definer = DbDefiner(self.user_name)
         self.test_type = ''
         self.check_test_type(test_type)
 
@@ -363,8 +376,9 @@ class DbManipulator(DbInterface):
         Check the test type attribute.
         """
         if test_type not in ['version', 'theme']:
-            logger.error(f"Test type {test_type} incorrect, \
-            should be either version or theme.")
+            logger.error(
+                f"Test type {test_type} incorrect, should be either version or theme."
+            )
         self.test_type = test_type
 
     def get_tables(self, password):
@@ -372,7 +386,9 @@ class DbManipulator(DbInterface):
         Load the different tables necessary to the app.
         """
         connection, cursor = self.get_db_cursor(
-            self.user_name, self.db_name, password
+            self.user_name,
+            self.db_name,
+            password
         )
         cols = self.db_definer.get_database_cols(self.db_name, password)
         tables_names = list(cols.keys())
@@ -418,19 +434,20 @@ class DbManipulator(DbInterface):
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
         native = row[1]
-        request_1 = f"INSERT INTO {sql_db_name}.{words_table_name} (english, français, creation_date, nb, score, taux) "
-        request_2 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
-        logger.debug(request_1 + request_2)
+        request_1 = f"INSERT INTO {sql_db_name}.{words_table_name}"
+        request_2 = "(english, français, creation_date, nb, score, taux)"
+        request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
         # Execute request
-        cursor.execute(request_1 + request_2)
+        cursor.execute(' '.join([request_1, request_2, request_3]))
         connection.commit()
-        logger.debug('Word inserted.')
         cursor.close()
         connection.close()
         return 0
 
     def read_word(self, password, english: str):
-        """Read the given word"""
+        """
+        Read the given word
+        """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = "SELECT english, français, score"
@@ -446,7 +463,9 @@ class DbManipulator(DbInterface):
         return english, native, score
 
     def update_word(self, password, english: str, new_nb, new_score):
-        """Update statistics on the given word"""
+        """
+        Update statistics on the given word
+        """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = f"UPDATE {words_table_name}"
@@ -462,7 +481,9 @@ class DbManipulator(DbInterface):
         return True
 
     def delete_word(self, password, english):
-        """Delete a word from the words table of the instance database."""
+        """
+        Delete a word from the words table of the instance database.
+        """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = f"DELETE FROM {words_table_name}"

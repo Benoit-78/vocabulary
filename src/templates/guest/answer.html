@@ -44,8 +44,12 @@
         </div>
 
         <div class="row">
-            <button class="button green" id="yes-button" onclick="sendUserAnswer('Yes', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`,`{{ content_box2|safe }}`)">Yes</button>
-            <button class="button red" id="no-button" onclick="sendUserAnswer('No', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`, `{{ content_box2|safe }}`)">No</button>
+            <button class="button green" id="yes-button" onclick="sendUserAnswer(
+                'Yes', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`,`{{ content_box2|safe }}`, `{{ token }}`
+                )">Yes</button>
+            <button class="button red" id="no-button" onclick="sendUserAnswer(
+                'No', {{ count }}, {{ numWords }}, {{ score }}, `{{ content_box1|safe }}`, `{{ content_box2|safe }}`, `{{ token }}`
+                )">No</button>
         </div>
 
         <div class="row">
