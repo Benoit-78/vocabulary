@@ -134,7 +134,7 @@ def check_token(token: str):
             algorithms=[ALGORITHM]
         )
         username: str = payload.get('sub')
-        logger.debug(f"username at check_token: {username}")
+        # logger.debug(f"username at check_token: {username}")
         if username.startswith('guest_'):
             return token
         users_list = get_users_names()

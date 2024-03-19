@@ -49,39 +49,42 @@ function startTest(numWords, token) {
 
 
 
-function showTranslation(numWords, count, score) {
+function showTranslation(numWords, count, score, token) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (!isNaN(numWords)) {
-        window.location.href = `/interro-answer/${numWords}/${count}/${score}`;
+        window.location.href = `/guest/interro-answer/${numWords}/${count}/${score}?token=${token}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
 }
 
 
-function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2) {
-    fetch("/user-answer", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            answer: answer,
-            count: count,
-            number_of_questions: numWords,
-            score: score,
-            english: content_box1,
-            french: content_box2
-        }),
-    })
+function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2, token) {
+    fetch(
+        `/guest/user-answer?token=${token}`,
+        {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                answer: answer,
+                count: count,
+                number_of_questions: numWords,
+                score: score,
+                english: content_box1,
+                french: content_box2
+            }),
+        }
+    )
     .then(answer => answer.json())
     .then(data => {
         // Extract the updated score from the JSON response
         const score = data.score;
         if (count < numWords) {
-            nextGuess(numWords, count, score);
+            nextGuess(numWords, count, score, token);
         } else {
-            endInterro(numWords, count, score);
+            endInterro(numWords, count, score, token);
         }
     })
     .catch(error => {
@@ -90,21 +93,21 @@ function sendUserAnswer(answer, count, numWords, score, content_box1, content_bo
 }
 
 
-function nextGuess(numWords, count, score) {
+function nextGuess(numWords, count, score, token) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
-    window.location.href = `/interro-question/${numWords}/${count}/${score}`;
+    window.location.href = `/guest/interro-question/${numWords}/${count}/${score}?token=${token}`;
 }
 
 
-function endInterro(numWords, count, score) {
+function endInterro(numWords, count, score, token) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (score === numWords) {
-        window.location.href = `/interro-end/${numWords}/${score}`;
+        window.location.href = `/guest/interro-end/${numWords}/${score}?token=${token}`;
     } else {
-        window.location.href = `/propose-rattraps/${numWords}/${count}/${score}`;
+        window.location.href = `/guest/propose-rattraps/${numWords}/${count}/${score}?token=${token}`;
     }
 }

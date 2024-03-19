@@ -29,7 +29,9 @@ from src.utils.data import complete_columns
 
 
 class CliUser():
-    """User who launchs the app through the CLI."""
+    """
+    User who launchs the app through the CLI.
+    """
     def __init__(self):
         self.settings = None
 
@@ -100,7 +102,7 @@ class Loader():
         """
         self.tables = self.data_handler.get_tables(password)
         voc = self.test_type + '_voc'
-        self.tables[voc] = self.tables[voc].reset_index()
+        # self.tables[voc] = self.tables[voc].reset_index()
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]
         self.tables[voc] = self.tables[voc].sort_values(
             by='creation_date',

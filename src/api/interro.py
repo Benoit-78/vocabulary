@@ -8,8 +8,10 @@
 """
 
 import os
+import pickle
 import sys
 
+import redis
 from fastapi import HTTPException, status
 from loguru import logger
 
@@ -22,6 +24,11 @@ from src import interro, views
 from src.data import data_handler, users
 
 cred_checker = users.CredChecker()
+redis_db = redis.Redis(
+    host='localhost',
+    port=6379,
+    db=0
+)
 
 
 def load_interro_settings(request, creds: dict):
@@ -123,100 +130,38 @@ def get_interro_question(
     return request_dict
 
 
-
-# async def store_object_id_in_session(
-#         request: Request,
-#         obj: MyObject
-#     ):
-#     """
-#     Storing the object ID in the session
-#     """
-#     # Generate a unique ID for the object
-#     obj_id = str(uuid.uuid4())
-#     # Store the object ID in the session
-#     session = request.session
-#     session["object_id"] = obj_id
-#     response = JSONResponse(
-#         content={
-#             "message": "Object stored in session",
-#             "object_id": obj_id
-#         }
-#     )
-#     return response
+def save_test_in_redis(test, token):
+    """
+    Save a test object in redis using token as key.
+    """
+    test = pickle.dumps(test)
+    redis_db.set(token, test)
 
 
-# async def retrieve_object_from_session(request: Request):
-#     """
-#     Retrieving an object from the session
-#     """
-#     # Retrieve the object ID from the session
-#     session = request.session
-#     obj_id = session.get("object_id")
-#     # If the object ID is not found in the session, return an error
-#     if not obj_id:
-#         raise HTTPException(
-#             status_code=404,
-#             detail="Object not found in session"
-#         )
-#     # Retrieve the object from the database or another storage mechanism using the object ID
-#     # For demonstration purposes, we'll just create a new object with a name based on the object ID
-#     obj = MyObject(name=f"Object_{obj_id}")
-#     response = JSONResponse(
-#         content={
-#             "message": "Object retrieved from session",
-#             "object": obj.__dict__
-#         }
-#     )
-#     return response
+def load_test_from_redis(token):
+    """
+    Load a test object from redis using token as key.
+    """
+    pickelized_test = redis_db.get(token)
+    test = pickle.loads(pickelized_test)
+    return test
 
-
-# Redis
 
 # Limit the Size: Implement logic to limit the number or size of objects stored in memory.
 #     For example, you could set a maximum limit on the number of objects a user can store
 #     or limit the size of individual objects.
 
+
 # Expiration: Set expiration times for the stored objects so that they are automatically
 #     removed from memory after a certain period. This ensures that memory usage doesn't grow indefinitely.
+
 
 # Rate Limiting:
 #     Implement rate limiting to prevent users from creating an excessive number of objects
 #     within a short period. This can help prevent abuse and reduce the risk of OOM errors.
 
+
 # Separate Data and Behavior:
 #     If possible, separate the data and behavior in your classes.
 #     Serialize only the data attributes of your objects to JSON, excluding any methods.
 #     You can then reconstruct your objects and reattach the methods when deserializing the JSON data.
-
-
-# import redis
-
-# # Connect to Redis
-# redis_db = redis.Redis(
-#     host='localhost',
-#     port=6379,
-#     db=0
-# )
-
-# # --------------------------------------------
-# # Define a sample object
-# data = {
-#     'a': 1,
-#     'b': 2,
-#     'c': 3
-# }
-
-# # Serialize the object
-# serialized_data = pickle.dumps(data)
-
-# # Store the serialized data in Redis
-# redis_db.set('my_data_key', serialized_data)
-
-# # --------------------------------------------
-# # Retrieve the serialized data from Redis
-# serialized_data = redis_db.get('my_data_key')
-
-# # Deserialize the data
-# loaded_data = pickle.loads(serialized_data)
-
-# print(loaded_data)  # Output: {'a': 1, 'b': 2, 'c': 3}

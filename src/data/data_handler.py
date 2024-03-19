@@ -308,7 +308,9 @@ class DbDefiner(DbInterface):
         return result
 
     def get_database_cols(self, db_name, password):
-        """Get table columns."""
+        """
+        Get table columns.
+        """
         connection, cursor = self.get_db_cursor(self.user_name, db_name, password)
         try:
             cursor.execute(f"USE {db_name};")
@@ -374,8 +376,9 @@ class DbManipulator(DbInterface):
         Check the test type attribute.
         """
         if test_type not in ['version', 'theme']:
-            logger.error(f"Test type {test_type} incorrect, \
-            should be either version or theme.")
+            logger.error(
+                f"Test type {test_type} incorrect, should be either version or theme."
+            )
         self.test_type = test_type
 
     def get_tables(self, password):
@@ -383,7 +386,9 @@ class DbManipulator(DbInterface):
         Load the different tables necessary to the app.
         """
         connection, cursor = self.get_db_cursor(
-            self.user_name, self.db_name, password
+            self.user_name,
+            self.db_name,
+            password
         )
         cols = self.db_definer.get_database_cols(self.db_name, password)
         tables_names = list(cols.keys())
