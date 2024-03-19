@@ -190,6 +190,8 @@ sudo apt-get install -y mariadb-server
 sudo apt-get install -y python3
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python3-venv
+sudo apt-get install -y redis-server
+sudo apt-get install -y thefuck
 sudo apt-get install -y uvicorn
 sudo apt-get install -y nginx
 
@@ -271,6 +273,13 @@ aws route53 change-resource-record-sets \
             }
         ]
     }'
+
+
+
+# ==============================================
+#  E N V I R O N M E N T   V A R I A B L E S
+# ==============================================
+# See the 'export' instructions in ~/.bashrc of the local dev machine
 
 
 

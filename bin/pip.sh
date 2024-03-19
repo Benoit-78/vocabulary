@@ -80,6 +80,8 @@ pip install urllib3==1.26.16
 echo "# -------------------------"
 pip install uvicorn==0.23.2
 echo "# -------------------------"
+pip install itsdangerous==2.1.2
+echo "# -------------------------"
 
 # Visualization
 pip install plotly==5.18.0
@@ -102,6 +104,8 @@ echo "# -------------------------"
 pip install PyMySQL==1.1.0
 echo "# -------------------------"
 pip install SQLAlchemy==2.0.20
+echo "# -------------------------"
+pip install redis==5.0.3
 echo "# -------------------------"
 
 # Data processing
@@ -144,7 +148,7 @@ pip install altgraph==0.17.3
 echo "# -------------------------"
 pip install annotated-types==0.5.0
 echo "# -------------------------"
-pip install astroid=3.1.0
+pip install astroid==3.1.0
 echo "# -------------------------"
 pip install asttokens==2.4.0
 echo "# -------------------------"

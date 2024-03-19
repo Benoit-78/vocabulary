@@ -1,4 +1,5 @@
 
+CREATE DATABASE english;
 USE vocabulary;
 
 
