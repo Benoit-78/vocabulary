@@ -2,10 +2,10 @@ function createAccount() {
     var inputNameElement = document.getElementById("content_box1");
     var inputPasswordElement = document.getElementById("content_box2");
     if (inputNameElement) {
-        var inputName = inputNameElement.value;
+        var inputName = inputNameElement;
     }
     if (inputPasswordElement) {
-        var inputPassword = inputPasswordElement.value;
+        var inputPassword = inputPasswordElement;
     }
     fetch("/create-user-account", {
         method: "POST",
@@ -35,44 +35,56 @@ function createAccount() {
         console.error("Error sending user answer:", error);
     });
 }
-function signIn() {
-    var inputNameElement = document.getElementById("inputName");
-    var inputPasswordElement = document.getElementById("inputPassword");
-    if (inputNameElement) {var inputName = inputNameElement.value;}
-    if (inputPasswordElement) {var inputPassword = inputPasswordElement.value;}
-    fetch("/user/authenticate-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            input_name: inputName,
-            input_password: inputPassword
-        }),
-    })
-    .then(function (response) {
+
+
+function signIn(token) {
+    window.location.href = `/sign-in?token=${token}`;
+}
+
+
+async function authenticateUser() {
+    // const formData = new FormData(document.getElementById('signInForm'));
+    const inputName = document.getElementById("inputName").value;
+    const inputPassword = document.getElementById("inputPassword").value;
+    // const formData = {
+    //     username: inputName,
+    //     password: inputPassword
+    // };
+    const formData = new URLSearchParams();
+    formData.append("username", inputName);
+    formData.append("password", inputPassword);
+    console.log(formData)
+    try {
+        console.log("Sending sign-in request...");
+        const response = await fetch(
+            "/user/user-token",
+            {
+                method: "POST",
+                // headers: {"Content-Type": "application/json"},
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: formData.toString(),
+            }
+        );
+        console.log("Authentication request completed.");
         if (response.ok) {
-            return response.text();
+            console.log("Sign-in successful. Processing response...");
+            const data = await response.json();
+            const accessToken = data.access_token;
+            window.location.href = `/user/user-space?token=${accessToken}`;
         } else {
-            console.error('Error:', response.statusText);
-            return Promise.reject('Error occurred');
+            console.error("Sign-in failed:", response.statusText);
         }
-    })
-    .then(function (data) {
-        if (data && data.message === "User credentials validated successfully") {
-            console.log("User credentials validated successfully.");
-            document.body.innerHTML = data;
-        }
-        else {
-            window.location.href = "/sign-in";
-            console.error("Invalid credentials");
-        }
-    })
-        .catch(function (error) {
+    } catch (error) {
         console.error("Error:", error);
-    });
+    }
 }
+
+
 function goToUserDashboards(userName, userPassword) {
-    window.location.href = "/user/user-dashboards?userName=".concat(userName, "&userPassword=").concat(userPassword);
+    window.location.href = `/user/user-dashboards?userName=${userName}&userPassword=${userPassword})`;
 }
+
+
 function goToUserSettings(userName, userPassword) {
     var params = {
         userName: userName,
@@ -81,6 +93,8 @@ function goToUserSettings(userName, userPassword) {
     var searchParams = new URLSearchParams(params);
     window.location.href = "/user/user-settings?".concat(searchParams.toString());
 }
+
+
 function goToUserSpace(userName, userPassword) {
     window.location.href = "/user/user-space?userName=".concat(userName, "&userPassword=").concat(userPassword);
 }

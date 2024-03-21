@@ -56,14 +56,9 @@ class UserInDB(User):
 
 
 
-def get_users_names():
-    """
-    Function to get the list of users names.
-    """
-    controller = DbController()
-    users_list = controller.get_users_list()
-    return users_list
-
+# -------------------------
+#  T O K E N
+# -------------------------
 
 def create_guest_user_name():
     """
@@ -80,7 +75,6 @@ async def create_token(
     """
     Function to generate a token for a guest or an existing user.
     """
-    # logger.debug(f"data dict: {data}")
     if data is None:
         data = create_guest_user_name()
     to_encode = data.copy()
@@ -97,23 +91,13 @@ async def create_token(
     return encoded_jwt
 
 
-def get_user(users_db, username: str):
-    if username in users_db:
-        user_dict = users_db[username]
-        return UserInDB(**user_dict)
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def authenticate_user(users_db, username: str, password: str):
-    user = get_user(users_db, username)
-    if not user:
-        return 'User name unknown'
-    if not verify_password(password, user.hashed_password):
-        return 'Password incorrect'
-    return user
+def get_users_names():
+    """
+    Function to get the list of users names.
+    """
+    controller = DbController()
+    users_list = controller.get_users_list()
+    return users_list
 
 
 def check_token(token: str):
@@ -134,19 +118,21 @@ def check_token(token: str):
             algorithms=[ALGORITHM]
         )
         username: str = payload.get('sub')
-        # logger.debug(f"username at check_token: {username}")
         if username.startswith('guest_'):
             return token
         users_list = get_users_names()
         if username not in users_list:
             raise credentials_exception
-        # return username
         return token
     except JWTError as exc:
         # If there's any JWTError, raise credentials_exception
         raise credentials_exception from exc
 
 
+
+# -------------------------
+#  O A u t h 2
+# -------------------------
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     """
@@ -171,3 +157,31 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     if username not in list(users_dict.keys()):
         raise credentials_exception
     return username
+
+
+
+def authenticate_user(
+        users_list: list,
+        username: str,
+        password: str
+    ):
+    def get_user(
+            users_list: list,
+            username: str
+        ):
+        if username in users_list:
+            user_dict = users_list[username]
+            return UserInDB(**user_dict)
+
+    def verify_password(
+            plain_password,
+            hashed_password
+        ):
+        return pwd_context.verify(plain_password, hashed_password)
+
+    user = get_user(users_list, username)
+    if user is None:
+        return 'Unknown user'
+    if not verify_password(password, user.hashed_password):
+        return 'Password incorrect'
+    return user

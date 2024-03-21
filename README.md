@@ -16,9 +16,7 @@ Time passed, and I created an application for that. And ever since, my app asks 
 
 
 
-There is an Arabic sentence that says that a language is a sea without shores. Indeed, even now, I still encounter new words in Shakespeare's language.
-
-But I encounter far more words that passed through my app, and those words are in my memory now.
+A lot of words have passed through my app, and those words are in my memory now.
 
 
 

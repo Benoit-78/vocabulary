@@ -63,7 +63,6 @@ async def save_interro_settings_guest(
     """
     Acquire the user settings for one interro.
     """
-    logger.info("Route called: /guest/save-interro-settings")
     _, test = load_test(
         user_name='wh0Are_y0u',
         db_name=HUM['user']['guest']['databases'][0],

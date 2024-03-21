@@ -13,7 +13,8 @@
 
 <body>
     <div class="container">
-        <form onsubmit="return signIn()">
+        <!-- <form onsubmit="return authenticateUser()"> -->
+        <form id="signInForm">
             <div class="row">
                 <label for="inputName">User name</label>
                 <input type="text" id="inputName" name="inputName" required>
@@ -23,7 +24,8 @@
                 <input type="password" id="inputPassword" name="inputPassword" required>
             </div>
             <div class="row">
-                <button type="submit" class="button">Sign in</button>
+                <!-- <button type="submit" class="button">Sign in</button> -->
+                <button type="button" class="button" onclick="authenticateUser()">Sign in</button>
             </div>
         </form>
         <div class="row">

@@ -115,7 +115,7 @@ class DbInterface(ABC):
     All methods invoked by the user should provide with a host name.
     """
     def __init__(self):
-        self.host = socket.gethostname()
+        self.host = PARAMS['host'][socket.gethostname()]
 
     def get_db_cursor(self, user_name, db_name, password):
         """

@@ -1,86 +1,89 @@
-
 function createAccount() {
-    var inputNameElement = document.getElementById("content_box1") as HTMLInputElement;
-    var inputPasswordElement = document.getElementById("content_box2") as HTMLInputElement;
+    var inputNameElement = document.getElementById("content_box1");
+    var inputPasswordElement = document.getElementById("content_box2");
     if (inputNameElement) {
-        var inputName = inputNameElement.value;
+        var inputName = inputNameElement;
     }
-    
     if (inputPasswordElement) {
-        var inputPassword = inputPasswordElement.value;
+        var inputPassword = inputPasswordElement;
     }
     fetch("/create-user-account", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             input_name: inputName,
             input_password: inputPassword
         }),
     })
-    .then(response => response.json())
-    .then(data => {
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
         if (data && data.message === "User account created successfully") {
             // Use sessionStorage to store userName
             sessionStorage.setItem('userName', data.userName);
             // Redirect to user-space with userName as a query parameter
-            window.location.href = `/user-space?userName=${data.userName}?userPassword=${data.userPassword}`;
-        } else if (data && data.message === "User name not available") {
+            window.location.href = "/user-space?userName=".concat(data.userName, "?userPassword=").concat(data.userPassword);
+        }
+        else if (data && data.message === "User name not available") {
             // Redirect to create-account route
             window.location.href = "/create-account";
-        } else {
+        }
+        else {
             console.error("Unable to create user account");
         }
     })
-    .catch(error => {
+        .catch(function (error) {
         console.error("Error sending user answer:", error);
     });
 }
 
 
-function signIn() {
-    var inputNameElement = document.getElementById("inputName") as HTMLInputElement;
-    var inputPasswordElement = document.getElementById("inputPassword") as HTMLInputElement;
-    if (inputNameElement) {var inputName = inputNameElement.value;}
-    if (inputPasswordElement) {var inputPassword = inputPasswordElement.value;}
-    fetch("/user/authenticate-user", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            input_name: inputName,
-            input_password: inputPassword
-        }),
-    })
-    .then(response => response.json())
-        .then(data => {
-            if (data && data.message === "User credentials validated successfully") {
-                console.log("User credentials validated successfully.");
-                document.body.innerHTML = data;
-            } else {
-                window.location.href = "/sign-in";
-                console.error("Invalid credentials");
+function signIn(token) {
+    window.location.href = `/sign-in?token=${token}`;
+}
+
+
+async function authenticateUser() {
+    const formData = new FormData(document.getElementById('signInForm'));
+    console.log(formData)
+    try {
+        console.log("Sending sign-in request...");
+        const response = await fetch(
+            "/user/user-token",
+            {
+                method: "POST",
+                body: formData,
             }
-        })
-    .catch(error => {
+        );
+        console.log("Authentication request completed.");
+        if (response.ok) {
+            console.log("Sign-in successful. Processing response...");
+            const data = await response.json();
+            const accessToken = data.access_token;
+            window.location.href = `/user/user-space?token=${accessToken}`;
+        } else {
+            console.error("Sign-in failed:", response.statusText);
+        }
+    } catch (error) {
         console.error("Error:", error);
-    });
+    }
 }
 
 
 function goToUserDashboards(userName, userPassword) {
-    window.location.href = `/user/user-dashboards?userName=${userName}&userPassword=${userPassword}`;
+    window.location.href = `/user/user-dashboards?userName=${userName}&userPassword=${userPassword})`;
 }
 
 
-function goToUserSettings(userName: string, userPassword: string) {
-    const params = {
+function goToUserSettings(userName, userPassword) {
+    var params = {
         userName: userName,
         userPassword: userPassword
     };
-    const searchParams = new URLSearchParams(params);
-    window.location.href = `/user/user-settings?${searchParams.toString()}`;
+    var searchParams = new URLSearchParams(params);
+    window.location.href = "/user/user-settings?".concat(searchParams.toString());
 }
 
 
 function goToUserSpace(userName, userPassword) {
-    window.location.href = `/user/user-space?userName=${userName}&userPassword=${userPassword}`;
+    window.location.href = "/user/user-space?userName=".concat(userName, "&userPassword=").concat(userPassword);
 }
