@@ -147,7 +147,7 @@ class DbController(DbInterface):
     """
     Manage access.
     """
-    def create_user(self, user_name, user_password):
+    def create_user_in_mysql(self, user_name, user_password):
         """
         Create a user in the mysql.user table.
         """
@@ -231,12 +231,27 @@ class DbController(DbInterface):
             connection.close()
         return users_list
 
-    def add_user_to_users_table(self):
+    def add_user_to_users_table(
+            self,
+            user_name: str,
+            hash_password: str,
+            user_email: str
+        ):
         """
-
+        Add a user to the users MariaDB table in users Database.
         """
-        result = False
-        return result
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        try:
+            cursor.execute(
+                f"INSERT INTO `users`.`voc_users` (`username`, `password_hash`, `email`, `disabled`) \
+                VALUES({user_name}, {hash_password}, {user_email}, FALSE);"
+            )
+        except mariadb.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        return True
 
     def get_users_list(self) -> List[Dict]:
         """
@@ -250,9 +265,9 @@ class DbController(DbInterface):
             )
             result = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
-            df = pd.DataFrame(result, columns=columns)
-            df = df[df['Host'] == self.host]
-            users_list = df['User'].tolist()
+            users_df = pd.DataFrame(result, columns=columns)
+            users_str = users_df.to_json(orient='records')
+            users_list = json.loads(users_str)
         except mariadb.Error as err:
             logger.error(err)
         finally:

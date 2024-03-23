@@ -37,7 +37,9 @@ REVOKE CREATE ON vocabulary.* FROM `wh0Are_y0u`@`localhost`;
 DROP USER 'wh0Are_y0u'@'localhost';
 
 -- users
-SELECT host, user password FROM mysql.user;
+SELECT host, user, authentication_string
+FROM mysql.user
+WHERE authentication_string IS NOT NULL;
 
 GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO '<user-name>'@'localhost';
 

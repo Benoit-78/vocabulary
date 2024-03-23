@@ -24,28 +24,33 @@ from src.data import users
 cred_checker = users.CredChecker()
 
 
-def create_account(creds):
+def create_account(creds, token):
     """
     Create the user account if the given user name does not exist yet.
     """
-    user_account = users.UserAccount(creds['input_name'], creds['input_password'])
+    user_account = users.UserAccount(
+        creds['input_name'],
+        creds['input_password']
+    )
     result = user_account.create_account()
     json_response = {}
-    if result == 1:
+    if result is False:
         json_response = JSONResponse(
             content=
             {
                 "message": "User name not available.",
-                "userName": user_account.user_name
+                "userName": user_account.user_name,
+                'token': token
             }
         )
-    if result == 0:
+    if result is True:
         json_response = JSONResponse(
             content=
             {
                 "message": "User account created successfully",
                 "userName": user_account.user_name,
-                "userPassword": user_account.user_password
+                "userPassword": user_account.user_password,
+                'token': token
             }
         )
     return json_response
@@ -66,7 +71,12 @@ def authenticate_user(input_dict):
     return request_dict
 
 
-def get_user_main_page(request, user_name, user_password):
+def get_user_main_page(
+        request,
+        user_name: str,
+        user_password: str,
+        token: str
+    ):
     """
     API function to load the interro settings.
     """
@@ -81,9 +91,10 @@ def get_user_main_page(request, user_name, user_password):
         )
     # Load settings
     request_dict = {
-        "request": request,
-        "userName": user_name,
-        "userPassword": user_password
+        'request': request,
+        'userName': user_name,
+        'userPassword': user_password,
+        'token': token
     }
     return request_dict
 

@@ -19,6 +19,7 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src.data.data_handler import DbController, DbDefiner, DbManipulator
+from src.api import authentication as auth_api
 
 load_dotenv()
 DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
@@ -34,7 +35,7 @@ class CredChecker():
 
     def check_input_name(self, name_to_check):
         """Check if the input name belongs to the users list."""
-        users_list = self.db_controller.get_users_list()
+        users_list = self.db_controller.get_users_list_from_mysql()
         if name_to_check in users_list:
             return True
         return False
@@ -144,10 +145,15 @@ class UserAccount(Account):
         """
         account_exists = self.check_if_account_exists()
         if account_exists:
-            return 1
+            return False
         db_controller = DbController()
-        db_controller.create_user(self.user_name, self.user_password)
+        logger.debug(f"User password: {self.user_password}")
+        hash_password = auth_api.get_password_hash(self.user_password)
+        logger.debug(f"Hash password: {hash_password}")
+        db_controller.create_user_in_mysql(self.user_name, hash_password)
+        logger.debug("User created in mysql")
         db_controller.grant_privileges_on_common_database(self.user_name)
+        logger.debug("User granted privileges on common database")
         return True
 
     def check_if_account_exists(self):
@@ -155,7 +161,12 @@ class UserAccount(Account):
         Check if the account exists.
         """
         db_controller = DbController()
+        users_list = db_controller.get_users_list_from_mysql()
+        if self.user_name in users_list:
+            logger.error(f"User name '{self.user_name}' already exists.")
+            return True
         users_list = db_controller.get_users_list()
+        users_list = [element['username'] for element in users_list]
         if self.user_name in users_list:
             logger.error(f"User name '{self.user_name}' already exists.")
             return True

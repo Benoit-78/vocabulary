@@ -36,18 +36,20 @@ class LoginForm(BaseModel):
 
 
 
-# @user_router.post("/create-user-account")
-# async def create_account(creds: dict):
-#     """
-#     Create the user account if the given user name does not exist yet.
-#     """
-#     json_response = user_api.create_account(creds)
-#     return json_response
+@user_router.post("/create-user-account")
+async def create_account(
+        creds: dict,
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Create the user account if the given user name does not exist yet.
+    """
+    json_response = user_api.create_account(creds, token)
+    return json_response
 
 
 @user_router.post("/user-token")
 async def login_for_access_token(
-        # form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
         form_data: OAuth2PasswordRequestForm = Depends()
     ) -> auth_api.Token:
     """
@@ -57,13 +59,11 @@ async def login_for_access_token(
     logger.debug("Route user-token called.")
     # Identify user
     users_list = auth_api.get_users_list()
-    logger.debug(f"Users list: {users_list}")
     user = auth_api.authenticate_user(
         users_list,
         form_data.username,
         form_data.password
     )
-    logger.debug(f"User: {user}")
     if user in ['Unknown user', 'Password incorrect']:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -83,21 +83,26 @@ async def login_for_access_token(
 
 @user_router.get("/user-space", response_class=HTMLResponse)
 def user_main_page(
-    request: Request,
-    user_name: str = Query(None, alias="userName"),
-    user_password: str = Query(None, alias="userPassword")
+        request: Request,
+        # user_name: str = Query(None, alias="userName"),
+        # user_password: str = Query(None, alias="userPassword"),
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Call the base page of user space.
     """
-    request_dict = user_api.get_user_main_page(
-        request,
-        user_name,
-        user_password
-    )
+    # request_dict = user_api.get_user_main_page(
+    #     request,
+    #     user_name,
+    #     user_password,
+    #     token
+    # )
     return templates.TemplateResponse(
-        "user/user_space.html",
-        request_dict
+        "guest/settings.html",
+        {
+            'request': request,
+            'token': token
+        }
     )
 
 

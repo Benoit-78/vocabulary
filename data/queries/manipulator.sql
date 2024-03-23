@@ -10,4 +10,5 @@ LOAD DATA INFILE '/path/data.txt' INTO TABLE your_table
     FIELDS TERMINATED BY ','
     LINES TERMINATED BY '\n'
     (column1, column2, @percentage_variable)
-    SET percentage = CAST(@percentage_variable AS SIGNED);
+    SET percentage = CAST(@percentage_variable AS SIGNED)
+;

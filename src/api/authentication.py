@@ -17,6 +17,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from loguru import logger
 from passlib.context import CryptContext
+from passlib.exc import UnknownHashError
 from pydantic import BaseModel
 
 from src.data.data_handler import DbController
@@ -51,7 +52,7 @@ class User(BaseModel):
 
 
 class UserInDB(User):
-    hashed_password: str
+    password_hash: str
 
 
 
@@ -134,7 +135,14 @@ def check_token(token: str):
 #  O A U T H
 # -------------------------
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_password_hash(password):
+    """
+    Return the hashed password.
+    """
+    return pwd_context.hash(password)
+
+
+def get_username_from_token(token: str = Depends(oauth2_scheme)):
     """
     Given a token, return the user name.
     """
@@ -154,14 +162,20 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError as exc:
         raise credentials_exception from exc
-    if username not in list(users_dict.keys()):
+    controller = DbController()
+    users_list = controller.get_users_list()
+    users_names = [
+        element['username']
+        for element in users_list
+    ]
+    if username not in users_names:
         raise credentials_exception
     return username
 
 
 
 def authenticate_user(
-        users_list: list,
+        users_list: dict,
         username: str,
         password: str
     ) -> UserInDB:
@@ -169,30 +183,45 @@ def authenticate_user(
     Return the user data if the user exists.
     """
     def get_user(
-            users_list: list,
+            users_list: dict,
             username: str
         ) -> UserInDB:
-        if username in users_list:
-            user_dict = users_list[username]
-            return UserInDB(**user_dict)
+        user_dict = [
+            user_dict
+            for user_dict in users_list
+            if user_dict['username'] == username
+        ]
+        try:
+            user_dict = user_dict[0]
+        except IndexError as exc:
+            logger.error("Unknown user")
+            raise exc
+        logger.debug(f"User dict: {user_dict}")
+        return UserInDB(**user_dict)
 
     def verify_password(
             plain_password: str,
-            hashed_password
+            password_hash
         ):
+        logger.debug(f"Input password: {plain_password}")
+        logger.debug(f"Password hash: {password_hash}")
+        # input_hash = pwd_context.hash(plain_password)
+        logger.debug(f"Input hash: {plain_password}")
         result = pwd_context.verify(
             plain_password,
-            hashed_password
+            # input_hash,
+            password_hash
         )
         return result
 
     user_in_db_model = get_user(users_list, username)
     if user_in_db_model is None:
         return 'Unknown user'
-    password_ok = verify_password(
-        password,
-        user_in_db_model.hashed_password
-    )
-    if not password_ok:
+    try:
+        verify_password(
+            password,
+            user_in_db_model.password_hash
+        )
+    except UnknownHashError:
         return 'Password incorrect'
     return user_in_db_model

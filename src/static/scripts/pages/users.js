@@ -1,39 +1,36 @@
-function createAccount() {
-    var inputNameElement = document.getElementById("content_box1");
-    var inputPasswordElement = document.getElementById("content_box2");
-    if (inputNameElement) {
-        var inputName = inputNameElement;
-    }
-    if (inputPasswordElement) {
-        var inputPassword = inputPasswordElement;
-    }
-    fetch("/create-user-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            input_name: inputName,
-            input_password: inputPassword
-        }),
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
+
+async function createAccount(token) {
+    console.log("createAccount function called");
+    const inputName = document.getElementById("inputName").value;
+    const inputPassword = document.getElementById("inputPassword").value;
+    const formData = new URLSearchParams();
+    formData.append("username", inputName);
+    formData.append("password", inputPassword);
+    try {
+        const response = await fetch(
+            `/user/create-user-account?token=${token}`,
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    input_name: inputName,
+                    input_password: inputPassword
+                }),
+            }
+        )
+        const data = await response.json();
+        console.log("Response Data:", data);
         if (data && data.message === "User account created successfully") {
-            // Use sessionStorage to store userName
-            sessionStorage.setItem('userName', data.userName);
-            // Redirect to user-space with userName as a query parameter
-            window.location.href = "/user-space?userName=".concat(data.userName, "?userPassword=").concat(data.userPassword);
+            const accessToken = data.token;
+            window.location.href = `/user/user-space?token=${accessToken}`;
+        } else if (data && data.message === "User name not available") {
+            window.location.href = `/sign-up?token=${accessToken}`;
+        } else {
+            console.error("Error during the creation of user account");
         }
-        else if (data && data.message === "User name not available") {
-            // Redirect to create-account route
-            window.location.href = "/create-account";
-        }
-        else {
-            console.error("Unable to create user account");
-        }
-    })
-        .catch(function (error) {
-        console.error("Error sending user answer:", error);
-    });
+    } catch(error) {
+        console.error("Error:", error);
+    };
 }
 
 
@@ -43,31 +40,21 @@ function signIn(token) {
 
 
 async function authenticateUser() {
-    // const formData = new FormData(document.getElementById('signInForm'));
     const inputName = document.getElementById("inputName").value;
     const inputPassword = document.getElementById("inputPassword").value;
-    // const formData = {
-    //     username: inputName,
-    //     password: inputPassword
-    // };
     const formData = new URLSearchParams();
     formData.append("username", inputName);
     formData.append("password", inputPassword);
-    console.log(formData)
     try {
-        console.log("Sending sign-in request...");
         const response = await fetch(
             "/user/user-token",
             {
                 method: "POST",
-                // headers: {"Content-Type": "application/json"},
                 headers: {"Content-Type": "application/x-www-form-urlencoded"},
                 body: formData.toString(),
             }
         );
-        console.log("Authentication request completed.");
         if (response.ok) {
-            console.log("Sign-in successful. Processing response...");
             const data = await response.json();
             const accessToken = data.access_token;
             window.location.href = `/user/user-space?token=${accessToken}`;
