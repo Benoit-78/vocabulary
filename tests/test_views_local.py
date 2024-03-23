@@ -5,7 +5,6 @@
 import os
 import sys
 import unittest
-from tkinter import messagebox
 from unittest.mock import patch
 
 REPO_DIR = os.getcwd().split('tests')[0]

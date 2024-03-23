@@ -149,12 +149,14 @@ class DbController(DbInterface):
     """
     def create_user(self, user_name, user_password):
         """
-        Create user.
+        Create a user in the mysql.user table.
         """
         connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         result = None
         try:
-            cursor.execute(f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';")
+            cursor.execute(
+                f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';"
+            )
             connection.commit()
             result = True
         except mariadb.Error as err:
@@ -207,15 +209,45 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def get_users_list(self):
+    def get_users_list_from_mysql(self) -> List[str]:
         """
-        Get list of users.
+        For management purpose, not the usual app purpose.
+        Get list of users registered in mysql table.
         Keep in mind that the user is first created on '%' and then on 'localhost'.
         """
         connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         users_list = []
         try:
             cursor.execute("SELECT User, Host FROM mysql.user;")
+            result = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            df = pd.DataFrame(result, columns=columns)
+            df = df[df['Host'] == self.host]
+            users_list = df['User'].tolist()
+        except mariadb.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        return users_list
+
+    def add_user_to_users_table(self):
+        """
+
+        """
+        result = False
+        return result
+
+    def get_users_list(self) -> List[Dict]:
+        """
+        Get list of users registered in users table.
+        """
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        users_list = []
+        try:
+            cursor.execute(
+                "SELECT username, password_hash, email, disabled FROM users.voc_users;"
+            )
             result = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
             df = pd.DataFrame(result, columns=columns)
@@ -442,7 +474,7 @@ class DbManipulator(DbInterface):
         connection.commit()
         cursor.close()
         connection.close()
-        return 0
+        return True
 
     def read_word(self, password, english: str):
         """

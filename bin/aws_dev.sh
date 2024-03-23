@@ -103,16 +103,15 @@ pip install -r requirements.txt
 # =======================
 #  R U N
 # =======================
-cd ~/vocabulary
 # DEV
+cd ~/vocabulary
 redis-server
-
 uvicorn src.web_app:app \
     --port 8080 \
     --host 0.0.0.0 \
     --reload
 
-# PROD ?
+# PROD
 uvicorn src.web_app:app \
     --port 8080 \
     --host 0.0.0.0 \

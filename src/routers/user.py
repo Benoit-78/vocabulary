@@ -7,7 +7,6 @@
 
 import os
 import sys
-from typing import Dict, Any
 
 from loguru import logger
 from fastapi import Query, Request, Depends, HTTPException, status
@@ -16,7 +15,6 @@ from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from typing import Annotated
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -58,7 +56,7 @@ async def login_for_access_token(
     """
     logger.debug("Route user-token called.")
     # Identify user
-    users_list = auth_api.get_users_names()
+    users_list = auth_api.get_users_list()
     logger.debug(f"Users list: {users_list}")
     user = auth_api.authenticate_user(
         users_list,

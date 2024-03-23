@@ -9,7 +9,7 @@ import os
 import sys
 
 from loguru import logger
-from fastapi import Query, HTTPException, Request, status
+from fastapi import Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates

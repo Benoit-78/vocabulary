@@ -7,11 +7,9 @@
         Test function for utils module.
 """
 
-import logging
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock, patch
 
 import pandas as pd
 

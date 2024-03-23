@@ -10,7 +10,7 @@
 import os
 import random
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Dict, List, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -46,7 +46,6 @@ class Token(BaseModel):
 class User(BaseModel):
     username: str
     email: str | None = None
-    full_name: str | None = None
     disabled: bool | None = None
 
 
@@ -91,9 +90,10 @@ async def create_token(
     return encoded_jwt
 
 
-def get_users_names():
+def get_users_list() -> List[Dict]:
     """
     Function to get the list of users names.
+    User names are the keys of each dictionnary.
     """
     controller = DbController()
     users_list = controller.get_users_list()
@@ -121,7 +121,7 @@ def check_token(token: str):
         if username.startswith('guest_'):
             return token
         users_list = get_users_names()
-        if username not in users_list:
+        if username not in list(users_list.keys()):
             raise credentials_exception
         return token
     except JWTError as exc:
@@ -131,7 +131,7 @@ def check_token(token: str):
 
 
 # -------------------------
-#  O A u t h 2
+#  O A U T H
 # -------------------------
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -164,24 +164,35 @@ def authenticate_user(
         users_list: list,
         username: str,
         password: str
-    ):
+    ) -> UserInDB:
+    """
+    Return the user data if the user exists.
+    """
     def get_user(
             users_list: list,
             username: str
-        ):
+        ) -> UserInDB:
         if username in users_list:
             user_dict = users_list[username]
             return UserInDB(**user_dict)
 
     def verify_password(
-            plain_password,
+            plain_password: str,
             hashed_password
         ):
-        return pwd_context.verify(plain_password, hashed_password)
+        result = pwd_context.verify(
+            plain_password,
+            hashed_password
+        )
+        return result
 
-    user = get_user(users_list, username)
-    if user is None:
+    user_in_db_model = get_user(users_list, username)
+    if user_in_db_model is None:
         return 'Unknown user'
-    if not verify_password(password, user.hashed_password):
+    password_ok = verify_password(
+        password,
+        user_in_db_model.hashed_password
+    )
+    if not password_ok:
         return 'Password incorrect'
-    return user
+    return user_in_db_model

@@ -5,7 +5,6 @@
         Users management
 """
 
-import json
 import os
 import sys
 from abc import ABC, abstractmethod
@@ -19,7 +18,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.data.data_handler import DbController, DbDefiner, DbManipulator 
+from src.data.data_handler import DbController, DbDefiner, DbManipulator
 
 load_dotenv()
 DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
@@ -48,10 +47,7 @@ class CredChecker():
             'Caesar': "Veni, vidi, vici",
             'usr': 'pwd'
         }
-        if password_to_check == secrets[user_name]:
-            return True
-        else:
-            return False
+        return bool(password_to_check == secrets[user_name])
 
     def flag_incorrect_user_name(self, name_to_check):
         """
@@ -146,24 +142,25 @@ class UserAccount(Account):
         """
         Acquire name and password, and store them in the credentials.
         """
-        for host in ['localhost']:  # '%' has been removed from the list
-            account_exists = self.check_if_account_exists(host)
-            if account_exists:
-                return 1
-            db_controller = DbController(host=host)
-            db_controller.create_user(self.user_name, self.user_password)
-            db_controller.grant_privileges_on_common_database(self.user_name)
-        return 0
+        account_exists = self.check_if_account_exists()
+        if account_exists:
+            return 1
+        db_controller = DbController()
+        db_controller.create_user(self.user_name, self.user_password)
+        db_controller.grant_privileges_on_common_database(self.user_name)
+        return True
 
-    def check_if_account_exists(self, host):
-        db_controller = DbController(host=host)
+    def check_if_account_exists(self):
+        """
+        Check if the account exists.
+        """
+        db_controller = DbController()
         users_list = db_controller.get_users_list()
         if self.user_name in users_list:
             logger.error(f"User name '{self.user_name}' already exists.")
             return True
-        else:
-            logger.success(f"User name '{self.user_name}' is available.")
-            return False
+        logger.success(f"User name '{self.user_name}' is available.")
+        return False
 
     def delete(self):
         """
@@ -204,45 +201,33 @@ class UserAccount(Account):
         if account_exists:
             return 1
         # Create database
-        for host in ['localhost']:  # '%' has been removed from the list
-            db_definer = DbDefiner(host, self.user_name)
-            db_created = db_definer.create_database(
-                DB_ROOT_PWD,
-                self.user_password,
-                db_name
-            )
-            if not db_created:
-                return 1
-            db_controller = DbController(host)
-            db_controller.grant_privileges(self.user_name, db_name)
-            tables_created = db_definer.create_seven_tables(self.user_password, db_name)
-            if not tables_created:
-                logger.error(f"Error with the creation of tables for {db_name}.")
-                return 1
-            return 0
+        db_definer = DbDefiner(self.user_name)
+        db_created = db_definer.create_database(
+            DB_ROOT_PWD,
+            db_name
+        )
+        if not db_created:
+            return 1
+        db_controller = DbController()
+        db_controller.grant_privileges(self.user_name, db_name)
+        tables_created = db_definer.create_seven_tables(self.user_password, db_name)
+        if not tables_created:
+            logger.error(f"Error with the creation of tables for {db_name}.")
+            return 1
+        return True
 
     def check_if_database_exists(self, db_name):
         """
         Check if the user's database already exists.
         """
-        for host in ['localhost']:  # '%' has been removed from the list
-            db_definer = DbDefiner(host, self.user_name)
-            db_names = db_definer.get_user_databases(DB_ROOT_PWD, self.user_password)
-            sql_db_name = self.user_name + '_' + db_name
-            if sql_db_name in db_names:
-                logger.error(f"Database name {db_name} already exists.")
-                return True
-            logger.success(f"Database name {db_name} is available.")
-            return False
-
-    def rename_database(self, old_name, new_name):
-        """
-        Change the name of the user's database.
-        """
-        # Copy the database
-        # Transfer the privileges to the new database
-        # Remove the old database
-        return None
+        db_definer = DbDefiner(self.user_name)
+        db_names = db_definer.get_user_databases(DB_ROOT_PWD)
+        sql_db_name = self.user_name + '_' + db_name
+        if sql_db_name in db_names:
+            logger.error(f"Database name {db_name} already exists.")
+            return True
+        logger.success(f"Database name {db_name} is available.")
+        return False
 
     def remove_database(self):
         """
@@ -256,18 +241,16 @@ class UserAccount(Account):
         """
         Add a couple of words to the user's database.
         """
-        for host in ['localhost']:  # '%' has been removed from the list
-            db_manipulator = DbManipulator(
-                'localhost',    
-                self.user_name,
-                db_name,
-                'version',
-            )
-            result = db_manipulator.insert_word(
-                self.user_password,
-                [foreign, native]
-            )
-            return 0
+        db_manipulator = DbManipulator(
+            self.user_name,
+            db_name,
+            'version',
+        )
+        result = db_manipulator.insert_word(
+            self.user_password,
+            [foreign, native]
+        )
+        return result
 
     def remove_word(self):
         """
