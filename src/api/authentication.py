@@ -10,13 +10,14 @@
 import os
 import random
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Dict, List, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from loguru import logger
 from passlib.context import CryptContext
+from passlib.exc import UnknownHashError
 from pydantic import BaseModel
 
 from src.data.data_handler import DbController
@@ -46,24 +47,18 @@ class Token(BaseModel):
 class User(BaseModel):
     username: str
     email: str | None = None
-    full_name: str | None = None
     disabled: bool | None = None
 
 
 
 class UserInDB(User):
-    hashed_password: str
+    password_hash: str
 
 
 
-def get_users_names():
-    """
-    Function to get the list of users names.
-    """
-    controller = DbController()
-    users_list = controller.get_users_list()
-    return users_list
-
+# -------------------------
+#  T O K E N
+# -------------------------
 
 def create_guest_user_name():
     """
@@ -73,14 +68,13 @@ def create_guest_user_name():
     return {"sub": guest_user_name}
 
 
-async def create_token(
+def create_token(
         data: dict = None,
         expires_delta: Optional[int] = None
     ):
     """
     Function to generate a token for a guest or an existing user.
     """
-    # logger.debug(f"data dict: {data}")
     if data is None:
         data = create_guest_user_name()
     to_encode = data.copy()
@@ -97,23 +91,14 @@ async def create_token(
     return encoded_jwt
 
 
-def get_user(users_db, username: str):
-    if username in users_db:
-        user_dict = users_db[username]
-        return UserInDB(**user_dict)
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def authenticate_user(users_db, username: str, password: str):
-    user = get_user(users_db, username)
-    if not user:
-        return 'User name unknown'
-    if not verify_password(password, user.hashed_password):
-        return 'Password incorrect'
-    return user
+def get_users_list() -> List[Dict]:
+    """
+    Function to get the list of users names.
+    User names are the keys of each dictionnary.
+    """
+    controller = DbController()
+    users_list = controller.get_users_list()
+    return users_list
 
 
 def check_token(token: str):
@@ -134,13 +119,13 @@ def check_token(token: str):
             algorithms=[ALGORITHM]
         )
         username: str = payload.get('sub')
-        # logger.debug(f"username at check_token: {username}")
         if username.startswith('guest_'):
             return token
-        users_list = get_users_names()
-        if username not in users_list:
+        users_list = get_users_list()
+        # logger.debug(f"users_list: {users_list}")
+        user_names = [element['username'] for element in users_list]
+        if username not in user_names:
             raise credentials_exception
-        # return username
         return token
     except JWTError as exc:
         # If there's any JWTError, raise credentials_exception
@@ -148,7 +133,18 @@ def check_token(token: str):
 
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+# -------------------------
+#  O A U T H
+# -------------------------
+
+def get_password_hash(password):
+    """
+    Return the hashed password.
+    """
+    return pwd_context.hash(password)
+
+
+def get_username_from_token(token: str = Depends(oauth2_scheme)):
     """
     Given a token, return the user name.
     """
@@ -168,6 +164,63 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError as exc:
         raise credentials_exception from exc
-    if username not in list(users_dict.keys()):
+    controller = DbController()
+    users_list = controller.get_users_list()
+    users_names = [
+        element['username']
+        for element in users_list
+    ]
+    if username not in users_names:
         raise credentials_exception
     return username
+
+
+
+def authenticate_user(
+        users_list: dict,
+        username: str,
+        password: str
+    ) -> UserInDB:
+    """
+    Return the user data if the user exists.
+    """
+    def get_user(
+            users_list: dict,
+            username: str
+        ) -> UserInDB:
+        # logger.debug(f"users_list: {users_list}")
+        # logger.debug(f"username: {username}")
+        user_dict = [
+            user_dict
+            for user_dict in users_list
+            if user_dict['username'] == username
+        ]
+        # logger.debug(f"user_dict: {user_dict}")
+        try:
+            user_dict = user_dict[0]
+        except IndexError as exc:
+            logger.error("Unknown user")
+            raise exc
+        return UserInDB(**user_dict)
+
+    def verify_password(
+            plain_password: str,
+            password_hash
+        ):
+        result = pwd_context.verify(
+            plain_password,
+            password_hash
+        )
+        return result
+
+    user_in_db_model = get_user(users_list, username)
+    if user_in_db_model is None:
+        return 'Unknown user'
+    try:
+        verify_password(
+            password,
+            user_in_db_model.password_hash
+        )
+    except UnknownHashError:
+        return 'Password incorrect'
+    return user_in_db_model

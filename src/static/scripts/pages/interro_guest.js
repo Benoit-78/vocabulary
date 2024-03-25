@@ -48,7 +48,6 @@ function startTest(numWords, token) {
 }
 
 
-
 function showTranslation(numWords, count, score, token) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);

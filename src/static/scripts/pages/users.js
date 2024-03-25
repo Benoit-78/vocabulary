@@ -1,86 +1,82 @@
-function createAccount() {
-    var inputNameElement = document.getElementById("content_box1");
-    var inputPasswordElement = document.getElementById("content_box2");
-    if (inputNameElement) {
-        var inputName = inputNameElement.value;
-    }
-    if (inputPasswordElement) {
-        var inputPassword = inputPasswordElement.value;
-    }
-    fetch("/create-user-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            input_name: inputName,
-            input_password: inputPassword
-        }),
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
+
+async function createAccount(token) {
+    console.log("createAccount function called");
+    const inputName = document.getElementById("inputName").value;
+    const inputPassword = document.getElementById("inputPassword").value;
+    const formData = new URLSearchParams();
+    formData.append("username", inputName);
+    formData.append("password", inputPassword);
+    try {
+        const response = await fetch(
+            `/user/create-user-account?token=${token}`,
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    input_name: inputName,
+                    input_password: inputPassword
+                }),
+            }
+        )
+        const data = await response.json();
+        console.log("Response Data:", data);
         if (data && data.message === "User account created successfully") {
-            // Use sessionStorage to store userName
-            sessionStorage.setItem('userName', data.userName);
-            // Redirect to user-space with userName as a query parameter
-            window.location.href = "/user-space?userName=".concat(data.userName, "?userPassword=").concat(data.userPassword);
-        }
-        else if (data && data.message === "User name not available") {
-            // Redirect to create-account route
-            window.location.href = "/create-account";
-        }
-        else {
-            console.error("Unable to create user account");
-        }
-    })
-        .catch(function (error) {
-        console.error("Error sending user answer:", error);
-    });
-}
-function signIn() {
-    var inputNameElement = document.getElementById("inputName");
-    var inputPasswordElement = document.getElementById("inputPassword");
-    if (inputNameElement) {var inputName = inputNameElement.value;}
-    if (inputPasswordElement) {var inputPassword = inputPasswordElement.value;}
-    fetch("/user/authenticate-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            input_name: inputName,
-            input_password: inputPassword
-        }),
-    })
-    .then(function (response) {
-        if (response.ok) {
-            return response.text();
+            const accessToken = data.token;
+            window.location.href = `/user/user-space?token=${accessToken}`;
+        } else if (data && data.message === "User name not available") {
+            window.location.href = `/sign-up?token=${accessToken}`;
         } else {
-            console.error('Error:', response.statusText);
-            return Promise.reject('Error occurred');
+            console.error("Error during the creation of user account");
         }
-    })
-    .then(function (data) {
-        if (data && data.message === "User credentials validated successfully") {
-            console.log("User credentials validated successfully.");
-            document.body.innerHTML = data;
-        }
-        else {
-            window.location.href = "/sign-in";
-            console.error("Invalid credentials");
-        }
-    })
-        .catch(function (error) {
+    } catch(error) {
         console.error("Error:", error);
-    });
-}
-function goToUserDashboards(userName, userPassword) {
-    window.location.href = "/user/user-dashboards?userName=".concat(userName, "&userPassword=").concat(userPassword);
-}
-function goToUserSettings(userName, userPassword) {
-    var params = {
-        userName: userName,
-        userPassword: userPassword
     };
-    var searchParams = new URLSearchParams(params);
-    window.location.href = "/user/user-settings?".concat(searchParams.toString());
 }
-function goToUserSpace(userName, userPassword) {
-    window.location.href = "/user/user-space?userName=".concat(userName, "&userPassword=").concat(userPassword);
+
+
+function signIn(token) {
+    window.location.href = `/sign-in?token=${token}`;
+}
+
+
+async function authenticateUser() {
+    const inputName = document.getElementById("inputName").value;
+    const inputPassword = document.getElementById("inputPassword").value;
+    const formData = new URLSearchParams();
+    formData.append("username", inputName);
+    formData.append("password", inputPassword);
+    try {
+        const response = await fetch(
+            "/user/user-token",
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: formData.toString(),
+            }
+        );
+        if (response.ok) {
+            const data = await response.json();
+            const token = data.access_token;
+            window.location.href = `/user/user-space?token=${token}`;
+        } else {
+            console.error("Sign-in failed:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+
+function goToUserDashboards(token) {
+    window.location.href = `/user/user-dashboards?token=${token}`;
+}
+
+
+function goToUserSettings(token) {
+    window.location.href = `/user/user-settings?token=${token}`;
+}
+
+
+function goToUserSpace(token) {
+    window.location.href = `/user/user-space?token=${token}`;
 }

@@ -6,16 +6,16 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/root.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
 </head>
 
 <body>
     <div class="container">
         <h1>Welcome to the vocabulary app!</h1>
         <div class="button-list">
-            <!-- <button class="" onclick="window.location.href='/interro-settings-guest'">Try</button> -->
             <button class="" onclick="interroGuest(`{{ token }}`)">Try</button>
-            <button class="" onclick="window.location.href='/sign-in'">Sign in</button>
-            <button class="" onclick="window.location.href='/create-account'">Create account</button>
+            <button class="" onclick="signIn(`{{ token }}`)">Sign in</button>
+            <button class="" onclick="signUp(`{{ token }}`)">Sign up</button>
             <button class="" onclick="window.location.href='/about-the-app'">About the app</button>
             <button class="" onclick="window.location.href='/help'">Help</button>
         </div>

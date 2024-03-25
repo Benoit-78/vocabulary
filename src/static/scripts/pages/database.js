@@ -1,13 +1,13 @@
 
 
-function goToUserDatabases(userName, userPassword) {
-    window.location.href = `/list-databases?userName=${userName}&userPassword=${userPassword}`;
+function goToUserDatabases(token) {
+    window.location.href = `/database/list-databases?token=${token}`;
 }
 
 
 function createDatabase(userName, userPassword) {
     var databaseName = document.getElementById("databaseName").value;
-    fetch("/create-database", {
+    fetch("/database/create-database", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -19,9 +19,9 @@ function createDatabase(userName, userPassword) {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "Database created successfully.") {
-            window.location.href = `/fill_database?userName=${userName}&userPassword=${userPassword}&databaseName=${databaseName}`;
+            window.location.href = `/database/fill_database?userName=${userName}&userPassword=${userPassword}&databaseName=${databaseName}`;
         } else if (data && data.message === "Database name not available.") {
-            window.location.href = `/user-databases?userName=${userName}&userPassword=${userPassword}`;
+            window.location.href = `/database/user-databases?userName=${userName}&userPassword=${userPassword}`;
             console.error("Database name not available");
         } else {
             console.error("Error with the database creation");
@@ -34,7 +34,7 @@ function createDatabase(userName, userPassword) {
 
 
 function chooseDatabase(userName, userPassword, databaseName) {
-    fetch("/choose-database", {
+    fetch("/database/choose-database", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
@@ -46,9 +46,9 @@ function chooseDatabase(userName, userPassword, databaseName) {
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "Database chosen successfully.") {
-            window.location.href = `/fill_database?userName=${userName}&userPassword=${userPassword}&databaseName=${databaseName}`;
+            window.location.href = `/database/fill_database?userName=${userName}&userPassword=${userPassword}&databaseName=${databaseName}`;
         } else if (data && data.message === `Database ${databaseName} name not available.`) {
-            window.location.href = `/user-databases?userName=${userName}&userPassword=${userPassword}`;
+            window.location.href = `/database/user-databases?userName=${userName}&userPassword=${userPassword}`;
             console.error("Database name not available");
         }
             else {
@@ -64,7 +64,7 @@ function chooseDatabase(userName, userPassword, databaseName) {
 function addWord(userName, userPassword, databaseName) {
     var foreign = document.getElementById("input1").value;
     var native = document.getElementById("input2").value;
-    fetch("/add-word", {
+    fetch("/database/add-word", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({

@@ -115,7 +115,7 @@ class DbInterface(ABC):
     All methods invoked by the user should provide with a host name.
     """
     def __init__(self):
-        self.host = socket.gethostname()
+        self.host = PARAMS['host'][socket.gethostname()]
 
     def get_db_cursor(self, user_name, db_name, password):
         """
@@ -147,14 +147,16 @@ class DbController(DbInterface):
     """
     Manage access.
     """
-    def create_user(self, user_name, user_password):
+    def create_user_in_mysql(self, user_name, user_password):
         """
-        Create user.
+        Create a user in the mysql.user table.
         """
         connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         result = None
         try:
-            cursor.execute(f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';")
+            cursor.execute(
+                f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';"
+            )
             connection.commit()
             result = True
         except mariadb.Error as err:
@@ -207,9 +209,10 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def get_users_list(self):
+    def get_users_list_from_mysql(self) -> List[str]:
         """
-        Get list of users.
+        For management purpose, not the usual app purpose.
+        Get list of users registered in mysql table.
         Keep in mind that the user is first created on '%' and then on 'localhost'.
         """
         connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
@@ -221,6 +224,53 @@ class DbController(DbInterface):
             df = pd.DataFrame(result, columns=columns)
             df = df[df['Host'] == self.host]
             users_list = df['User'].tolist()
+        except mariadb.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        return users_list
+
+    def add_user_to_users_table(
+            self,
+            user_name: str,
+            hash_password: str,
+            user_email: str=None
+        ):
+        """
+        Add a user to the users MariaDB table in users Database.
+        """
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        try:
+            cursor.execute(
+                f"INSERT INTO `users`.`voc_users` \
+                (`username`, `password_hash`, `email`, `disabled`) \
+                VALUES('{user_name}', '{hash_password}', '{user_email}', FALSE);"
+            )
+            connection.commit()
+            logger.success(f"User '{user_name}' added to users table.")
+        except mariadb.Error as err:
+            logger.error(err)
+        finally:
+            cursor.close()
+            connection.close()
+        return True
+
+    def get_users_list(self) -> List[Dict]:
+        """
+        Get list of users registered in users table.
+        """
+        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        users_list = []
+        try:
+            cursor.execute(
+                "SELECT username, password_hash, email, disabled FROM users.voc_users;"
+            )
+            result = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            users_df = pd.DataFrame(result, columns=columns)
+            users_str = users_df.to_json(orient='records')
+            users_list = json.loads(users_str)
         except mariadb.Error as err:
             logger.error(err)
         finally:
@@ -442,7 +492,7 @@ class DbManipulator(DbInterface):
         connection.commit()
         cursor.close()
         connection.close()
-        return 0
+        return True
 
     def read_word(self, password, english: str):
         """

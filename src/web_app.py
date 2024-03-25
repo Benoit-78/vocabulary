@@ -19,7 +19,7 @@ from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-# from loguru import logger
+from loguru import logger
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
@@ -86,7 +86,7 @@ def sign_in(
     )
 
 
-@app.get("/create-account", response_class=HTMLResponse)
+@app.get("/sign-up", response_class=HTMLResponse)
 def create_account(
         request: Request,
         token: str = Depends(authentication.check_token)
@@ -97,8 +97,8 @@ def create_account(
     return templates.TemplateResponse(
         "user/create_account.html",
         {
-            "request": request,
-            "errorMessage": "",
+            'request': request,
+            'errorMessage': '',
             'token': token
         }
     )
