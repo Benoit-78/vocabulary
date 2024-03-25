@@ -8,8 +8,8 @@ document.addEventListener(
 );
 
 
-function goToInterroSettings(userName, userPassword) {
-    fetch(`/interro/interro-settings`, {
+function goToInterroSettings(token) {
+    fetch(`/interro/interro-settings?token=$token}`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({

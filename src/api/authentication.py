@@ -68,7 +68,7 @@ def create_guest_user_name():
     return {"sub": guest_user_name}
 
 
-async def create_token(
+def create_token(
         data: dict = None,
         expires_delta: Optional[int] = None
     ):
@@ -121,8 +121,10 @@ def check_token(token: str):
         username: str = payload.get('sub')
         if username.startswith('guest_'):
             return token
-        users_list = get_users_names()
-        if username not in list(users_list.keys()):
+        users_list = get_users_list()
+        # logger.debug(f"users_list: {users_list}")
+        user_names = [element['username'] for element in users_list]
+        if username not in user_names:
             raise credentials_exception
         return token
     except JWTError as exc:
@@ -186,30 +188,27 @@ def authenticate_user(
             users_list: dict,
             username: str
         ) -> UserInDB:
+        # logger.debug(f"users_list: {users_list}")
+        # logger.debug(f"username: {username}")
         user_dict = [
             user_dict
             for user_dict in users_list
             if user_dict['username'] == username
         ]
+        # logger.debug(f"user_dict: {user_dict}")
         try:
             user_dict = user_dict[0]
         except IndexError as exc:
             logger.error("Unknown user")
             raise exc
-        logger.debug(f"User dict: {user_dict}")
         return UserInDB(**user_dict)
 
     def verify_password(
             plain_password: str,
             password_hash
         ):
-        logger.debug(f"Input password: {plain_password}")
-        logger.debug(f"Password hash: {password_hash}")
-        # input_hash = pwd_context.hash(plain_password)
-        logger.debug(f"Input hash: {plain_password}")
         result = pwd_context.verify(
             plain_password,
-            # input_hash,
             password_hash
         )
         return result

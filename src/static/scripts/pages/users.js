@@ -56,8 +56,8 @@ async function authenticateUser() {
         );
         if (response.ok) {
             const data = await response.json();
-            const accessToken = data.access_token;
-            window.location.href = `/user/user-space?token=${accessToken}`;
+            const token = data.access_token;
+            window.location.href = `/user/user-space?token=${token}`;
         } else {
             console.error("Sign-in failed:", response.statusText);
         }
@@ -67,21 +67,16 @@ async function authenticateUser() {
 }
 
 
-function goToUserDashboards(userName, userPassword) {
-    window.location.href = `/user/user-dashboards?userName=${userName}&userPassword=${userPassword})`;
+function goToUserDashboards(token) {
+    window.location.href = `/user/user-dashboards?token=${token}`;
 }
 
 
-function goToUserSettings(userName, userPassword) {
-    var params = {
-        userName: userName,
-        userPassword: userPassword
-    };
-    var searchParams = new URLSearchParams(params);
-    window.location.href = "/user/user-settings?".concat(searchParams.toString());
+function goToUserSettings(token) {
+    window.location.href = `/user/user-settings?token=${token}`;
 }
 
 
-function goToUserSpace(userName, userPassword) {
-    window.location.href = "/user/user-space?userName=".concat(userName, "&userPassword=").concat(userPassword);
+function goToUserSpace(token) {
+    window.location.href = `/user/user-space?token=${token}`;
 }

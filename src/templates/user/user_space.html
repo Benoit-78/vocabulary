@@ -15,10 +15,10 @@
     <div class="container">
         <h1>Welcome {{ userName }}!</h1>
         <div class="button-list">
-            <button onclick="goToInterroSettings(`{{ userName }}`, `{{ userPassword }}`)">Interroooo !!!</button>
-            <button onclick="goToUserDatabases(`{{ userName }}`, `{{ userPassword }}`)">Databases</button>
-            <button onclick="goToUserDashboards(`{{ userName }}`, `{{ userPassword }}`)">Dashboard</button>
-            <button onclick="goToUserSettings(`{{ userName }}`, `{{ userPassword }}`)">Settings</button>
+            <button onclick="goToInterroSettings(`{{ token }}`)">Interroooo !!!</button>
+            <button onclick="goToUserDatabases(`{{ token }}`)">Databases</button>
+            <button onclick="goToUserDashboards(`{{ token }}`)">Dashboard</button>
+            <button onclick="goToUserSettings(`{{ token }}`)">Settings</button>
             <button onclick="goToRoot()">Sign-out</button>
         </div>
     </div>

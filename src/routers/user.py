@@ -56,7 +56,6 @@ async def login_for_access_token(
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
     """
-    logger.debug("Route user-token called.")
     # Identify user
     users_list = auth_api.get_users_list()
     user = auth_api.authenticate_user(
@@ -72,33 +71,23 @@ async def login_for_access_token(
         )
     # Create a token
     user_token = auth_api.create_token(data={"sub": form_data.username})
-    logger.debug(f"Token: {user_token}")
     result = auth_api.Token(
         access_token=user_token,
         token_type="bearer"
     )
-    logger.debug(f"Result: {result}")
     return result
 
 
 @user_router.get("/user-space", response_class=HTMLResponse)
 def user_main_page(
         request: Request,
-        # user_name: str = Query(None, alias="userName"),
-        # user_password: str = Query(None, alias="userPassword"),
         token: str = Depends(auth_api.check_token)
     ):
     """
     Call the base page of user space.
     """
-    # request_dict = user_api.get_user_main_page(
-    #     request,
-    #     user_name,
-    #     user_password,
-    #     token
-    # )
     return templates.TemplateResponse(
-        "guest/settings.html",
+        "user/user_space.html",
         {
             'request': request,
             'token': token
@@ -108,31 +97,33 @@ def user_main_page(
 
 @user_router.get("/user-settings", response_class=HTMLResponse)
 def settings_page(
-    request: Request,
-    user_name: str = Query(None, alias="userName"),
-    user_password: str = Query(None, alias="userPassword"),
-    db_name: str = Query(None, alias="dbName"),
-    test_type: str = Query(None, alias="testType"),
-    total_words: str = Query(None, alias="numWords")
-    ): 
-    """Load the main page for settings."""
-    request_dict = user_api.get_user_settings(
-        request,
-        user_name,
-        user_password,
-        db_name,
-        test_type,
-        total_words
+        request: Request,
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Load the main page for settings.
+    """
+    return templates.TemplateResponse(
+        "user/settings.html",
+        {
+            "request": request,
+            "token": token
+        }
     )
-    return templates.TemplateResponse("user/settings.html", request_dict)
 
 
 @user_router.get("/user-dashboards", response_class=HTMLResponse)
 def dashboard_page(
-    request: Request,
-    user_name: str = Query(None, alias="userName"),
-    user_password: str = Query(None, alias="userPassword")
-    ): 
-    """Load the dashboard page."""
-    request_dict = user_api.get_user_dashboards(request, user_name, user_password)
-    return templates.TemplateResponse("user/dashboard.html", request_dict)
+        request: Request,
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Load the dashboard page.
+    """
+    return templates.TemplateResponse(
+        "user/dashboard.html",
+        {
+            "request": request,
+            "token": token
+        }
+    )

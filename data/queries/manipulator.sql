@@ -12,3 +12,7 @@ LOAD DATA INFILE '/path/data.txt' INTO TABLE your_table
     (column1, column2, @percentage_variable)
     SET percentage = CAST(@percentage_variable AS SIGNED)
 ;
+
+
+DELETE FROM users.voc_users
+WHERE username = 'usr_3';

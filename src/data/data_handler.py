@@ -235,7 +235,7 @@ class DbController(DbInterface):
             self,
             user_name: str,
             hash_password: str,
-            user_email: str
+            user_email: str=None
         ):
         """
         Add a user to the users MariaDB table in users Database.
@@ -243,9 +243,12 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
         try:
             cursor.execute(
-                f"INSERT INTO `users`.`voc_users` (`username`, `password_hash`, `email`, `disabled`) \
-                VALUES({user_name}, {hash_password}, {user_email}, FALSE);"
+                f"INSERT INTO `users`.`voc_users` \
+                (`username`, `password_hash`, `email`, `disabled`) \
+                VALUES('{user_name}', '{hash_password}', '{user_email}', FALSE);"
             )
+            connection.commit()
+            logger.success(f"User '{user_name}' added to users table.")
         except mariadb.Error as err:
             logger.error(err)
         finally:

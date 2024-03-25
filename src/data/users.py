@@ -147,13 +147,10 @@ class UserAccount(Account):
         if account_exists:
             return False
         db_controller = DbController()
-        logger.debug(f"User password: {self.user_password}")
         hash_password = auth_api.get_password_hash(self.user_password)
-        logger.debug(f"Hash password: {hash_password}")
         db_controller.create_user_in_mysql(self.user_name, hash_password)
-        logger.debug("User created in mysql")
         db_controller.grant_privileges_on_common_database(self.user_name)
-        logger.debug("User granted privileges on common database")
+        db_controller.add_user_to_users_table(self.user_name, hash_password)
         return True
 
     def check_if_account_exists(self):
@@ -170,7 +167,6 @@ class UserAccount(Account):
         if self.user_name in users_list:
             logger.error(f"User name '{self.user_name}' already exists.")
             return True
-        logger.success(f"User name '{self.user_name}' is available.")
         return False
 
     def delete(self):
