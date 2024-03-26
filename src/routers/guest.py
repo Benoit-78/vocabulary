@@ -63,11 +63,11 @@ async def save_interro_settings_guest(
     Acquire the user settings for one interro.
     """
     _, test = load_test(
-        user_name='wh0Are_y0u',
+        user_name=os.environ['VOC_GUEST_NAME'],
         db_name=HUM['user']['guest']['databases'][0],
         test_type=settings['testType'].lower(),
         test_length=settings['numWords'],
-        password=HUM['user']['guest']['OK']
+        password=os.environ['VOC_GUEST_PWD']
     )
     save_test_in_redis(test, token)
     response = JSONResponse(

@@ -1,6 +1,6 @@
 
-function goToRoot() {
-    window.location.href = '/';
+function goToRoot(token) {
+    window.location.href = `/?token=${token}`;
 }
 
 
@@ -11,4 +11,14 @@ function interroGuest(token) {
 
 function signUp(token) {
     window.location.href = `/sign-up?token=${token}`;
+}
+
+
+function aboutTheApp(token) {
+    window.location.href = `/about-the-app?token=${token}`;
+}
+
+
+function help(token) {
+    window.location.href = `/help?token=${token}`;
 }
