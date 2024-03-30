@@ -32,4 +32,4 @@ GRANT SELECT ON voc_users TO 'root'@'localhost';
 INSERT INTO `users`.`voc_users` (`username`, `password_hash`, `email`, `disabled`) VALUES
     ('wh0Are_y0u', '*DA6C14463E14177A0621A25F264C2AED66E5A2F4', '', FALSE);
 
-SELECT username FROM `users`.`voc_users`;
+SELECT * FROM `users`.`voc_users`;

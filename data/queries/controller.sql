@@ -33,6 +33,7 @@ CREATE USER 'wh0Are_y0u'@'localhost' IDENTIFIED BY 'AnIs0tr0p|';
 
 GRANT SELECT ON vocabulary.* TO 'wh0Are_y0u'@'localhost';
 
+SHOW GRANTS FOR 'wh0Are_y0u'@'localhost';
 
 -- users
 SELECT host, user, authentication_string

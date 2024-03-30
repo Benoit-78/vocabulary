@@ -101,6 +101,19 @@ def get_users_list() -> List[Dict]:
     return users_list
 
 
+def get_user_name_from_token(token: str):
+    """
+    Function to get the user name from a token.
+    """
+    payload = jwt.decode(
+        token,
+        SECRET_KEY,
+        algorithms=[ALGORITHM]
+    )
+    user_name: str = payload.get('sub')
+    return user_name
+
+
 def check_token(token: str):
     """
     Function to check if a token is valid.
@@ -113,18 +126,13 @@ def check_token(token: str):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-        username: str = payload.get('sub')
-        if username.startswith('guest_'):
+        user_name = get_user_name_from_token(token)
+        if user_name.startswith('guest_'):
             return token
         users_list = get_users_list()
         # logger.debug(f"users_list: {users_list}")
         user_names = [element['username'] for element in users_list]
-        if username not in user_names:
+        if user_name not in user_names:
             raise credentials_exception
         return token
     except JWTError as exc:

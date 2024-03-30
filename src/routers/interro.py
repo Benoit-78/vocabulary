@@ -55,12 +55,13 @@ async def save_interro_settings(
     """
     Save the user settings for the interro.
     """
+    user_name = auth_api.get_user_name_from_token(token)
+    logger.debug(f"User name: {user_name}")
     _, test = load_test(
-        user_name=,
+        user_name=user_name,
         db_name=settings['databaseName'],
         test_type=settings['testType'].lower(),
-        test_length=settings['numWords'],
-        password=
+        test_length=settings['numWords']
     )
     save_test_in_redis(test, token)
     response = JSONResponse(

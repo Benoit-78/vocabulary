@@ -14,12 +14,11 @@ function goToInterroSettings(token) {
 
 function sendUserSettings(token, databaseName, testType, numWords) {
     fetch(
-        `/user/user-settings`,
+        `/interro/save-interro-settings?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                token: token,
                 databaseName: databaseName,
                 testType: testType,
                 numWords: numWords

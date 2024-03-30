@@ -20,7 +20,6 @@ from sqlalchemy import create_engine
 
 load_dotenv()
 
-DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
@@ -124,12 +123,12 @@ class DbInterface(ABC):
         # logger.debug(f"user_name: {user_name}")
         # logger.debug(f"db_name: {db_name}")
         # logger.debug(f"password: {password}")
-        # logger.debug(f"port: {PARAMS['MariaDB']['port']}")
+        # logger.debug(f"port: {PARAMS['port']}")
         connection_config = {
             'user': user_name,
             'password': password,
             'database': db_name,
-            'port': PARAMS['MariaDB']['port']
+            'port': PARAMS['port']
         }
         if self.host not in HOSTS:
             logger.warning(f"host: {self.host}")
@@ -151,7 +150,11 @@ class DbController(DbInterface):
         """
         Create a user in the mysql.user table.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        connection, cursor = self.get_db_cursor(
+            'root',
+            'mysql',
+            os.getenv('VOC_DB_ROOT_PWD')
+        )
         result = None
         try:
             cursor.execute(
@@ -171,7 +174,11 @@ class DbController(DbInterface):
         """
         Grant the new user access to the common database.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        connection, cursor = self.get_db_cursor(
+            'root',
+            'mysql',
+            os.getenv('VOC_DB_ROOT_PWD')
+        )
         result = None
         try:
             cursor.execute(f"GRANT SELECT ON common.* TO '{user_name}'@'{self.host}';")
@@ -190,7 +197,11 @@ class DbController(DbInterface):
         """
         Grant privileges to the user on the given database.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        connection, cursor = self.get_db_cursor(
+            'root',
+            'mysql',
+            os.getenv('VOC_DB_ROOT_PWD')
+        )
         result = None
         try:
             request_1 = "GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON "
@@ -215,7 +226,11 @@ class DbController(DbInterface):
         Get list of users registered in mysql table.
         Keep in mind that the user is first created on '%' and then on 'localhost'.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        connection, cursor = self.get_db_cursor(
+            'root',
+            'mysql',
+            os.getenv('VOC_DB_ROOT_PWD')
+        )
         users_list = []
         try:
             cursor.execute("SELECT User, Host FROM mysql.user;")
@@ -240,7 +255,11 @@ class DbController(DbInterface):
         """
         Add a user to the users MariaDB table in users Database.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        connection, cursor = self.get_db_cursor(
+            'root',
+            'mysql',
+            os.getenv('VOC_DB_ROOT_PWD')
+        )
         try:
             cursor.execute(
                 f"INSERT INTO `users`.`voc_users` \
@@ -260,7 +279,11 @@ class DbController(DbInterface):
         """
         Get list of users registered in users table.
         """
-        connection, cursor = self.get_db_cursor('root', 'mysql', DB_ROOT_PWD)
+        connection, cursor = self.get_db_cursor(
+            'root',
+            'mysql',
+            os.getenv('VOC_DB_ROOT_PWD')
+        )
         users_list = []
         try:
             cursor.execute(
@@ -431,16 +454,19 @@ class DbManipulator(DbInterface):
             )
         self.test_type = test_type
 
-    def get_tables(self, password):
+    def get_tables(self):
         """
         Load the different tables necessary to the app.
         """
         connection, cursor = self.get_db_cursor(
-            self.user_name,
+            'root',
             self.db_name,
-            password
+            os.environ['VOC_DB_ROOT_PWD']
         )
-        cols = self.db_definer.get_database_cols(self.db_name, password)
+        cols = self.db_definer.get_database_cols(
+            self.db_name,
+            os.environ['VOC_DB_ROOT_PWD']
+        )
         tables_names = list(cols.keys())
         tables = {}
         for table_name in tables_names:

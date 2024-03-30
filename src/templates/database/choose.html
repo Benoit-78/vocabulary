@@ -14,45 +14,45 @@
 <body>
 
     <div class="container">
+        <form>
 
-        <!-- ------------------------------------------------- -->
+            <div class="row">
+                <div>
+                    <label for="input2">Choose an existing database</label>
+                    <select id="menu">
+                        <option value="0">Select a database</option>
+                        {% for database in databases %}
+                            <option value="{{ database }}">{{ database }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <div class="row">
-            <div>
-                <label for="input2">Choose an existing database</label>
-                <select id="menu">
-                    <!-- Options will be dynamically added here using JavaScript -->
-                </select>
+            <div class="row">
+                <button class="button" onclick="chooseDatabase(`{{ selected_database|safe }}`)">Choose database</button>
             </div>
 
-        <div class="row">
-            <button class="button" onclick="chooseDatabase(`{{ selected_database|safe }}`)">Choose database</button>
-        </div>
-
-        <!-- ------------------------------------------------- -->
-
-        <div class="row">
-            <div>
-                <label for="input1">Create a new database</label>
-                <input type="text" id="databaseName" name="databaseName">
+            <div class="row">
+                <div>
+                    <label for="input1">Create a new database</label>
+                    <input type="text" id="databaseName" name="databaseName">
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <button class="button" onclick="createDatabase(`{{ userName }}`, `{{ userPassword }}`)">Create database</button>
-        </div>
-
-        <!-- ------------------------------------------------- -->
-
-        <div class="row">
-            <div>
-                <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+            <div class="row">
+                <button class="button" onclick="createDatabase(`{{ token }}`)">Create database</button>
             </div>
-        </div>
 
-        <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`, `{{ userPassword }}`)">Quit</button>
-        </div>
+            <div class="row">
+                <div>
+                    <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            </div>
+
+        </form>
 
     </div>
 

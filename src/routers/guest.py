@@ -66,8 +66,7 @@ async def save_interro_settings_guest(
         user_name=os.environ['VOC_GUEST_NAME'],
         db_name=HUM['user']['guest']['databases'][0],
         test_type=settings['testType'].lower(),
-        test_length=settings['numWords'],
-        password=os.environ['VOC_GUEST_PWD']
+        test_length=settings['numWords']
     )
     save_test_in_redis(test, token)
     response = JSONResponse(

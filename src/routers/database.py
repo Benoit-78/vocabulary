@@ -36,7 +36,7 @@ def user_databases(
     Call the base page of user databases.
     """
     return templates.TemplateResponse(
-        "database/databases.html",
+        "database/choose.html",
         {
             'request': request,
             'token': token
@@ -64,18 +64,17 @@ async def choose_database(data: dict):
 
 @database_router.get("/fill_database", response_class=HTMLResponse)
 def data_page(
-    request: Request,
-    user_name: str = Query(None, alias="userName"),
-    user_password: str = Query(None, alias="userPassword"),
-    db_name: str = Query(None, alias="databaseName"),
+        request: Request,
+        token: str = Depends(auth_api.check_token),
+        db_name: str = Query(None, alias="databaseName"),
     ):
     """
     Base page for data input by the user.
     """
+    user_name = auth_api.get_user_name_from_token(token)
     request_dict = database_api.fill_database(
         request,
         user_name,
-        user_password,
         db_name
     )
     return templates.TemplateResponse("database/fill.html", request_dict)
@@ -83,17 +82,30 @@ def data_page(
 
 @database_router.post("/add-word")
 async def create_word(data: dict):
-    """Save the word in the database."""
+    """
+    Save the word in the database.
+    """
     # Authenticate user
     user_name = data['usr']
     user_password = data['pwd']
     cred_checker.check_credentials(user_name, user_password)
     # Add the word
     db_name = data['db_name']
-    user_account = users.UserAccount(user_name, user_password)
-    result = user_account.insert_word(db_name, data['foreign'], data['native'])
+    user_account = users.UserAccount(
+        user_name,
+        user_password
+    )
+    result = user_account.insert_word(
+        db_name,
+        data['foreign'],
+        data['native']
+    )
     if result == 1:
-        json_response = JSONResponse(content={"message": "Error with the word creation."})
+        json_response = JSONResponse(
+            content={"message": "Error with the word creation."}
+        )
     if result == 0:
-        json_response =  JSONResponse(content={"message": "Word added successfully."})
+        json_response =  JSONResponse(
+            content={"message": "Word added successfully."}
+        )
     return json_response

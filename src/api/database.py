@@ -131,7 +131,7 @@ def create_word(data: dict):
         return JSONResponse(content={"message": "Word created successfully."})
 
 
-def fill_database(request, user_name, user_password, db_name):
+def fill_database(request, user_name, db_name):
     """
     
     """
@@ -157,7 +157,6 @@ def fill_database(request, user_name, user_password, db_name):
         "request": request,
         "title": title,
         "userName": user_name,
-        "userPassword": user_password,
         "databaseName": db_name
     }
     return request_dict
