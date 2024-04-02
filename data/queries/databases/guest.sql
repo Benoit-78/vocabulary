@@ -1,6 +1,6 @@
 
-CREATE DATABASE vocabulary;
-USE vocabulary;
+CREATE DATABASE wh0_Are_y0u_vocabulary;
+USE wh0_Are_y0u_vocabulary;
 
 
 

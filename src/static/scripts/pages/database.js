@@ -19,7 +19,7 @@ function createDatabase(token) {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "Database created successfully.") {
-            window.location.href = `/database/fill_database?token=${token}}&databaseName=${databaseName}`;
+            window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
         } else if (data && data.message === "Database name not available.") {
             window.location.href = `/database/user-databases?token=${token}`;
             console.error("Database name not available");
@@ -33,7 +33,8 @@ function createDatabase(token) {
 }
 
 
-function chooseDatabase(token, databaseName) {
+function chooseDatabase(token) {
+    var databaseName = document.getElementById("databaseName").value;
     fetch(
         `/database/choose-database?token=${token}`,
         {

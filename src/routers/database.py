@@ -45,16 +45,22 @@ def user_databases(
 
 
 @database_router.post("/create-database")
-async def create_database(data: dict):
+async def create_database(
+        data: dict,
+        token: str = Depends(auth_api.check_token)
+    ):
     """
     Create a database.
     """
-    json_response = database_api.create_database(data)
+    json_response = database_api.create_database(data, token)
     return json_response
 
 
 @database_router.post("/choose-database")
-async def choose_database(data: dict):
+async def choose_database(
+        data: dict,
+        token: str = Depends(auth_api.check_token)
+    ):
     """
     Choose a database.
     """
@@ -62,7 +68,7 @@ async def choose_database(data: dict):
     return json_response
 
 
-@database_router.get("/fill_database", response_class=HTMLResponse)
+@database_router.get("/fill-database", response_class=HTMLResponse)
 def data_page(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -91,10 +97,7 @@ async def create_word(data: dict):
     cred_checker.check_credentials(user_name, user_password)
     # Add the word
     db_name = data['db_name']
-    user_account = users.UserAccount(
-        user_name,
-        user_password
-    )
+    user_account = users.UserAccount(user_name)
     result = user_account.insert_word(
         db_name,
         data['foreign'],

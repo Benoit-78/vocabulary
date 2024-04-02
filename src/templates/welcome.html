@@ -11,16 +11,19 @@
 
 <body>
     <div class="container">
-        <h1>Welcome to the vocabulary app!</h1>
+
+        <h1>Vocabulary</h1>
+
+        <h3>Keep your words</h3>
+
         <div class="button-list">
-            <button class="" onclick="interroGuest(`{{ token }}`)">Try</button>
-            <button class="" onclick="signIn(`{{ token }}`)">Sign in</button>
-            <button class="" onclick="signUp(`{{ token }}`)">Sign up</button>
-            <button class="" onclick="aboutTheApp(`{{ token }}`)">About the app</button>
-            <button class="" onclick="help(`{{ token }}`)">Help</button>
+            <button class="button" onclick="interroGuest(`{{ token }}`)">Try</button>
+            <button class="button" onclick="signIn(`{{ token }}`)">Sign in</button>
+            <button class="button" onclick="signUp(`{{ token }}`)">Sign up</button>
+            <button class="button" onclick="aboutTheApp(`{{ token }}`)">About</button>
+            <button class="button" onclick="help(`{{ token }}`)">Help</button>
         </div>
-        <p>Do NOT store any confidential data in this app.</p>
-        <p>Data storage is currently NOT secure.</p>
+
     </div>
 </body>
 

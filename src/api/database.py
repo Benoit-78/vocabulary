@@ -20,17 +20,18 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src.data import users
+from src.api import authentication as auth_api
 
 cred_checker = users.CredChecker()
 
 
-def get_user_databases(request, user_name, user_password):
+def get_user_databases(request, user_name):
     """
     Call the base page of user databases.
     """
     # Authenticate user
     if user_name:
-        cred_checker.check_credentials(user_name, user_password)
+        cred_checker.check_credentials(user_name)
     else:
         logger.error("User name not found.")
         raise HTTPException(
@@ -39,41 +40,36 @@ def get_user_databases(request, user_name, user_password):
         )
     request_dict = {
         "request": request,
-        "userName": user_name,
-        "userPassword": user_password
+        "userName": user_name
     }
     return request_dict
 
 
-def create_database(data: dict):
+def create_database(data: dict, token: str):
     """
     Create the given database.
     """
     # Authenticate user
-    user_name = data['usr']
-    user_password = data['pwd']
-    cred_checker.check_credentials(user_name, user_password)
+    user_name = auth_api.get_user_name_from_token(token)
     # Create database
     db_name = data['db_name']
-    user_account = users.UserAccount(user_name, user_password)
+    user_account = users.UserAccount(user_name)
     result = user_account.create_database(db_name)
     if result == 1:
         json_response = JSONResponse(
             content=
             {
-                "message": f"Database name {db_name} not available.",
-                "userName": user_account.user_name,
-                "userPassword": user_account.user_password,
-                "databaseName": db_name
+                'message': f"Database name {db_name} not available.",
+                'token': token,
+                'databaseName': db_name
             }
         )
     if result == 0:
         json_response = JSONResponse(
             content=
             {
-                "message": "Database created successfully.",
-                "userName": user_account.user_name,
-                "userPassword": user_account.user_password
+                'message': "Database created successfully.",
+                'token': token
             }
         )
     return json_response
@@ -85,20 +81,17 @@ def choose_database(data: dict):
     """
     # Authenticate user
     user_name = data['userName']
-    user_password = data['userPassword']
-    cred_checker.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     # Choose database
     db_name = data['databaseName']
-    user_account = users.UserAccount(user_name, user_password)
+    user_account = users.UserAccount(user_name)
     result = user_account.check_if_database_exists(db_name)
     if not result:
         json_response = JSONResponse(
             content=
             {
                 "message": f"Database name {db_name} not available.",
-                "userName": user_account.user_name,
-                "userPassword": user_account.user_password
-            }
+                "userName": user_account.user_name            }
         )
     if result:
         json_response = JSONResponse(
@@ -106,7 +99,6 @@ def choose_database(data: dict):
             {
                 "message": "Database chosen successfully.",
                 "userName": user_account.user_name,
-                "userPassword": user_account.user_password,
                 "databaseName": db_name
             }
         )
@@ -119,15 +111,13 @@ def create_word(data: dict):
     """
     # Authenticate user
     user_name = data['usr']
-    user_password = data['pwd']
-    cred_checker.check_credentials(user_name, user_password)
+    cred_checker.check_credentials(user_name)
     # Add the word
     db_name = data['db_name']
-    user_account = users.UserAccount(user_name, user_password)
     result = user_account.insert_word(db_name, data['foreign'], data['native'])
     if result == 1:
         return JSONResponse(content={"message": "Error with the word creation."})
-    elif result == 0:
+    if result == 0:
         return JSONResponse(content={"message": "Word created successfully."})
 
 
@@ -137,7 +127,7 @@ def fill_database(request, user_name, db_name):
     """
     # Authenticate user
     if user_name:
-        cred_checker.check_credentials(user_name, user_password)
+        cred_checker.check_credentials(user_name)
     else:
         logger.error("User name not found.")
         raise HTTPException(

@@ -22,7 +22,6 @@ from pydantic import BaseModel
 
 from src.data.data_handler import DbController
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 users_dict = {
@@ -85,7 +84,7 @@ def create_token(
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode,
-        SECRET_KEY,
+        os.environ['SECRET_KEY'],
         algorithm=ALGORITHM
     )
     return encoded_jwt
@@ -107,7 +106,7 @@ def get_user_name_from_token(token: str):
     """
     payload = jwt.decode(
         token,
-        SECRET_KEY,
+        os.environ['SECRET_KEY'],
         algorithms=[ALGORITHM]
     )
     user_name: str = payload.get('sub')
@@ -164,7 +163,7 @@ def get_username_from_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(
             token,
-            SECRET_KEY,
+            os.environ['SECRET_KEY'],
             algorithms=[ALGORITHM]
         )
         username: str = payload.get('sub')

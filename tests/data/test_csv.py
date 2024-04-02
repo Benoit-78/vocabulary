@@ -17,7 +17,7 @@ REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
-from src.data import data_handler
+from src.data import csv_interface
 
 
 
@@ -26,8 +26,8 @@ class TestCsvHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
-        cls.csv_handler_1 = data_handler.CsvHandler('version')
-        cls.csv_handler_2 = data_handler.CsvHandler('theme')
+        cls.csv_handler_1 = csv_interface.CsvHandler('version')
+        cls.csv_handler_2 = csv_interface.CsvHandler('theme')
         cls.error_data_handler = None
 
     def test_set_paths(self):
@@ -46,7 +46,7 @@ class TestCsvHandler(unittest.TestCase):
         """Error should be raised in case of unknown OS."""
         # Arrange
         invalid_test_type = "blablabla"
-        self.error_data_handler = data_handler.CsvHandler(invalid_test_type)
+        self.error_data_handler = csv_interface.CsvHandler(invalid_test_type)
         mock_logger = MagicMock()
         logging.basicConfig(level=logging.INFO)
         with self.assertRaises(SystemExit):
@@ -83,7 +83,7 @@ class TestCsvHandler(unittest.TestCase):
     def test_save_table(self):
         """Should save the table as a csv file."""
         # Arrange
-        csv_handler = data_handler.CsvHandler('version')
+        csv_handler = csv_interface.CsvHandler('version')
         csv_handler.set_paths()
         old_df = pd.DataFrame(columns=['words', 'integers', 'floats', 'booleans'])
         old_df.loc[old_df.shape[0]] = ['a', 0, 0.0, True]
