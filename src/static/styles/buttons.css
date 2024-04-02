@@ -1,13 +1,18 @@
 
 .button {
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: rgba(0, 128, 255, 0.5); /* Semi-transparent blue color */
     color: white;
     border: none;
     cursor: pointer;
     font-size: 14px;
     margin: 10px;
     transition: background-color 0.3s ease-in-out;
+    border-radius: 20px;
+}
+
+.button:hover {
+    background-color: rgba(0, 128, 255, 0.8);
 }
 
 .button.green {

@@ -12,10 +12,7 @@ function sendUserSettings(testType, numWords, token) {
         `/guest/save-interro-settings?token=${token}`,
         {
             method: "POST",
-            headers:
-            {
-                "Content-Type": "application/json"
-            },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 testType: testType,
                 numWords: numWords,

@@ -34,7 +34,7 @@ app = FastAPI(
 # Sessions
 app.add_middleware(
     SessionMiddleware,
-    secret_key=authentication.SECRET_KEY
+    secret_key=os.environ.get("SECRET_KEY")
 )
 # Routers
 app.include_router(user_router)

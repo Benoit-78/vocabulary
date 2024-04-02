@@ -28,11 +28,8 @@ def create_account(creds, token):
     """
     Create the user account if the given user name does not exist yet.
     """
-    user_account = users.UserAccount(
-        creds['input_name'],
-        creds['input_password']
-    )
-    result = user_account.create_account()
+    user_account = users.UserAccount(creds['input_name'])
+    result = user_account.create_account(creds['input_password'])
     json_response = {}
     if result is False:
         json_response = JSONResponse(
@@ -49,7 +46,6 @@ def create_account(creds, token):
             {
                 "message": "User account created successfully",
                 "userName": user_account.user_name,
-                "userPassword": user_account.user_password,
                 'token': token
             }
         )

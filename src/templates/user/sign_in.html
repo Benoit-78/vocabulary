@@ -13,7 +13,6 @@
 
 <body>
     <div class="container">
-        <!-- <form onsubmit="return authenticateUser()"> -->
         <form id="signInForm">
             <div class="row">
                 <label for="inputName">User name</label>
@@ -24,10 +23,10 @@
                 <input type="password" id="inputPassword" name="inputPassword" required>
             </div>
             <div class="row">
-                <!-- <button type="submit" class="button">Sign in</button> -->
-                <button type="button" class="button" onclick="authenticateUser()">Sign in</button>
+                <button type="button" class="button" onclick="authenticateUser(`{{ token }}`)">Sign in</button>
             </div>
         </form>
+        <p>Do NOT store any confidential data in this app.</p>
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
         </div>

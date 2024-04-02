@@ -50,15 +50,14 @@
         </form>
         <div class="row">
             <button class="button" onclick="sendUserSettings(
-                `{{ userName }}`,
-                `{{ userPassword }}`,
+                `{{ token }}`,
                 document.getElementById('db_name').value,
                 document.getElementById('test-type').value,
                 document.getElementById('num-words').value
                 )">Start Test</button>
-        </div>EN -> FR
+        </div>
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ userName }}`, `{{ userPassword }}`)">Quit</button>
+            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
         </div>
     </div>
 </body>

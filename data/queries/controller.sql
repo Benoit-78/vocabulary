@@ -33,6 +33,7 @@ CREATE USER 'wh0Are_y0u'@'localhost' IDENTIFIED BY 'AnIs0tr0p|';
 
 GRANT SELECT ON vocabulary.* TO 'wh0Are_y0u'@'localhost';
 
+SHOW GRANTS FOR 'wh0Are_y0u'@'localhost';
 
 -- users
 SELECT host, user, authentication_string
@@ -43,8 +44,11 @@ SELECT * FROM users.voc_users;
 
 GRANT CREATE, SELECT, INSERT, UPDATE, DROP ON theme_perf TO '<user-name>'@'localhost';
 
-DROP USER 'usr'@'%';
 DROP USER 'usr'@'localhost';
+
+DELETE FROM users.voc_users
+WHERE username = 'usr';
+
 
 SELECT * FROM sys.memory_by_user_by_current_bytes;
 

@@ -96,11 +96,11 @@ class Loader():
         self.tables = {}
         self.output_table = ''
 
-    def load_tables(self, password):
+    def load_tables(self):
         """
         Return the tables necessary for the interro to run.
         """
-        self.tables = self.data_handler.get_tables(password)
+        self.tables = self.data_handler.get_tables()
         voc = self.test_type + '_voc'
         # self.tables[voc] = self.tables[voc].reset_index()
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]

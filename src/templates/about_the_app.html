@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Test Configuration</title>
+    <title>About the app</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
@@ -16,19 +16,15 @@
 
     <div class="container">
     
-        <h1>Welcome to my vocabulary application!</h1>
+        <h1>About the app</h1>
 
-        <p>This application allows you to review words in a foreign language.</p>
-        <p>Each time you discover a new word, add it to the app along with its translation.</p>
-        <p>The app will then ask you, say, 10 random words each day.</p>
-        <p>As you progress, the words you retain well will be archived, while those you have difficulties with will be revisited more frequently.</p>
-        <p>In the end, these words will be yours!</p>
-        <p>Happy learning!</p>
+        <p>When you discover a new word, save it in the app, along with its translation</p>
+        <p>The app will then ask you, say, 10 random words each day</p>
+        <p>As you progress, the words you retain well will be archived</p>
+        <p>Those you have difficulties with will be revisited more frequently</p>
+        <p>In the end, these words will be in your memory</p>
 
-        <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
-        </div>
-
+        <button class="button quit-button" onclick="goToRoot(`{{ token }}`)">Quit</button>
     </div>
 
 </body>

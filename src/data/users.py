@@ -134,12 +134,11 @@ class UserAccount(Account):
     Interface between web_app API and database handlers,
     such as Controller, Definer, and Manipulator.
     """
-    def __init__(self, user_name, user_password):
+    def __init__(self, user_name):
         super().__init__()
         self.user_name = user_name
-        self.user_password = user_password
 
-    def create_account(self):
+    def create_account(self, password):
         """
         Acquire name and password, and store them in the credentials.
         """
@@ -147,7 +146,7 @@ class UserAccount(Account):
         if account_exists:
             return False
         db_controller = DbController()
-        hash_password = auth_api.get_password_hash(self.user_password)
+        hash_password = auth_api.get_password_hash(password)
         db_controller.create_user_in_mysql(self.user_name, hash_password)
         db_controller.grant_privileges_on_common_database(self.user_name)
         db_controller.add_user_to_users_table(self.user_name, hash_password)
@@ -209,15 +208,12 @@ class UserAccount(Account):
             return 1
         # Create database
         db_definer = DbDefiner(self.user_name)
-        db_created = db_definer.create_database(
-            DB_ROOT_PWD,
-            db_name
-        )
+        db_created = db_definer.create_database(db_name)
         if not db_created:
             return 1
         db_controller = DbController()
         db_controller.grant_privileges(self.user_name, db_name)
-        tables_created = db_definer.create_seven_tables(self.user_password, db_name)
+        tables_created = db_definer.create_seven_tables(db_name)
         if not tables_created:
             logger.error(f"Error with the creation of tables for {db_name}.")
             return 1
@@ -228,7 +224,7 @@ class UserAccount(Account):
         Check if the user's database already exists.
         """
         db_definer = DbDefiner(self.user_name)
-        db_names = db_definer.get_user_databases(DB_ROOT_PWD)
+        db_names = db_definer.get_user_databases()
         sql_db_name = self.user_name + '_' + db_name
         if sql_db_name in db_names:
             logger.error(f"Database name {db_name} already exists.")
@@ -253,10 +249,7 @@ class UserAccount(Account):
             db_name,
             'version',
         )
-        result = db_manipulator.insert_word(
-            self.user_password,
-            [foreign, native]
-        )
+        result = db_manipulator.insert_word([foreign, native])
         return result
 
     def remove_word(self):

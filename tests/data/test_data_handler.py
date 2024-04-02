@@ -1,23 +1,17 @@
 """
-    Tests for data_handler module.
+    Main purpose:
+        Tests for data_handler module.
 """
 
-import logging
 import os
-import socket
 import sys
 import unittest
 from datetime import datetime
-from dotenv import load_dotenv
 from unittest.mock import MagicMock, patch
 
 import mysql.connector as mariadb
 import pandas as pd
-from loguru import logger
-
-load_dotenv()
-
-DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
+# from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -27,109 +21,27 @@ from src.data import data_handler
 
 
 
-class TestCsvHandler(unittest.TestCase):
-    """The CsvHandler class should serve as an interface with csv data."""
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
-        cls.csv_handler_1 = data_handler.CsvHandler('version')
-        cls.csv_handler_2 = data_handler.CsvHandler('theme')
-        cls.error_data_handler = None
-
-    def test_set_paths(self):
-        """Data paths should exist"""
-        # Act
-        self.csv_handler_1.set_paths()
-        self.csv_handler_2.set_paths()
-        # Assert
-        for csv_handler in [self.csv_handler_1, self.csv_handler_2]:
-            self.assertIsInstance(csv_handler.paths, dict)
-            self.assertEqual(len(csv_handler.paths), 4)
-            for _, path in csv_handler.paths.items():
-                self.assertIsInstance(path, str)
-
-    def test_set_paths_error(self):
-        """Error should be raised in case of unknown OS."""
-        # Arrange
-        invalid_test_type = "blablabla"
-        self.error_data_handler = data_handler.CsvHandler(invalid_test_type)
-        mock_logger = MagicMock()
-        logging.basicConfig(level=logging.INFO)
-        with self.assertRaises(SystemExit):
-            # Act
-            self.error_data_handler.set_paths()
-            # Assert
-            mock_logger.error.assert_called_with(f"Wrong test_type argument: {invalid_test_type}")
-            mock_logger.error.assert_called_once()
-
-    def test_set_tables(self):
-        """Data should be correctly loaded"""
-        # Act
-        self.csv_handler_1.set_tables()
-        self.csv_handler_2.set_tables()
-        # Assert
-        for csv_handler in [self.csv_handler_1, self.csv_handler_2]:
-            self.assertGreater(len(csv_handler.paths), 1)
-            self.assertIsInstance(csv_handler.tables, dict)
-            self.assertEqual(len(csv_handler.tables), 4)
-            for df_name, dataframe in csv_handler.tables.items():
-                self.assertIn(
-                    df_name,
-                    [
-                        csv_handler.test_type + '_voc',
-                        csv_handler.test_type + '_perf',
-                        csv_handler.test_type + '_word_cnt',
-                        'output'
-                    ]
-                )
-                self.assertIsInstance(dataframe, type(pd.DataFrame()))
-                self.assertGreater(dataframe.shape[1], 0)
-        os.chdir('tests')
-
-    def test_save_table(self):
-        """Should save the table as a csv file."""
-        # Arrange
-        csv_handler = data_handler.CsvHandler('version')
-        csv_handler.set_paths()
-        old_df = pd.DataFrame(columns=['words', 'integers', 'floats', 'booleans'])
-        old_df.loc[old_df.shape[0]] = ['a', 0, 0.0, True]
-        old_df.loc[old_df.shape[0]] = ['b', 1, 1.0, False]
-        old_df.loc[old_df.shape[0]] = ['c', 2, 2.0, False]
-        csv_handler.paths['for_test_only'] = csv_handler.os_sep.join(
-            [r'.', 'data', 'for_test_only.csv']
-        )
-        # Act
-        csv_handler.save_table(
-            table_name='for_test_only',
-            table=old_df
-        )
-        new_df = pd.read_csv(csv_handler.paths['for_test_only'], sep=';')
-        # Assert
-        self.assertEqual(old_df.shape, new_df.shape)
-        for column in new_df.columns:
-            self.assertEqual(
-                list(old_df[column]),
-                list(new_df[column])
-            )
-        os.remove(csv_handler.paths['for_test_only'])
-
-
-
 class TestDbInterface(unittest.TestCase):
+    """
+    Abstract class, embodied by divers daughter classes that serve as 
+    interfaces for different data operations.
+    As of today (2024-03-30), the daughter classes are:
+    - DbController, for Data Control Language operations,
+    - DbDefiner, for Data Definition Language operations,
+    - DbManipulator, for Data Manipulation Language operations.
+    """
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.logger')
     @patch('src.data.data_handler.mariadb.connect')
     def test_get_db_cursor(self, mock_connect, mock_logger):
         # Prepare
-        user_name = 'test_user'
-        db_name = 'test_db'
-        password = 'test_password'
         mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
         mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
         mock_connect.return_value = mock_connection
         mock_connection.cursor.return_value = mock_cursor
         db_interface = data_handler.DbInterface()
         # Act
-        result = db_interface.get_db_cursor(user_name, db_name, password)
+        result = db_interface.get_db_cursor()
         # Assert
         # mock_connect.assert_called_once_with(
         #     user=user_name,
@@ -157,35 +69,33 @@ class TestDbController(unittest.TestCase):
     """
     @classmethod
     def setUp(cls):
-        cls.db_controller = data_handler.DbController()
-        cls.root_password = DB_ROOT_PWD
+        cls.mock_host = 'localhost'
+        with patch('socket.gethostname', return_value=cls.mock_host):
+            cls.db_controller = data_handler.DbController()
         cls.user_name = 'test_user'
 
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.DbController.get_db_cursor')
-    def test_create_user(self, mock_get_db_cursor):
+    def test_create_user_in_mysql(self, mock_get_db_cursor):
         """Should create a user."""
         # Arrange
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         user_password = 'test_user_password'
-        host = socket.gethostname()
         # Act
-        result = self.db_controller.create_user(self.user_name, user_password)
+        result = self.db_controller.create_user_in_mysql(self.user_name, user_password)
         # Assert
         self.assertEqual(result, True)
-        mock_get_db_cursor.assert_called_once_with(
-            'root',
-            'mysql',
-            self.root_password
-        )
-        request_1 = f"CREATE USER '{self.user_name}'@'{host}'"
+        mock_get_db_cursor.assert_called_once()
+        request_1 = f"CREATE USER '{self.user_name}'@'{self.mock_host}'"
         request_2 = f"IDENTIFIED BY '{user_password}';"
         sql_request_1 = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_with(sql_request_1)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.DbController.get_db_cursor')
     def test_grant_privileges(self, mock_get_db_cursor):
         """
@@ -196,18 +106,13 @@ class TestDbController(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         db_name = 'test_database_name'
-        host = socket.gethostname()
         # Act
         result = self.db_controller.grant_privileges(self.user_name, db_name)
         # Assert
         self.assertEqual(result, True)
-        mock_get_db_cursor.assert_called_once_with(
-            'root',
-            'mysql',
-            self.root_password
-        )
+        mock_get_db_cursor.assert_called_once_with()
         request_1 = f"GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON {self.user_name}_{db_name}.*"
-        request_2 = f"TO '{self.user_name}'@'{host}';"
+        request_2 = f"TO '{self.user_name}'@'{self.mock_host}';"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
         mock_cursor.close.assert_called_once()
@@ -222,7 +127,6 @@ class TestDbDefiner(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.user_name = 'benoit'
-        cls.password = 'test_password'
         cls.db_definer = data_handler.DbDefiner(cls.user_name)
 
     @patch('src.data.data_handler.DbDefiner.get_db_cursor')
@@ -232,12 +136,10 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         db_name = 'test_db'
-        root_password = 'test_root_password'
-        password = 'test_password'
         # Act
-        result = self.db_definer.create_database(root_password, password, db_name)
+        result = self.db_definer.create_database(db_name)
         # Assert
-        mock_get_db_cursor.assert_called_once_with('root', 'mysql', root_password)
+        mock_get_db_cursor.assert_called_once()
         sql_request = f"CREATE DATABASE {self.user_name}_{db_name};"
         mock_cursor.execute.assert_called_once_with(sql_request)
         mock_connection.commit.assert_called_once()
@@ -261,13 +163,9 @@ class TestDbDefiner(unittest.TestCase):
             [('col3', 'type3'), ('col4', 'type4')]  # Mock SHOW COLUMNS result
         ]
         # Act
-        result = self.db_definer.get_database_cols(db_name, self.password)
+        result = self.db_definer.get_database_cols(db_name)
         # Assertions
-        mock_get_db_cursor.assert_called_once_with(
-            self.db_definer.user_name,
-            db_name,
-            self.password
-        )
+        mock_get_db_cursor.assert_called_once()
         mock_cursor.execute.assert_any_call(f"USE {db_name};")
         mock_cursor.execute.assert_any_call("SHOW TABLES;")
         mock_cursor.execute.assert_any_call("SHOW COLUMNS FROM table1;")
@@ -337,6 +235,7 @@ class TestDbManipulator(unittest.TestCase):
         self.assertIn(self.db_manipulator.test_type, ['version', 'theme'])
         self.assertEqual(self.db_manipulator.test_type, 'version')
 
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.DbDefiner.get_database_cols')
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
     def test_get_tables(self, mock_get_db_cursor, mock_get_database_cols):
@@ -346,26 +245,42 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         mock_get_database_cols.return_value = {
-            'version_voc': ['col_1', 'col_2'],
-            'version_perf': ['col_3', 'col_4'],
-            'version_words_count': ['col_5', 'col_6'],
-            'theme_voc': ['col_7', 'col_8'],
-            'theme_perf': ['col_9', 'col_10'],
-            'theme_words_count': ['col_11', 'col_12'],
-            'archives': ['col_13', 'col_14']
+            'version_voc':
+            [
+                'col_1', 'col_2'
+            ],
+            'version_perf':
+            [
+                'col_3', 'col_4'
+            ],
+            'version_words_count':
+            [
+                'col_5', 'col_6'
+            ],
+            'theme_voc':
+            [
+                'col_7', 'col_8'
+            ],
+            'theme_perf':
+            [
+                'col_9', 'col_10'
+            ],
+            'theme_words_count':
+            [
+                'col_11', 'col_12'
+            ],
+            'archives':
+            [
+                'col_13', 'col_14'
+            ]
         }
-        password = 'test_password'
         # Act
-        result = self.db_manipulator.get_tables(password)
+        result = self.db_manipulator.get_tables()
         # Assert
         self.assertIsInstance(result, dict)
         self.assertEqual(len(result), 7)
         self.assertIn('output', list(result.keys()))
-        mock_get_db_cursor.assert_called_once_with(
-            self.db_manipulator.user_name,
-            self.db_manipulator.db_name,
-            password
-        )
+        mock_get_db_cursor.assert_called_once_with()
 
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
     def test_insert_word(self, mock_get_db_cursor):
@@ -379,16 +294,12 @@ class TestDbManipulator(unittest.TestCase):
         test_row = ['Bugger off', 'Fous moi le camp']
         today_date = datetime.today().date()
         # Act
-        result = self.db_manipulator.insert_word(self.password, test_row)
+        result = self.db_manipulator.insert_word(test_row)
         # Assert
         self.assertIsInstance(result, int)
-        self.assertEqual(result, 0)
+        self.assertEqual(result, True)
         sql_db_name = f'{self.db_manipulator.user_name}_{self.db_manipulator.db_name}'
-        mock_get_db_cursor.assert_called_once_with(
-            self.db_manipulator.user_name,
-            sql_db_name,
-            self.password
-        )
+        mock_get_db_cursor.assert_called_once()
         english = test_row[0]
         native = test_row[1]
         request_1 = f"INSERT INTO {sql_db_name}.{self.table_name}"
@@ -408,13 +319,9 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.execute.return_value = [('test_english', 'test_french', 42)]
         english = self.words_df['english'][0]
         # Act
-        result = self.db_manipulator.read_word(self.password, english)
+        result = self.db_manipulator.read_word(english)
         # Assert
-        mock_get_db_cursor.assert_called_once_with(
-            self.db_manipulator.user_name,
-            self.db_manipulator.db_name,
-            self.password
-        )
+        mock_get_db_cursor.assert_called_once_with()
         request_1 = f"SELECT english, français, score FROM {self.table_name}"
         request_2 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2])
@@ -430,12 +337,11 @@ class TestDbManipulator(unittest.TestCase):
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-        password = 'test_password'
         english = 'test_word'
         new_nb = 4
         new_score = 67
         # Act
-        self.db_manipulator.update_word(password, english, new_nb, new_score)
+        self.db_manipulator.update_word(english, new_nb, new_score)
         # Assert
         request_1 = f"UPDATE {self.table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
@@ -452,10 +358,9 @@ class TestDbManipulator(unittest.TestCase):
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-        password = 'test_password'
         english = 'test_word'
         # Act
-        self.db_manipulator.delete_word(password, english)
+        self.db_manipulator.delete_word(english)
         # Assert
         request_1 = f"DELETE FROM {self.table_name}"
         request_2 = f"WHERE english = {english};"
@@ -464,6 +369,7 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
     @patch('src.data.data_handler.DbDefiner.get_database_cols')
     @patch('src.data.data_handler.create_engine')
@@ -485,19 +391,15 @@ class TestDbManipulator(unittest.TestCase):
         #
         mock_engine = MagicMock()
         mock_create_engine.return_value = mock_engine
-        password = 'test_password'
+        password = 'root_password'
         table_name = 'version_voc'
         table = pd.DataFrame({'col_1': [1, 2], 'col_2': ['a', 'b']})
         # Act
-        self.db_manipulator.save_table(password, table_name, table)
+        self.db_manipulator.save_table(table_name, table)
         # Assert
-        mock_get_db_cursor.assert_called_once_with(
-            self.db_manipulator.user_name,
-            self.db_manipulator.db_name,
-            password
-        )
+        mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://{self.db_manipulator.user_name}:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
         )
         # mock_engine.to_sql.assert_called_once_with(
         #     name=table_name,

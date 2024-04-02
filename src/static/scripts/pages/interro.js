@@ -7,41 +7,32 @@ document.addEventListener(
     }
 );
 
-
 function goToInterroSettings(token) {
-    fetch(`/interro/interro-settings?token=$token}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            userName: userName,
-            userPassword: userPassword
-        }),
-    })
-    .then(response => response.text())
-    .then(data => {
-        document.body.innerHTML = data;
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+    window.location.href = `/interro/interro-settings?token=${token}`;
 }
 
 
-function sendUserSettings(userName, userPassword, databaseName, testType, numWords) {
-    fetch(`/user/user-settings`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            userName: userName,
-            userPassword: userPassword,
-            databaseName: databaseName,
-            testType: testType,
-            numWords: numWords
-        }),
+function sendUserSettings(token, databaseName, testType, numWords) {
+    fetch(
+        `/interro/save-interro-settings?token=${token}`,
+        {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                databaseName: databaseName,
+                testType: testType,
+                numWords: numWords
+            })
+        }
+    )
+    .then(response => {
+        if (!response.ok) { // Check if the response status is NOK (outside the range 200-299)
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
     })
-    .then(answer => answer.json())
     .then(data => {
-        startTest(userName, userPassword, databaseName, testType, numWords)
+        startTest(token, databaseName)
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
@@ -49,13 +40,12 @@ function sendUserSettings(userName, userPassword, databaseName, testType, numWor
 }
 
 
-function startTest(userName, userPassword, databaseName, testType, numWords) {
+function startTest(token, databaseName) {
     total = parseInt(numWords, 10);
     if (!isNaN(numWords)) {
         // Check if the conversion was successful
         const params = {
-            userName: {userName},
-            userPassword: {userPassword},
+            token: {token},
             databaseName: {databaseName},
             testType: {testType},
             total: {total},
