@@ -44,6 +44,18 @@ def user_databases(
     )
 
 
+@database_router.post("/choose-database")
+async def choose_database(
+        data: dict,
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Choose a database.
+    """
+    json_response = database_api.choose_database(data, token)
+    return json_response
+
+
 @database_router.post("/create-database")
 async def create_database(
         data: dict,
@@ -56,18 +68,6 @@ async def create_database(
     return json_response
 
 
-@database_router.post("/choose-database")
-async def choose_database(
-        data: dict,
-        token: str = Depends(auth_api.check_token)
-    ):
-    """
-    Choose a database.
-    """
-    json_response = database_api.choose_database(data)
-    return json_response
-
-
 @database_router.get("/fill-database", response_class=HTMLResponse)
 def data_page(
         request: Request,
@@ -77,24 +77,27 @@ def data_page(
     """
     Base page for data input by the user.
     """
-    user_name = auth_api.get_user_name_from_token(token)
     request_dict = database_api.fill_database(
         request,
-        user_name,
+        token,
         db_name
     )
-    return templates.TemplateResponse("database/fill.html", request_dict)
+    return templates.TemplateResponse(
+        "database/fill.html",
+        request_dict
+    )
 
 
 @database_router.post("/add-word")
-async def create_word(data: dict):
+async def create_word(
+        data: dict,
+        token: str = Depends(auth_api.check_token)
+    ):
     """
     Save the word in the database.
     """
     # Authenticate user
-    user_name = data['usr']
-    user_password = data['pwd']
-    cred_checker.check_credentials(user_name, user_password)
+    user_name = auth_api.get_user_name_from_token(token)
     # Add the word
     db_name = data['db_name']
     user_account = users.UserAccount(user_name)
@@ -103,11 +106,11 @@ async def create_word(data: dict):
         data['foreign'],
         data['native']
     )
-    if result == 1:
+    if result is False:
         json_response = JSONResponse(
             content={"message": "Error with the word creation."}
         )
-    if result == 0:
+    if result is True:
         json_response =  JSONResponse(
             content={"message": "Word added successfully."}
         )

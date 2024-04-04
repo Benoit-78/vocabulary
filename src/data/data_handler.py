@@ -407,15 +407,20 @@ class DbManipulator(DbInterface):
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
         native = row[1]
-        request_1 = f"INSERT INTO {sql_db_name}.{words_table_name}"
-        request_2 = "(english, français, creation_date, nb, score, taux)"
-        request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
-        # Execute request
-        cursor.execute(' '.join([request_1, request_2, request_3]))
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return True
+        try:
+            request_1 = f"INSERT INTO {sql_db_name}.{words_table_name}"
+            request_2 = "(english, français, creation_date, nb, score, taux)"
+            request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
+            # Execute request
+            cursor.execute(' '.join([request_1, request_2, request_3]))
+            connection.commit()
+            result = True
+        except:
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
 
     def read_word(self, english: str):
         """

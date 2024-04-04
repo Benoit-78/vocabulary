@@ -203,20 +203,20 @@ class UserAccount(Account):
         Add a database to the user's space.
         """
         # Bad path
-        account_exists = self.check_if_database_exists(db_name)
-        if account_exists:
-            return 1
+        database_already_exists = self.check_if_database_exists(db_name)
+        if database_already_exists:
+            return False
         # Create database
         db_definer = DbDefiner(self.user_name)
         db_created = db_definer.create_database(db_name)
         if not db_created:
-            return 1
+            return False
         db_controller = DbController()
         db_controller.grant_privileges(self.user_name, db_name)
         tables_created = db_definer.create_seven_tables(db_name)
         if not tables_created:
             logger.error(f"Error with the creation of tables for {db_name}.")
-            return 1
+            return False
         return True
 
     def check_if_database_exists(self, db_name):

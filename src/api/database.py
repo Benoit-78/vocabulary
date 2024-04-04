@@ -55,7 +55,7 @@ def create_database(data: dict, token: str):
     db_name = data['db_name']
     user_account = users.UserAccount(user_name)
     result = user_account.create_database(db_name)
-    if result == 1:
+    if result is False:
         json_response = JSONResponse(
             content=
             {
@@ -64,24 +64,24 @@ def create_database(data: dict, token: str):
                 'databaseName': db_name
             }
         )
-    if result == 0:
+    if result is True:
         json_response = JSONResponse(
             content=
             {
                 'message': "Database created successfully.",
-                'token': token
+                'token': token,
+                'databaseName': db_name
             }
         )
     return json_response
 
 
-def choose_database(data: dict):
+def choose_database(data: dict, token: str):
     """
     Choose the given database.
     """
     # Authenticate user
-    user_name = data['userName']
-    cred_checker.check_credentials(user_name)
+    user_name = auth_api.get_user_name_from_token(token)
     # Choose database
     db_name = data['databaseName']
     user_account = users.UserAccount(user_name)
@@ -91,7 +91,8 @@ def choose_database(data: dict):
             content=
             {
                 "message": f"Database name {db_name} not available.",
-                "userName": user_account.user_name            }
+                "userName": user_account.user_name
+            }
         )
     if result:
         json_response = JSONResponse(
@@ -121,19 +122,12 @@ def create_word(data: dict):
         return JSONResponse(content={"message": "Word created successfully."})
 
 
-def fill_database(request, user_name, db_name):
+def fill_database(request, token, db_name):
     """
     
     """
     # Authenticate user
-    if user_name:
-        cred_checker.check_credentials(user_name)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
+    user_name = auth_api.get_user_name_from_token(token)
     # Check if a database has been chosen
     if not db_name:
         logger.error("No database name given.")
@@ -146,7 +140,7 @@ def fill_database(request, user_name, db_name):
     request_dict = {
         "request": request,
         "title": title,
-        "userName": user_name,
+        "token": token,
         "databaseName": db_name
     }
     return request_dict

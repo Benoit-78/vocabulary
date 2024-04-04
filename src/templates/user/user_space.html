@@ -6,17 +6,17 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/root.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/pages/database.js"></script>
-    <script type="text/javascript" src="/static/scripts/pages/interro.js"></script>
-    <script type="text/javascript" src="/static/scripts/pages/users.js"></script>
+    <script type="text/javascript" src="/static/scripts/database.js"></script>
+    <script type="text/javascript" src="/static/scripts/interro.js"></script>
+    <script type="text/javascript" src="/static/scripts/users.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <h1>Welcome {{ userName }}!</h1>
+        <h1>Welcome {{ user_name }}</h1>
         <div class="button-list">
             <button class="button" onclick="goToInterroSettings(`{{ token }}`)">Interroooo !!!</button>
-            <button class="button" onclick="goToUserDatabases(`{{ token }}`)">Databases</button>
+            <button class="button" onclick="goToUserDatabases(`{{ token }}`)">Add words</button>
             <button class="button" onclick="goToUserDashboards(`{{ token }}`)">Dashboard</button>
             <button class="button" onclick="goToUserSettings(`{{ token }}`)">Settings</button>
             <button class="button" onclick="goToRoot()">Sign-out</button>
