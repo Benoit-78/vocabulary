@@ -25,24 +25,15 @@ from src.api import authentication as auth_api
 cred_checker = users.CredChecker()
 
 
-def get_user_databases(request, user_name):
+def get_user_databases(token):
     """
     Call the base page of user databases.
     """
     # Authenticate user
-    if user_name:
-        cred_checker.check_credentials(user_name)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    request_dict = {
-        "request": request,
-        "userName": user_name
-    }
-    return request_dict
+    user_name = auth_api.get_user_name_from_token(token)
+    user_account = users.UserAccount(user_name)
+    databases = user_account.get_databases_list()
+    return databases
 
 
 def create_database(data: dict, token: str):
@@ -55,7 +46,7 @@ def create_database(data: dict, token: str):
     db_name = data['db_name']
     user_account = users.UserAccount(user_name)
     result = user_account.create_database(db_name)
-    if result == 1:
+    if result is False:
         json_response = JSONResponse(
             content=
             {
@@ -64,42 +55,37 @@ def create_database(data: dict, token: str):
                 'databaseName': db_name
             }
         )
-    if result == 0:
+    if result is True:
         json_response = JSONResponse(
             content=
             {
                 'message': "Database created successfully.",
-                'token': token
+                'token': token,
+                'databaseName': db_name
             }
         )
     return json_response
 
 
-def choose_database(data: dict):
+def choose_database(db_name: str, token: str):
     """
     Choose the given database.
     """
-    # Authenticate user
-    user_name = data['userName']
-    cred_checker.check_credentials(user_name)
-    # Choose database
-    db_name = data['databaseName']
+    user_name = auth_api.get_user_name_from_token(token)
     user_account = users.UserAccount(user_name)
-    result = user_account.check_if_database_exists(db_name)
-    if not result:
+    db_exists = user_account.check_if_database_exists(db_name)
+    if db_exists:
         json_response = JSONResponse(
             content=
             {
                 "message": f"Database name {db_name} not available.",
-                "userName": user_account.user_name            }
+            }
         )
-    if result:
+    if not db_exists:
         json_response = JSONResponse(
             content=
             {
                 "message": "Database chosen successfully.",
-                "userName": user_account.user_name,
-                "databaseName": db_name
             }
         )
     return json_response
@@ -121,19 +107,12 @@ def create_word(data: dict):
         return JSONResponse(content={"message": "Word created successfully."})
 
 
-def fill_database(request, user_name, db_name):
+def fill_database(request, token, db_name):
     """
     
     """
     # Authenticate user
-    if user_name:
-        cred_checker.check_credentials(user_name)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
+    user_name = auth_api.get_user_name_from_token(token)
     # Check if a database has been chosen
     if not db_name:
         logger.error("No database name given.")
@@ -146,7 +125,27 @@ def fill_database(request, user_name, db_name):
     request_dict = {
         "request": request,
         "title": title,
-        "userName": user_name,
+        "token": token,
         "databaseName": db_name
     }
     return request_dict
+
+
+def delete_database(token: str, db_name: str):
+    """
+    Remove the given database.
+    """
+    # Authenticate user
+    user_name = auth_api.get_user_name_from_token(token)
+    # Remove the database
+    user_account = users.UserAccount(user_name)
+    result = user_account.remove_database(db_name)
+    if result is False:
+        return JSONResponse(
+            content={"message": "Error with the database removal."}
+        )
+    if result is True:
+        return JSONResponse(
+            content={"message": "Database deleted successfully."}
+        )
+    

@@ -86,11 +86,13 @@ def user_main_page(
     """
     Call the base page of user space.
     """
+    user_name = auth_api.get_user_name_from_token(token)
     return templates.TemplateResponse(
         "user/user_space.html",
         {
             'request': request,
-            'token': token
+            'token': token,
+            'user_name': user_name
         }
     )
 

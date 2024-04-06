@@ -9,6 +9,7 @@ import os
 import sys
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
+from typing import List
 
 from fastapi import HTTPException
 from loguru import logger
@@ -203,20 +204,20 @@ class UserAccount(Account):
         Add a database to the user's space.
         """
         # Bad path
-        account_exists = self.check_if_database_exists(db_name)
-        if account_exists:
-            return 1
+        database_already_exists = self.check_if_database_exists(db_name)
+        if database_already_exists:
+            return False
         # Create database
         db_definer = DbDefiner(self.user_name)
         db_created = db_definer.create_database(db_name)
         if not db_created:
-            return 1
+            return False
         db_controller = DbController()
         db_controller.grant_privileges(self.user_name, db_name)
         tables_created = db_definer.create_seven_tables(db_name)
         if not tables_created:
             logger.error(f"Error with the creation of tables for {db_name}.")
-            return 1
+            return False
         return True
 
     def check_if_database_exists(self, db_name):
@@ -232,13 +233,25 @@ class UserAccount(Account):
         logger.success(f"Database name {db_name} is available.")
         return False
 
-    def remove_database(self):
+    def get_databases_list(self) -> List[str]:
+        """
+        List the databases of the user.
+        """
+        db_definer = DbDefiner(self.user_name)
+        databases = db_definer.get_user_databases()
+        return databases
+
+    def remove_database(self, db_name):
         """
         Remove a database from the user's space.
         """
         # Remove database
+        db_definer = DbDefiner(self.user_name)
+        db_dropped = db_definer.drop_database(db_name)
         # Remove privileges of the user on the database (they're not removed automatically)
-        return None
+        db_controller = DbController()
+        privileges_dropped = db_controller.revoke_privileges(self.user_name, db_name)
+        return bool(db_dropped and privileges_dropped)
 
     def insert_word(self, db_name, foreign, native):
         """
