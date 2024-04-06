@@ -64,6 +64,33 @@ function createDatabase(token) {
 }
 
 
+function deleteDatabase(token) {
+    var dropdown = document.getElementById("dropdown");
+    var databaseName = dropdown.value;
+    fetch(
+        `/database/delete-database?token=${token}`,
+        {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                db_name: databaseName
+            }),
+        }
+    )
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.message === "Database deleted successfully.") {
+            window.location.href = `/database/list-databases?token=${token}`;
+        } else {
+            console.error("Error with the database deletion.");
+        }
+    })
+    .catch(error => {
+        console.error("Error sending user answer:", error);
+    });
+}
+
+
 function addWord(token, databaseName) {
     var foreign = document.getElementById("input1").value;
     var native = document.getElementById("input2").value;

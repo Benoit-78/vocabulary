@@ -241,13 +241,17 @@ class UserAccount(Account):
         databases = db_definer.get_user_databases()
         return databases
 
-    def remove_database(self):
+    def remove_database(self, db_name):
         """
         Remove a database from the user's space.
         """
         # Remove database
+        db_definer = DbDefiner(self.user_name)
+        db_dropped = db_definer.drop_database(db_name)
         # Remove privileges of the user on the database (they're not removed automatically)
-        return None
+        db_controller = DbController()
+        privileges_dropped = db_controller.revoke_privileges(self.user_name, db_name)
+        return bool(db_dropped and privileges_dropped)
 
     def insert_word(self, db_name, foreign, native):
         """

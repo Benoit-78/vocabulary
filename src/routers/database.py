@@ -118,3 +118,16 @@ async def create_word(
             content={"message": "Word added successfully."}
         )
     return json_response
+
+
+@database_router.post("/delete-database")
+async def delete_database(
+        data: dict,
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Delete the database.
+    """
+    db_name = data['db_name']
+    json_response = database_api.delete_database(token, db_name)
+    return json_response

@@ -199,6 +199,29 @@ class DbController(DbInterface):
             connection.close()
         return users_list
 
+    def revoke_privileges(self, user_name, db_name):
+        """
+        Remove privileges from the user on the given database.
+        """
+        connection, cursor = self.get_db_cursor()
+        result = None
+        try:
+            request_1 = "REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON "
+            request_2 = f"{db_name}.* FROM '{user_name}'@'{self.host}';"
+            cursor.execute(request_1 + request_2)
+            connection.commit()
+            logger.success(
+                f"User '{user_name}' removed from '{user_name}_{db_name}'."
+            )
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
 
 
 class DbDefiner(DbInterface):
@@ -284,7 +307,6 @@ class DbDefiner(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         try:
-            logger.debug(f"USE {db_name};")
             cursor.execute(f"USE {db_name};")
             cursor.execute("SHOW TABLES;")
             tables = list(cursor.fetchall())
@@ -331,6 +353,23 @@ class DbDefiner(DbInterface):
             raise ValueError
         return [voc_table, perf_table, word_cnt_table, output_table]
 
+    def drop_database(self, db_name):
+        """
+        Drop the given database.
+        """
+        connection, cursor = self.get_db_cursor()
+        try:
+            cursor.execute(f"DROP DATABASE {db_name};")
+            connection.commit()
+            result = True
+        except mariadb.Error as err:
+            logger.error(err)
+            result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
 
 
 class DbManipulator(DbInterface):
@@ -360,7 +399,6 @@ class DbManipulator(DbInterface):
         Load the different tables necessary to the app.
         """
         connection, cursor = self.get_db_cursor()
-        logger.debug(f"Db_name: {self.db_name}")
         cursor.execute(f"USE {self.db_name};")
         cols = self.db_definer.get_database_cols(self.db_name)
         tables_names = list(cols.keys())

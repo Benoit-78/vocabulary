@@ -129,3 +129,23 @@ def fill_database(request, token, db_name):
         "databaseName": db_name
     }
     return request_dict
+
+
+def delete_database(token: str, db_name: str):
+    """
+    Remove the given database.
+    """
+    # Authenticate user
+    user_name = auth_api.get_user_name_from_token(token)
+    # Remove the database
+    user_account = users.UserAccount(user_name)
+    result = user_account.remove_database(db_name)
+    if result is False:
+        return JSONResponse(
+            content={"message": "Error with the database removal."}
+        )
+    if result is True:
+        return JSONResponse(
+            content={"message": "Database deleted successfully."}
+        )
+    
