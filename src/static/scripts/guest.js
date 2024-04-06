@@ -7,12 +7,15 @@ document.addEventListener(
 );
 
 
-function sendUserSettings(token) {
+function sendGuestSettings(token, language) {
     fetch(
         `/guest/save-interro-settings?token=${token}`,
         {
             method: "POST",
-            headers: {"Content-Type": "application/json"}
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                language: language
+            })
         }
     )
     .then(response => {
@@ -25,7 +28,7 @@ function sendUserSettings(token) {
         startTest(token)
     })
     .catch(error => {
-        console.error("Error sending user answer:", error);
+        console.error("Error sending guest settings:", error);
     });
 }
 

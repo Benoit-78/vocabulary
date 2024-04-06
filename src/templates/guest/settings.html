@@ -2,10 +2,9 @@
 <html>
     
 <head>
-    <title>Test Configuration</title>
+    <title>Discover the app</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
     <script type="text/javascript" src="/static/scripts/guest.js"></script>
 </head>
@@ -14,16 +13,64 @@
     <div class="container">
         <form>
             <div class="row">
-                <label for="test-type">Test type:</label>
+                <label for="test-type">Select a language:</label>
             </div>
         </form>
-        <div class="row">
-            <button class="button" onclick="sendUserSettings(`{{ token }}`)">Start Test</button>
-        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td><span class="flag">&#x1F1EC;&#x1F1E7;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `English`)">English</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1E9;&#x1F1EA;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Deutsch`)">Deutsch</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1F3;&#x1F1F1;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Nederlands`)">Nederlands</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1EA;&#x1F1F8;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Espanol`)">Espanol</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1F5;&#x1F1F9;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Portugues`)">Portuges</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1F7;&#x1F1FA;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Russkyi`)">Pусский</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1F8;&#x1F1E6;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Arabiyya`)">عربي</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1EE;&#x1F1F1;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Ivrit`)">עִבְרִית</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F1E8;&#x1F1F3;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Chinese`)">汉语</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag-latin">&#x1F985;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Latin`)">Latin</button></td>
+                </tr>
+                <tr>
+                    <td><span class="flag">&#x1F989;</span></td>
+                    <td><button onclick="sendGuestSettings(`{{ token }}`, `Greek`)">Ancient Greek</button></td>
+                </tr>
+            </tbody>
+        </table>
+
         <div class="row">
             <button class="button quit-button" onclick="goToRoot()">Quit</button>
         </div>
+
     </div>
+
 </body>
 
 </html>
