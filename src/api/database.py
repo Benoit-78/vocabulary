@@ -25,24 +25,15 @@ from src.api import authentication as auth_api
 cred_checker = users.CredChecker()
 
 
-def get_user_databases(request, user_name):
+def get_user_databases(token):
     """
     Call the base page of user databases.
     """
     # Authenticate user
-    if user_name:
-        cred_checker.check_credentials(user_name)
-    else:
-        logger.error("User name not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User name not found."
-        )
-    request_dict = {
-        "request": request,
-        "userName": user_name
-    }
-    return request_dict
+    user_name = auth_api.get_user_name_from_token(token)
+    user_account = users.UserAccount(user_name)
+    databases = user_account.get_databases_list()
+    return databases
 
 
 def create_database(data: dict, token: str):
@@ -76,31 +67,25 @@ def create_database(data: dict, token: str):
     return json_response
 
 
-def choose_database(data: dict, token: str):
+def choose_database(db_name: str, token: str):
     """
     Choose the given database.
     """
-    # Authenticate user
     user_name = auth_api.get_user_name_from_token(token)
-    # Choose database
-    db_name = data['databaseName']
     user_account = users.UserAccount(user_name)
-    result = user_account.check_if_database_exists(db_name)
-    if not result:
+    db_exists = user_account.check_if_database_exists(db_name)
+    if db_exists:
         json_response = JSONResponse(
             content=
             {
                 "message": f"Database name {db_name} not available.",
-                "userName": user_account.user_name
             }
         )
-    if result:
+    if not db_exists:
         json_response = JSONResponse(
             content=
             {
                 "message": "Database chosen successfully.",
-                "userName": user_account.user_name,
-                "databaseName": db_name
             }
         )
     return json_response

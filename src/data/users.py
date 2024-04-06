@@ -9,6 +9,7 @@ import os
 import sys
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
+from typing import List
 
 from fastapi import HTTPException
 from loguru import logger
@@ -231,6 +232,14 @@ class UserAccount(Account):
             return True
         logger.success(f"Database name {db_name} is available.")
         return False
+
+    def get_databases_list(self) -> List[str]:
+        """
+        List the databases of the user.
+        """
+        db_definer = DbDefiner(self.user_name)
+        databases = db_definer.get_user_databases()
+        return databases
 
     def remove_database(self):
         """

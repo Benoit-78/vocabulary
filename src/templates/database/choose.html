@@ -1,57 +1,58 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <title>Add a word</title>
-        <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-        <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-        <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
-        <script type="text/javascript" src="/static/scripts/main.js"></script>
-        <script type="text/javascript" src="/static/scripts/users.js"></script>
-        <script type="text/javascript" src="/static/scripts/database.js"></script>
-    </head>
+<head>
+    <title>Add a word</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
+    <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/users.js"></script>
+    <script type="text/javascript" src="/static/scripts/database.js"></script>
+</head>
 
 <body>
 
-    <div class="container">
-            <div class="row">
-                <div>
-                    <label for="input2">Choose an existing database</label>
-                    <select id="menu">
-                        <option value="0">Select a database</option>
-                        <!-- {% for database in databases %}
-                            <option value="{{ database }}">{{ database }}</option>
-                        {% endfor %} -->
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <button class="button" onclick="chooseDatabase(`{{ token }}`)">Choose database</button>
-            </div>
-
-            <div class="row">
-                <div>
-                    <label for="input1">Create a new database</label>
-                    <input type="text" id="databaseName" name="databaseName">
-                </div>
-            </div>
-
-            <div class="row">
-                <button class="button" onclick="createDatabase(`{{ token }}`)">Create database</button>
-            </div>
-
-            <div class="row">
-                <div>
-                    <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
-                </div>
-            </div>
-
+<div class="container">
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <div>
+                <label for="dropdown">Choose an existing database</label>
+                <select id="dropdown">
+                    <!-- <option value="0"></option> -->
+                    <!-- Use Jinja2 template syntax to inject options -->
+                    {% for database in databases %}
+                        <option value="{{ database }}">{{ database }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
 
+        <div class="row">
+            <button class="button" onclick="chooseDatabase(`{{ token }}`)">Choose database</button>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="input1">Create a new database</label>
+                <input type="text" id="databaseName" name="databaseName">
+            </div>
+        </div>
+
+        <div class="row">
+            <button class="button" onclick="createDatabase(`{{ token }}`)">Create database</button>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+            </div>
+        </div>
+
+    <div class="row">
+        <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
     </div>
+
+</div>
 
 </body>
 

@@ -35,11 +35,13 @@ def user_databases(
     """
     Call the base page of user databases.
     """
+    databases = database_api.get_user_databases(token)
     return templates.TemplateResponse(
         "database/choose.html",
         {
             'request': request,
-            'token': token
+            'token': token,
+            'databases': databases
         }
     )
 
@@ -47,12 +49,13 @@ def user_databases(
 @database_router.post("/choose-database")
 async def choose_database(
         data: dict,
-        token: str = Depends(auth_api.check_token)
+        token: str = Depends(auth_api.check_token),
     ):
     """
     Choose a database.
     """
-    json_response = database_api.choose_database(data, token)
+    db_name = data['db_name']
+    json_response = database_api.choose_database(db_name, token)
     return json_response
 
 

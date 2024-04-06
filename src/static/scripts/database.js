@@ -5,7 +5,8 @@ function goToUserDatabases(token) {
 
 
 function chooseDatabase(token) {
-    var databaseName = document.getElementById("databaseName").value;
+    var dropdown = document.getElementById("dropdown");
+    var databaseName = dropdown.value;
     fetch(
         `/database/choose-database?token=${token}`,
         {
@@ -19,7 +20,7 @@ function chooseDatabase(token) {
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "Database chosen successfully.") {
-            window.location.href = `/database/fill_database?token=${token}&databaseName=${databaseName}`;
+            window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
         } else if (data && data.message === `Database ${databaseName} name not available.`) {
             window.location.href = `/database/user-databases?token=${token}`;
             console.error("Database name not available");
@@ -61,8 +62,6 @@ function createDatabase(token) {
         console.error("", error);
     });
 }
-
-
 
 
 function addWord(token, databaseName) {
