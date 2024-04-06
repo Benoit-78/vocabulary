@@ -33,16 +33,16 @@ class TestDbInterface(unittest.TestCase):
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.logger')
     @patch('src.data.data_handler.mariadb.connect')
-    def test_get_db_cursor(self, mock_connect, mock_logger):
-        # Prepare
+    def test_get_db_cursor_host_ok(self, mock_connect, mock_logger):
+        # ----- ARRANGE
         mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
         mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
         mock_connect.return_value = mock_connection
         mock_connection.cursor.return_value = mock_cursor
         db_interface = data_handler.DbInterface()
-        # Act
+        # ----- ACT
         result = db_interface.get_db_cursor()
-        # Assert
+        # ----- ASSERT
         # mock_connect.assert_called_once_with(
         #     user=user_name,
         #     password=password,
@@ -58,6 +58,37 @@ class TestDbInterface(unittest.TestCase):
         self.assertEqual(result[0], mock_connection)
         self.assertEqual(result[1], mock_cursor)
         mock_logger.assert_not_called()
+
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb.connect')
+    def test_get_db_cursor_host_nok(self, mock_connect, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
+        mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value = mock_cursor
+        db_interface = data_handler.DbInterface()
+        db_interface.host = 'nimportequoi'
+        # ----- ACT
+        result = db_interface.get_db_cursor()
+        # ----- ASSERT
+        # mock_connect.assert_called_once_with(
+        #     user=user_name,
+        #     password=password,
+        #     database=db_name,
+        #     port=data_handler.PARAMS['MariaDB']['port'],
+        #     host=host
+        # )
+        mock_connection.cursor.assert_called_once()
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        self.assertIsInstance(result[0], mariadb.connection.MySQLConnection)
+        self.assertIsInstance(result[1], mariadb.connection.MySQLCursor)
+        self.assertEqual(result[0], mock_connection)
+        self.assertEqual(result[1], mock_cursor)
+        mock_logger.warning.assert_called_once_with("host: nimportequoi")
+        mock_logger.error.assert_called_once_with(f"host should be in {data_handler.HOSTS}")
 
 
 
@@ -76,16 +107,18 @@ class TestDbController(unittest.TestCase):
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.DbController.get_db_cursor')
-    def test_create_user_in_mysql(self, mock_get_db_cursor):
-        """Should create a user."""
-        # Arrange
+    def test_create_user_in_mysql_ok(self, mock_get_db_cursor):
+        """
+        Should create a user in the mysql database.
+        """
+        # ----- ARRANGE
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         user_password = 'test_user_password'
-        # Act
+        # ----- ACT
         result = self.db_controller.create_user_in_mysql(self.user_name, user_password)
-        # Assert
+        # ----- ASSERT
         self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once()
         request_1 = f"CREATE USER '{self.user_name}'@'{self.mock_host}'"
@@ -94,6 +127,45 @@ class TestDbController(unittest.TestCase):
         mock_cursor.execute.assert_called_with(sql_request_1)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
+
+    # @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
+    # @patch('src.data.data_handler.DbController.get_db_cursor')
+    # def test_create_user_in_mysql_nok(self, mock_get_db_cursor):
+    #     # ----- ARRANGE
+    #     mock_connection = MagicMock()
+    #     mock_cursor = MagicMock()
+    #     mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+    #     user_password = 'test_user_password'
+    #     # ----- ACT
+    #     result = self.db_controller.create_user_in_mysql(self.user_name, user_password)
+    #     # ----- ASSERT
+    #     self.assertEqual(result, True)
+    #     mock_get_db_cursor.assert_called_once()
+    #     request_1 = f"CREATE USER '{self.user_name}'@'{self.mock_host}'"
+    #     request_2 = f"IDENTIFIED BY '{user_password}';"
+    #     sql_request_1 = " ".join([request_1, request_2])
+    #     mock_cursor.execute.assert_called_with(sql_request_1)
+    #     mock_cursor.close.assert_called_once()
+    #     mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.mariadb')
+    def test_create_user_failure(self, mock_mariadb):
+        # Arrange
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_mariadb.connect.return_value = (mock_connection, mock_cursor)
+        mock_cursor.execute.side_effect = mariadb.Error("Mock error")
+        user_name = 'test_user'
+        user_password = 'test_password'
+        # Act
+        result = self.db_controller.create_user_in_mysql(user_name, user_password)
+        # Assert
+        self.assertFalse(result)
+        mock_cursor.execute.assert_called_once()
+        mock_connection.rollback.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.DbController.get_db_cursor')

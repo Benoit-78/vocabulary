@@ -49,7 +49,6 @@ function createDatabase(token) {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "Database created successfully.") {
-            console.log("Database created successfully.");
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
         } else if (data && data.message === "Database name not available.") {
             window.location.href = `/database/user-databases?token=${token}`;
@@ -62,6 +61,8 @@ function createDatabase(token) {
         console.error("", error);
     });
 }
+
+
 
 
 function addWord(token, databaseName) {
@@ -79,10 +80,12 @@ function addWord(token, databaseName) {
             }),
         }
     )
-    .then(answer => answer.json())
+    .then(response => response.json())
     .then(data => {
         if (data && data.message === "Word added successfully.") {
-            window.location.href = `/database/fill_database?token=${token}&databaseName=${databaseName}`;
+            console.log(token)
+            console.log(databaseName)
+            window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
         } else {
             console.error("Error with the word creation.");
         }
