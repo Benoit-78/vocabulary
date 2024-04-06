@@ -35,6 +35,7 @@ templates = Jinja2Templates(directory="src/templates")
 
 with open('conf/hum.json', 'r') as json_file:
     HUM = json.load(json_file)
+WORDS = 10
 
 
 @guest_router.get("/interro-settings", response_class=HTMLResponse)
@@ -56,19 +57,21 @@ def interro_settings_guest(
 
 @guest_router.post("/save-interro-settings")
 async def save_interro_settings_guest(
-        settings: dict,
         token: str = Depends(auth_api.check_token)
     ):
     """
     Acquire the user settings for one interro.
     """
+    test_type = 'version'
     _, test = load_test(
         user_name=os.environ['VOC_GUEST_NAME'],
         db_name=HUM['user']['guest']['databases'][0],
-        test_type=settings['testType'].lower(),
-        test_length=settings['numWords']
+        test_type=test_type,
+        test_length=WORDS
     )
+    logger.debug("Test instanciated")
     save_test_in_redis(test, token)
+    logger.debug("Test saved in redis")
     response = JSONResponse(
         content=
         {

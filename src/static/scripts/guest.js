@@ -7,16 +7,12 @@ document.addEventListener(
 );
 
 
-function sendUserSettings(testType, numWords, token) {
+function sendUserSettings(token) {
     fetch(
         `/guest/save-interro-settings?token=${token}`,
         {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                testType: testType,
-                numWords: numWords,
-            })
+            headers: {"Content-Type": "application/json"}
         }
     )
     .then(response => {
@@ -26,7 +22,7 @@ function sendUserSettings(testType, numWords, token) {
         return response.json();
     })
     .then(data => {
-        startTest(numWords, token)
+        startTest(token)
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
@@ -34,14 +30,8 @@ function sendUserSettings(testType, numWords, token) {
 }
 
 
-function startTest(numWords, token) {
-    numWords = parseInt(numWords, 10);
-    // Check if the conversion was successful
-    if (!isNaN(numWords)) {
-        window.location.href = `/guest/interro-question/${numWords}/0/0?token=${token}`;
-    } else {
-        console.error("Invalid numWords:", numWords);
-    }
+function startTest(token) {
+        window.location.href = `/guest/interro-question/10/0/0?token=${token}`;
 }
 
 
