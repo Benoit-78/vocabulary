@@ -107,6 +107,8 @@ pip install SQLAlchemy==2.0.20
 echo "# -------------------------"
 pip install redis==5.0.3
 echo "# -------------------------"
+pip install openpyxl==3.1.2
+echo "# -------------------------"
 
 # Data processing
 pip install numpy==1.25.0

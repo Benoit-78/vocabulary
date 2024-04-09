@@ -77,3 +77,8 @@ input {
     margin-bottom: 10px;
     width: 100%;
 }
+
+
+.flag-latin {
+    background-color: red;
+}
