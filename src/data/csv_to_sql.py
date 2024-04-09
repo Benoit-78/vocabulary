@@ -4,7 +4,7 @@ from loguru import logger
 
 
 # Read the CSV file into a DataFrame
-df = pd.read_excel('data/neerlandais.xlsm')
+df = pd.read_excel('data/latin.xlsm')
 
 logger.debug(f"Table: \n{df.head()}")
 
@@ -27,7 +27,7 @@ table_name = 'version_voc'
 # with open('data/arabic.sql', 'w') as f:
 #     f.write('\n'.join(sql_inserts))
 
-with open('data/dutch.sql', 'w') as sql_file:
+with open('data/databases/latin.sql', 'w') as sql_file:
     # Write the SQL insert statement for each row in the DataFrame
     for _, row in df.iterrows():
         values = ", ".join([
@@ -36,5 +36,5 @@ with open('data/dutch.sql', 'w') as sql_file:
             else str(value)
             for value in row
         ])
-        insert_statement = f"INSERT INTO `version_voc` (`id_word`, `greek`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES ({values});\n"
+        insert_statement = f"INSERT INTO `version_voc` (`latina`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES ({values});\n"
         sql_file.write(insert_statement)

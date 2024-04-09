@@ -1,3 +1,6 @@
+
+
+
 -- If localhost
 CREATE DATABASE wh0_Are_y0u_dutch;
 USE wh0_Are_y0u_dutch;
