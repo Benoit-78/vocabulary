@@ -1,32 +1,46 @@
 
+/* MAIN */
+
 .button {
-    padding: 10px 20px;
-    background-color: rgba(0, 128, 255, 0.5); /* Semi-transparent blue color */
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    margin: 10px;
-    transition: background-color 0.3s ease-in-out;
+    background-color: rgba(178, 128, 34, 0.7);
+    border: 1px solid rgb(254, 161, 0);
     border-radius: 20px;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    font-size: 18px;
+    /* font-weight: bold; */
+    margin: 10px;
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease-in-out;
+    width: 100%;
 }
 
 .button:hover {
-    background-color: rgba(0, 128, 255, 0.8);
+    background-color: rgb(212, 124, 23);
+    color: rgb(255, 255, 255);
+    /* border: 2px solid rgb(254, 161, 0); */
 }
 
+
+/* INTERRO */
 .button.green {
-    background-color: #4CAF50;
+    background-color: rgba(33, 172, 61, 0.7);
+    border: 1px solid rgb(0, 255, 47);
     color: white;
+    width: 30%;
 }
 
 .button.green:hover {
     background-color: #3d8b40;
+    color: rgb(255, 255, 255);
 }
 
 .button.red {
-    background-color: #f44336;
+    background-color: rgba(172, 33, 33, 0.7);
+    border: 1px solid rgb(255, 0, 0);
     color: white;
+    width: 30%;
 }
 
 .button.red:hover {
@@ -39,11 +53,16 @@
 
 .quit-button {
     margin-left: auto;
+    background-color: rgba(178, 128, 34, 0.704);
 }
 
-.rattraps_button {
-    font-size: 20px;
+.quit-button:hover {
+    background-color: rgb(212, 124, 23);
 }
+
+/* .rattraps_button {
+    font-size: 20px;
+} */
 
 
 
@@ -57,16 +76,7 @@
     align-items: center;
 }
 
-.button-list button {
-    width: 100%;
-    margin-bottom: 10px;
-    background-color: rgba(0, 128, 255, 0.5); /* Semi-transparent blue color */
-    padding: 10px;
-    border: none;
-    color: white;
-    cursor: pointer;
-}
 
-.button-list button:hover {
-    background-color: rgba(0, 128, 255, 0.8);
+table {
+    width: 100%;
 }

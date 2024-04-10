@@ -16,7 +16,7 @@
 <div class="container">
         <div class="row">
             <div>
-                <label for="dropdown">Choose an existing database</label>
+                <label class="white-text" for="dropdown">Choose an existing database</label>
                 <select id="dropdown">
                     <!-- <option value="0"></option> -->
                     <!-- Use Jinja2 template syntax to inject options -->
@@ -34,7 +34,7 @@
 
         <div class="row">
             <div>
-                <label for="input1">Create a new database</label>
+                <label class="white-text" for="input1">Create a new database</label>
                 <input type="text" id="databaseName" name="databaseName">
             </div>
         </div>
@@ -50,7 +50,7 @@
         </div>
 
     <div class="row">
-        <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+        <button class="button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
     </div>
 
 </div>

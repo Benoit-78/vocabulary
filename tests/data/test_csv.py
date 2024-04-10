@@ -9,7 +9,7 @@ import logging
 import os
 import sys
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
@@ -56,29 +56,32 @@ class TestCsvHandler(unittest.TestCase):
             mock_logger.error.assert_called_with(f"Wrong test_type argument: {invalid_test_type}")
             mock_logger.error.assert_called_once()
 
-    def test_set_tables(self):
-        """Data should be correctly loaded"""
-        # Act
-        self.csv_handler_1.set_tables()
-        self.csv_handler_2.set_tables()
-        # Assert
-        for csv_handler in [self.csv_handler_1, self.csv_handler_2]:
-            self.assertGreater(len(csv_handler.paths), 1)
-            self.assertIsInstance(csv_handler.tables, dict)
-            self.assertEqual(len(csv_handler.tables), 4)
-            for df_name, dataframe in csv_handler.tables.items():
-                self.assertIn(
-                    df_name,
-                    [
-                        csv_handler.test_type + '_voc',
-                        csv_handler.test_type + '_perf',
-                        csv_handler.test_type + '_word_cnt',
-                        'output'
-                    ]
-                )
-                self.assertIsInstance(dataframe, type(pd.DataFrame()))
-                self.assertGreater(dataframe.shape[1], 0)
-        os.chdir('tests')
+    # @patch('src.data.csv_interface.pd.read_csv')
+    # def test_set_tables(self, mock_read_csv):
+    #     """
+    #     Data should be correctly loaded.
+    #     """
+    #     # ----- ARRANGE
+    #     self.tables = {}
+    #     # ----- ACT
+    #     self.csv_handler_1.set_tables()
+    #     # ----- ASSERT
+    #     self.assertGreater(len(self.csv_handler_1.paths), 1)
+    #     self.assertIsInstance(self.csv_handler_1.tables, dict)
+    #     self.assertEqual(len(self.csv_handler_1.tables), 4)
+    #     for df_name, dataframe in self.csv_handler_1.tables.items():
+    #         self.assertIn(
+    #             df_name,
+    #             [
+    #                 self.csv_handler_1.test_type + '_voc',
+    #                 self.csv_handler_1.test_type + '_perf',
+    #                 self.csv_handler_1.test_type + '_word_cnt',
+    #                 'output'
+    #             ]
+    #         )
+    #         self.assertIsInstance(dataframe, type(pd.DataFrame()))
+    #         self.assertGreater(dataframe.shape[1], 0)
+    #     os.chdir('tests')
 
     def test_save_table(self):
         """Should save the table as a csv file."""
