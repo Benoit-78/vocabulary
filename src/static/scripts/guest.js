@@ -25,7 +25,7 @@ function sendGuestSettings(token, language) {
         return response.json();
     })
     .then(data => {
-        startTest(token)
+        startTest(token, language.toLowerCase())
     })
     .catch(error => {
         console.error("Error sending guest settings:", error);
@@ -33,24 +33,24 @@ function sendGuestSettings(token, language) {
 }
 
 
-function startTest(token) {
-        window.location.href = `/guest/interro-question/10/0/0?token=${token}`;
+function startTest(token, language) {
+    window.location.href = `/guest/interro-question/10/0/0?token=${token}&language=${language.toLowerCase()}`;
 }
 
 
-function showTranslation(numWords, count, score, token) {
+function showTranslation(numWords, count, score, token, language) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (!isNaN(numWords)) {
-        window.location.href = `/guest/interro-answer/${numWords}/${count}/${score}?token=${token}`;
+        window.location.href = `/guest/interro-answer/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
 }
 
 
-function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2, token) {
+function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2, token, language) {
     fetch(
         `/guest/user-answer?token=${token}`,
         {
@@ -71,9 +71,9 @@ function sendUserAnswer(answer, count, numWords, score, content_box1, content_bo
         // Extract the updated score from the JSON response
         const score = data.score;
         if (count < numWords) {
-            nextGuess(numWords, count, score, token);
+            nextGuess(numWords, count, score, token, language.toLowerCase());
         } else {
-            endInterro(numWords, count, score, token);
+            endInterro(numWords, count, score, token, language.toLowerCase());
         }
     })
     .catch(error => {
@@ -82,21 +82,21 @@ function sendUserAnswer(answer, count, numWords, score, content_box1, content_bo
 }
 
 
-function nextGuess(numWords, count, score, token) {
+function nextGuess(numWords, count, score, token, language) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
-    window.location.href = `/guest/interro-question/${numWords}/${count}/${score}?token=${token}`;
+    window.location.href = `/guest/interro-question/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
 }
 
 
-function endInterro(numWords, count, score, token) {
+function endInterro(numWords, count, score, token, language) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
     if (score === numWords) {
         window.location.href = `/guest/interro-end/${numWords}/${score}?token=${token}`;
     } else {
-        window.location.href = `/guest/propose-rattraps/${numWords}/${count}/${score}?token=${token}`;
+        window.location.href = `/guest/propose-rattraps/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
     }
 }

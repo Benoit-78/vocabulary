@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
     <script type="text/javascript" src="/static/scripts/guest.js"></script>
+    <meta charset="UTF-8">
 </head>
 
 <body>
@@ -19,47 +20,47 @@
         <table>
             <tbody>
                 <tr>
-                    <td><span class="flag">&#x1F1EC;&#x1F1E7;</span></td>
+                    <td><span class="flag">{{ english|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `English`)">English</button></td>
                 </tr>
                 <tr>
-                    <td><span class="flag">&#x1F1E9;&#x1F1EA;</span></td>
+                    <td><span class="flag">{{ german|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `German`)">Deutsch</button></td>
                 </tr>
                 <tr>
-                    <td><span class="flag">&#x1F1F3;&#x1F1F1;</span></td>
+                    <td><span class="flag">{{ dutch|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Dutch`)">Nederlands</button></td>
                 </tr>
                 <!-- <tr>
-                    <td><span class="flag">&#x1F1EA;&#x1F1F8;</span></td>
+                    <td><span class="flag">{{ spanish|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Spanish`)">Espanol</button></td>
                 </tr> -->
                 <tr>
-                    <td><span class="flag">&#x1F1F5;&#x1F1F9;</span></td>
+                    <td><span class="flag">{{ portuguese|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Portuguese`)">Portuges</button></td>
                 </tr>
                 <!-- <tr>
-                    <td><span class="flag">&#x1F1F7;&#x1F1FA;</span></td>
+                    <td><span class="flag">{{ russian|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Russian`)">Pусский</button></td>
                 </tr> -->
                 <tr>
-                    <td><span class="flag">&#x1F1F8;&#x1F1E6;</span></td>
+                    <td><span class="flag">{{ arabic|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Arabic`)">عربي</button></td>
                 </tr>
                 <!-- <tr>
-                    <td><span class="flag">&#x1F1EE;&#x1F1F1;</span></td>
+                    <td><span class="flag">{{ hebrew|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Hebrew`)">עִבְרִית</button></td>
                 </tr> -->
                 <tr>
-                    <td><span class="flag">&#x1F1E8;&#x1F1F3;</span></td>
+                    <td><span class="flag">{{ chinese|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Chinese`)">汉语</button></td>
                 </tr>
                 <tr>
-                    <td><span class="flag-latin">&#x1F985;</span></td>
+                    <td><span class="flag-latin">{{ latin|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Latin`)">Latin</button></td>
                 </tr>
                 <tr>
-                    <td><span class="flag">&#x1F989;</span></td>
+                    <td><span class="flag">{{ greek|safe }}</span></td>
                     <td><button class="button" onclick="sendGuestSettings(`{{ token }}`, `Greek`)">Ancient Greek</button></td>
                 </tr>
             </tbody>

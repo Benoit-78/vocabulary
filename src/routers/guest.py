@@ -14,7 +14,7 @@ import sys
 
 # import base64
 import pandas as pd
-from fastapi import Request, Depends
+from fastapi import Request, Depends, Query
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
@@ -26,6 +26,7 @@ sys.path.append(REPO_DIR)
 
 from src.data import users
 from src.api import authentication as auth_api
+from src.api import guest as guest_api
 from src.api.interro import load_test, save_test_in_redis, load_test_from_redis
 
 guest_router = APIRouter(prefix='/guest')
@@ -33,6 +34,7 @@ cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 WORDS = 10
+FLAGS_DICT = guest_api.get_flags_dict()
 
 
 @guest_router.get("/interro-settings", response_class=HTMLResponse)
@@ -43,12 +45,12 @@ def interro_settings_guest(
     """
     Call the page that gets the user settings for one interro.
     """
+    response_dict = FLAGS_DICT.copy()
+    response_dict['request'] = request
+    response_dict['token'] = token
     return templates.TemplateResponse(
         "guest/settings.html",
-        {
-            'request': request,
-            'token': token
-        }
+        response_dict
     )
 
 
@@ -85,11 +87,13 @@ def load_interro_question_guest(
         words: int,
         count=None,
         score=None,
-        token: str = Depends(auth_api.check_token)
+        token: str = Depends(auth_api.check_token),
+        language: str = Query('', alias='language')
     ):
     """
     Call the page that asks the user the meaning of a word
     """
+    logger.debug(f"language: {language}")
     try:
         count = int(count)
     except NameError:
@@ -113,7 +117,9 @@ def load_interro_question_guest(
             'score': score,
             'progressPercent': progress_percent,
             'content_box1': english,
-            'token': token
+            'token': token,
+            'language': language,
+            'flag': FLAGS_DICT[language]
         }
     )
 
@@ -124,7 +130,8 @@ def load_interro_answer_guest(
         words: int,
         count: int,
         score: int,
-        token: str = Depends(auth_api.check_token)
+        token: str = Depends(auth_api.check_token),
+        language: str = Query('', alias='language')
     ):
     """
     Call the page that displays the right answer
@@ -148,7 +155,9 @@ def load_interro_answer_guest(
             "progressPercent": progress_percent,
             "content_box1": english,
             "content_box2": french,
-            'token': token
+            'token': token,
+            'language': language,
+            'flag': FLAGS_DICT[language]
         }
     )
 
@@ -192,7 +201,8 @@ def propose_rattraps_guest(
         words: int,
         count: int,
         score: int,
-        token: str = Depends(auth_api.check_token)
+        token: str = Depends(auth_api.check_token),
+        language: str = Query('', alias='language')
     ):
     """
     Load a page that proposes the user to take a rattraps, or leave the test.
@@ -215,7 +225,8 @@ def propose_rattraps_guest(
             'newScore': new_score,
             'newWords': new_words,
             'newCount': new_count,
-            'token': token
+            'token': token,
+            'language': language
         }
     )
 
