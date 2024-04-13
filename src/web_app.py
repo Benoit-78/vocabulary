@@ -82,12 +82,14 @@ def sign_in(
         {
             "request": request,
             "token": token,
+            'inputName': '',
+            'inputPassword': ''
         }
     )
 
 
 @app.get("/sign-up", response_class=HTMLResponse)
-def create_account(
+def sign_up(
         request: Request,
         token: str = Depends(authentication.check_token)
     ):
@@ -95,7 +97,7 @@ def create_account(
     Call the create account page.
     """
     return templates.TemplateResponse(
-        "user/create_account.html",
+        "user/sign_up.html",
         {
             'request': request,
             'errorMessage': '',

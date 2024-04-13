@@ -127,7 +127,7 @@ pkill uvicorn
 
 
 # ==============================================
-#  E N D   O F   L I F E
+#  E N D   O F   S E S S I O N
 # ==============================================
 aws ec2 stop-instances \
     --instance-ids i-03fae8b09bdb0587f \
