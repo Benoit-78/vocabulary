@@ -19,6 +19,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
+from src.api import authentication as auth_api
 from src.data import users
 
 cred_checker = users.CredChecker()
@@ -35,8 +36,8 @@ def create_account(creds, token):
         json_response = JSONResponse(
             content=
             {
-                "message": "User name not available.",
-                "userName": user_account.user_name,
+                'message': "User name not available",
+                'userName': user_account.user_name,
                 'token': token
             }
         )
@@ -44,52 +45,60 @@ def create_account(creds, token):
         json_response = JSONResponse(
             content=
             {
-                "message": "User account created successfully",
-                "userName": user_account.user_name,
+                'message': "User account created successfully",
+                'userName': user_account.user_name,
                 'token': token
             }
         )
     return json_response
 
 
-def authenticate_user(input_dict):
-    """
-    Acquire the user credentials.
-    """
-    input_name = input_dict.get('input_name')
-    input_password = input_dict.get('input_password')
-    cred_checker.check_credentials(input_name, input_password)
-    request_dict = {
-        "message": "User credentials validated successfully",
-        "userName": input_name,
-        "userPassword": input_password
-    }
-    return request_dict
-
-
-def get_user_main_page(
-        request,
-        user_name: str,
-        user_password: str,
-        token: str
+def authenticate_user(
+        token,
+        form_data
     ):
     """
-    API function to load the interro settings.
+    Authenticate the user.
     """
-    # Authenticate user
-    if user_name:
-        cred_checker.check_credentials(user_name, user_password)
-    else:
-        logger.error("No user name found in cookies.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No user name found in cookies."
+    # Identify user
+    users_list = auth_api.get_users_list()
+    user = auth_api.authenticate_user(
+        users_list,
+        form_data.username,
+        form_data.password
+    )
+    if user == "Unknown user":
+        json_response = JSONResponse(
+            content=
+            {
+                'message': "Unknown user",
+                'token': token
+            }
         )
-    # Load settings
-    request_dict = {
-        'request': request,
-        'userName': user_name,
-        'userPassword': user_password,
-        'token': token
-    }
-    return request_dict
+    elif user == "Password incorrect":
+        json_response = JSONResponse(
+            content=
+            {
+                'message': "Password incorrect",
+                'token': token
+            }
+        )
+    else:
+        user_token = auth_api.create_token(data={"sub": form_data.username})
+        # token = auth_api.Token(
+        #     access_token=user_token,
+        #     token_type="bearer"
+        # )
+        # token_data = {
+        #     'access_token': user_token,
+        #     'token_type': 'bearer'
+        # }
+        json_response = JSONResponse(
+                content=
+                {
+                    'message': "User successfully authenticated",
+                    'userName': form_data.username,
+                    'token': user_token
+                }
+            )
+    return json_response

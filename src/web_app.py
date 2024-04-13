@@ -15,7 +15,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Query
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -25,6 +25,7 @@ from starlette.requests import Request
 
 from src.routers import user_router, interro_router, guest_router, database_router, dashboard_router
 from src.api import authentication
+from src.api import main as main_api
 
 app = FastAPI(
     title="vocabulary",
@@ -37,11 +38,11 @@ app.add_middleware(
     secret_key=os.environ.get("SECRET_KEY")
 )
 # Routers
-app.include_router(user_router)
-app.include_router(interro_router)
-app.include_router(guest_router)
-app.include_router(database_router)
 app.include_router(dashboard_router)
+app.include_router(database_router)
+app.include_router(guest_router)
+app.include_router(interro_router)
+app.include_router(user_router)
 # CSS
 app.mount(
     "/static",
@@ -72,18 +73,20 @@ async def welcome_page(
 @app.get("/sign-in", response_class=HTMLResponse)
 def sign_in(
         request: Request,
-        token: str = Depends(authentication.check_token)
+        token: str = Depends(authentication.check_token),
+        error_message: str = Query('', alias='errorMessage')
     ):
     """
     Call the sign-in page.
     """
+    name_message, password_message = main_api.get_error_messages(error_message)
     return templates.TemplateResponse(
         "user/sign_in.html",
         {
-            "request": request,
-            "token": token,
-            'inputName': '',
-            'inputPassword': ''
+            'request': request,
+            'token': token,
+            'nameUnknownErrorMessage': name_message,
+            'passwordIncorrectErrorMessage': password_message
         }
     )
 
@@ -91,16 +94,19 @@ def sign_in(
 @app.get("/sign-up", response_class=HTMLResponse)
 def sign_up(
         request: Request,
-        token: str = Depends(authentication.check_token)
+        token: str = Depends(authentication.check_token),
+        error_message: str = Query('', alias='errorMessage')
     ):
     """
     Call the create account page.
     """
+    logger.debug(f"token: {token}")
+    logger.debug(f"error_message: {error_message}")
     return templates.TemplateResponse(
         "user/sign_up.html",
         {
             'request': request,
-            'errorMessage': '',
+            'errorMessage': error_message,
             'token': token
         }
     )
