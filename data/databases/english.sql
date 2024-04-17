@@ -10,7 +10,8 @@ USE wh0_Are_y0u_english;
 CREATE TABLE IF NOT EXISTS theme_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
     test_date DATE,
-    test TINYINT);
+    test TINYINT
+);
 
 
 CREATE TABLE IF NOT EXISTS theme_voc (
@@ -20,19 +21,22 @@ CREATE TABLE IF NOT EXISTS theme_voc (
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,
-	taux SMALLINT);
+	taux SMALLINT
+);
 
 
 CREATE TABLE IF NOT EXISTS theme_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
     test_date DATE,
-	words_count SMALLINT);
+	words_count SMALLINT
+);
 
 
 CREATE TABLE IF NOT EXISTS version_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
     test_date DATE,
-    test TINYINT);
+    test TINYINT
+);
 
 
 CREATE TABLE IF NOT EXISTS version_voc (
@@ -42,7 +46,8 @@ CREATE TABLE IF NOT EXISTS version_voc (
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,
-	taux TINYINT);
+	taux TINYINT
+);
 
 
 CREATE TABLE IF NOT EXISTS version_words_count (

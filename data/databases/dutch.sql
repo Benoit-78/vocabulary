@@ -85,21 +85,6 @@ GRANT SELECT ON archive TO 'wh0_Are_y0u'@'localhost';
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 INSERT INTO `version_voc` (`dutch`, `français`, `creation_date`, `nb`, `score`, `taux`) VALUES
     ('de les', 'la leçon', '2024-01-01', 1, 1, 4),
     ('de dag', 'le jour', '2024-01-01', 1, 1, 1),

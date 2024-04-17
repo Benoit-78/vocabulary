@@ -19,7 +19,7 @@
                 <label class="white-text" for="test-type">Choose your database:</label>
             </div>
             <div class="row">
-                <select id="db_name" name="db_name" class="dropdown-container" required>
+                <select id="db_name" name="db_name" class="dropdown-container rounded-input" required>
                     {% for database in databases %}
                         <option value="{{ database }}">{{ database }}</option>
                     {% endfor %}
@@ -30,7 +30,7 @@
                 <label class="white-text" for="test-type">Choose your test type:</label>
             </div>
             <div class="row">
-                <select id="test-type" name="test-type" class="dropdown-container" required>
+                <select id="test-type" name="test-type" class="dropdown-container rounded-input" required>
                     <option value="Version">Normal</option>
                     <option value="Theme">Reverse</option>
                 </select>
@@ -40,7 +40,7 @@
                 <label class="white-text" for="num-words">Number of words:</label>
             </div>
             <div class="row">
-                <select id="num-words" name="num-words" class="dropdown-container" required>
+                <select id="num-words" name="num-words" class="dropdown-container rounded-input" required>
                     <option value="100">100</option>
                     <option value="50">50</option>
                     <option value="20">20</option>

@@ -109,9 +109,9 @@ function addWord(token, databaseName) {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "Word added successfully.") {
-            console.log(token)
-            console.log(databaseName)
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
+        } else if (data && data.message === "Word already exists") {
+            window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}&errorMessage=${data.message}`;
         } else {
             console.error("Error with the word creation.");
         }

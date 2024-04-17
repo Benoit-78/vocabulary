@@ -86,14 +86,6 @@ def authenticate_user(
         )
     else:
         user_token = auth_api.create_token(data={"sub": form_data.username})
-        # token = auth_api.Token(
-        #     access_token=user_token,
-        #     token_type="bearer"
-        # )
-        # token_data = {
-        #     'access_token': user_token,
-        #     'token_type': 'bearer'
-        # }
         json_response = JSONResponse(
                 content=
                 {

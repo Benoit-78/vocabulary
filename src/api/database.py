@@ -107,11 +107,16 @@ def create_word(data: dict):
         return JSONResponse(content={"message": "Word created successfully."})
 
 
-def fill_database(request, token, db_name):
+def fill_database(
+        request,
+        token,
+        db_name,
+        error_message
+    ):
     """
     
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    _ = auth_api.get_user_name_from_token(token)
     if not db_name:
         logger.error("No database name given.")
         raise HTTPException(
@@ -119,10 +124,11 @@ def fill_database(request, token, db_name):
             detail="No database name given."
         )
     request_dict = {
-        "request": request,
-        "title": "Here you can add words to your database.",
-        "token": token,
-        "databaseName": db_name
+        'request': request,
+        'title': "Here you can add words to your database.",
+        'token': token,
+        'databaseName': db_name,
+        'wordAlreadyPresentErrorMessage': error_message,
     }
     return request_dict
 

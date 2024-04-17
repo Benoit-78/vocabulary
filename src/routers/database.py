@@ -76,6 +76,7 @@ def data_page(
         request: Request,
         token: str = Depends(auth_api.check_token),
         db_name: str = Query(None, alias="databaseName"),
+        error_message: str = Query('', alias='errorMessage')
     ):
     """
     Base page for data input by the user.
@@ -83,7 +84,8 @@ def data_page(
     request_dict = database_api.fill_database(
         request,
         token,
-        db_name
+        db_name,
+        error_message
     )
     return templates.TemplateResponse(
         "database/fill.html",
@@ -109,11 +111,15 @@ async def create_word(
         data['foreign'],
         data['native']
     )
-    if result is False:
+    if result == 'Word already exists':
+        json_response = JSONResponse(
+            content={"message": "Word already exists"}
+        )
+    elif result is False:
         json_response = JSONResponse(
             content={"message": "Error with the word creation."}
         )
-    if result is True:
+    elif result is True:
         json_response =  JSONResponse(
             content={"message": "Word added successfully."}
         )

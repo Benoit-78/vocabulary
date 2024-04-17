@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
     <script type="text/javascript" src="/static/scripts/users.js"></script>
     <script type="text/javascript" src="/static/scripts/database.js"></script>
@@ -17,7 +18,7 @@
         <div class="row">
             <div>
                 <label class="white-text" for="dropdown">Choose an existing database</label>
-                <select id="dropdown">
+                <select class="rounded-input" id="dropdown">
                     {% for database in databases %}
                         <option value="{{ database }}">{{ database }}</option>
                     {% endfor %}
@@ -33,7 +34,7 @@
         <div class="row">
             <div>
                 <label class="white-text" for="input1">Create a new database</label>
-                <input type="text" id="databaseName" name="databaseName">
+                <input class="rounded-input" type="text" id="databaseName" name="databaseName">
             </div>
         </div>
 

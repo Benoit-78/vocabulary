@@ -6,6 +6,8 @@
         <title>Add words</title>
         <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
         <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
+        <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
         <script type="text/javascript" src="/static/scripts/main.js"></script>
         <script type="text/javascript" src="/static/scripts/users.js"></script>
         <script type="text/javascript" src="/static/scripts/database.js"></script>
@@ -16,14 +18,17 @@
 
         <div class="row">
 
-            <div class="flag-box">
-                <label class="white-text" for="input1">English</label>
-                <input type="text" id="input1" name="input1">
+            <div class="row">
+                <label class="white-text" for="input1">Foreign</label>
+                {% if wordAlreadyPresentErrorMessage %}
+                    <p class="error-message">{{ wordAlreadyPresentErrorMessage }}</p>
+                {% endif %}
+                <input class="rounded-input" type="text" id="input1" name="input1">
             </div>
 
-            <div class="flag-box">
-                <input type="text" id="input2" name="input2">
-                <label class="white-text" for="input2">Français</label>
+            <div class="row">
+                <input class="rounded-input" type="text" id="input2" name="input2">
+                <label class="white-text" for="input2">Native</label>
             </div>
 
         </div>
