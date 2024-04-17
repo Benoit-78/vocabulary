@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Add a word</title>
+    <title>Choose database</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
@@ -18,8 +18,6 @@
             <div>
                 <label class="white-text" for="dropdown">Choose an existing database</label>
                 <select id="dropdown">
-                    <!-- <option value="0"></option> -->
-                    <!-- Use Jinja2 template syntax to inject options -->
                     {% for database in databases %}
                         <option value="{{ database }}">{{ database }}</option>
                     {% endfor %}
@@ -29,7 +27,7 @@
 
         <div class="row">
             <button class="button" onclick="chooseDatabase(`{{ token }}`)">Choose database</button>
-            <button class="button" onclick="deleteDatabase(`{{ token }}`)">Delete database</button>
+            <!-- <button class="button" onclick="deleteDatabase(`{{ token }}`)">Delete database</button> -->
         </div>
 
         <div class="row">

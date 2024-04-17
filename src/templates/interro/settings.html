@@ -2,7 +2,7 @@
 <html>
     
 <head>
-    <title>Test Configuration</title>
+    <title>Configuration</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
@@ -20,8 +20,9 @@
             </div>
             <div class="row">
                 <select id="db_name" name="db_name" class="dropdown-container" required>
-                    <option value="db_1">database_1</option>
-                    <option value="db_2">database_2</option>
+                    {% for database in databases %}
+                        <option value="{{ database }}">{{ database }}</option>
+                    {% endfor %}
                 </select>
             </div>
 

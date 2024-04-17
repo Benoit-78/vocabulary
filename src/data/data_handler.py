@@ -271,25 +271,25 @@ class DbDefiner(DbInterface):
         try:
             cursor.execute(f"USE {sql_db_name};")
             cursor.execute(
-                "CREATE TABLE version_voc (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE version_perf (date DATE, score INT, taux INT);"
+                "CREATE TABLE version_perf (test_date DATE, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE version_words_count (date DATE, nb INT);"
+                "CREATE TABLE version_words_count (test_date DATE, nb INT);"
             )
             cursor.execute(
-                "CREATE TABLE theme_voc (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE theme_perf (date DATE, score INT, taux INT);"
+                "CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE theme_words_count (date DATE, nb INT);"
+                "CREATE TABLE theme_words_count (test_date DATE, nb INT);"
             )
             cursor.execute(
-                "CREATE TABLE archives (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             connection.commit()
             result = True
@@ -318,8 +318,11 @@ class DbDefiner(DbInterface):
                     true_table_name = table_name
                 cursor.execute(f"SHOW COLUMNS FROM {true_table_name};")
                 columns = list(cursor.fetchall())
+                # logger.debug(f"columns: {columns}")
                 columns = self.rectify_this_strange_result(columns)
+                # logger.debug(f"columns: {columns}")
                 cols_dict[true_table_name] = columns
+            # logger.debug(f"cols_dict: {cols_dict}")
         except mariadb.Error as err:
             logger.error(err)
         finally:
@@ -379,7 +382,10 @@ class DbManipulator(DbInterface):
     def __init__(self, user_name, db_name, test_type):
         super().__init__()
         self.user_name = user_name
-        self.db_name = f"{user_name}_{db_name}"
+        if self.user_name not in db_name:
+            self.db_name = f"{user_name}_{db_name}"
+        else:
+            self.db_name = db_name
         self.db_definer = DbDefiner(self.user_name)
         self.test_type = ''
         self.check_test_type(test_type)
@@ -524,6 +530,9 @@ class DbManipulator(DbInterface):
                 table_name = 'theme_voc'
             elif self.test_type == 'theme':
                 table_name = 'archives'
+        # logger.debug(f"table_name: {table_name}")
+        # logger.debug(f"table columns: {table.columns}")
+        # logger.debug(f"cols[table_name]: {cols[table_name]}")
         table = table[cols[table_name]]
         engine = create_engine(
             ''.join([

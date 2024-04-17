@@ -93,7 +93,6 @@ def load_interro_question_guest(
     """
     Call the page that asks the user the meaning of a word
     """
-    logger.debug(f"language: {language}")
     try:
         count = int(count)
     except NameError:
@@ -172,6 +171,7 @@ async def get_user_response_guest(
     """
     test = load_test_from_redis(token)
     score = data.get('score')
+    score = int(score)
     if data["answer"] == 'Yes':
         score += 1
         test.update_voc_df(True)

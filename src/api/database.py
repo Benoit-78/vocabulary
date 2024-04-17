@@ -111,20 +111,16 @@ def fill_database(request, token, db_name):
     """
     
     """
-    # Authenticate user
     user_name = auth_api.get_user_name_from_token(token)
-    # Check if a database has been chosen
     if not db_name:
         logger.error("No database name given.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No database name given."
         )
-    # Load database page
-    title = "Here you can add words to your database."
     request_dict = {
         "request": request,
-        "title": title,
+        "title": "Here you can add words to your database.",
         "token": token,
         "databaseName": db_name
     }
@@ -148,4 +144,9 @@ def delete_database(token: str, db_name: str):
         return JSONResponse(
             content={"message": "Database deleted successfully."}
         )
+
+
+def upload_csv():
+    """
+    """
     

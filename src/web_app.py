@@ -100,8 +100,6 @@ def sign_up(
     """
     Call the create account page.
     """
-    logger.debug(f"token: {token}")
-    logger.debug(f"error_message: {error_message}")
     return templates.TemplateResponse(
         "user/sign_up.html",
         {

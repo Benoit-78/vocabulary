@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Translation Quiz</title>
+    <title>Interro!</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
@@ -16,10 +16,10 @@
             <h1>Score: {{ score }} / {{ numWords }}</h1>
         </div>
         <div class="row">
-            <button class="button rattraps_button" onclick="nextGuess(`{{ userName }}`, `{{ newWords }}`, `{{ newCount }}`, `{{ newScore }}`)">Take a catch-up test</button>
+            <button class="button rattraps_button" onclick="launchRattraps(`{{ token }}`, `{{ newTotal }}`, `{{ newCount }}`, `{{ newScore }}`)">Take a catch-up test</button>
         </div>
         <div class="row">
-            <button class="button" onclick="goToUserSpace(`{{ userName }}`)">Quit</button>
+            <button class="button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
         </div>
     </div>
 </body>

@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Add a word</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Add words</title>
         <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
         <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
         <script type="text/javascript" src="/static/scripts/main.js"></script>
@@ -29,6 +31,13 @@
         <div class="row">
             <button class="button" onclick="addWord(`{{ token }}`, `{{ databaseName }}`)">Add word</button>
         </div>
+
+        <h1>Upload CSV File</h1>
+        <form id="csvForm" enctype="multipart/form-data">
+            <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+            <input type="hidden" id="token" value="{{ token }}">
+            <button class="button" type="submit">Upload</button>
+        </form>
 
         <div class="row">
             <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>

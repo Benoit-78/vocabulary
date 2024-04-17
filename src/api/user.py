@@ -42,12 +42,13 @@ def create_account(creds, token):
             }
         )
     if result is True:
+        new_token = auth_api.create_token({"sub": creds['input_name']})
         json_response = JSONResponse(
             content=
             {
                 'message': "User account created successfully",
                 'userName': user_account.user_name,
-                'token': token
+                'token': new_token
             }
         )
     return json_response

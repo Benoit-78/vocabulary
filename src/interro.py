@@ -142,7 +142,9 @@ class Interro(ABC):
         self.row = [self.index, mot_etranger, mot_natal]
 
     def update_faults_df(self, word_guessed: bool, row: List[str]):
-        """Save the faulty answers for the second test."""
+        """
+        Save the faulty answers for the second test.
+        """
         if word_guessed is False:
             self.faults_df.loc[self.faults_df.shape[0]] = [row[-2], row[-1]]
 
@@ -152,7 +154,14 @@ class Test(Interro):
     """
     First round!
     """
-    def __init__(self, words_df_, words: int, guesser, perf_df_=None, words_cnt_df=None):
+    def __init__(
+            self,
+            words_df_,
+            words: int,
+            guesser,
+            perf_df_=None,
+            words_cnt_df=None
+        ):
         super().__init__(words_df_, int(words), guesser)
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
@@ -204,7 +213,9 @@ class Test(Interro):
             self.interro_df.loc[self.row[0]] = self.row[1:]
 
     def update_voc_df(self, word_guessed: bool):
-        """Update the vocabulary dataframe"""
+        """
+        Update the vocabulary dataframe
+        """
         # -----
         self.words_df.loc[self.index, 'nb'] += 1
         # -----
@@ -256,14 +267,19 @@ class Rattrap(Interro):
     Rattrapage !!!
     """
     def __init__(
-        self,
-        faults_df_: pd.DataFrame,
-        rattraps: int,
-        guesser
+            self,
+            faults_df_: pd.DataFrame,
+            rattraps: int,
+            guesser
         ):
-        super().__init__(faults_df_, faults_df_.shape[0], guesser)
+        super().__init__(
+            faults_df_,
+            faults_df_.shape[0],
+            guesser
+        )
         self.words_df = faults_df_.copy()
         self.rattraps = int(rattraps)
+        self.interro_df = faults_df_.copy()
 
     def run(self):
         """Launch a rattrapage"""
@@ -299,7 +315,6 @@ class Updater():
         self.criteria = {}
         self.set_criteria()
 
-    # Business logic
     def set_criteria(self):
         """
         Upload the dictionnary of criteria.
@@ -406,16 +421,20 @@ class Updater():
         new_row = pd.DataFrame(
             data={
                 'test_date': datetime.today().date().strftime('%Y-%m-%d'),
-                'words_count': self.interro.words_df.shape[0]
-                },
+                'nb': self.interro.words_df.shape[0]
+            },
             index=[count_before + 1]
         )
+        self.interro.word_cnt_df = self.interro.word_cnt_df.reset_index()
+        # logger.debug(f"self.interro.word_cnt_df: \n{self.interro.word_cnt_df.head()}")
+        # logger.debug(f"new_row: \n{new_row}")
         self.interro.word_cnt_df = pd.concat(
             [
                 self.interro.word_cnt_df,
                 new_row
             ]
         )
+        # logger.debug(f"self.interro.word_cnt_df: \n{self.interro.word_cnt_df.head()}")
         self.interro.word_cnt_df.sort_index(inplace=True)
         self.interro.word_cnt_df.reset_index(
             inplace=True,

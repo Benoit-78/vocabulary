@@ -9,7 +9,7 @@ import os
 import sys
 
 from loguru import logger
-from fastapi import Query, Request, Depends
+from fastapi import Query, Request, Depends, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
@@ -131,3 +131,24 @@ async def delete_database(
     db_name = data['db_name']
     json_response = database_api.delete_database(token, db_name)
     return json_response
+
+
+@database_router.post("/upload-csv", response_class=HTMLResponse)
+async def upload_csv(
+        csv_file: UploadFile = File(...),
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Upload the given CSV file.
+    """
+    # Check if the file has a CSV extension
+    if not csv_file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Invalid file format, only CSV files are allowed")
+    # Read and decode the CSV content
+    csv_content = await csv_file.read()
+    # Check for malicious code
+    if database_api.is_malicious(csv_content.decode('utf-8')):
+        raise HTTPException(status_code=400, detail="Malicious code detected in the CSV file")
+    # Add CSV content to the user database
+    database_api.add_to_database(csv_content.decode('utf-8'))
+    return {"message": "CSV file uploaded successfully"}
