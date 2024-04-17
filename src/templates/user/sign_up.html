@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sign-up</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
+    <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <script type="text/javascript" src="/static/scripts/users.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <form id="signInForm">
+            <div class="row">
+                <label class="white-text" for="inputName">User name</label>
+                <input type="text" id="inputName" name="inputName" class="rounded-input" required>
+                {% if errorMessage %}
+                    <p class="error-message">{{ errorMessage }}</p>
+                {% endif %}
+            </div>
+            <div class="row">
+                <label class="white-text" for="input2">Password</label>
+                <input type="inputPassword" id="inputPassword" name="inputPassword" class="rounded-input" required>
+            </div>
+            <div class="row">
+                <button type="button" class="button" onclick="createAccount(`{{ token }}`)">Sign-up</button>
+            </div>
+        </form>
+        <div class="row">
+            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+        </div>
+    </div>
+</body>
+
+</html>

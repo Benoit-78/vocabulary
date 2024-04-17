@@ -79,12 +79,17 @@ ssh -i  \
 scp -r -i \
     conf/voc_ssh_key_1.pem \
     /home/benoit/projects/vocabulary/src/ \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/ && cl
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/
 
 scp -r -i \
     conf/voc_ssh_key_1.pem \
-    /home/benoit/projects/vocabulary/conf/hum.json \
+    /home/benoit/projects/vocabulary/conf/languages.json \
     ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/ && cl
+
+scp -r -i \
+    conf/voc_ssh_key_1.pem \
+    /home/benoit/projects/vocabulary/requirements.txt \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/ && cl
 
 
 
@@ -93,8 +98,8 @@ scp -r -i \
 # =======================
 export PYTHONPATH=/home/ubuntu/vocabulary/src:$PYTHONPATH
 cd vocabulary
-python3 -m venv env
-source env/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
@@ -105,6 +110,7 @@ pip install -r requirements.txt
 # =======================
 # DEV
 cd ~/vocabulary
+sudo service redis-server stop
 redis-server
 uvicorn src.web_app:app \
     --port 8080 \
@@ -127,7 +133,7 @@ pkill uvicorn
 
 
 # ==============================================
-#  E N D   O F   L I F E
+#  E N D   O F   S E S S I O N
 # ==============================================
 aws ec2 stop-instances \
     --instance-ids i-03fae8b09bdb0587f \

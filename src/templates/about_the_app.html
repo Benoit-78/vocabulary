@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>About the app</title>
+    <title>About</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
@@ -15,16 +15,19 @@
 
     <div class="container">
     
-        <h1>About the app</h1>
+        <h1 class="white-text">About the app</h1>
 
-        <p>When you discover a new word, save it in the app, along with its translation</p>
-        <p>The app will ask you, say, 10 random words each day</p>
-        <p>As you progress, the words you retain well will be archived</p>
-        <p>Those you have difficulties with will be revisited more frequently</p>
-        <p>And in the end, these words will be in your memory</p>
+        <p class="white-text">When you discover a new word, save it in the app, along with its translation</p>
+        <p class="white-text">The app will ask you, say, 10 random words each day</p>
+        <p class="white-text">As you progress, the words you retain well will be archived</p>
+        <p class="white-text">Those you have difficulties with will be revisited more frequently</p>
+        <p class="white-text">And in the end, these words will be in your memory</p>
 
-        <button class="button quit-button" onclick="goToRoot(`{{ token }}`)">Quit</button>
+        <button class="button" onclick="goToRoot(`{{ token }}`)">Quit</button>
+        
+        <p class ="white-text">Do NOT store any sensitive data on this app!</p>
     </div>
+
 
 </body>
 

@@ -182,7 +182,6 @@ def get_username_from_token(token: str = Depends(oauth2_scheme)):
     return username
 
 
-
 def authenticate_user(
         users_list: dict,
         username: str,
@@ -205,10 +204,11 @@ def authenticate_user(
         # logger.debug(f"user_dict: {user_dict}")
         try:
             user_dict = user_dict[0]
-        except IndexError as exc:
-            logger.error("Unknown user")
-            raise exc
-        return UserInDB(**user_dict)
+            user = UserInDB(**user_dict)
+        except IndexError:
+            logger.warning("Unknown user")
+            user = None
+        return user
 
     def verify_password(
             plain_password: str,
@@ -222,12 +222,15 @@ def authenticate_user(
 
     user_in_db_model = get_user(users_list, username)
     if user_in_db_model is None:
-        return 'Unknown user'
-    try:
-        verify_password(
-            password,
-            user_in_db_model.password_hash
-        )
-    except UnknownHashError:
-        return 'Password incorrect'
-    return user_in_db_model
+        user = 'Unknown user'
+    else:
+        try:
+            verify_password(
+                password,
+                user_in_db_model.password_hash
+            )
+            user = user_in_db_model
+        except UnknownHashError:
+            logger.error("Password incorrect")
+            user = 'Password incorrect'
+    return user

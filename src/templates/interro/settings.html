@@ -2,9 +2,10 @@
 <html>
     
 <head>
-    <title>Test Configuration</title>
+    <title>Configuration</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
     <script type="text/javascript" src="/static/scripts/interro.js"></script>
     <script type="text/javascript" src="/static/scripts/users.js"></script>
@@ -15,30 +16,31 @@
         <form>
 
             <div class="row">
-                <label for="test-type">Choose your database:</label>
+                <label class="white-text" for="test-type">Choose your database:</label>
             </div>
             <div class="row">
-                <select id="db_name" name="db_name" class="dropdown-container" required>
-                    <option value="db_1">database_1</option>
-                    <option value="db_2">database_2</option>
+                <select id="db_name" name="db_name" class="dropdown-container rounded-input" required>
+                    {% for database in databases %}
+                        <option value="{{ database }}">{{ database }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
             <div class="row">
-                <label for="test-type">Choose your test type:</label>
+                <label class="white-text" for="test-type">Choose your test type:</label>
             </div>
             <div class="row">
-                <select id="test-type" name="test-type" class="dropdown-container" required>
+                <select id="test-type" name="test-type" class="dropdown-container rounded-input" required>
                     <option value="Version">Normal</option>
                     <option value="Theme">Reverse</option>
                 </select>
             </div>
 
             <div class="row">
-                <label for="num-words">Number of words:</label>
+                <label class="white-text" for="num-words">Number of words:</label>
             </div>
             <div class="row">
-                <select id="num-words" name="num-words" class="dropdown-container" required>
+                <select id="num-words" name="num-words" class="dropdown-container rounded-input" required>
                     <option value="100">100</option>
                     <option value="50">50</option>
                     <option value="20">20</option>

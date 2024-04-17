@@ -107,26 +107,28 @@ def create_word(data: dict):
         return JSONResponse(content={"message": "Word created successfully."})
 
 
-def fill_database(request, token, db_name):
+def fill_database(
+        request,
+        token,
+        db_name,
+        error_message
+    ):
     """
     
     """
-    # Authenticate user
-    user_name = auth_api.get_user_name_from_token(token)
-    # Check if a database has been chosen
+    _ = auth_api.get_user_name_from_token(token)
     if not db_name:
         logger.error("No database name given.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No database name given."
         )
-    # Load database page
-    title = "Here you can add words to your database."
     request_dict = {
-        "request": request,
-        "title": title,
-        "token": token,
-        "databaseName": db_name
+        'request': request,
+        'title': "Here you can add words to your database.",
+        'token': token,
+        'databaseName': db_name,
+        'wordAlreadyPresentErrorMessage': error_message,
     }
     return request_dict
 
@@ -148,4 +150,9 @@ def delete_database(token: str, db_name: str):
         return JSONResponse(
             content={"message": "Database deleted successfully."}
         )
+
+
+def upload_csv():
+    """
+    """
     

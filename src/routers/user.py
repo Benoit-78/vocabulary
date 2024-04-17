@@ -21,8 +21,8 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from src.api import authentication as auth_api
-from src.data import users
 from src.api import user as user_api
+from src.data import users
 
 user_router = APIRouter(prefix="/user")
 cred_checker = users.CredChecker()
@@ -50,32 +50,18 @@ async def create_account(
 
 @user_router.post("/user-token")
 async def login_for_access_token(
+        token: str = Depends(auth_api.check_token),
         form_data: OAuth2PasswordRequestForm = Depends()
     ) -> auth_api.Token:
     """
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
     """
-    # Identify user
-    users_list = auth_api.get_users_list()
-    user = auth_api.authenticate_user(
-        users_list,
-        form_data.username,
-        form_data.password
+    json_response = user_api.authenticate_user(
+        token,
+        form_data
     )
-    if user in ['Unknown user', 'Password incorrect']:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
-    # Create a token
-    user_token = auth_api.create_token(data={"sub": form_data.username})
-    result = auth_api.Token(
-        access_token=user_token,
-        token_type="bearer"
-    )
-    return result
+    return json_response
 
 
 @user_router.get("/user-space", response_class=HTMLResponse)

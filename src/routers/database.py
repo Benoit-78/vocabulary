@@ -9,7 +9,7 @@ import os
 import sys
 
 from loguru import logger
-from fastapi import Query, Request, Depends
+from fastapi import Query, Request, Depends, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
@@ -76,6 +76,7 @@ def data_page(
         request: Request,
         token: str = Depends(auth_api.check_token),
         db_name: str = Query(None, alias="databaseName"),
+        error_message: str = Query('', alias='errorMessage')
     ):
     """
     Base page for data input by the user.
@@ -83,7 +84,8 @@ def data_page(
     request_dict = database_api.fill_database(
         request,
         token,
-        db_name
+        db_name,
+        error_message
     )
     return templates.TemplateResponse(
         "database/fill.html",
@@ -109,11 +111,15 @@ async def create_word(
         data['foreign'],
         data['native']
     )
-    if result is False:
+    if result == 'Word already exists':
+        json_response = JSONResponse(
+            content={"message": "Word already exists"}
+        )
+    elif result is False:
         json_response = JSONResponse(
             content={"message": "Error with the word creation."}
         )
-    if result is True:
+    elif result is True:
         json_response =  JSONResponse(
             content={"message": "Word added successfully."}
         )
@@ -131,3 +137,24 @@ async def delete_database(
     db_name = data['db_name']
     json_response = database_api.delete_database(token, db_name)
     return json_response
+
+
+@database_router.post("/upload-csv", response_class=HTMLResponse)
+async def upload_csv(
+        csv_file: UploadFile = File(...),
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Upload the given CSV file.
+    """
+    # Check if the file has a CSV extension
+    if not csv_file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Invalid file format, only CSV files are allowed")
+    # Read and decode the CSV content
+    csv_content = await csv_file.read()
+    # Check for malicious code
+    if database_api.is_malicious(csv_content.decode('utf-8')):
+        raise HTTPException(status_code=400, detail="Malicious code detected in the CSV file")
+    # Add CSV content to the user database
+    database_api.add_to_database(csv_content.decode('utf-8'))
+    return {"message": "CSV file uploaded successfully"}

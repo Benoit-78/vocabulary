@@ -271,25 +271,25 @@ class DbDefiner(DbInterface):
         try:
             cursor.execute(f"USE {sql_db_name};")
             cursor.execute(
-                "CREATE TABLE version_voc (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE version_perf (date DATE, score INT, taux INT);"
+                "CREATE TABLE version_perf (test_date DATE, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE version_words_count (date DATE, nb INT);"
+                "CREATE TABLE version_words_count (test_date DATE, nb INT);"
             )
             cursor.execute(
-                "CREATE TABLE theme_voc (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE theme_perf (date DATE, score INT, taux INT);"
+                "CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);"
             )
             cursor.execute(
-                "CREATE TABLE theme_words_count (date DATE, nb INT);"
+                "CREATE TABLE theme_words_count (test_date DATE, nb INT);"
             )
             cursor.execute(
-                "CREATE TABLE archives (english VARCHAR(50) PRIMARY KEY, français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             connection.commit()
             result = True
@@ -318,8 +318,11 @@ class DbDefiner(DbInterface):
                     true_table_name = table_name
                 cursor.execute(f"SHOW COLUMNS FROM {true_table_name};")
                 columns = list(cursor.fetchall())
+                # logger.debug(f"columns: {columns}")
                 columns = self.rectify_this_strange_result(columns)
+                # logger.debug(f"columns: {columns}")
                 cols_dict[true_table_name] = columns
+            # logger.debug(f"cols_dict: {cols_dict}")
         except mariadb.Error as err:
             logger.error(err)
         finally:
@@ -379,7 +382,10 @@ class DbManipulator(DbInterface):
     def __init__(self, user_name, db_name, test_type):
         super().__init__()
         self.user_name = user_name
-        self.db_name = f"{user_name}_{db_name}"
+        if self.user_name not in db_name:
+            self.db_name = f"{user_name}_{db_name}"
+        else:
+            self.db_name = db_name
         self.db_definer = DbDefiner(self.user_name)
         self.test_type = ''
         self.check_test_type(test_type)
@@ -437,16 +443,19 @@ class DbManipulator(DbInterface):
         """
         Add a word to the table.
         """
-        # sql_db_name = f"{self.user_name}_{self.db_name}"
-        sql_db_name = self.db_name
         connection, cursor = self.get_db_cursor()
         # Create request string
         today_str = str(datetime.today().date())
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
+        logger.debug(f"english: {english}")
+        if self.read_word(english) is not None:
+            result = 'Word already exists'
+            logger.error(result)
+            return result
         native = row[1]
         try:
-            request_1 = f"INSERT INTO {sql_db_name}.{words_table_name}"
+            request_1 = f"INSERT INTO {self.db_name}.{words_table_name}"
             request_2 = "(english, français, creation_date, nb, score, taux)"
             request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
             # Execute request
@@ -464,19 +473,27 @@ class DbManipulator(DbInterface):
         """
         Read the given word
         """
+        connection, cursor = self.get_db_cursor()
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = "SELECT english, français, score"
-        request_2 = f"FROM {words_table_name}"
+        request_2 = f"FROM {self.db_name}.{words_table_name}"
         request_3 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2, request_3])
+        logger.debug(f"{self.db_name}.{words_table_name}")
         # Execute request
-        connection, cursor = self.get_db_cursor()
-        english, native, score = cursor.execute(sql_request)[0]
-        connection.commit()
-        cursor.close()
+        try:
+            connection, cursor = self.get_db_cursor()
+            request_result = cursor.execute(sql_request)
+            request_result = cursor.fetchall()
+            logger.debug(f"request_result: {request_result}")
+            english, native, score = request_result[0]
+            result = (english, native, score)
+        except IndexError:
+            result = None
+        # cursor.close()
         connection.close()
-        return english, native, score
+        return result
 
     def update_word(self, english: str, new_nb, new_score):
         """
@@ -524,6 +541,9 @@ class DbManipulator(DbInterface):
                 table_name = 'theme_voc'
             elif self.test_type == 'theme':
                 table_name = 'archives'
+        # logger.debug(f"table_name: {table_name}")
+        # logger.debug(f"table columns: {table.columns}")
+        # logger.debug(f"cols[table_name]: {cols[table_name]}")
         table = table[cols[table_name]]
         engine = create_engine(
             ''.join([

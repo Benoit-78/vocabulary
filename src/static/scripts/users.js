@@ -1,6 +1,5 @@
 
 async function createAccount(token) {
-    console.log("createAccount function called");
     const inputName = document.getElementById("inputName").value;
     const inputPassword = document.getElementById("inputPassword").value;
     const formData = new URLSearchParams();
@@ -19,14 +18,12 @@ async function createAccount(token) {
             }
         )
         const data = await response.json();
-        console.log("Response Data:", data);
         if (data && data.message === "User account created successfully") {
-            const accessToken = data.token;
-            window.location.href = `/user/user-space?token=${accessToken}`;
+            window.location.href = `/user/user-space?token=${data.token}`;
         } else if (data && data.message === "User name not available") {
-            window.location.href = `/sign-up?token=${accessToken}`;
+            window.location.href = `/sign-up?token=${data.token}&errorMessage=${data.message}`;
         } else {
-            console.error("Error during the creation of user account");
+            console.error("Error in sign-up");
         }
     } catch(error) {
         console.error("Error:", error);
@@ -39,7 +36,7 @@ function signIn(token) {
 }
 
 
-async function authenticateUser() {
+async function authenticateUser(token) {
     const inputName = document.getElementById("inputName").value;
     const inputPassword = document.getElementById("inputPassword").value;
     const formData = new URLSearchParams();
@@ -47,19 +44,23 @@ async function authenticateUser() {
     formData.append("password", inputPassword);
     try {
         const response = await fetch(
-            "/user/user-token",
+            `/user/user-token?token=${token}`,
             {
                 method: "POST",
                 headers: {"Content-Type": "application/x-www-form-urlencoded"},
                 body: formData.toString(),
             }
         );
-        if (response.ok) {
-            const data = await response.json();
-            const token = data.access_token;
-            window.location.href = `/user/user-space?token=${token}`;
+        const data = await response.json();
+        if (data && data.message === "User successfully authenticated") {
+            console.log(data.access_token)
+            window.location.href = `/user/user-space?token=${data.token}`;
+        } else if (data && data.message === "Unknown user") {
+            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
+        } else if (data && data.message === "Password incorrect") {
+            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else {
-            console.error("Sign-in failed:", response.statusText);
+            console.error("Error in sign-in");
         }
     } catch (error) {
         console.error("Error:", error);

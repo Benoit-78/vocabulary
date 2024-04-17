@@ -10,7 +10,7 @@ import sys
 
 import pandas as pd
 from loguru import logger
-from fastapi import Query, Request, Depends
+from fastapi import Query, Request, Depends, Body
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
@@ -20,8 +20,10 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.api import authentication as auth_api 
-from src.api.interro import load_test, save_test_in_redis, load_test_from_redis
+from src.interro import Updater
+from src.api import authentication as auth_api
+from src.api import database as database_api
+from src.api import interro as interro_api
 from src.data import users
 
 
@@ -38,11 +40,13 @@ def interro_settings(
     """
     Call the page that gets the user settings for one interro.
     """
+    databases = database_api.get_user_databases(token)
     return templates.TemplateResponse(
         "interro/settings.html",
         {
             'request': request,
-            'token': token
+            'token': token,
+            'databases': databases
         }
     )
 
@@ -56,18 +60,18 @@ async def save_interro_settings(
     Save the user settings for the interro.
     """
     user_name = auth_api.get_user_name_from_token(token)
-    logger.debug(f"User name: {user_name}")
-    _, test = load_test(
+    loader, test = interro_api.load_test(
         user_name=user_name,
         db_name=settings['databaseName'],
         test_type=settings['testType'].lower(),
         test_length=settings['numWords']
     )
-    save_test_in_redis(test, token)
+    interro_api.save_loader_in_redis(loader, token)
+    interro_api.save_test_in_redis(test, token)
     response = JSONResponse(
         content=
         {
-            'message': "Guest user settings stored successfully.",
+            'message': "Guest user settings stored successfully",
             'token': token
         }
     )
@@ -77,81 +81,79 @@ async def save_interro_settings(
 @interro_router.get("/interro-question", response_class=HTMLResponse)
 def load_interro_question(
         request: Request,
-        user_name: str = Query(None, alias="userName"),
-        user_password: str = Query(None, alias="userPassword"),
-        db_name: str = Query(None, alias="databaseName"),
-        test_type: str = Query(None, alias="testType"),
         total: str = Query(None, alias="total"),
         count: str = Query(None, alias="count"),
-        score: str = Query(None, alias="score")
+        score: str = Query(None, alias="score"),
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Call the page that asks the user the meaning of a word.
     """
     request_dict = interro_api.get_interro_question(
         request,
-        user_name,
-        user_password,
-        db_name,
-        test_type,
+        token,
         total,
         count,
         score
     )
-    return templates.TemplateResponse("interro/question.html", request_dict)
+    return templates.TemplateResponse(
+        "interro/question.html",
+        request_dict
+    )
 
 
 @interro_router.get("/interro-answer", response_class=HTMLResponse)
 def load_interro_answer(
         request: Request,
-        user_name,
-        words: int,
-        count: int,
-        score: int
+        total: str = Query(None, alias="total"),
+        count: str = Query(None, alias="count"),
+        score: str = Query(None, alias="score"),
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
     """
-    cred_checker.check_credentials(user_name)
     count = int(count)
-    global test
+    test = interro_api.load_test_from_redis(token)
+    progress_percent = int(count / int(total) * 100)
     index = test.interro_df.index[count - 1]
     english = test.interro_df.loc[index][0]
-    french = test.interro_df.loc[index][1]
     english = english.replace("'", "\'")
+    french = test.interro_df.loc[index][1]
     french = french.replace("'", "\'")
-    progress_percent = int(count / int(words) * 100)
     request_dict = {
         "request": request,
-        "userName": user_name,
-        "numWords": words,
+        "token": token,
+        "numWords": total,
         "count": count,
         "score": score,
         "progressPercent": progress_percent,
         "content_box1": english,
         "content_box2": french
     }
-    request_dict = interro_api.get_user_response(user_name)
-    return templates.TemplateResponse("interro/answer.html", request_dict)
+    return templates.TemplateResponse(
+        "interro/answer.html",
+        request_dict
+    )
 
 
-@interro_router.post("/user-answer/{user_name}")
+@interro_router.post("/user-answer")
 async def get_user_response(
-        data: dict,
-        user_name
+        data: dict = Body(...),
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Acquire the user decision: was his answer right or wrong.
     """
-    cred_checker.check_credentials(user_name)
-    global test
+    test = interro_api.load_test_from_redis(token)
     score = data.get('score')
+    score = int(score)
     if data["answer"] == 'Yes':
         score += 1
-        test.update_voc_df(True)
+        update = True
     elif data["answer"] == 'No':
-        test.update_voc_df(False)
+        update = False
         test.update_faults_df(
             False,
             [
@@ -159,76 +161,82 @@ async def get_user_response(
                 data.get('french')
             ]
         )
+    if not hasattr(test, 'rattraps'):
+        test.update_voc_df(update)
+    interro_api.save_test_in_redis(test, token)
     return JSONResponse(
         content=
         {
             "score": score,
-            "message": "User response stored successfully."
+            "message": "User response stored successfully"
         }
     )
 
 
-@interro_router.get("/propose-rattraps/{user_name}/{words}/{count}/{score}", response_class=HTMLResponse)
+@interro_router.get("/propose-rattraps", response_class=HTMLResponse)
 def propose_rattraps(
         request: Request,
-        user_name,
-        words: int,
-        count: int,
-        score: int
+        total: str = Query(None, alias="total"),
+        score: str = Query(None, alias="score"),
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Load a page that proposes the user to take a rattraps, or leave the test.
     """
-    cred_checker.check_credentials(user_name)
-    global test
+    test = interro_api.load_test_from_redis(token)
+    new_total = test.faults_df.shape[0]
     # Enregistrer les résultats
-    global flag_data_updated
-    if flag_data_updated is False:
-        global loader
+    if not hasattr(test, 'rattraps'):
         test.compute_success_rate()
-        updater = interro.Updater(loader, test)
+        loader = interro_api.load_loader_from_redis(token)
+        updater = Updater(loader, test)
         updater.update_data()
         logger.info("User data updated.")
-        flag_data_updated = True
-    else:
-        logger.info("User data not updated yet.")
     # Réinitialisation
-    new_words = test.faults_df.shape[0]
-    test.interro_df = test.faults_df
-    test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
+    logger.debug(f"New words: {new_total}")
     return templates.TemplateResponse(
         "interro/rattraps.html",
         {
             "request": request,
-            "userName": user_name,
-            "score": score,
-            "numWords": words,
-            "count": count,
+            "token": token,
+            "newTotal": new_total,
             "newScore": 0,
-            "newWords": new_words,
-            "newCount": 0
+            "newCount": 0,
+            "score": score,
+            "numWords": total
         }
     )
 
 
-@interro_router.get("/interro-end/{user_name}/{words}/{score}", response_class=HTMLResponse)
+@interro_router.post("/launch-rattraps", response_class=HTMLResponse)
+async def launch_rattraps(
+        data: dict = Body(...),
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Load the rattraps page.
+    """
+    json_response = interro_api.load_rattraps(token, data)
+    return json_response
+
+
+@interro_router.get("/interro-end", response_class=HTMLResponse)
 def end_interro(
-    request: Request,
-    user_name,
-    words: int,
-    score: int):
+        request: Request,
+        total: str = Query(None, alias="total"),
+        score: str = Query(None, alias="score"),
+        token: str = Depends(auth_api.check_token)
+    ):
     """
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performances.
     """
-    cred_checker.check_credentials(user_name)
-    # Execution
-    global flag_data_updated
-    if flag_data_updated is False:
-        global loader
-        global test
+    test = interro_api.load_test_from_redis(token)
+    # Enregistrer les résultats
+    if not hasattr(test, 'rattraps'):
         test.compute_success_rate()
-        updater = interro.Updater(loader, test)
+        loader = interro_api.load_loader_from_redis(token)
+        updater = Updater(loader, test)
         updater.update_data()
         logger.info("User data updated.")
     return templates.TemplateResponse(
@@ -236,7 +244,7 @@ def end_interro(
         {
             "request": request,
             "score": score,
-            "numWords": words,
-            "userName": user_name
+            "numWords": total,
+            "token": token
         }
     )

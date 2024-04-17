@@ -2,9 +2,10 @@
 <html>
 
 <head>
-    <title>Translation Quiz</title>
+    <title>Guest interro</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
     <script type="text/javascript" src="/static/scripts/main.js"></script>
     <script type="text/javascript" src="/static/scripts/guest.js"></script>
@@ -16,28 +17,28 @@
             <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
         <div>
-            <p>{{ count }} / {{ numWords }}</p>
+            <p class="white-text">{{ count }} / {{ numWords }}</p>
         </div>
         <div class="row">
-            <p>What is the translation for:</p>
+            <p class="white-text">What is the translation for:</p>
         </div>
         <div class="row">
             <div class="flag-box">
-                <div class="box">
+                <div class="box rounded-input">
                     {{ content_box1 }}
                 </div>
-                <span class="flag flag-us">&#x1F1FA;&#x1F1F8;</span>
+                <span class="flag">{{ flag|safe }}</span>
             </div>
             <div class="flag-box">
                 <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
-                <div class="box">
+                <div class="box rounded-input">
                     ?
                 </div>
             </div>
         </div>
         <div class="row">
             <button class="button middle_button" onclick="showTranslation(
-                {{ numWords }}, {{ count }}, {{ score }}, `{{ token }}`
+                `{{ numWords }}`, `{{ count }}`, `{{ score }}`, `{{ token }}`, `{{ language|safe }}`
                 )">Show translation</button>
         </div>
         <div class="row">

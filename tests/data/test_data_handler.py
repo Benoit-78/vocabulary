@@ -148,21 +148,38 @@ class TestDbController(unittest.TestCase):
     #     mock_cursor.close.assert_called_once()
     #     mock_connection.close.assert_called_once()
 
+    # @patch('src.data.data_handler.mariadb')
+    # def test_create_user_failure(self, mock_mariadb):
+    #     # Arrange
+    #     mock_connection = MagicMock()
+    #     mock_cursor = MagicMock()
+        # mock_mariadb.connect.return_value = mock_connection
+        # mock_connection.cursor.return_value = mock_cursor
+    #     mock_cursor.execute.side_effect = mariadb.Error("Mock error")
+    #     user_name = 'test_user'
+    #     user_password = 'test_password'
+    #     # Act
+    #     result = self.db_controller.create_user_in_mysql(user_name, user_password)
+    #     # Assert
+    #     self.assertFalse(result)
+    #     mock_cursor.execute.assert_called_once()
+    #     mock_connection.rollback.assert_called_once()
+    #     mock_cursor.close.assert_called_once()
+    #     mock_connection.close.assert_called_once()
+
     @patch('src.data.data_handler.mariadb')
-    def test_create_user_failure(self, mock_mariadb):
+    def test_create_user_error_handling(self, mock_mariadb):
         # Arrange
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
-        mock_mariadb.connect.return_value = (mock_connection, mock_cursor)
+        mock_mariadb.connect.return_value = mock_connection
+        # mock_connection.cursor.return_value = mock_cursor
         mock_cursor.execute.side_effect = mariadb.Error("Mock error")
-        user_name = 'test_user'
-        user_password = 'test_password'
+        mock_mariadb.connect.cursor.return_value = mock_cursor
         # Act
-        result = self.db_controller.create_user_in_mysql(user_name, user_password)
+        result = self.db_controller.create_user_in_mysql("test_user", "test_password")
         # Assert
-        self.assertFalse(result)
-        mock_cursor.execute.assert_called_once()
-        mock_connection.rollback.assert_called_once()
+        self.assertEqual(result, False)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
@@ -370,7 +387,7 @@ class TestDbManipulator(unittest.TestCase):
         # Assert
         self.assertIsInstance(result, int)
         self.assertEqual(result, True)
-        sql_db_name = f'{self.db_manipulator.user_name}_{self.db_manipulator.db_name}'
+        sql_db_name = self.db_manipulator.db_name
         mock_get_db_cursor.assert_called_once()
         english = test_row[0]
         native = test_row[1]

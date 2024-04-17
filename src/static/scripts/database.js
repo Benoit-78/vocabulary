@@ -109,14 +109,59 @@ function addWord(token, databaseName) {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "Word added successfully.") {
-            console.log(token)
-            console.log(databaseName)
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
+        } else if (data && data.message === "Word already exists") {
+            window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}&errorMessage=${data.message}`;
         } else {
             console.error("Error with the word creation.");
         }
     })
     .catch(error => {
         console.error("Error sending user answer:", error);
+    });
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+        // Bind the submit event of the form to the uploadCSV function
+        document.getElementById("csvForm").addEventListener(
+            "submit",
+            function(event) {
+                event.preventDefault(); // Prevent the form from submitting normally
+                var token = document.getElementById("token").value;
+                uploadCSV(token); // Call the uploadCSV function
+            }
+        );
+    }
+);
+
+
+function uploadCSV(token) {
+    console.log("Uploading CSV file...");
+    var formData = new FormData();
+    var fileInput = document.getElementById("csvFile");
+    formData.append("csvFile", fileInput.files[0]);
+    fetch(
+        `/database/upload-csv?token=${token}`,
+        {
+            method: "POST",
+            body: formData
+        }
+    )
+    .then(response => {
+        if (response.ok) {
+            return response.text();
+        }
+        throw new Error("Network response was not ok.");
+    })
+    .then(data => {
+        // Handle response from the server
+        console.log(data);
+    })
+    .catch(error => {
+        // Handle errors
+        console.error("Error in csv loading:", error);
     });
 }

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Translation Quiz</title>
+    <title>Guest interro</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
@@ -12,12 +12,12 @@
 
 <body>
     <div class="container">
-        <div class="row">
+        <div class="row white-text">
             <h1>Your score is: {{ score }} / {{ numWords }}</h1>
         </div>
         <div class="row">
             <button class="button rattraps_button" onclick="nextGuess(
-                {{ newWords }}, {{ newCount }}, {{ newScore }}, `{{ token }}`
+                `{{ newWords }}`, `{{ newCount }}`, `{{ newScore }}`, `{{ token }}`, `{{ language|safe }}`
                 )">Take a catch-up test</button>
         </div>
         <div class="row">
