@@ -46,6 +46,7 @@ def get_user_dashboards(request, user_name, user_password, db_name):
     return request_dict
 
 
+
 class WordsGraph(ABC):
     """Abstract class for creating and saving user-specific graphs."""
     def __init__(self, db_handler):

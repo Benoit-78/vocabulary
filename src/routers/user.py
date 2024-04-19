@@ -44,7 +44,10 @@ async def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
-    json_response = user_api.create_account(creds, token)
+    json_response = user_api.create_account(
+        creds,
+        token
+    )
     return json_response
 
 
@@ -72,14 +75,13 @@ def user_main_page(
     """
     Call the base page of user space.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    response_dict = user_api.load_user_space(
+        request,
+        token
+    )
     return templates.TemplateResponse(
         "user/user_space.html",
-        {
-            'request': request,
-            'token': token,
-            'user_name': user_name
-        }
+        response_dict
     )
 
 

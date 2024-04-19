@@ -9,10 +9,10 @@
 
 import os
 import sys
+from typing import Dict
 
-from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
-from loguru import logger
+# from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -25,7 +25,10 @@ from src.data import users
 cred_checker = users.CredChecker()
 
 
-def create_account(creds, token):
+def create_account(
+        creds: dict,
+        token: str
+    ) -> Dict:
     """
     Create the user account if the given user name does not exist yet.
     """
@@ -55,9 +58,9 @@ def create_account(creds, token):
 
 
 def authenticate_user(
-        token,
+        token: str,
         form_data
-    ):
+    ) -> Dict:
     """
     Authenticate the user.
     """
@@ -94,4 +97,17 @@ def authenticate_user(
                     'token': user_token
                 }
             )
+    return json_response
+
+
+def load_user_space(request, token) -> Dict:
+    """
+    Call the base page of user space.
+    """
+    user_name = auth_api.get_user_name_from_token(token)
+    json_response = {
+        'request': request,
+        'token': token,
+        'user_name': user_name
+    }
     return json_response

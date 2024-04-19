@@ -8,17 +8,15 @@
         - a guest should not access the 'root' page, even by accident.
 """
 
-import json
 import os
 import sys
 
 # import base64
 import pandas as pd
 from fastapi import Request, Depends, Query
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
-from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -27,14 +25,10 @@ sys.path.append(REPO_DIR)
 from src.data import users
 from src.api import authentication as auth_api
 from src.api import guest as guest_api
-from src.api.interro import load_test, save_test_in_redis, load_test_from_redis
 
 guest_router = APIRouter(prefix='/guest')
 cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
-
-WORDS = 10
-FLAGS_DICT = guest_api.get_flags_dict()
 
 
 @guest_router.get("/interro-settings", response_class=HTMLResponse)
@@ -45,9 +39,7 @@ def interro_settings_guest(
     """
     Call the page that gets the user settings for one interro.
     """
-    response_dict = FLAGS_DICT.copy()
-    response_dict['request'] = request
-    response_dict['token'] = token
+    response_dict = guest_api.load_guest_settings(request, token)
     return templates.TemplateResponse(
         "guest/settings.html",
         response_dict
@@ -62,23 +54,8 @@ async def save_interro_settings_guest(
     """
     Acquire the user settings for one interro.
     """
-    language = language['language'].lower()
-    test_type = 'version'
-    _, test = load_test(
-        user_name=os.environ['VOC_GUEST_NAME'],
-        db_name=language,
-        test_type=test_type,
-        test_length=WORDS
-    )
-    save_test_in_redis(test, token)
-    response = JSONResponse(
-        content=
-        {
-            'message': "Guest user settings stored successfully.",
-            'token': token
-        }
-    )
-    return response
+    json_response = guest_api.save_interro_settings_guest(language, token)
+    return json_response
 
 
 @guest_router.get("/interro-question/{words}/{count}/{score}", response_class=HTMLResponse)
@@ -93,33 +70,17 @@ def load_interro_question_guest(
     """
     Call the page that asks the user the meaning of a word
     """
-    try:
-        count = int(count)
-    except NameError:
-        count = 0
-    try:
-        score = int(score)
-    except NameError:
-        score = 0
-    test = load_test_from_redis(token)
-    progress_percent = int(count / int(words) * 100)
-    index = test.interro_df.index[count]
-    english = test.interro_df.loc[index][0]
-    english = english.replace("'", "\'")
-    count += 1
+    response_dict = guest_api.load_interro_question_guest(
+        request,
+        words,
+        count,
+        score,
+        language,
+        token
+    )
     return templates.TemplateResponse(
         "guest/question.html",
-        {
-            'request': request,
-            'numWords': words,
-            'count': count,
-            'score': score,
-            'progressPercent': progress_percent,
-            'content_box1': english,
-            'token': token,
-            'language': language,
-            'flag': FLAGS_DICT[language]
-        }
+        response_dict
     )
 
 
@@ -136,28 +97,17 @@ def load_interro_answer_guest(
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
     """
-    test = load_test_from_redis(token)
-    count = int(count)
-    index = test.interro_df.index[count - 1]
-    english = test.interro_df.loc[index][0]
-    french = test.interro_df.loc[index][1]
-    english = english.replace("'", "\'")
-    french = french.replace("'", "\'")
-    progress_percent = int(count / int(words) * 100)
+    response_dict = guest_api.load_interro_answer_guest(
+        request,
+        words,
+        count,
+        score,
+        token,
+        language
+    )
     return templates.TemplateResponse(
         "guest/answer.html",
-        {
-            "request": request,
-            "numWords": words,
-            "count": count,
-            "score": score,
-            "progressPercent": progress_percent,
-            "content_box1": english,
-            "content_box2": french,
-            'token': token,
-            'language': language,
-            'flag': FLAGS_DICT[language]
-        }
+        response_dict
     )
 
 
@@ -169,30 +119,8 @@ async def get_user_response_guest(
     """
     Acquire the user decision: was his answer right or wrong.
     """
-    test = load_test_from_redis(token)
-    score = data.get('score')
-    score = int(score)
-    if data["answer"] == 'Yes':
-        score += 1
-        test.update_voc_df(True)
-    elif data["answer"] == 'No':
-        test.update_voc_df(False)
-        test.update_faults_df(
-            False,
-            [
-                data.get('english'),
-                data.get('french')
-            ]
-        )
-    save_test_in_redis(test, token)
-    return JSONResponse(
-        content=
-        {
-            'score': score,
-            'message': "User response stored successfully.",
-            'token': token
-        }
-    )
+    json_response = guest_api.get_user_response_guest(data, token)
+    return json_response
 
 
 @guest_router.get("/propose-rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
@@ -207,27 +135,17 @@ def propose_rattraps_guest(
     """
     Load a page that proposes the user to take a rattraps, or leave the test.
     """
-    test = load_test_from_redis(token)
-    # Réinitialisation
-    new_count = 0
-    new_score = 0
-    new_words = test.faults_df.shape[0]
-    test.interro_df = test.faults_df
-    test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
-    save_test_in_redis(test, token)
+    response_dict = guest_api.propose_rattraps_guest(
+        request,
+        words,
+        count,
+        score,
+        token,
+        language
+    )
     return templates.TemplateResponse(
         "guest/rattraps.html",
-        {
-            'request': request,
-            'score': score,
-            'numWords': words,
-            'count': count,
-            'newScore': new_score,
-            'newWords': new_words,
-            'newCount': new_count,
-            'token': token,
-            'language': language
-        }
+        response_dict
     )
 
 
@@ -242,12 +160,13 @@ def end_interro_guest(
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performance.
     """
+    response_dict = {
+        'request': request,
+        'score': score,
+        'numWords': words,
+        'token': token
+    }
     return templates.TemplateResponse(
         "guest/end.html",
-        {
-            'request': request,
-            'score': score,
-            'numWords': words,
-            'token': token
-        }
+        response_dict
     )
