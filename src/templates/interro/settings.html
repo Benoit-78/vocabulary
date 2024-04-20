@@ -2,6 +2,8 @@
 <html>
     
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuration</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
@@ -48,8 +50,8 @@
                     <option value="2">2</option>
                 </select>
             </div>
-
         </form>
+
         <div class="row">
             <button class="button" onclick="sendUserSettings(
                 `{{ token }}`,
@@ -58,6 +60,7 @@
                 document.getElementById('num-words').value
                 )">Start Test</button>
         </div>
+
         <div class="row">
             <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
         </div>

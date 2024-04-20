@@ -25,7 +25,6 @@ from starlette.requests import Request
 
 from src.routers import user_router, interro_router, guest_router, database_router, dashboard_router
 from src.api import authentication
-from src.api import main as main_api
 
 app = FastAPI(
     title="vocabulary",
@@ -79,7 +78,7 @@ def sign_in(
     """
     Call the sign-in page.
     """
-    name_message, password_message = main_api.get_error_messages(error_message)
+    name_message, password_message = authentication.get_error_messages(error_message)
     return templates.TemplateResponse(
         "user/sign_in.html",
         {
