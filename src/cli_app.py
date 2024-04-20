@@ -29,10 +29,7 @@ def cli_main():
         'cli',
         'Zhongwen'
     )
-    loader = interro.Loader(
-        user.settings.rattraps,
-        data_handler_
-    )
+    loader = interro.Loader(data_handler_)
     loader.load_tables()
     # WeuuAaaInterrooo !!!
     guesser = views_local.CliGuesser()

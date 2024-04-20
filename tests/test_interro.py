@@ -7,6 +7,7 @@
         Test script for interro.py, main script of vocabulary application
 """
 
+import argparse
 import os
 import sys
 import unittest
@@ -26,65 +27,123 @@ from src.data import data_handler
 
 
 
-class TestParser(unittest.TestCase):
-    """Tests on arguments parser."""
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
-        cls.user = interro.CliUser()
+class TestCliUser(unittest.TestCase):
+    """
+    Tests on arguments parser.
+    """
+    def setUp(self):
+        self.user = interro.CliUser()
 
-    # def test_parse_arguments(self):
-    #     """The method should store three arguments."""
-        # with unittest.mock.patch('argparse.ArgumentParser.parse_args') as mock_parse_args:
-        #     self.user.parse_arguments([])
-        #     mock_parse_args.assert_called_with(
-        #         [
-        #             '-t', 'version',
-        #             '-w', '10',
-        #             '-r', '2'
-        #         ]
-        #     )
-        # ### Happy paths
-        # # Test case 1: Valid arguments provided
-        # args = [
-        #     '--type', 'version',
-        #     '--words', '100',
-        #     '--rattraps', '1'
-        # ]
-        # self.user.parse_arguments(args)
-        # assert isinstance(self.user.settings, dict)
-        # # Test case 2: Only required argument provided
-        # args = ['-t', 'theme']
-        # result = self.user.parse_arguments(args)
-        # assert isinstance(result, argparse.Namespace)
-        # assert result.type == 'theme'
-        # assert result.rattraps is None
-        # ### Sad paths
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_parse_arguments_default(self, mock_parse_args):
+        """
+        The method should store three arguments.
+        """
+        # ----- ARRANGE
+        args = []
+        # ----- ACT
+        self.user.parse_arguments(args)
+        # ----- ASSERT
+        mock_parse_args.assert_called_with(
+            [
+                '-t', 'version',
+                '-w', '10',
+                '-r', '2'
+            ]
+        )
 
-    # def test_get_settings(self):
-    #     """Should save the user's settings as attributes."""
-        # ### Happy paths
-        # # Test case 1
-        # for test_kind in ['version', 'theme']:
-        #     args = argparse.Namespace(type=test_kind, words=100, rattraps=1)
-        #     result = interro.check_args(args)
-        #     assert result == args
-        # ### Sad paths
-        # # Test case 2
-        # args = argparse.Namespace(type=None, words=10, rattraps=10)
-        # with pytest.raises(SystemExit):
-        #     interro.check_args(args)
-        # # Test case 3
-        # args = argparse.Namespace(type='', words=10, rattraps=1)
-        # with pytest.raises(SystemExit):
-        #     expected_output = "# ERROR   | Please give a test type: either version or theme"
-        #     with StringIO() as output:
-        #         interro.check_args(args)
-        #         self.assertEqual(output.getvalue(), expected_output)
-        # # Test case 4
-        # args = argparse.Namespace(type="invalid", words=10, rattraps=1)
-        # with pytest.raises(SystemExit):
-        #     interro.check_args(args)
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_arguments_all(self, mock_parse_args):
+        """
+        Test case 1: Valid arguments provided
+        """
+        # ----- ARRANGE
+        args = [
+            '--type', 'version',
+            '--words', '100',
+            '--rattraps', '1'
+        ]
+        # ----- ACT
+        self.user.parse_arguments(args)
+        # ----- ASSERT
+        mock_parse_args.assert_called_with(
+            [
+                '--type', 'version',
+                '--words', '100',
+                '--rattraps', '1',
+                '-t', 'version',
+                '-w', '10',
+                '-r', '2'
+            ]
+        )
+
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_arguments_required_only(self, mock_parse_args):
+        """
+        Test case 2: Only required argument provided
+        """
+        # ----- ARRANGE
+        args = ['-t', 'theme']
+        # ----- ACT
+        self.user.parse_arguments(args)
+        # ----- ASSERT
+        mock_parse_args.assert_called_with(
+            [
+                '-t', 'theme',
+                '-w', '10',
+                '-r', '2'
+            ]
+        )
+
+    @patch('src.interro.sys.argv', ['interro.py', '-t', '', '-w', '100', '-r', '1'])
+    @patch('src.interro.logger')
+    def test_get_settings_error_1(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        message = ' '.join([
+            "Please give",
+            "-t <test type>, ",
+            "-w <number of words> and ",
+            "-r <number of rattraps>"
+        ])
+        mock_logger.error.assert_called_with(message)
+
+    @patch('src.interro.sys.argv', ['interro.py', '-t', 'mock_type', '-w', '100', '-r', '1'])
+    @patch('src.interro.logger')
+    def test_get_settings_error_2(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        mock_logger.error.assert_called_with("Test type must be either version or theme")
+
+    @patch('src.interro.sys.argv', ['interro.py', '-t', 'version', '-w', '100', '-r', '-2'])
+    @patch('src.interro.logger')
+    def test_get_settings_rattraps_negative(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        mock_logger.error.assert_called_with(
+            "Number of rattraps must be greater than -1."
+        )
+
+    @patch('src.interro.sys.argv', ['interro.py', '-t', 'version', '-w', '-100', '-r', '1'])
+    @patch('src.interro.logger')
+    def test_get_settings_words_negative(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        mock_logger.error.assert_called_with(
+            "Number of words must be greater than 0."
+        )
 
 
 
@@ -92,35 +151,72 @@ class TestLoader(unittest.TestCase):
     """
     The Loader class should interact with database interfaces, such as CsvHandler or MariaDBHandler.
     """
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
-        # Arrange
-        cls.user = interro.CliUser()
-        cls.user.parse_arguments(['-t', 'version'])
-        cls.data_manipulator = data_handler.DbManipulator(
-            user_name='test_user',
-            db_name='test_db',
-            test_type='test_type'
+    def setUp(self):
+        self.test_type = 'mock_test_type'
+        self.data_manipulator = data_handler.DbManipulator(
+            user_name='mock_user_name',
+            db_name='mock_db_name',
+            test_type=self.test_type
         )
-        cls.loader = None
+        self.loader = interro.Loader(self.data_manipulator)
 
-    def test_load_tables(self):
-        """Input should be a dataframe, and it should be added a query column"""
-        # Arrange
-        # Act
-        self.loader = interro.Loader(
-            self.user.settings.rattraps,
-            self.data_manipulator
-        )
-        # Assert
+    def test_init(self):
+        """
+        Test the constructor.
+        """
+        # ----- ARRANGE
+        # ----- ACT
+        # ----- ASSERT
+        self.assertEqual(hasattr(self.loader, 'test_type'), True)
+        self.assertEqual(hasattr(self.loader, 'data_handler'), True)
+        self.assertEqual(hasattr(self.loader, 'tables'), True)
+        self.assertEqual(hasattr(self.loader, 'output_table'), True)
+        self.assertEqual(self.loader.test_type, self.test_type)
+        self.assertEqual(self.loader.data_handler, self.data_manipulator)
+        self.assertEqual(self.loader.tables, {})
+        self.assertEqual(self.loader.output_table, '')
+
+    @patch('src.data.data_handler.DbManipulator.get_tables')
+    def test_load_tables(self, mock_get_tables):
+        """
+        Input should be a dataframe, and it should be added a query column.
+        """
+        # ----- ARRANGE
+        voc = self.loader.test_type + '_voc'
+        mock_get_tables.return_value = {
+            voc: pd.DataFrame({
+                'creation_date': ['2022-01-01', '2022-02-01'],
+                'taux': [0.5, 0.34],
+                'bad_word': [0, 1]
+            })
+        }
+        # ----- ACT
+        self.loader.load_tables()
+        # ----- ASSERT
         for table in self.loader.tables.values():
             self.assertIn('creation_date', list(table.columns))
             self.assertIn('query', list(table.columns))
-            self.assertEqual(table[table.columns[0]].dtype, object)
-            self.assertEqual(table[table.columns[1]].dtype, object)
             self.assertEqual(table['taux'].dtype, np.float64)
             self.assertGreater(table.shape[0], 1)
+
+    @patch('src.data.data_handler.DbManipulator.get_tables')
+    def test_load_tables_no_bad_word_column(self, mock_get_tables):
+        """
+        Input should be a dataframe, and it should be added a query column.
+        """
+        # ----- ARRANGE
+        voc = self.loader.test_type + '_voc'
+        mock_get_tables.return_value = {
+            voc: pd.DataFrame({
+                'creation_date': ['2022-01-01', '2022-02-01'],
+                'taux': [0.5, 0.34],
+            })
+        }
+        # ----- ACT
+        self.loader.load_tables()
+        # ----- ASSERT
+        for table in self.loader.tables.values():
+            self.assertIn('bad_word', list(table.columns))
 
 
 
@@ -139,10 +235,7 @@ class TestTest(unittest.TestCase):
             db_name='test_db',
             test_type='test_type'
         )
-        cls.loader_1 = interro.Loader(
-            cls.user_1.settings.rattraps,
-            cls.data_handler_1
-        )
+        cls.loader_1 = interro.Loader(cls.data_handler_1)
 
     def setUp(self):
         df = pd.DataFrame(columns=['english', 'français'])
@@ -326,21 +419,36 @@ class TestTest(unittest.TestCase):
         self.assertLess(new_row['taux'], old_row['taux'])
         self.assertEqual(new_row['query'], old_row['query'] + 1)
 
-    @patch('src.interro.Test.update_voc_df')
+    @patch('src.views_local.CliGuesser.guess_word')
     @patch('src.interro.Test.update_faults_df')
-    def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df):
-        """Should ask a series of guesses to the user."""
-        # Arrange
-        mock_guess_word = MagicMock(return_value=True)
-        self.interro_1.guesser.guess_word = mock_guess_word
-        # Act
+    @patch('src.interro.Test.update_voc_df')
+    def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df, mock_guess_word):
+        # ----- ARRANGE
+        self.interro_1.interro_df = pd.DataFrame(
+            {
+                'english': ['Hello'],
+                'français': ['Bonjour']
+            },
+            index=[1]
+        )
+        mock_update_voc_df.return_value = True
+        mock_update_faults_df.return_value = True
+        mock_guess_word.return_value = 'Bonjour'
+        # ----- ACT
         self.interro_1.ask_series_of_guesses()
-        # Assert
-        self.assertEqual(mock_guess_word.call_count, len(self.interro_1.interro_df))
-        for _, index in enumerate(self.interro_1.interro_df.index):
-            row = list(self.interro_1.interro_df.loc[index])
-            mock_update_voc_df.assert_any_call(True)
-            mock_update_faults_df.assert_any_call(True, row)
+        # ----- ASSERT
+        mock_guess_word.assert_called_once_with(
+            ['Hello', 'Bonjour'],
+            1,
+            self.interro_1.words
+        )
+        mock_update_voc_df.assert_called_once_with(
+            'Bonjour'
+        )
+        mock_update_faults_df.assert_called_once_with(
+            'Bonjour',
+            ['Hello', 'Bonjour']
+        )
 
     def test_compute_success_rate(self):
         """Based on the user's guesses and the umber of words asked, a success rate is computed."""
@@ -376,7 +484,111 @@ class TestTest(unittest.TestCase):
 
 
 class TestRattrap(unittest.TestCase):
-    """Tests on Rattrap class methods."""
+    """
+    Tests on Rattrap class methods.
+    """
+    def setUp(self):
+        self.faults_df = pd.DataFrame({
+            'english': [1, 2, 3],
+            'français': [4, 5, 6]
+        })
+        self.rattraps = 10
+        self.guesser = MagicMock()
+        self.rattrap = interro.Rattrap(
+            self.faults_df,
+            self.rattraps,
+            self.guesser
+        )
+
+    def test_init(self):
+        """
+        The constructor should create a Rattrap object.
+        """
+        # ----- ARRANGE
+        # ----- ACT
+        # ----- ASSERT
+        # Verify superclass constructor call
+        pd.testing.assert_frame_equal(self.rattrap.words_df, self.faults_df)
+        self.assertEqual(self.rattrap.words, self.faults_df.shape[0])
+        self.assertEqual(self.rattrap.guesser, self.guesser)
+        # Verify attribute initialization
+        pd.testing.assert_frame_equal(self.rattrap.words_df, self.faults_df)
+        self.assertEqual(self.rattrap.rattraps, self.rattraps)
+        pd.testing.assert_frame_equal(self.rattrap.interro_df, self.faults_df)
+
+    def test_run_2(self):
+        # ----- ARRANGE
+        self.rattrap.set_row = MagicMock()
+        self.rattrap.guesser.guess_word = MagicMock(return_value='guessed_word')
+        self.rattrap.update_faults_df = MagicMock()
+        self.rattrap.words_df = pd.DataFrame(
+            {
+                'col1': [1, 2, 3],
+                'col2': [4, 5, 6]
+            }
+        )
+        self.rattrap.faults_df = pd.DataFrame(
+            {
+                'col1': [1, 2, 3],
+                'col2': [4, 5, 6]
+            }
+        )
+        # ----- ACT
+        self.rattrap.run()
+        # ----- ASSERT
+        self.assertEqual(
+            self.rattrap.set_row.call_count,
+            self.rattrap.words_df.shape[0]
+        )
+        self.assertEqual(
+            self.rattrap.guesser.guess_word.call_count,
+            self.rattrap.words_df.shape[0]
+        )
+        self.assertEqual(
+            self.rattrap.update_faults_df.call_count,
+            self.rattrap.words_df.shape[0]
+        )
+        self.assertEqual(len(self.rattrap.faults_df), 0)
+
+    def test_start_loop(self):
+        """
+        The method should run the test as many times as necessary
+        to go through all the words.
+        """
+        # ----- ARRANGE
+        self.rattrap.rattraps = -1
+        self.rattrap.words_df = pd.DataFrame({
+            'mock_column': [1, 2, 3]
+        })
+        old_length = self.rattrap.words_df.shape[0]
+        self.rattrap.run = MagicMock()
+        def side_effect():
+            self.rattrap.words_df = self.rattrap.words_df.iloc[1:]
+        self.rattrap.run.side_effect = side_effect
+        # ----- ACT
+        self.rattrap.start_loop()
+        # ----- ASSERT
+        assert self.rattrap.run.call_count == old_length
+
+    def test_start_loop_with_positive_rattraps(self):
+        """
+        Should run the test as many times as the number of rattraps.
+        """
+        # ----- ARRANGE
+        self.rattrap.rattraps = 2
+        self.rattrap.words_df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [4, 5, 6]})
+        self.rattrap.run = MagicMock()
+        # ----- ACT
+        self.rattrap.start_loop()
+        # ----- ASSERT
+        expected_calls = min(
+            self.rattrap.rattraps,
+            len(self.rattrap.words_df)
+        )
+        self.assertEqual(
+            self.rattrap.run.call_count,
+            expected_calls
+        )
 
 
 
@@ -387,19 +599,16 @@ class TestUpdater(unittest.TestCase):
     - flag bad words;
     - and remove good words.
     """
-    @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
-        rattraps = 1
-        cls.user_1 = interro.CliUser()
-        cls.user_1.parse_arguments(['-t', 'version'])
-        cls.data_handler_1 = data_handler.DbManipulator(
+    def setUp(self):
+        self.user_1 = interro.CliUser()
+        self.user_1.parse_arguments(['-t', 'version'])
+        self.data_handler_1 = data_handler.DbManipulator(
             user_name='test_user',
             db_name='test_db',
-            test_type=cls.user_1.settings.type
+            test_type=self.user_1.settings.type
         )
-        cls.loader_1 = interro.Loader(rattraps, cls.data_handler_1)
-        cls.loader_1.tables = {
+        self.loader_1 = interro.Loader(self.data_handler_1)
+        self.loader_1.tables = {
             'version_voc': pd.DataFrame(
                 columns=[
                     'id_word',
@@ -437,21 +646,18 @@ class TestUpdater(unittest.TestCase):
                 ]
             )
         }
-
-    def setUp(self):
-        """Runs before each test"""
-        df = pd.DataFrame(columns=['english', 'français'])
-        df.loc[df.shape[0]] = ['Hello', 'Bonjour']
-        df.loc[df.shape[0]] = ['One', 'Un']
-        df.loc[df.shape[0]] = ['Two', 'Deux']
-        df.loc[df.shape[0]] = ['Three', 'Trois']
-        df.loc[df.shape[0]] = ['Four', 'Quatre']
-        df.loc[df.shape[0]] = ['Cinq', 'Cinq']
-        df.loc[df.shape[0]] = ['Six', 'Six']
-        df.loc[df.shape[0]] = ['Seven', 'Sept']
-        df.loc[df.shape[0]] = ['Eight', 'Huit']
-        df.loc[df.shape[0]] = ['Nine', 'Neuf']
-        df.loc[df.shape[0]] = ['Ten', 'Dix']
+        df = pd.DataFrame({
+            'english':
+            [
+                'Hello', 'One', 'Two', 'Three', 'Four', 'Five',
+                'Six', 'Seven', 'Eight', 'Nine', 'Ten'
+            ],
+            'français':
+            [
+                'Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq',
+                'Six', 'Sept', 'Huit', 'Neuf', 'Dix'
+            ]
+        })
         df['query'] = [0] * df.shape[0]
         df['nb'] = [0] * df.shape[0]
         df['score'] = [0] * df.shape[0]
@@ -600,29 +806,33 @@ class TestUpdater(unittest.TestCase):
         last_perf = last_perf['test']
         self.assertEqual(last_perf, self.updater_1.interro.perf)
 
-    def test_save_words_count(self):
-        """Save the number of words recorded on the current date."""
-        # Arrange
-        self.updater_1.loader.data_handler.save_table = MagicMock()
-        word_cnt_df = pd.DataFrame(columns=['test_date', 'words_count'])
-        word_cnt_df.loc[word_cnt_df.shape[0]] = ["2022-01-01", 1876]
-        word_cnt_df.loc[word_cnt_df.shape[0]] = ["2022-02-01", 2341]
-        self.updater_1.interro.word_cnt_df = word_cnt_df
+    @patch('src.data.data_handler.DbManipulator.save_table')
+    def test_save_words_count(self, mock_save_table):
+        """
+        Save the number of words recorded on the current date.
+        """
+        # ----- ARRANGE
+        self.updater_1.interro.word_cnt_df = pd.DataFrame({
+            'test_date': ['2022-01-01', '2022-02-01'],
+            'nb': [1876, 2341]
+        })
         old_shape = self.updater_1.interro.word_cnt_df.shape
-        # Act
+        mock_save_table.return_value = True
+        # ----- ACT
         self.updater_1.save_words_count()
+        # ----- ASSERT
         new_shape = self.updater_1.interro.word_cnt_df.shape
-        # Assert
         self.assertEqual(new_shape[0], old_shape[0] + 1)
-        self.assertEqual(new_shape[1], old_shape[1] + 1)
+        self.assertEqual(new_shape[1], old_shape[1])
         self.updater_1.loader.data_handler.save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_words_count',
             self.updater_1.interro.word_cnt_df
         )
+        logger.debug(f"A very strange table: \n{self.updater_1.interro.word_cnt_df}")
         last_count = self.updater_1.interro.word_cnt_df.loc[
             self.updater_1.interro.word_cnt_df.shape[0] - 1
         ]
-        last_count = last_count['words_count']
+        last_count = last_count['nb']
         self.assertEqual(last_count, self.updater_1.interro.words_df.shape[0])
 
     @patch.object(interro.Updater, 'move_good_words')

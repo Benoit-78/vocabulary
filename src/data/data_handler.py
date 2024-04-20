@@ -80,9 +80,16 @@ class DbController(DbInterface):
             )
             connection.commit()
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno in [1396, 1973]:
+                logger.error(f"User '{user_name}' already exists.")
+                result = False
+            elif err.errno == -1:
+                logger.error(f"Mock error")
+                result = False
+            else:
+                logger.error(f"Error number: {err.errno}")
+                logger.error(err)
         finally:
             cursor.close()
             connection.close()
@@ -458,7 +465,6 @@ class DbManipulator(DbInterface):
             request_1 = f"INSERT INTO {self.db_name}.{words_table_name}"
             request_2 = "(english, français, creation_date, nb, score, taux)"
             request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
-            # Execute request
             cursor.execute(' '.join([request_1, request_2, request_3]))
             connection.commit()
             result = True
@@ -480,18 +486,17 @@ class DbManipulator(DbInterface):
         request_2 = f"FROM {self.db_name}.{words_table_name}"
         request_3 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2, request_3])
-        logger.debug(f"{self.db_name}.{words_table_name}")
         # Execute request
         try:
-            connection, cursor = self.get_db_cursor()
             request_result = cursor.execute(sql_request)
             request_result = cursor.fetchall()
-            logger.debug(f"request_result: {request_result}")
             english, native, score = request_result[0]
             result = (english, native, score)
         except IndexError:
             result = None
-        # cursor.close()
+        except ValueError:
+            result = None
+        cursor.close()
         connection.close()
         return result
 
@@ -501,7 +506,7 @@ class DbManipulator(DbInterface):
         """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = f"UPDATE {words_table_name}"
+        request_1 = f"UPDATE {self.db_name }.{words_table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
@@ -519,7 +524,7 @@ class DbManipulator(DbInterface):
         """
         # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = f"DELETE FROM {words_table_name}"
+        request_1 = f"DELETE FROM {self.db_name}.{words_table_name}"
         request_2 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2])
         # Execute request

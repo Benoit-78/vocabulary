@@ -36,7 +36,9 @@ class CliUser():
         self.settings = None
 
     def parse_arguments(self, arg: List[str]) -> argparse.Namespace:
-        """Parse command line argument"""
+        """
+        Parse command line argument.
+        """
         another_parser = argparse.ArgumentParser()
         another_parser.add_argument("-t", "--type", type=str)
         another_parser.add_argument("-w", "--words", type=int)
@@ -52,8 +54,10 @@ class CliUser():
             arg.append('2')
         self.settings = another_parser.parse_args(arg)
 
-    def get_settings(self) -> argparse.Namespace:
-        """Check the kind of interro, version or theme"""
+    def get_settings(self):
+        """
+        Check the kind of interro, version or theme.
+        """
         self.parse_arguments(sys.argv[1:])
         cond_1 = not self.settings.type
         cond_2 = not self.settings.words
@@ -66,9 +70,6 @@ class CliUser():
                 "-r <number of rattraps>"
             ])
             logger.error(message)
-            raise SystemExit
-        if self.settings.type == '':
-            logger.error("Please give a test type: either version or theme")
             raise SystemExit
         if self.settings.type not in ['version', 'theme']:
             logger.error("Test type must be either version or theme")
@@ -86,12 +87,11 @@ class Loader():
     """
     Data loader.
     """
-    def __init__(self, rattraps, data_handler_):
+    def __init__(self, data_handler_):
         """
         Must be done in the same session than the interroooo is launched.
         """
         self.test_type = data_handler_.test_type
-        self.rattraps = rattraps
         self.data_handler = data_handler_
         self.tables = {}
         self.output_table = ''
@@ -136,7 +136,9 @@ class Interro(ABC):
         """Launch the interroooo !!!!"""
 
     def set_row(self) -> pd.DataFrame:
-        """Get the row of the word to be asked"""
+        """
+        Get the row of the word to be asked
+        """
         mot_etranger = self.words_df.loc[self.index, self.words_df.columns[0]]
         mot_natal = self.words_df.loc[self.index, self.words_df.columns[1]]
         self.row = [self.index, mot_etranger, mot_natal]
@@ -282,7 +284,9 @@ class Rattrap(Interro):
         self.interro_df = faults_df_.copy()
 
     def run(self):
-        """Launch a rattrapage"""
+        """
+        Launch a rattraps.
+        """
         words_total = self.words_df.shape[0]
         for j in range(0, words_total):
             self.index = j
@@ -293,7 +297,9 @@ class Rattrap(Interro):
         self.faults_df.drop(self.faults_df.index, inplace=True)
 
     def start_loop(self):
-        """Start rattrapages loop."""
+        """
+        Start rattraps loop.
+        """
         if self.rattraps == -1:
             while self.words_df.shape[0] > 0:
                 self.run()
@@ -423,23 +429,13 @@ class Updater():
                 'test_date': datetime.today().date().strftime('%Y-%m-%d'),
                 'nb': self.interro.words_df.shape[0]
             },
-            index=[count_before + 1]
+            index=[count_before]
         )
-        self.interro.word_cnt_df = self.interro.word_cnt_df.reset_index()
-        # logger.debug(f"self.interro.word_cnt_df: \n{self.interro.word_cnt_df.head()}")
-        # logger.debug(f"new_row: \n{new_row}")
-        self.interro.word_cnt_df = pd.concat(
-            [
-                self.interro.word_cnt_df,
-                new_row
-            ]
-        )
-        # logger.debug(f"self.interro.word_cnt_df: \n{self.interro.word_cnt_df.head()}")
+        self.interro.word_cnt_df = pd.concat([
+            self.interro.word_cnt_df,
+            new_row
+        ])
         self.interro.word_cnt_df.sort_index(inplace=True)
-        self.interro.word_cnt_df.reset_index(
-            inplace=True,
-            names=['id_test']
-        )
         self.loader.data_handler.save_table(
             self.loader.test_type + '_words_count',
             self.interro.word_cnt_df

@@ -20,46 +20,108 @@ class TestCliGuesser(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        """Run once before all tests."""
         cls.guesser = views_local.CliGuesser()
         cls.row = [
             "How fast is an African swallow?",
             "A quelle vitesse vole une mouette africaine ?"
         ]
 
-    @patch('tkinter.messagebox.showinfo', return_value=True)
-    def test_ask_word(self, mock_showinfo):
-        """Should ask the user a translation for the word proposed to him."""
-        # Arrange
+    @patch('src.views_local.messagebox.showinfo')
+    def test_ask_word(self, mock_show_info):
+        """
+        Should ask the user a translation for the word proposed to him.
+        """
+        # ----- ARRANGE
         title = "Test Title"
-        # Act
+        mock_show_info.return_value = True
+        # ----- ACT
         self.guesser.ask_word(self.row, title)
-        # Assert
-        mock_showinfo.assert_called_with(
+        # ----- ASSERT
+        mock_show_info.assert_called_with(
             title=title,
             message=f"Quelle traduction donnez-vous pour : {self.row[0]}?"
         )
 
-    @patch('tkinter.messagebox.showinfo', return_value=False)
-    @patch('builtins.print')
-    @patch('builtins.exit')
-    def test_ask_word_user_interrupt(self, mock_print, mock_exit, mock_showinfo):
-        """User should be able to interrupt the test at anytime."""
-        # Arrange
+    @patch('tkinter.messagebox.showinfo')
+    @patch('src.views_local.logger')
+    def test_ask_word_user_interrupt(self, mock_logger, mock_show_info):
+        """
+        User should be able to interrupt the test at anytime.
+        """
+        # ----- ARRANGE
         title = "Test Title"
+        mock_show_info.return_value = False
+        # ----- ACT
         with self.assertRaises(SystemExit):
-            # Act
             self.guesser.ask_word(self.row, title)
-            # Assert that the appropriate messages are printed
-            mock_print.assert_called_with("Interruption by user")
-            mock_exit.assert_called_once()
+        # ----- ASSERT
+        mock_logger.error.assert_called_once_with("Interruption by user")
 
-    @patch('tkinter.messagebox.showinfo', return_value=True)
-    def test_guess_word(self, mock_showinfo):
-        # Arrange
+    @patch('src.views_local.messagebox.askyesnocancel')
+    def test_get_user_answer(self, mock_ask_yes_no_cancel):
+        # ----- ARRANGE
+        title = "Test Title"
+        message = f"Voici la traduction correcte : \'{self.row[1]}\'. \nAviez-vous la bonne réponse ?"
+        mock_ask_yes_no_cancel.return_value = True
+        # ----- ACT
+        result = self.guesser.get_user_answer(self.row, title)
+        # ----- ASSERT
+        self.assertIsInstance(result, bool)
+        mock_ask_yes_no_cancel.assert_called_once_with(
+            title=title,
+            message=message
+        )
+
+    @patch('src.views_local.messagebox.askyesnocancel')
+    @patch('src.views_local.logger')
+    def test_get_user_answer_interrupt(self, mock_logger, mock_ask_yes_no_cancel):
+        # ----- ARRANGE
+        title = "Test Title"
+        message = f"Voici la traduction correcte : \'{self.row[1]}\'. \nAviez-vous la bonne réponse ?"
+        mock_ask_yes_no_cancel.return_value = None
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.guesser.get_user_answer(self.row, title)
+        # ----- ASSERT
+        mock_logger.error.assert_called_with("Interruption by user")
+        mock_ask_yes_no_cancel.assert_called_once_with(
+            title=title,
+            message=message
+        )
+
+    @patch('src.views_local.CliGuesser.get_user_answer')
+    @patch('src.views_local.CliGuesser.ask_word')
+    def test_guess_word(self, mock_ask_word, mock_get_user_answer):
+        # ----- ARRANGE
         i = 1
         words = 2
-        # Act
+        mock_ask_word.return_value = True
+        mock_get_user_answer.return_value = True
+        # ----- ACT
         result = self.guesser.guess_word(self.row, i, words)
-        # Assert
-        self.assertIsInstance(result, bool)
+        # ----- ASSERT
+        self.assertEqual(result, True)
+        mock_ask_word.assert_called_once()
+        mock_get_user_answer.assert_called_once_with(
+            self.row,
+            f"Word {i}/{words}"
+        )
+
+    @patch('src.views_local.CliGuesser.get_user_answer')
+    @patch('src.views_local.CliGuesser.ask_word')
+    def test_guess_word_error(self, mock_ask_word, mock_get_user_answer):
+        # ----- ARRANGE
+        i = 1
+        words = 2
+        mock_ask_word.return_value = True
+        mock_get_user_answer.return_value = False
+        # ----- ACT
+        result = self.guesser.guess_word(self.row, i, words)
+        # ----- ASSERT
+        self.assertEqual(result, False)
+        mock_ask_word.assert_called_once()
+        mock_get_user_answer.assert_called_once_with(
+            self.row,
+            f"Word {i}/{words}"
+        )
+

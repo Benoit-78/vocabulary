@@ -42,7 +42,7 @@ def load_test(
         test_type=test_type,
     )
     db_handler.check_test_type(test_type)
-    loader_ = interro.Loader(0, db_handler)
+    loader_ = interro.Loader(db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
     test_ = interro.Test(

@@ -168,14 +168,14 @@ class TestDbController(unittest.TestCase):
     #     mock_connection.close.assert_called_once()
 
     @patch('src.data.data_handler.mariadb')
-    def test_create_user_error_handling(self, mock_mariadb):
+    @patch('src.data.data_handler.DbController.get_db_cursor')
+    def test_create_user_error_handling(self, mock_get_db_cursor, mock_mariadb):
         # Arrange
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
-        mock_mariadb.connect.return_value = mock_connection
-        # mock_connection.cursor.return_value = mock_cursor
-        mock_cursor.execute.side_effect = mariadb.Error("Mock error")
-        mock_mariadb.connect.cursor.return_value = mock_cursor
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_connection.commit.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         # Act
         result = self.db_controller.create_user_in_mysql("test_user", "test_password")
         # Assert
@@ -299,8 +299,8 @@ class TestDbManipulator(unittest.TestCase):
         cls.user_name = 'benoit'
         cls.db_definer = data_handler.DbDefiner(cls.user_name)
         # Data manipulation
-        cls.table_name = 'version_voc'
         cls.db_name = 'english'
+        cls.table_name = cls.user_name + '_' + cls.db_name + '.' + 'version_voc'
         cls.test_type = 'version'
         cls.password = 'test_password'
         cls.db_manipulator = data_handler.DbManipulator(
@@ -387,25 +387,26 @@ class TestDbManipulator(unittest.TestCase):
         # Assert
         self.assertIsInstance(result, int)
         self.assertEqual(result, True)
-        sql_db_name = self.db_manipulator.db_name
-        mock_get_db_cursor.assert_called_once()
+        assert mock_get_db_cursor.call_count == 2
         english = test_row[0]
         native = test_row[1]
-        request_1 = f"INSERT INTO {sql_db_name}.{self.table_name}"
+        request_1 = f"INSERT INTO {self.table_name}"
         request_2 = "(english, français, creation_date, nb, score, taux)"
         request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2, request_3])
-        mock_cursor.execute.assert_called_once_with(sql_request)
-        mock_cursor.close.assert_called_once()
-        mock_connection.close.assert_called_once()
+        mock_cursor.execute.assert_called_with(sql_request)
+        assert mock_get_db_cursor.call_count == 2
+        assert mock_cursor.close.call_count == 2
+        assert mock_connection.close.call_count == 2
 
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
     def test_read_word(self, mock_get_db_cursor):
         # Arrange
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
-        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         mock_cursor.execute.return_value = [('test_english', 'test_french', 42)]
+        mock_cursor.fetchall.return_value = [('test_english', 'test_french', 42)]
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         english = self.words_df['english'][0]
         # Act
         result = self.db_manipulator.read_word(english)
@@ -415,6 +416,7 @@ class TestDbManipulator(unittest.TestCase):
         request_2 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.fetchall.assert_called_once()
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
         self.assertEqual(result, ('test_english', 'test_french', 42))
