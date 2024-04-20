@@ -8,10 +8,8 @@
 """
 
 import os
-import pickle
 import sys
 
-import redis
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -23,15 +21,10 @@ if REPO_DIR not in sys.path:
 from src import interro, views
 from src.api import authentication as auth_api
 from src.api import database as db_api
-from src.data import data_handler, users
+from src.data import data_handler
+from src.data import redis_interface
 from src.interro import Updater
 
-cred_checker = users.CredChecker()
-redis_db = redis.Redis(
-    host='localhost',
-    port=6379,
-    db=0
-)
 
 
 def load_test(
@@ -86,15 +79,19 @@ def save_interro_settings(
     """
     API function to save the interro settings.
     """
+    logger.info('african_swallow')
     user_name = auth_api.get_user_name_from_token(token)
+    db_name = settings.get('databaseName')
+    test_type = settings.get('testType').lower()
+    test_length = int(settings.get('numWords'))
     loader, test = load_test(
         user_name=user_name,
-        db_name=settings.get('db_name'),
-        test_type=settings.get('test_type'),
-        test_length=int(settings.get('numWords'))
+        db_name=db_name,
+        test_type=test_type,
+        test_length=test_length
     )
-    save_test_in_redis(test, token)
-    save_loader_in_redis(loader, token)
+    redis_interface.save_test_in_redis(test, token)
+    redis_interface.save_loader_in_redis(loader, token)
     return JSONResponse(
         content=
         {
@@ -124,7 +121,7 @@ def get_interro_question(
         score = int(score)
     except NameError:
         score = 0
-    test = load_test_from_redis(token)
+    test = redis_interface.load_test_from_redis(token)
     progress_percent = int(count / int(total) * 100)
     index = test.interro_df.index[count]
     english = test.interro_df.loc[index][0]
@@ -154,7 +151,7 @@ def load_interro_answer(
     Load the interro answer.
     """
     count = int(count)
-    test = load_test_from_redis(token)
+    test = redis_interface.load_test_from_redis(token)
     progress_percent = int(count / int(total) * 100)
     index = test.interro_df.index[count - 1]
     english = test.interro_df.loc[index][0]
@@ -181,7 +178,7 @@ def get_user_response(
     """
     Get the user response.
     """
-    test = load_test_from_redis(token)
+    test = redis_interface.load_test_from_redis(token)
     score = data.get('score')
     score = int(score)
     if data["answer"] == 'Yes':
@@ -198,7 +195,7 @@ def get_user_response(
         )
     if not hasattr(test, 'rattraps'):
         test.update_voc_df(update)
-    save_test_in_redis(test, token)
+    redis_interface.save_test_in_redis(test, token)
     json_response = JSONResponse(
         content=
         {
@@ -218,12 +215,12 @@ def propose_rattraps(
     """
     Propose the rattraps.
     """
-    test = load_test_from_redis(token)
+    test = redis_interface.load_test_from_redis(token)
     new_total = test.faults_df.shape[0]
     # Enregistrer les résultats
     if not hasattr(test, 'rattraps'):
         test.compute_success_rate()
-        loader = load_loader_from_redis(token)
+        loader = redis_interface.load_loader_from_redis(token)
         updater = Updater(loader, test)
         updater.update_data()
         logger.info("User data updated.")
@@ -248,7 +245,7 @@ def load_rattraps(
     """
     Load the rattraps!
     """
-    test = load_test_from_redis(token)
+    test = redis_interface.load_test_from_redis(token)
     count = int(data.get('count'))
     total = int(data.get('total'))
     score = int(data.get('score'))
@@ -262,7 +259,7 @@ def load_rattraps(
         rattraps_cnt,
         guesser
     )
-    save_test_in_redis(rattrap, token)
+    redis_interface.save_test_in_redis(rattrap, token)
     message = "Rattraps created successfully"
     return JSONResponse(
         content=
@@ -285,11 +282,12 @@ def end_interro(
     """
     End the interro.
     """
-    test = load_test_from_redis(token)
+    logger.info("african_swallow")
+    test = redis_interface.load_test_from_redis(token)
     # Enregistrer les résultats
     if not hasattr(test, 'rattraps'):
         test.compute_success_rate()
-        loader = load_loader_from_redis(token)
+        loader = redis_interface.load_loader_from_redis(token)
         updater = Updater(loader, test)
         updater.update_data()
         logger.info("User data updated.")
@@ -300,39 +298,3 @@ def end_interro(
         "token": token
     }
     return response_dict
-
-
-
-
-def save_test_in_redis(test, token):
-    """
-    Save a test object in redis using token as key.
-    """
-    test = pickle.dumps(test)
-    redis_db.set(token  + '_test', test)
-
-
-def load_test_from_redis(token):
-    """
-    Load a test object from redis using token as key.
-    """
-    pickelized_test = redis_db.get(token + '_test')
-    test = pickle.loads(pickelized_test)
-    return test
-
-
-def save_loader_in_redis(loader, token):
-    """
-    Save a loader object in redis using token as key.
-    """
-    loader = pickle.dumps(loader)
-    redis_db.set(token + '_loader', loader)
-
-
-def load_loader_from_redis(token):
-    """
-    Load a test object from redis using token as key.
-    """
-    pickelized_loader = redis_db.get(token + '_loader')
-    loader = pickle.loads(pickelized_loader)
-    return loader

@@ -4,7 +4,7 @@ import os
 import sys
 
 import pandas as pd
-# from loguru import logger
+from loguru import logger
 from typing import Dict
 
 REPO_NAME = 'vocabulary'
@@ -12,7 +12,8 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from fastapi.responses import JSONResponse
-from src.api.interro import load_test, save_test_in_redis, load_test_from_redis
+from src.api.interro import load_test
+from src.data.redis_interface import save_test_in_redis, load_test_from_redis
 
 WORDS = 10
 
@@ -41,6 +42,7 @@ def load_guest_settings(request, token):
 
 
 def save_interro_settings_guest(language, token):
+    logger.debug('logs')
     language = language['language'].lower()
     test_type = 'version'
     _, test = load_test(
@@ -188,5 +190,21 @@ def propose_rattraps_guest(
         'newCount': new_count,
         'token': token,
         'language': language
+    }
+    return response_dict
+
+
+def end_interro_guest(
+        request,
+        score,
+        words,
+        token
+    ):
+    logger.info('african_swallow')
+    response_dict = {
+        'request': request,
+        'score': score,
+        'numWords': words,
+        'token': token
     }
     return response_dict

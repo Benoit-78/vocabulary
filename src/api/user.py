@@ -12,7 +12,7 @@ import sys
 from typing import Dict
 
 from fastapi.responses import JSONResponse
-# from loguru import logger
+from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -32,6 +32,7 @@ def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
+    logger.info('african_swallow')
     user_account = users.UserAccount(creds['input_name'])
     result = user_account.create_account(creds['input_password'])
     json_response = {}
@@ -64,7 +65,7 @@ def authenticate_user(
     """
     Authenticate the user.
     """
-    # Identify user
+    logger.info('african_swallow')
     users_list = auth_api.get_users_list()
     user = auth_api.authenticate_user(
         users_list,
@@ -104,6 +105,7 @@ def load_user_space(request, token) -> Dict:
     """
     Call the base page of user space.
     """
+    logger.info('african_swallow')
     user_name = auth_api.get_user_name_from_token(token)
     json_response = {
         'request': request,

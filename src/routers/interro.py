@@ -8,7 +8,7 @@
 import os
 import sys
 
-from loguru import logger
+# from loguru import logger
 from fastapi import Query, Request, Depends, Body
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
@@ -19,7 +19,6 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.interro import Updater
 from src.api import authentication as auth_api
 from src.api import interro as interro_api
 from src.data import users
@@ -76,10 +75,10 @@ def load_interro_question(
     """
     response_dict = interro_api.get_interro_question(
         request,
-        token,
         total,
         count,
-        score
+        score,
+        token
     )
     return templates.TemplateResponse(
         "interro/question.html",
@@ -101,10 +100,10 @@ def load_interro_answer(
     """
     request_dict = interro_api.load_interro_answer(
         request,
-        token,
         total,
         count,
-        score
+        score,
+        token
     )
     return templates.TemplateResponse(
         "interro/answer.html",
@@ -139,9 +138,9 @@ def propose_rattraps(
     """
     response_dict = interro_api.propose_rattraps(
         request,
-        token,
         total,
-        score
+        score,
+        token
     )
     return templates.TemplateResponse(
         "interro/rattraps.html",

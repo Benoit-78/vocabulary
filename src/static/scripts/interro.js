@@ -14,6 +14,9 @@ function goToInterroSettings(token) {
 
 
 function sendUserSettings(token, language, testType, numWords) {
+    console.log("Language:", language);
+    console.log("Test type:", testType);
+    console.log("Number of words:", numWords);
     fetch(
         `/interro/save-interro-settings?token=${token}`,
         {

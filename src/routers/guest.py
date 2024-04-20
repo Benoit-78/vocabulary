@@ -160,12 +160,12 @@ def end_interro_guest(
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performance.
     """
-    response_dict = {
-        'request': request,
-        'score': score,
-        'numWords': words,
-        'token': token
-    }
+    response_dict = guest_api.end_interro_guest(
+        request,
+        score,
+        words,
+        token
+    )
     return templates.TemplateResponse(
         "guest/end.html",
         response_dict

@@ -32,6 +32,7 @@ def get_user_dashboards(request, user_name, user_password, db_name):
     """
     Get the user dashboards.
     """
+    logger.info('african_swallow')
     graphs = load_graphs(user_name, user_password, db_name)
     request_dict = {
         "request": request,
