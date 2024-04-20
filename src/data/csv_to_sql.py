@@ -4,7 +4,7 @@ from loguru import logger
 
 
 # Read the CSV file into a DataFrame
-df = pd.read_excel('data/latin.xlsm')
+df = pd.read_csv('data/csv/version_voc.csv', sep=';')
 
 logger.debug(f"Table: \n{df.head()}")
 
@@ -27,7 +27,7 @@ table_name = 'version_voc'
 # with open('data/arabic.sql', 'w') as f:
 #     f.write('\n'.join(sql_inserts))
 
-with open('data/databases/latin.sql', 'w') as sql_file:
+with open('data/english_voc.sql', 'w') as sql_file:
     # Write the SQL insert statement for each row in the DataFrame
     for _, row in df.iterrows():
         values = ", ".join([
