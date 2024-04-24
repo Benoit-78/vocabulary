@@ -96,7 +96,7 @@ function sendUserAnswer(token, answer, count, numWords, score, content_box1, con
                 endInterro(token, numWords, count, score);
             }
         } else {
-            console.error("Error with user answer acquisition.");
+            console.error("Error with user answer acquisition");
         }
     })
     .catch(error => {

@@ -152,7 +152,7 @@ class Interro(ABC):
 
 
 
-class Test(Interro):
+class PremierTest(Interro):
     """
     First round!
     """

@@ -10,14 +10,14 @@
 import pickle
 import redis
 
-redis_db = redis.Redis(
+REDIS_DB = redis.Redis(
     host='localhost',
     port=6379,
     db=0
 )
 
 
-def save_test_in_redis(test, token):
+def save_test_in_redis(test, token, redis_db=REDIS_DB):
     """
     Save a test object in redis using token as key.
     """
@@ -25,7 +25,7 @@ def save_test_in_redis(test, token):
     redis_db.set(token  + '_test', test)
 
 
-def load_test_from_redis(token):
+def load_test_from_redis(token, redis_db=REDIS_DB):
     """
     Load a test object from redis using token as key.
     """
@@ -34,7 +34,7 @@ def load_test_from_redis(token):
     return test
 
 
-def save_loader_in_redis(loader, token):
+def save_loader_in_redis(loader, token, redis_db=REDIS_DB):
     """
     Save a loader object in redis using token as key.
     """
@@ -42,7 +42,7 @@ def save_loader_in_redis(loader, token):
     redis_db.set(token + '_loader', loader)
 
 
-def load_loader_from_redis(token):
+def load_loader_from_redis(token, redis_db=REDIS_DB):
     """
     Load a test object from redis using token as key.
     """

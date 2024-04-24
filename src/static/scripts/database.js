@@ -19,7 +19,7 @@ function chooseDatabase(token) {
     )
     .then(answer => answer.json())
     .then(data => {
-        if (data && data.message === "Database chosen successfully.") {
+        if (data && data.message === "Database chosen successfully") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
         } else if (data && data.message === `Database ${databaseName} name not available.`) {
             window.location.href = `/database/user-databases?token=${token}`;
@@ -49,7 +49,7 @@ function createDatabase(token) {
     )
     .then(response => response.json())
     .then(data => {
-        if (data && data.message === "Database created successfully.") {
+        if (data && data.message === "Database created successfully") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
         } else if (data && data.message === "Database name not available.") {
             window.location.href = `/database/user-databases?token=${token}`;
@@ -79,7 +79,7 @@ function deleteDatabase(token) {
     )
     .then(response => response.json())
     .then(data => {
-        if (data && data.message === "Database deleted successfully.") {
+        if (data && data.message === "Database deleted successfully") {
             window.location.href = `/database/list-databases?token=${token}`;
         } else {
             console.error("Error with the database deletion.");
@@ -108,7 +108,7 @@ function addWord(token, databaseName) {
     )
     .then(response => response.json())
     .then(data => {
-        if (data && data.message === "Word added successfully.") {
+        if (data && data.message === "Word added successfully") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
         } else if (data && data.message === "Word already exists") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}&errorMessage=${data.message}`;
@@ -154,7 +154,7 @@ function uploadCSV(token) {
         if (response.ok) {
             return response.text();
         }
-        throw new Error("Network response was not ok.");
+        throw new Error("Network response was not ok");
     })
     .then(data => {
         // Handle response from the server

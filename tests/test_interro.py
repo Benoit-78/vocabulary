@@ -220,7 +220,7 @@ class TestLoader(unittest.TestCase):
 
 
 
-class TestTest(unittest.TestCase):
+class TestPremierTest(unittest.TestCase):
     """
     The Interro class represents the concept of a test taken by the user.
     It should then be abstract.
@@ -259,7 +259,7 @@ class TestTest(unittest.TestCase):
         words = df.shape[0] //  2
         self.loader_1.tables['version_voc'] = df
         guesser = views_local.CliGuesser()
-        self.interro_1 = interro.Test(
+        self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,
             guesser
@@ -345,7 +345,7 @@ class TestTest(unittest.TestCase):
         if next_index != 1: # Case where the first next_index falls on 1
             self.assertNotEqual(former_index, next_index)
 
-    @patch.object(interro.Test, 'get_another_index', return_value=4)
+    @patch.object(interro.PremierTest, 'get_another_index', return_value=4)
     def test_get_next_index_if_bad_word(self, mock_get_another_index):
         """
         When the next index points to a bad word, the search should stop.
@@ -360,7 +360,7 @@ class TestTest(unittest.TestCase):
         mock_get_another_index.assert_called()
         assert mock_get_another_index.call_count == 1
 
-    @patch.object(interro.Test, 'get_another_index', return_value=4)
+    @patch.object(interro.PremierTest, 'get_another_index', return_value=4)
     def test_get_next_index_if_not_bad_word(self, mock_get_another_index):
         """
         When the next index points to a bad word, the search should run once again.
@@ -420,8 +420,8 @@ class TestTest(unittest.TestCase):
         self.assertEqual(new_row['query'], old_row['query'] + 1)
 
     @patch('src.views_local.CliGuesser.guess_word')
-    @patch('src.interro.Test.update_faults_df')
-    @patch('src.interro.Test.update_voc_df')
+    @patch('src.interro.PremierTest.update_faults_df')
+    @patch('src.interro.PremierTest.update_voc_df')
     def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df, mock_guess_word):
         # ----- ARRANGE
         self.interro_1.interro_df = pd.DataFrame(
@@ -463,9 +463,9 @@ class TestTest(unittest.TestCase):
         self.assertLess(self.interro_1.perf, 101)
         self.assertGreater(self.interro_1.perf, -1)
 
-    @patch.object(interro.Test, 'set_interro_df')
-    @patch.object(interro.Test, 'ask_series_of_guesses')
-    @patch.object(interro.Test, 'compute_success_rate')
+    @patch.object(interro.PremierTest, 'set_interro_df')
+    @patch.object(interro.PremierTest, 'ask_series_of_guesses')
+    @patch.object(interro.PremierTest, 'compute_success_rate')
     def test_run(
         self,
         mock_compute_success_rate,
@@ -667,7 +667,7 @@ class TestUpdater(unittest.TestCase):
         self.loader_1.tables['version_voc'] = df
         words = 10
         self.guesser = views_local.CliGuesser()
-        self.interro_1 = interro.Test(
+        self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,
             self.guesser,
@@ -694,7 +694,9 @@ class TestUpdater(unittest.TestCase):
         self.assertIsInstance(self.updater_1.good_words_df, pd.DataFrame)
 
     def test_copy_good_words(self):
-        """Should copy the well good words in the output table."""
+        """
+        Should copy the well good words in the output table.
+        """
         # Arrange
         good_words_df = pd.DataFrame(columns=['english', 'français', 'creation_date'])
         good_words_df.loc[good_words_df.shape[0]] = ['One', 'Un', '2023-01-01']

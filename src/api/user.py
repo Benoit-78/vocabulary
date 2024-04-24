@@ -101,7 +101,10 @@ def authenticate_user(
     return json_response
 
 
-def load_user_space(request, token) -> Dict:
+def load_user_space(
+        request,
+        token
+    ) -> Dict:
     """
     Call the base page of user space.
     """

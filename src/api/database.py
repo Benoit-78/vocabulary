@@ -53,9 +53,9 @@ def choose_database(data, token: str):
     Choose the given database.
     """
     logger.info('african_swallow')
-    db_name = data['db_name']
     user_name = auth_api.get_user_name_from_token(token)
     user_account = users.UserAccount(user_name)
+    db_name = data['db_name']
     db_exists = user_account.check_if_database_exists(db_name)
     if db_exists:
         json_response = JSONResponse(
@@ -80,8 +80,8 @@ def create_database(data: dict, token: str):
     """
     logger.info('african_swallow')
     user_name = auth_api.get_user_name_from_token(token)
-    db_name = data['db_name']
     user_account = users.UserAccount(user_name)
+    db_name = data['db_name']
     result = user_account.create_database(db_name)
     if result is False:
         json_response = JSONResponse(
@@ -148,11 +148,11 @@ def create_word(data: dict, token:str):
         )
     elif result is False:
         json_response = JSONResponse(
-            content={"message": "Error with the word creation."}
+            content={"message": "Error with the word creation"}
         )
     elif result is True:
         json_response =  JSONResponse(
-            content={"message": "Word added successfully."}
+            content={"message": "Word added successfully"}
         )
     return json_response
 
@@ -168,16 +168,16 @@ def delete_database(data: dict, token: str):
     result = user_account.remove_database(db_name)
     if result is False:
         json_response = JSONResponse(
-            content={"message": "Error with the database removal."}
+            content={"message": "Error with the database removal"}
         )
     if result is True:
         json_response = JSONResponse(
-            content={"message": "Database deleted successfully."}
+            content={"message": "Database deleted successfully"}
         )
     return json_response
 
 
-async def upload_csv(csv_file, token: str):
+async def load_csv(csv_file, token: str):
     """
     """
     if not csv_file.filename.endswith('.csv'):
@@ -191,7 +191,7 @@ async def upload_csv(csv_file, token: str):
             status_code=400,
             detail="Malicious code detected in the CSV file"
         )
-    add_to_database(csv_content.decode('utf-8'))
+    add_csv_to_database(csv_content.decode('utf-8'))
     response_dict = {
         'message': "CSV file uploaded successfully",
         'token': token
@@ -210,7 +210,7 @@ def is_malicious(csv_content):
     return False
 
 
-def add_to_database(csv_content):
+def add_csv_to_database(csv_content):
     """
     Add the CSV content to the database.
     """

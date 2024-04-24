@@ -112,15 +112,8 @@ def get_interro_question(
     API function to load the interro question.
     """
     user_name = auth_api.get_user_name_from_token(token)
-    # Check input consistency
-    try:
-        count = int(count)
-    except NameError:
-        count = 0
-    try:
-        score = int(score)
-    except NameError:
-        score = 0
+    count = int(count)
+    score = int(score)
     test = redis_interface.load_test_from_redis(token)
     progress_percent = int(count / int(total) * 100)
     index = test.interro_df.index[count]
@@ -225,7 +218,6 @@ def propose_rattraps(
         updater.update_data()
         logger.info("User data updated.")
     # Réinitialisation
-    logger.debug(f"New words: {new_total}")
     response_dict = {
         "request": request,
         "token": token,

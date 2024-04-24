@@ -28,21 +28,27 @@ DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
 
 
 class CredChecker():
-    """Class dedicated to the credentials checking process."""
+    """
+    Class dedicated to the credentials checking process.
+    """
     def __init__(self):
         self.name = ""
         self.password = ""
         self.db_controller = DbController()
 
     def check_input_name(self, name_to_check):
-        """Check if the input name belongs to the users list."""
+        """
+        Check if the input name belongs to the users list.
+        """
         users_list = self.db_controller.get_users_list_from_mysql()
         if name_to_check in users_list:
             return True
         return False
 
     def check_input_password(self, user_name, password_to_check):
-        """Check if the input password is correct."""
+        """
+        Check if the input password is correct.
+        """
         secrets = {
             'benoit': "vive la vie",
             'Donald Trump': "Make America Great Again",
@@ -72,7 +78,9 @@ class CredChecker():
         )
 
     def check_user_name(self, name_to_check):
-        """Validate user name."""
+        """
+        Validate user name.
+        """
         if name_to_check in [None, ""]:
             logger.warning("Input name is empty or somewhat sneaky.")
             self.flag_incorrect_user_name(name_to_check)
@@ -81,7 +89,9 @@ class CredChecker():
             self.flag_incorrect_user_name(name_to_check)
 
     def check_password(self, name_to_check, password_to_check):
-        """Validate user password."""
+        """
+        Validate user password.
+        """
         if password_to_check in [None, ""]:
             logger.warning("Input password is empty or somewhat sneaky.")
             self.flag_incorrect_user_password(name_to_check, password_to_check)
@@ -91,7 +101,9 @@ class CredChecker():
         logger.success("Password valid.")
 
     def check_credentials(self, name_to_check, password_to_check):
-        """Validate user credentials."""
+        """
+        Validate user credentials.
+        """
         self.check_user_name(name_to_check)
         self.check_password(name_to_check, password_to_check)
         logger.success(f"Access granted for {name_to_check}.")
@@ -104,7 +116,11 @@ class Account(ABC):
     - guest
     - user (free version)
     - customer (paid version)
-    - developer : architect, developer, tester and ops
+    - developer:
+        - architect,
+        - developer,
+        - tester,
+        - Ops (maintenance, monitoring, etc.)
     """
     def __init__(self):
         self.account_types = [
@@ -146,8 +162,8 @@ class UserAccount(Account):
         account_exists = self.check_if_account_exists()
         if account_exists:
             return False
-        db_controller = DbController()
         hash_password = auth_api.get_password_hash(password)
+        db_controller = DbController()
         db_controller.create_user_in_mysql(self.user_name, hash_password)
         db_controller.grant_privileges_on_common_database(self.user_name)
         db_controller.add_user_to_users_table(self.user_name, hash_password)
@@ -173,37 +189,32 @@ class UserAccount(Account):
         """
         Delete the user account.
         """
-        return None
 
     def log_in(self):
         """
         Enable the user to log in to his account.
         """
-        return None
 
     def log_out(self):
         """
         Enable the user to log out of his account.
         """
-        return None
 
     def update_name(self):
         """
         Change the name of the user.
         """
-        return None
 
     def update_password(self):
         """
         Change the password of the user.
         """
-        return None
 
     def create_database(self, db_name):
         """
         Add a database to the user's space.
         """
-        # Bad path
+        # Check
         database_already_exists = self.check_if_database_exists(db_name)
         if database_already_exists:
             return False
@@ -248,7 +259,7 @@ class UserAccount(Account):
         # Remove database
         db_definer = DbDefiner(self.user_name)
         db_dropped = db_definer.drop_database(db_name)
-        # Remove privileges of the user on the database (they're not removed automatically)
+        # Remove privileges of the user on the database, as they're not removed automatically
         db_controller = DbController()
         privileges_dropped = db_controller.revoke_privileges(self.user_name, db_name)
         return bool(db_dropped and privileges_dropped)
@@ -269,4 +280,3 @@ class UserAccount(Account):
         """
         Remove a couple of words from the user's database.
         """
-        return None

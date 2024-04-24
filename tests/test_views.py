@@ -10,7 +10,7 @@
 import os
 import sys
 import unittest
-# from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 # from loguru import logger
 
@@ -20,3 +20,67 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src import views
+
+
+
+class TestFastapiGuesser(unittest.TestCase):
+    def setUp(self):
+        self.fastapi_guesser = views.FastapiGuesser()
+
+    def test_ask_word(self):
+        """
+        Ask a word to the user
+        """
+        # ----- ARRANGE
+        row = ['1', 'word', 'mot']
+        # ----- ACT
+        result = self.fastapi_guesser.ask_word(row)
+        # ----- ASSERT
+        self.assertEqual(result, 'word')
+
+    def test_return_translation(self):
+        """
+        Return translation to the user
+        """
+        # ----- ARRANGE
+        row = ['1', 'word', 'mot']
+        # ----- ACT
+        result = self.fastapi_guesser.return_translation(row)
+        # ----- ASSERT
+        self.assertEqual(result, 'mot')
+
+    def test_get_user_answer(self):
+        """
+        Ask the user to decide if the answer was correct or not.
+        """
+        # ----- ARRANGE
+        # ----- ACT
+        result = self.fastapi_guesser.get_user_answer()
+        # ----- ASSERT
+        self.assertFalse(result)
+
+    @patch('src.views.FastapiGuesser.get_user_answer')
+    @patch('src.views.FastapiGuesser.return_translation')
+    @patch('src.views.FastapiGuesser.ask_word')
+    def test_guess_word(
+            self,
+            mock_ask_word,
+            mock_return_translation,
+            mock_get_user_answer
+        ):
+        """
+        Steps of the user's guessing process.
+        """
+        # ----- ARRANGE
+        row = ['1', 'word', 'mot']
+        i = 1
+        words = 10
+        mock_ask_word.return_value = True
+        mock_return_translation.return_value = True
+        mock_get_user_answer.return_value = True
+        # ----- ACT
+        self.fastapi_guesser.guess_word(row, i, words)
+        # ----- ASSERT
+        mock_ask_word.assert_called_once_with(row)
+        mock_return_translation.assert_called_once_with(row)
+        mock_get_user_answer.assert_called_once()

@@ -55,7 +55,7 @@ def save_interro_settings_guest(language, token):
     json_response = JSONResponse(
         content=
         {
-            'message': "Guest user settings stored successfully.",
+            'message': "Guest user settings stored successfully",
             'token': token
         }
     )
@@ -73,16 +73,10 @@ def load_interro_question_guest(
     """
     Load the interro question for the guest user.
     """
-    try:
-        count = int(count)
-    except NameError:
-        count = 0
-    try:
-        score = int(score)
-    except NameError:
-        score = 0
-    test = load_test_from_redis(token)
+    count = int(count)
+    score = int(score)
     progress_percent = int(count / int(words) * 100)
+    test = load_test_from_redis(token)
     index = test.interro_df.index[count]
     english = test.interro_df.loc[index][0]
     english = english.replace("'", "\'")
@@ -110,8 +104,9 @@ def load_interro_answer_guest(
         token,
         language
     ):
-    test = load_test_from_redis(token)
     count = int(count)
+    score = int(score)
+    test = load_test_from_redis(token)
     index = test.interro_df.index[count - 1]
     english = test.interro_df.loc[index][0]
     french = test.interro_df.loc[index][1]
