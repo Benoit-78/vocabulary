@@ -32,7 +32,7 @@ class TestInterro(unittest.TestCase):
     """
     Test class for interro.py
     """
-    # @patch('src.interro.Test.set_interro_df')
+    # @patch('src.interro.PremierTest.set_interro_df')
     # @patch('src.interro.Loader.load_tables')
     # @patch('src.data.data_handler.DbManipulator.check_test_type')
     # def test_load_test(
@@ -66,7 +66,7 @@ class TestInterro(unittest.TestCase):
     #     mock_check_test_type.assert_called_once_with(test_type)
     #     mock_set_interro_df.assert_called_once()
 
-    # @patch('src.interro.Test.set_interro_df')
+    # @patch('src.interro.PremierTest.set_interro_df')
     # @patch('src.interro.Loader.load_tables')
     # @patch('src.data.data_handler.DbManipulator.check_test_type')
     # def test_load_test(
@@ -603,6 +603,57 @@ class TestInterro(unittest.TestCase):
             guesser=views.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
+        mock_load_test_from_redis.return_value = mock_test
+        mock_save_test_in_redis.return_value = True
+        # ----- ACT
+        result = interro_api.load_rattraps(
+            token,
+            data
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, JSONResponse)
+        content = result.body
+        actual_dict = content.decode('utf-8')
+        actual_dict = json.loads(actual_dict)
+        expected_dict = {
+            'message': "Rattraps created successfully",
+            'token': token,
+            'total': int(data['total']),
+            'score': int(data['score']),
+            'count': int(data['count'])
+        }
+        self.assertEqual(actual_dict, expected_dict)
+
+
+    @patch('src.data.redis_interface.save_test_in_redis')
+    @patch('src.data.redis_interface.load_test_from_redis')
+    def test_load_rattraps_rattraps(
+            self,
+            mock_load_test_from_redis,
+            mock_save_test_in_redis,
+        ):
+        """
+        Should load the rattraps.
+        """
+        # ----- ARRANGE
+        token = 'mock_token'
+        data = {
+            'count': '2',
+            'total': '10',
+            'score': '3'
+        }
+        mock_interro_df = pd.DataFrame(
+            {
+                'some_column': ['some_value'],
+            }
+        )
+        mock_test = Rattrap(
+            faults_df_=pd.DataFrame(),
+            rattraps=2,
+            guesser=views.FastapiGuesser(),
+        )
+        mock_test.faults_df_ = mock_interro_df
+        mock_load_test_from_redis.return_value = mock_test
         mock_save_test_in_redis.return_value = True
         # ----- ACT
         result = interro_api.load_rattraps(

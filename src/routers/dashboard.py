@@ -21,7 +21,6 @@ from src.api import dashboard as dashboard_api
 from src.data import users
 
 dashboard_router = APIRouter(prefix='/dashboard')
-cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 

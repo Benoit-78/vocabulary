@@ -25,7 +25,6 @@ from src.data import users
 
 
 interro_router = APIRouter(prefix='/interro')
-cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 

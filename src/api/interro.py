@@ -45,7 +45,7 @@ def load_test(
     loader_ = interro.Loader(db_handler)
     loader_.load_tables()
     guesser = views.FastapiGuesser()
-    test_ = interro.Test(
+    test_ = interro.PremierTest(
         loader_.tables[loader_.test_type + '_voc'],
         test_length,
         guesser,

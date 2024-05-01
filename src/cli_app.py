@@ -33,7 +33,7 @@ def cli_main():
     loader.load_tables()
     # WeuuAaaInterrooo !!!
     guesser = views_local.CliGuesser()
-    test = interro.Test(
+    test = interro.PremierTest(
         loader.tables[loader.test_type + '_voc'],
         user.settings.words,
         guesser,

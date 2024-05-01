@@ -25,7 +25,6 @@ from src.api import user as user_api
 from src.data import users
 
 user_router = APIRouter(prefix="/user")
-cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 

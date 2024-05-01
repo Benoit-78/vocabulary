@@ -27,7 +27,6 @@ from src.api import authentication as auth_api
 from src.api import guest as guest_api
 
 guest_router = APIRouter(prefix='/guest')
-cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 

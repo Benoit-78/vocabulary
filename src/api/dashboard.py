@@ -22,42 +22,26 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.data import users
 from src.data.data_handler import DbManipulator
-
-cred_checker = users.CredChecker()
-
-
-def get_user_dashboards(request, user_name, user_password, db_name):
-    """
-    Get the user dashboards.
-    """
-    logger.info('african_swallow')
-    graphs = load_graphs(user_name, user_password, db_name)
-    request_dict = {
-        "request": request,
-        "graph_1": graphs[0],
-        "graph_2": graphs[1],
-        "graph_3": graphs[2],
-        "graph_4": graphs[3],
-        "graph_5": graphs[4],
-        "userName": user_name,
-        "userPassword": user_password
-    }
-    return request_dict
 
 
 
 class WordsGraph(ABC):
-    """Abstract class for creating and saving user-specific graphs."""
+    """
+    Abstract class for creating and saving user-specific graphs.
+    """
     def __init__(self, db_handler):
-        """Constructor should get a database handler"""
+        """
+        Constructor should get a database handler.
+        """
         self.db_handler = db_handler
         self.data = pd.DataFrame()
 
     @abstractmethod
     def set_data(self, user_password):
-        """Fetch the data that will feed the graph."""
+        """
+        Fetch the data that will feed the graph.
+        """
 
     @abstractmethod
     def create(self, user_password):
@@ -73,15 +57,17 @@ class WordsGraph1(WordsGraph):
     Graph that represents the evolution of test performance.
     """
     def set_data(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description
+        """
         tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_perf'
         self.data = tables[voc_table_name]
 
     def correct_data(self):
-        """Correct imprecisions or errors in the data"""
-        logger.debug(f"Columns: \n{self.data.columns}")
-        logger.debug(f"Data: \n{self.data}")
+        """
+        Correct imprecisions or errors in the data
+        """
         self.data = self.data[self.data['test']<=100]
         self.data = self.data[self.data['test']>=0]
 
@@ -119,12 +105,15 @@ class WordsGraph2(WordsGraph):
     in function of the number of times it has been asked.
     """
     def set_data(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description.
+        """
         tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_voc'
         voc_table = tables[voc_table_name]
+        db_name_short = self.db_handler.db_name.split('_')[1]
         self.data = voc_table[[
-            self.db_handler.language_1.lower(),
+            db_name_short,
             'nb',
             'taux'
         ]]
@@ -183,17 +172,22 @@ class WordsGraph3(WordsGraph):
     in function of its date rank in the words table.
     """
     def set_data(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description
+        """
         tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_voc'
         voc_table = tables[voc_table_name]
+        db_name_short = self.db_handler.db_name.split('_')[1]
         self.data = voc_table[[
-            self.db_handler.language_1.lower(),
+            db_name_short,
             'taux'
         ]]
 
     def correct_data(self):
-        """Correct imprecisions or errors in the data"""
+        """
+        Correct imprecisions or errors in the data
+        """
         self.data = self.data[self.data['taux']<=100]
         self.data = self.data[self.data['taux']>=-100]
 
@@ -234,21 +228,28 @@ class WordsGraph4(WordsGraph):
     in function of its date rank in the words table.
     """
     def set_data(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description
+        """
         tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_voc'
         voc_table = tables[voc_table_name]
+        db_name_short = self.db_handler.db_name.split('_')[1]
         self.data = voc_table[[
-            self.db_handler.language_1.lower(),
+            db_name_short,
             'nb'
         ]]
 
     def correct_data(self):
-        """Correct imprecisions or errors in the data"""
+        """
+        Correct imprecisions or errors in the data
+        """
         self.data = self.data[self.data['nb']>=0]
 
     def create(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description
+        """
         self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
@@ -284,17 +285,23 @@ class WordsGraph5(WordsGraph):
     in function of its date rank in the words table.
     """
     def set_data(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description
+        """
         tables = self.db_handler.get_tables(user_password)
         voc_table_name = self.db_handler.test_type + '_words_count'
         self.data = tables[voc_table_name]
 
     def correct_data(self):
-        """Correct imprecisions or errors in the data"""
+        """
+        Correct imprecisions or errors in the data
+        """
         self.data = self.data[self.data['words_count']>=0]
 
     def create(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description
+        """
         self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
@@ -324,8 +331,29 @@ class WordsGraph5(WordsGraph):
 
 
 
+def get_user_dashboards(request, user_name, user_password, db_name):
+    """
+    Get the user dashboards.
+    """
+    logger.info('african_swallow')
+    graphs = load_graphs(user_name, user_password, db_name)
+    request_dict = {
+        "request": request,
+        "graph_1": graphs[0],
+        "graph_2": graphs[1],
+        "graph_3": graphs[2],
+        "graph_4": graphs[3],
+        "graph_5": graphs[4],
+        "userName": user_name,
+        "userPassword": user_password
+    }
+    return request_dict
+
+
 def load_graphs(user_name, user_password, db_name):
-    """Load the user's graphs"""
+    """
+    Load the user's graphs.
+    """
     html_graphs = []
     # Version
     data_manipulator = DbManipulator(

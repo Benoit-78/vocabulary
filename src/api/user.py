@@ -22,8 +22,6 @@ if REPO_DIR not in sys.path:
 from src.api import authentication as auth_api
 from src.data import users
 
-cred_checker = users.CredChecker()
-
 
 def create_account(
         creds: dict,

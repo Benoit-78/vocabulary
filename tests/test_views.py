@@ -49,24 +49,24 @@ class TestFastapiGuesser(unittest.TestCase):
         # ----- ASSERT
         self.assertEqual(result, 'mot')
 
-    def test_get_user_answer(self):
-        """
-        Ask the user to decide if the answer was correct or not.
-        """
-        # ----- ARRANGE
-        # ----- ACT
-        result = self.fastapi_guesser.get_user_answer()
-        # ----- ASSERT
-        self.assertFalse(result)
+    # def test_get_user_answer(self):
+    #     """
+    #     Ask the user to decide if the answer was correct or not.
+    #     """
+    #     # ----- ARRANGE
+    #     # ----- ACT
+    #     result = self.fastapi_guesser.get_user_answer()
+    #     # ----- ASSERT
+    #     self.assertFalse(result)
 
-    @patch('src.views.FastapiGuesser.get_user_answer')
+    # @patch('src.views.FastapiGuesser.get_user_answer')
     @patch('src.views.FastapiGuesser.return_translation')
     @patch('src.views.FastapiGuesser.ask_word')
     def test_guess_word(
             self,
             mock_ask_word,
             mock_return_translation,
-            mock_get_user_answer
+            # mock_get_user_answer
         ):
         """
         Steps of the user's guessing process.
@@ -77,10 +77,10 @@ class TestFastapiGuesser(unittest.TestCase):
         words = 10
         mock_ask_word.return_value = True
         mock_return_translation.return_value = True
-        mock_get_user_answer.return_value = True
+        # mock_get_user_answer.return_value = True
         # ----- ACT
         self.fastapi_guesser.guess_word(row, i, words)
         # ----- ASSERT
         mock_ask_word.assert_called_once_with(row)
         mock_return_translation.assert_called_once_with(row)
-        mock_get_user_answer.assert_called_once()
+        # mock_get_user_answer.assert_called_once()

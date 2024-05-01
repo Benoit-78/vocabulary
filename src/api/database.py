@@ -22,8 +22,6 @@ if REPO_DIR not in sys.path:
 from src.data import users
 from src.api import authentication as auth_api
 
-cred_checker = users.CredChecker()
-
 
 def get_user_databases(token):
     """

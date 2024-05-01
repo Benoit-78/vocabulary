@@ -23,7 +23,6 @@ from src.api import database as db_api
 from src.api import authentication as auth_api
 
 database_router = APIRouter(prefix='/database')
-cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 
