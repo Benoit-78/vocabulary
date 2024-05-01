@@ -152,6 +152,35 @@ class TestWordsGraph1(unittest.TestCase):
         logger.debug(f"mock_df_after : \n{mock_df_after}")
         pd.testing.assert_frame_equal(self.graph.data, mock_df_after)
 
+    # @patch('src.api.dashboard.px.scatter')
+    # @patch('src.api.dashboard.WordsGraph1.correct_data')
+    # @patch('src.api.dashboard.WordsGraph1.set_data')
+    # def test_create_method(
+    #         self,
+    #         mock_set_data,
+    #         mock_correct_data,
+    #         mock_px_scatter
+    #     ):
+    #     # ----- ARRANGE
+    #     self.graph.data = pd.DataFrame({
+    #         'test_date': [1, 2, 3],
+    #         'test': [4, 5, 6]
+    #     })
+    #     mock_set_data.return_value = True
+    #     mock_correct_data.return_value = True
+    #     mock_px_scatter.return_value = MagicMock()
+    #     # ----- ACT
+    #     graph_html = self.graph.create("test_password")
+    #     # ----- ASSERT
+    #     self.assertTrue('<html>' in graph_html)
+    #     self.assertTrue('<script>' in graph_html)
+    #     # self.assertIn("Graph 1", graph_html)
+    #     # self.assertIn("Test count", graph_html)
+    #     # self.assertIn("Success rate", graph_html)
+    #     # self.assertIn("plotly_dark", graph_html)
+    #     mock_set_data.assert_called_once_with("test_password")
+    #     mock_correct_data.assert_called_once()
+
 
 
 class TestWordsGraph2(unittest.TestCase):

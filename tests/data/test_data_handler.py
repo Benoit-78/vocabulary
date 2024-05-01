@@ -646,7 +646,7 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.execute.assert_any_call("SHOW COLUMNS FROM table1;")
         mock_cursor.execute.assert_any_call("SHOW COLUMNS FROM table2;")
         assert mock_cursor.fetchall.call_count == 3
-        assert mock_rectify.call_count == 2
+        assert mock_rectify.call_count == 3
         mock_rectify.assert_any_call(
             [('col1', 'type1'), ('col2', 'type2')]
         )

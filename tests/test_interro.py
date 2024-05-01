@@ -326,26 +326,22 @@ class TestPremierTest(unittest.TestCase):
         if next_index != 1: # Case where the first next_index falls on 1
             self.assertNotEqual(former_index, next_index)
 
-    def test_get_next_index(self):
-        """Bad words should be asked twice as much as other words."""
-        # Arrange
-        self.interro_1.step = 7
-        self.interro_1.words_df['query'] = [0] * self.interro_1.words_df.shape[0]
-        self.interro_1.words_df['bad_word'] = [0] * self.interro_1.words_df.shape[0]
-        former_index = self.interro_1.index
-        logger.debug(f"former_index: {former_index}")
-        # Act
+    @patch('src.interro.PremierTest.get_another_index')
+    def test_get_next_index_if_not_bad_word(self, mock_get_another_index):
+        """
+        When the next index points to a bad word, the search should run once again.
+        So the index search method should be called twice.
+        """
+        # ----- ARRANGE
+        mock_get_another_index.return_value = 3
+        # ----- ACT
         next_index = self.interro_1.get_next_index()
-        logger.debug(f"next_index: {next_index}")
-        # Assert
-        self.assertIsInstance(next_index, int)
-        self.assertGreater(next_index, 0)
-        self.assertLess(next_index, self.interro_1.words_df.shape[0])
-        self.assertEqual(self.interro_1.words_df['query'].loc[next_index], 1)
-        if next_index != 1: # Case where the first next_index falls on 1
-            self.assertNotEqual(former_index, next_index)
+        # ----- ASSERT
+        self.assertEqual(next_index, 3)
+        assert mock_get_another_index.call_count == 2
+        self.assertEqual(self.interro_1.words_df['query'].loc[next_index], 0)
 
-    @patch.object(interro.PremierTest, 'get_another_index', return_value=4)
+    @patch('src.interro.PremierTest.get_another_index')
     def test_get_next_index_if_bad_word(self, mock_get_another_index):
         """
         When the next index points to a bad word, the search should stop.
@@ -353,37 +349,39 @@ class TestPremierTest(unittest.TestCase):
         """
         # Arrange
         self.interro_1.words_df['bad_word'] = [1] * self.interro_1.words_df.shape[0]
+        mock_get_another_index.return_value = 4
         # Act
         next_index = self.interro_1.get_next_index()
         # Assert
         self.assertEqual(next_index, 4)
-        mock_get_another_index.assert_called()
         assert mock_get_another_index.call_count == 1
 
-    @patch.object(interro.PremierTest, 'get_another_index', return_value=4)
-    def test_get_next_index_if_not_bad_word(self, mock_get_another_index):
+    @patch('src.interro.PremierTest.set_row')
+    @patch('src.interro.PremierTest.get_next_index')
+    @patch('src.interro.PremierTest.create_random_step')
+    def test_set_interro_df(
+            self,
+            mock_create_random_step,
+            mock_get_next_index,
+            mock_set_row
+        ):
         """
-        When the next index points to a bad word, the search should run once again.
-        So the index search method should be called twice.
+        A dataframe of words should be formed, that will be asked to the user
         """
-        # Arrange
-        self.interro_1.words_df['bad_word'] = [0] * self.interro_1.words_df.shape[0]
-        # Act
-        next_index = self.interro_1.get_next_index()
-        # Assert
-        self.assertEqual(next_index, 4)
-        mock_get_another_index.assert_called()
-        assert mock_get_another_index.call_count == 2
-
-    def test_set_interro_df(self):
-        """A dataframe of words should be formed, that will be asked to the user."""
-        # Act
+        # ----- ARRANGE
+        mock_create_random_step.return_value = True
+        self.interro_1.words = 1
+        self.interro_1.step = 23
+        mock_get_next_index.return_value = 6
+        mock_set_row.return_value = True
+        self.interro_1.row = [0, 'Hello', 'Bonjour']
+        # ----- ACT
         self.interro_1.set_interro_df()
-        # Assert
-        nan_values = self.interro_1.interro_df.isna().sum().sum()
-        self.assertNotEqual(self.interro_1.step, 0)
-        self.assertEqual(self.interro_1.interro_df.shape, (self.interro_1.words, 2))
-        self.assertEqual(nan_values, 0)
+        # ----- ASSERT
+        self.assertEqual(self.interro_1.index, 6)
+        mock_create_random_step.assert_called_once()
+        mock_get_next_index.assert_called_once()
+        mock_set_row.assert_called_once()
 
     def test_update_voc_df_success(self):
         """

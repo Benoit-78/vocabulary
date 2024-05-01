@@ -21,12 +21,12 @@ function chooseDatabase(token) {
     .then(data => {
         if (data && data.message === "Database chosen successfully") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
-        } else if (data && data.message === `Database ${databaseName} name not available.`) {
-            window.location.href = `/database/user-databases?token=${token}`;
+        } else if (data && data.message === `Database ${databaseName} name not available`) {
+            window.location.href = `/database/list-databases?token=${token}`;
             console.error("Database name not available");
         }
             else {
-            console.error("Error with the word creation.");
+            console.error("Error with the database selection");
         }
     })
     .catch(error => {
@@ -51,8 +51,8 @@ function createDatabase(token) {
     .then(data => {
         if (data && data.message === "Database created successfully") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
-        } else if (data && data.message === "Database name not available.") {
-            window.location.href = `/database/user-databases?token=${token}`;
+        } else if (data && data.message === "Database name not available") {
+            window.location.href = `/database/list-databases?token=${token}&errorMessage=${data.message}`;
             console.error("Database name not available");
         } else {
             console.error("Error with the database creation");
@@ -82,7 +82,7 @@ function deleteDatabase(token) {
         if (data && data.message === "Database deleted successfully") {
             window.location.href = `/database/list-databases?token=${token}`;
         } else {
-            console.error("Error with the database deletion.");
+            console.error("Error with the database deletion");
         }
     })
     .catch(error => {
@@ -113,7 +113,7 @@ function addWord(token, databaseName) {
         } else if (data && data.message === "Word already exists") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}&errorMessage=${data.message}`;
         } else {
-            console.error("Error with the word creation.");
+            console.error("Error with the word creation");
         }
     })
     .catch(error => {

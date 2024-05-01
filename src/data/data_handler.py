@@ -335,6 +335,7 @@ class DbDefiner(DbInterface):
             cursor.execute(f"USE {db_name};")
             cursor.execute("SHOW TABLES;")
             tables = list(cursor.fetchall())
+            tables = self.rectify_this_strange_result(tables)
             cols_dict = {}
             for table_name in tables:
                 cursor.execute(f"SHOW COLUMNS FROM {table_name};")
@@ -353,7 +354,9 @@ class DbDefiner(DbInterface):
 
     def rectify_this_strange_result(self, columns):
         """
-        Correct the result of the 'SHOW COLUMNS FROM table_name' request.
+        Correct the result of following requests:
+        - 'SHOW TABLES'
+        - 'SHOW COLUMNS FROM table_name'
         """
         if isinstance(columns[0], tuple):
             result = [col[0] for col in columns]
@@ -466,21 +469,20 @@ class DbManipulator(DbInterface):
         Add a word to the table.
         """
         connection, cursor = self.get_db_cursor()
-        # Create request string
         today_str = str(datetime.today().date())
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
-        logger.debug(f"english: {english}")
         if self.read_word(english) is not None:
             result = 'Word already exists'
             logger.error(result)
             return result
         native = row[1]
+        request_1 = f"INSERT INTO {self.db_name}.{words_table_name}"
+        request_2 = "(english, français, creation_date, nb, score, taux)"
+        request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
+        sql_request = ' '.join([request_1, request_2, request_3])
         try:
-            request_1 = f"INSERT INTO {self.db_name}.{words_table_name}"
-            request_2 = "(english, français, creation_date, nb, score, taux)"
-            request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
-            cursor.execute(' '.join([request_1, request_2, request_3]))
+            cursor.execute(sql_request)
             connection.commit()
             result = True
         except Exception as err:
@@ -497,24 +499,28 @@ class DbManipulator(DbInterface):
         Read the given word
         """
         connection, cursor = self.get_db_cursor()
-        # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = "SELECT english, français, score"
         request_2 = f"FROM {self.db_name}.{words_table_name}"
+        logger.debug(f"db_name: {self.db_name}")
         request_3 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2, request_3])
-        # Execute request
+        request_result = None
         try:
             request_result = cursor.execute(sql_request)
             request_result = cursor.fetchall()
-            english, native, score = request_result[0]
-            result = (english, native, score)
         except Exception as err:
             if err.errno == -1:
                 logger.error(err)
-                result = False
-        cursor.close()
-        connection.close()
+                result = None
+        finally:
+            cursor.close()
+            connection.close()
+        if request_result:
+            english, native, score = request_result[0]
+            result = (english, native, score)
+        else:
+            result = None
         return result
 
     def update_word(self, english: str, new_nb, new_score):

@@ -29,17 +29,19 @@ function sendUserSettings(token, language, testType, numWords) {
             })
         }
     )
-    .then(response => {
-        if (!response.ok) { // Check if the response status is NOK (outside the range 200-299)
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        startTest(token, numWords)
+        if (data && data.message === "Settings saved successfully") {
+            numWords = data.test_length;
+            startTest(token, numWords)
+        } else if (data && data.message === "Empty table") {
+            window.location.href = `/interro/interro-settings?token=${token}&errorMessage=${data.message}`;
+        } else {
+            console.error("Unknown message at interro creation:", data.message);
+        }
     })
     .catch(error => {
-        console.error("Error sending user answer:", error);
+        console.error("Error with the interro creation:", error);
     });
 }
 
@@ -48,6 +50,7 @@ function startTest(token, numWords) {
     total = parseInt(numWords, 10);
     count = 0;
     score = 0;
+    console.log("Number of words:", total);
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
         window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
@@ -61,6 +64,7 @@ function showTranslation(token, numWords, count, score) {
     total = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
+    console.log("Number of words:", total);
     if (!isNaN(numWords)) {
         window.location.href = `/interro/interro-answer?token=${token}&total=${total}&count=${count}&score=${score}`;
     } else {
@@ -70,6 +74,8 @@ function showTranslation(token, numWords, count, score) {
 
 
 function sendUserAnswer(token, answer, count, numWords, score, content_box1, content_box2) {
+    console.log("numWords:", numWords);
+    console.log("Count:", count);
     fetch(
         `/interro/user-answer?token=${token}`,
         {
@@ -89,7 +95,6 @@ function sendUserAnswer(token, answer, count, numWords, score, content_box1, con
     .then(data => {
         if (data && data.message === "User response stored successfully") {
             const score = data.score;
-            console.log("Score:", score);
             if (count < numWords) {
                 nextGuess(token, numWords, count, score);
             } else {
@@ -148,11 +153,8 @@ function launchRattraps(token, newTotal, newCount, newScore) {
     .then(data => {
         if (data && data.message === "Rattraps created successfully") {
             total = data.total;
-            console.log("Total:", total);
             count = data.count;
-            console.log("Count:", count);
             score = data.score;
-            console.log("Score:", score);
             window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
         } else {
             console.error("Error with rattraps creation.");

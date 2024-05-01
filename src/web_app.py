@@ -60,13 +60,8 @@ async def welcome_page(
     """
     Call the welcome page and assign a token to the guest.
     """
-    return templates.TemplateResponse(
-        "welcome.html",
-        {
-            "request": request,
-            "token": token,
-        }
-    )
+    response_dict = {'request': request, 'token': token}
+    return templates.TemplateResponse("welcome.html", response_dict)
 
 
 @app.get("/sign-in", response_class=HTMLResponse)
@@ -78,16 +73,8 @@ def sign_in(
     """
     Call the sign-in page.
     """
-    name_message, password_message = authentication.get_error_messages(error_message)
-    return templates.TemplateResponse(
-        "user/sign_in.html",
-        {
-            'request': request,
-            'token': token,
-            'nameUnknownErrorMessage': name_message,
-            'passwordIncorrectErrorMessage': password_message
-        }
-    )
+    response_dict = authentication.sign_in(request, token, error_message)
+    return templates.TemplateResponse("user/sign_in.html", response_dict)
 
 
 @app.get("/sign-up", response_class=HTMLResponse)
@@ -99,14 +86,8 @@ def sign_up(
     """
     Call the create account page.
     """
-    return templates.TemplateResponse(
-        "user/sign_up.html",
-        {
-            'request': request,
-            'errorMessage': error_message,
-            'token': token
-        }
-    )
+    response_dict = {'request': request, 'errorMessage': error_message, 'token': token}
+    return templates.TemplateResponse("user/sign_up.html", response_dict)
 
 
 @app.get("/about-the-app", response_class=HTMLResponse)
@@ -117,13 +98,8 @@ def about_the_app(
     """
     Call the page that helps the user to get started.
     """
-    return templates.TemplateResponse(
-        "about_the_app.html",
-        {
-            "request": request,
-            'token': token
-        }
-    )
+    response_dict = {'request': request, 'token': token}
+    return templates.TemplateResponse("about_the_app.html", response_dict)
 
 
 @app.get("/help", response_class=HTMLResponse)
@@ -134,10 +110,5 @@ def get_help(
     """
     Help!
     """
-    return templates.TemplateResponse(
-        "help.html",
-        {
-            "request": request,
-            'token': token
-        }
-    )
+    response_dict = {'request': request, 'token': token}
+    return templates.TemplateResponse("help.html", response_dict)

@@ -29,16 +29,14 @@ templates = Jinja2Templates(directory="src/templates")
 @database_router.get("/list-databases", response_class=HTMLResponse)
 def user_databases(
         request: Request,
-        token: str = Depends(auth_api.check_token)
+        token: str = Depends(auth_api.check_token),
+        error_message: str = Query('', alias='errorMessage')
     ):
     """
     Call the base page of user databases.
     """
-    response_dict = db_api.load_user_databases(request, token)
-    return templates.TemplateResponse(
-        "database/choose.html",
-        response_dict
-    )
+    response_dict = db_api.load_user_databases(request, token, error_message)
+    return templates.TemplateResponse("database/choose.html", response_dict)
 
 
 @database_router.post("/choose-database")

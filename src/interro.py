@@ -172,18 +172,22 @@ class PremierTest(Interro):
         self.interro_df = pd.DataFrame(columns=['english', 'français'])
 
     def create_random_step(self):
-        """Get random step, the jump from one word to another"""
+        """
+        Get random step, the jump from one word to another
+        """
         self.step = random.randint(1, self.words_df.shape[0])
 
     def get_another_index(self) -> int:
-        """The word must not have been already asked."""
-        next_index = random.randint(1, self.words_df.shape[0] - 1)
+        """
+        The word must not have been already asked.
+        """
+        next_index = random.randint(0, self.words_df.shape[0])
         next_index = max(next_index, 1)
         already_asked = self.words_df.loc[next_index, 'query'] == 1
         i = 0
-        while already_asked and i < (self.words_df.shape[0] + 1):
-            next_index = random.randint(1, self.words_df.shape[0] - 1)
-            next_index = max(next_index, 1)
+        while already_asked and i < (self.words_df.shape[0]):
+            next_index = random.randint(0, self.words_df.shape[0])
+            next_index = max(next_index, 0)
             already_asked = self.words_df.loc[next_index, 'query'] == 1
             i += 1
         self.words_df.loc[next_index, 'query'] = 1
@@ -206,7 +210,9 @@ class PremierTest(Interro):
         return next_index
 
     def set_interro_df(self):
-        """Extract the words that will be asked."""
+        """
+        Extract the words that will be asked.
+        """
         self.create_random_step()
         self.index = self.step
         for _ in range(1, self.words + 1):
@@ -247,7 +253,9 @@ class PremierTest(Interro):
             self.update_faults_df(word_guessed, row)
 
     def compute_success_rate(self):
-        """Compute success rate."""
+        """
+        Compute success rate.
+        """
         faults_total = self.faults_df.shape[0]
         success_rate = int(100 * (1 - (faults_total / self.words)))
         self.perf = success_rate

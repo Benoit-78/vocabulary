@@ -38,6 +38,9 @@
                 <label class="white-text" for="input1">Create a new database</label>
                 <input class="rounded-input" type="text" id="databaseName" name="databaseName">
             </div>
+            {% if dbAlreadyPresentErrorMessage %}
+                    <p class="error-message">{{ dbAlreadyPresentErrorMessage }}</p>
+            {% endif %}
         </div>
 
         <div class="row">

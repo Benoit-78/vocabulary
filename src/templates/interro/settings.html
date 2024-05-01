@@ -7,6 +7,7 @@
     <title>Configuration</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
     <script type="text/javascript" src="/static/scripts/interro.js"></script>
@@ -26,6 +27,9 @@
                         <option value="{{ database }}">{{ database }}</option>
                     {% endfor %}
                 </select>
+                {% if emptyTableErrorMessage %}
+                    <p class="error-message">{{ emptyTableErrorMessage }}</p>
+                {% endif %}
             </div>
 
             <div class="row">

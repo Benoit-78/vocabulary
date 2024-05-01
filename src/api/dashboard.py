@@ -72,7 +72,9 @@ class WordsGraph1(WordsGraph):
         self.data = self.data[self.data['test']>=0]
 
     def create(self, user_password):
-        """See abstract method description"""
+        """
+        See abstract method description
+        """
         self.set_data(user_password)
         self.correct_data()
         fig = px.scatter(
@@ -84,13 +86,18 @@ class WordsGraph1(WordsGraph):
             template='plotly_dark'
         )
         fig.update_traces(
-            marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
-            selector=dict(mode='markers')
+            marker={
+                'color': 'orange',
+                'size': 5,
+                'opacity': 0.8,
+                'line': {'color': 'orange', 'width': 2}
+            },
+            selector={'mode': 'markers'}
         )
         fig.update_layout(
             plot_bgcolor='black',
             paper_bgcolor='black',
-            font=dict(color='white'),
+            font={'color': 'white'},
             width=1000,
             height=500
         )

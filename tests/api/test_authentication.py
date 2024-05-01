@@ -389,11 +389,13 @@ class TestAuthentication(unittest.TestCase):
         with self.assertRaises(ValueError):
             auth_api.get_error_messages(error_message)
         # ----- ASSERT
-        mock_logger.error.assert_any_call(f"Error message incorrect: some_strange_message")
+        mock_logger.error.assert_any_call(
+            "Error message incorrect: some_strange_message"
+        )
         expected_list = [
-            "User successfully authenticated",
             "Unknown user",
             "Password incorrect",
+            "User successfully authenticated",
             ''
         ]
         mock_logger.error.assert_any_call(f"Should be in: {expected_list}")

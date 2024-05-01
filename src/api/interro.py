@@ -44,6 +44,7 @@ def load_test(
     db_handler.check_test_type(test_type)
     loader_ = interro.Loader(db_handler)
     loader_.load_tables()
+    test_length = adjust_test_length(test_length, loader_)
     guesser = views.FastapiGuesser()
     test_ = interro.PremierTest(
         loader_.tables[loader_.test_type + '_voc'],
@@ -56,18 +57,33 @@ def load_test(
     return loader_, test_
 
 
+def adjust_test_length(test_length, loader_):
+    """
+    Check the test length.
+    """
+    words_table = loader_.tables[loader_.test_type + '_voc']
+    words_total = words_table.shape[0]
+    test_length = min(words_total, test_length)
+    if test_length == 0:
+        raise ValueError
+    return test_length
+
+
 def get_interro_settings(
         request,
-        token
+        token,
+        error_message
     ):
     """
     API function to load the interro settings.
     """
     databases = db_api.get_user_databases(token)
+    db_message = get_error_messages(error_message)
     request_dict = {
         'request': request,
         'token': token,
-        'databases': databases
+        'databases': databases,
+        'emptyTableErrorMessage': db_message,
     }
     return request_dict
 
@@ -84,19 +100,31 @@ def save_interro_settings(
     db_name = settings.get('databaseName')
     test_type = settings.get('testType').lower()
     test_length = int(settings.get('numWords'))
-    loader, test = load_test(
-        user_name=user_name,
-        db_name=db_name,
-        test_type=test_type,
-        test_length=test_length
-    )
+    try:
+        loader, test = load_test(
+            user_name=user_name,
+            db_name=db_name,
+            test_type=test_type,
+            test_length=test_length
+        )
+    except ValueError:
+        return JSONResponse(
+            content=
+            {
+                'message': "Empty table",
+                'token': token,
+                'test_length': test_length
+            }
+        )
+    test_length = test.words
     redis_interface.save_test_in_redis(test, token)
     redis_interface.save_loader_in_redis(loader, token)
     return JSONResponse(
         content=
         {
             'message': "Settings saved successfully",
-            'token': token
+            'token': token,
+            'test_length': test_length
         }
     )
 
@@ -290,3 +318,25 @@ def end_interro(
         "token": token
     }
     return response_dict
+
+
+def get_error_messages(error_message: str):
+    """
+    Get the error messages from the error message.
+    """
+    messages = [
+        "Empty table",
+        "Settings saved successfully",
+        ''
+    ]
+    if error_message == messages[0]:
+        result = 'No words in the selected table'
+    elif error_message == messages[1]:
+        result = ''
+    elif error_message == messages[2]:
+        result = ''
+    else:
+        logger.error(f"Error message incorrect: {error_message}")
+        logger.error(f"Should be in: {messages}")
+        raise ValueError
+    return result

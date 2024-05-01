@@ -97,22 +97,22 @@ class CsvHandler():
 
 
 
-def csv_to_sql(csv_path: str, table_name: str):
-    """
-    Read the CSV file into a DataFrame
-    and write the SQL insert statements to a .sql file.
-    """
-    data_df = pd.read_csv(csv_path, sep=';')
-    with open(f'data/{table_name}.sql', 'w', encoding='utf-8') as sql_file:
-        for _, row in data_df.iterrows():
-            values = ", ".join([
-                f"'{value}'"
-                if isinstance(value, str)
-                else str(value)
-                for value in row
-            ])
-            request_1 = "INSERT INTO `version_voc` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)"
-            request_2 = f"VALUES ({values});\n"
-            insert_statement = request_1 + request_2
-            logger.debug(f"Writing to SQL file: {insert_statement}")
-            sql_file.write(insert_statement)
+# def csv_to_sql(csv_path: str, table_name: str):
+#     """
+#     Read the CSV file into a DataFrame
+#     and write the SQL insert statements to a .sql file.
+#     """
+#     data_df = pd.read_csv(csv_path, sep=';')
+#     with open(f'data/{table_name}.sql', 'w', encoding='utf-8') as sql_file:
+#         for _, row in data_df.iterrows():
+#             values = ", ".join([
+#                 f"'{value}'"
+#                 if isinstance(value, str)
+#                 else str(value)
+#                 for value in row
+#             ])
+#             request_1 = "INSERT INTO `version_voc` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)"
+#             request_2 = f"VALUES ({values});\n"
+#             insert_statement = request_1 + request_2
+#             logger.debug(f"Writing to SQL file: {insert_statement}")
+#             sql_file.write(insert_statement)

@@ -68,26 +68,35 @@ class TestDatabase(unittest.TestCase):
         mock_get_user_name_from_token.assert_called_once_with(token)
         mock_get_databases_list.assert_called_once()
 
+    @patch('src.api.database.get_error_messages')
     @patch('src.api.database.get_user_databases')
-    def test_load_user_databases(self, mock_get_user_databases):
+    def test_load_user_databases(
+            self,
+            mock_get_user_databases,
+            mock_get_error_messages
+        ):
         """
         Test the function load_user_databases
         """
         # ----- ARRANGE
         request = 'mock_request'
         token = 'mock_token'
+        error_message = 'mock_error_message'
         mock_get_user_databases.return_value = ['db1', 'db2']
+        mock_get_error_messages.return_value = 'mock_db_message'
         # ----- ACT
         result = db_api.load_user_databases(
             request,
-            token
+            token,
+            error_message
         )
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_result = {
             'request': request,
             'token': token,
-            'databases': ['db1', 'db2']
+            'databases': ['db1', 'db2'],
+            'dbAlreadyPresentErrorMessage': 'mock_db_message'
         }
         self.assertEqual(result, expected_result)
         mock_get_user_databases.assert_called_once_with(token)
@@ -117,7 +126,7 @@ class TestDatabase(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, JSONResponse)
         expected_result = {
-            "message": "Database chosen successfully."
+            "message": "Database chosen successfully"
         }
         content = result.body
         content_dict = content.decode('utf-8')
@@ -151,7 +160,7 @@ class TestDatabase(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, JSONResponse)
         expected_result = {
-            "message": f"Database name {data['db_name']} not available."
+            "message": f"Database name {data['db_name']} not available"
         }
         content = result.body
         content_dict = content.decode('utf-8')
@@ -185,7 +194,7 @@ class TestDatabase(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, JSONResponse)
         expected_result = {
-            'message': "Database created successfully.",
+            'message': "Database created successfully",
             'token': token,
             'databaseName': data['db_name']
         }
@@ -221,7 +230,7 @@ class TestDatabase(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, JSONResponse)
         expected_result = {
-            'message': f"Database name {data['db_name']} not available.",
+            'message': "Database name not available",
             'token': token,
             'databaseName': data['db_name']
         }
@@ -231,6 +240,63 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(content_dict, expected_result)
         mock_get_user_name_from_token.assert_called_once_with(token)
         mock_create_database.assert_called_once_with(data['db_name'])
+
+    def test_get_error_messages_fail(self):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = "Database name not available"
+        # ----- ACT
+        result = db_api.get_error_messages(error_message)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, 'A database of this name already exists')
+
+    def test_get_error_messages_success(self):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = "Database created successfully"
+        # ----- ACT
+        result = db_api.get_error_messages(error_message)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, '')
+
+    def test_get_error_messages_neutral(self):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = ''
+        # ----- ACT
+        result = db_api.get_error_messages(error_message)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, '')
+
+    @patch('src.api.database.logger')
+    def test_get_error_messages_error(self, mock_logger):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = 'blableblibloblu'
+        # ----- ACT
+        with self.assertRaises(ValueError):
+            db_api.get_error_messages(error_message)
+        # ----- ASSERT
+        mock_logger.error.assert_any_call(f"Error message incorrect: {error_message}")
+        expected_list = [
+            "Database name not available",
+            "Database created successfully",
+            ''
+        ]
+        mock_logger.error.assert_any_call(
+            f"Should be in: {expected_list}"
+        )
 
     @patch('src.api.authentication.get_user_name_from_token')
     def test_fill_database(self, mock_get_user_name_from_token):
@@ -254,7 +320,7 @@ class TestDatabase(unittest.TestCase):
         self.assertIsInstance(result, dict)
         expected_result = {
             'request': request,
-            'title': "Here you can add words to your database.",
+            'title': "Here you can add words to your database",
             'token': token,
             'databaseName': db_name,
             'wordAlreadyPresentErrorMessage': error_message,
@@ -283,7 +349,7 @@ class TestDatabase(unittest.TestCase):
                 token
             )
         # ----- ASSERT
-        mock_logger.eror.called_once_with("No database name given.")
+        mock_logger.error.called_once_with("No database name given")
         assert not mock_get_user_name_from_token.called
 
     @patch('src.data.users.UserAccount.insert_word')

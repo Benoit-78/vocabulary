@@ -280,8 +280,8 @@ class TestUserAccount(unittest.TestCase):
     def test_get_databases_list(self, mock_get_user_databases):
         # ----- ARRANGE
         mock_get_user_databases.return_value = [
-            'db_1',
-            'db_2',
+            'usr_db_1',
+            'usr_db_2',
         ]
         # ----- ACT
         result = self.account.get_databases_list()

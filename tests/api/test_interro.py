@@ -11,7 +11,7 @@ import json
 import os
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 from fastapi.responses import JSONResponse
@@ -131,17 +131,90 @@ class TestInterro(unittest.TestCase):
     #     mock_test_constructor.assert_called_once_with(*mock_test_call_args)
     #     mock_set_interro_df.assert_called_once()
 
+    def test_adjust_test_length(self):
+        """
+        Test adjust_test_length function
+        """
+        # ----- ARRANGE
+        test_length = 10
+        loader_ = MagicMock()
+        words_table = pd.DataFrame(
+            {
+                'some_column':
+                [
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+                ],
+            }
+        )
+        loader_ = MagicMock()
+        loader_.test_type = 'test_type'
+        loader_.tables = {
+            'test_type_voc': words_table
+        }
+        # ----- ACT
+        result = interro_api.adjust_test_length(test_length, loader_)
+        # ----- ASSERT
+        self.assertEqual(result, 10)
+
+    def test_adjust_test_length_small_table(self):
+        """
+        Test adjust_test_length function
+        """
+        # ----- ARRANGE
+        test_length = 4
+        loader_ = MagicMock()
+        words_table = pd.DataFrame(
+            {
+                'some_column': ['value_1', 'value_2', 'value_3'],
+            }
+        )
+        loader_ = MagicMock()
+        loader_.test_type = 'test_type'
+        loader_.tables = {
+            'test_type_voc': words_table
+        }
+        # ----- ACT
+        result = interro_api.adjust_test_length(test_length, loader_)
+        # ----- ASSERT
+        self.assertEqual(result, 3)
+
+    def test_adjust_test_length_empty_table(self):
+        """
+        Test adjust_test_length function
+        """
+        # ----- ARRANGE
+        test_length = 4
+        loader_ = MagicMock()
+        words_table = pd.DataFrame()
+        loader_ = MagicMock()
+        loader_.test_type = 'test_type'
+        loader_.tables = {
+            'test_type_voc': words_table
+        }
+        # ----- ACT
+        # ----- ASSERT
+        with self.assertRaises(ValueError):
+            interro_api.adjust_test_length(test_length, loader_)
+
+    @patch('src.api.interro.get_error_messages')
     @patch('src.api.database.get_user_databases')
-    def test_get_interro_settings(self, mock_get_user_databases):
+    def test_get_interro_settings(
+            self,
+            mock_get_user_databases,
+            mock_get_error_messages
+        ):
         """
         Test get_interro_settings function
         """
         # ----- ARRANGE
         request = 'mock_request'
         token = 'mock_token'
+        error_message = 'mock_error_message'
+        db_message = ('mock_db_message')
+        mock_get_error_messages.return_value = db_message
         mock_get_user_databases.return_value = ['db1', 'db2']
         # ----- ACT
-        result = interro_api.get_interro_settings(request, token)
+        result = interro_api.get_interro_settings(request, token, error_message)
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         self.assertEqual(
@@ -150,17 +223,18 @@ class TestInterro(unittest.TestCase):
                 'request': 'mock_request',
                 'token': 'mock_token',
                 'databases': ['db1', 'db2'],
+                'emptyTableErrorMessage': db_message,
             }
         )
+        mock_get_user_databases.assert_called_once_with(token)
+        mock_get_error_messages.assert_called_once_with(error_message)
 
     @patch('src.data.redis_interface.save_loader_in_redis')
     @patch('src.data.redis_interface.save_test_in_redis')
     @patch('src.api.interro.load_test')
     @patch('src.api.authentication.get_user_name_from_token')
-    @patch('src.api.interro.logger')
     def test_save_interro_settings(
             self,
-            mock_logger,
             mock_get_user_name_from_token,
             mock_load_test,
             mock_save_test_in_redis,
@@ -177,7 +251,9 @@ class TestInterro(unittest.TestCase):
         }
         token = 'mock_token'
         mock_get_user_name_from_token.return_value = 'mock_user_name'
-        mock_load_test.return_value = ('mock_loader', 'mock_test')
+        mock_test = MagicMock()
+        mock_test.words = 1
+        mock_load_test.return_value = ('mock_loader', mock_test)
         mock_save_test_in_redis.return_value = True
         mock_save_loader_in_redis.return_value = True
         # ----- ACT
@@ -192,7 +268,40 @@ class TestInterro(unittest.TestCase):
         content_dict = json.loads(content_dict)
         assert content_dict['message'] == "Settings saved successfully"
         assert content_dict['token'] == token
-        mock_logger.info.assert_called_once_with('african_swallow')
+
+    @patch('src.api.interro.load_test')
+    @patch('src.api.authentication.get_user_name_from_token')
+    def test_save_interro_settings_empty_table(
+            self,
+            mock_get_user_name_from_token,
+            mock_load_test,
+        ):
+        """
+        Test save_interro_settings function
+        """
+        # ----- ARRANGE
+        settings = {
+            'databaseName': 'mock_db_name',
+            'testType': 'mock_test_type',
+            'numWords': '2',
+        }
+        token = 'mock_token'
+        mock_get_user_name_from_token.return_value = 'mock_user_name'
+        mock_test = MagicMock()
+        mock_test.words = 1
+        mock_load_test.side_effect = ValueError()
+        # ----- ACT
+        result = interro_api.save_interro_settings(
+            settings,
+            token
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, JSONResponse)
+        content = result.body
+        content_dict = content.decode('utf-8')
+        content_dict = json.loads(content_dict)
+        assert content_dict['message'] == "Empty table"
+        assert content_dict['token'] == token
 
     @patch('src.data.redis_interface.load_test_from_redis')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -733,3 +842,60 @@ class TestInterro(unittest.TestCase):
         mock_load_loader_from_redis.assert_called_once_with(token)
         mock_update_data.assert_called_once()
         # mock_logger.info.assert_called_once_with("User data updated.")
+
+    def test_get_error_messages_fail(self):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = "Empty table"
+        # ----- ACT
+        result = interro_api.get_error_messages(error_message)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, 'No words in the selected table')
+
+    def test_get_error_messages_success(self):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = "Settings saved successfully"
+        # ----- ACT
+        result = interro_api.get_error_messages(error_message)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, '')
+
+    def test_get_error_messages_neutral(self):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = ''
+        # ----- ACT
+        result = interro_api.get_error_messages(error_message)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, '')
+
+    @patch('src.api.interro.logger')
+    def test_get_error_messages_error(self, mock_logger):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = 'blableblibloblu'
+        # ----- ACT
+        with self.assertRaises(ValueError):
+            interro_api.get_error_messages(error_message)
+        # ----- ASSERT
+        mock_logger.error.assert_any_call(f"Error message incorrect: {error_message}")
+        expected_list = [
+            "Empty table",
+            "Settings saved successfully",
+            ''
+        ]
+        mock_logger.error.assert_any_call(
+            f"Should be in: {expected_list}"
+        )

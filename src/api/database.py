@@ -33,15 +33,17 @@ def get_user_databases(token):
     return databases
 
 
-def load_user_databases(request, token):
+def load_user_databases(request, token, error_message):
     """
     Load the user databases.
     """
     databases = get_user_databases(token)
+    db_message = get_error_messages(error_message)
     response_dict = {
         'request': request,
         'token': token,
-        'databases': databases
+        'databases': databases,
+        'dbAlreadyPresentErrorMessage': db_message
     }
     return response_dict
 
@@ -59,14 +61,14 @@ def choose_database(data, token: str):
         json_response = JSONResponse(
             content=
             {
-                "message": f"Database name {db_name} not available.",
+                "message": f"Database name {db_name} not available",
             }
         )
     if not db_exists:
         json_response = JSONResponse(
             content=
             {
-                "message": "Database chosen successfully.",
+                "message": "Database chosen successfully",
             }
         )
     return json_response
@@ -85,7 +87,7 @@ def create_database(data: dict, token: str):
         json_response = JSONResponse(
             content=
             {
-                'message': f"Database name {db_name} not available.",
+                'message': "Database name not available",
                 'token': token,
                 'databaseName': db_name
             }
@@ -94,12 +96,34 @@ def create_database(data: dict, token: str):
         json_response = JSONResponse(
             content=
             {
-                'message': "Database created successfully.",
+                'message': "Database created successfully",
                 'token': token,
                 'databaseName': db_name
             }
         )
     return json_response
+
+
+def get_error_messages(error_message: str):
+    """
+    Get the error messages from the error message.
+    """
+    messages = [
+        "Database name not available",
+        "Database created successfully",
+        ''
+    ]
+    if error_message == messages[0]:
+        result = 'A database of this name already exists'
+    elif error_message == messages[1]:
+        result = ''
+    elif error_message == messages[2]:
+        result = ''
+    else:
+        logger.error(f"Error message incorrect: {error_message}")
+        logger.error(f"Should be in: {messages}")
+        raise ValueError
+    return result
 
 
 def fill_database(
@@ -112,15 +136,15 @@ def fill_database(
     
     """
     if not db_name:
-        logger.error("No database name given.")
+        logger.error("No database name given")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No database name given."
+            detail="No database name given"
         )
     _ = auth_api.get_user_name_from_token(token)
     request_dict = {
         'request': request,
-        'title': "Here you can add words to your database.",
+        'title': "Here you can add words to your database",
         'token': token,
         'databaseName': db_name,
         'wordAlreadyPresentErrorMessage': error_message,
@@ -175,26 +199,26 @@ def delete_database(data: dict, token: str):
     return json_response
 
 
-async def load_csv(csv_file, token: str):
-    """
-    """
-    if not csv_file.filename.endswith('.csv'):
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid file format, only CSV files are allowed"
-        )
-    csv_content = await csv_file.read()
-    if is_malicious(csv_content.decode('utf-8')):
-        raise HTTPException(
-            status_code=400,
-            detail="Malicious code detected in the CSV file"
-        )
-    add_csv_to_database(csv_content.decode('utf-8'))
-    response_dict = {
-        'message': "CSV file uploaded successfully",
-        'token': token
-    }
-    return response_dict
+# async def load_csv(csv_file, token: str):
+#     """
+#     """
+#     if not csv_file.filename.endswith('.csv'):
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Invalid file format, only CSV files are allowed"
+#         )
+#     csv_content = await csv_file.read()
+#     if is_malicious(csv_content.decode('utf-8')):
+#         raise HTTPException(
+#             status_code=400,
+#             detail="Malicious code detected in the CSV file"
+#         )
+#     add_csv_to_database(csv_content.decode('utf-8'))
+#     response_dict = {
+#         'message': "CSV file uploaded successfully",
+#         'token': token
+#     }
+#     return response_dict
 
 
 def is_malicious(csv_content):

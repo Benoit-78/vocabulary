@@ -166,6 +166,10 @@ class UserAccount(Account):
         """
         db_definer = DbDefiner(self.user_name)
         databases = db_definer.get_user_databases()
+        databases = [
+            '_'.join(db.split('_')[1:])
+            for db in databases
+        ]
         return databases
 
     def remove_database(self, db_name):

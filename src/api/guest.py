@@ -42,7 +42,9 @@ def load_guest_settings(request, token):
 
 
 def save_interro_settings_guest(language, token):
-    logger.debug('logs')
+    """
+    Save guest user interro settings.
+    """
     language = language['language'].lower()
     test_type = 'version'
     _, test = load_test(

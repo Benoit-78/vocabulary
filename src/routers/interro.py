@@ -8,7 +8,7 @@
 import os
 import sys
 
-# from loguru import logger
+from loguru import logger
 from fastapi import Query, Request, Depends, Body
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
@@ -21,8 +21,6 @@ if REPO_DIR not in sys.path:
 
 from src.api import authentication as auth_api
 from src.api import interro as interro_api
-from src.data import users
-
 
 interro_router = APIRouter(prefix='/interro')
 templates = Jinja2Templates(directory="src/templates")
@@ -31,19 +29,14 @@ templates = Jinja2Templates(directory="src/templates")
 @interro_router.get("/interro-settings", response_class=HTMLResponse)
 def interro_settings(
         request: Request,
-        token: str = Depends(auth_api.check_token)
+        token: str = Depends(auth_api.check_token),
+        error_message: str = Query('', alias='errorMessage')
     ):
     """
     Call the page that gets the user settings for one interro.
     """
-    response_dict = interro_api.get_interro_settings(
-        request,
-        token
-    )
-    return templates.TemplateResponse(
-        "interro/settings.html",
-        response_dict
-    )
+    response_dict = interro_api.get_interro_settings(request, token, error_message)
+    return templates.TemplateResponse("interro/settings.html", response_dict)
 
 
 @interro_router.post("/save-interro-settings")
@@ -54,10 +47,7 @@ async def save_interro_settings(
     """
     Save the user settings for the interro.
     """
-    json_response = interro_api.save_interro_settings(
-        settings,
-        token
-    )
+    json_response = interro_api.save_interro_settings(settings, token)
     return json_response
 
 
@@ -79,6 +69,7 @@ def load_interro_question(
         score,
         token
     )
+    logger.debug(f"Total: {total}, Count: {count}, Score: {score}")
     return templates.TemplateResponse(
         "interro/question.html",
         response_dict
