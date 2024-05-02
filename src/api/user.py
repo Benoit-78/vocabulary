@@ -9,8 +9,8 @@
 
 import os
 import sys
+from typing import Dict
 
-from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -22,13 +22,15 @@ if REPO_DIR not in sys.path:
 from src.api import authentication as auth_api
 from src.data import users
 
-cred_checker = users.CredChecker()
 
-
-def create_account(creds, token):
+def create_account(
+        creds: dict,
+        token: str
+    ) -> Dict:
     """
     Create the user account if the given user name does not exist yet.
     """
+    logger.info('african_swallow')
     user_account = users.UserAccount(creds['input_name'])
     result = user_account.create_account(creds['input_password'])
     json_response = {}
@@ -55,13 +57,13 @@ def create_account(creds, token):
 
 
 def authenticate_user(
-        token,
+        token: str,
         form_data
-    ):
+    ) -> Dict:
     """
     Authenticate the user.
     """
-    # Identify user
+    logger.info('african_swallow')
     users_list = auth_api.get_users_list()
     user = auth_api.authenticate_user(
         users_list,
@@ -94,4 +96,21 @@ def authenticate_user(
                     'token': user_token
                 }
             )
+    return json_response
+
+
+def load_user_space(
+        request,
+        token
+    ) -> Dict:
+    """
+    Call the base page of user space.
+    """
+    logger.info('african_swallow')
+    user_name = auth_api.get_user_name_from_token(token)
+    json_response = {
+        'request': request,
+        'token': token,
+        'user_name': user_name
+    }
     return json_response

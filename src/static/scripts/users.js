@@ -11,10 +11,12 @@ async function createAccount(token) {
             {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    input_name: inputName,
-                    input_password: inputPassword
-                }),
+                body: JSON.stringify(
+                    {
+                        input_name: inputName,
+                        input_password: inputPassword
+                    }
+                ),
             }
         )
         const data = await response.json();

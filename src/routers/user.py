@@ -25,7 +25,6 @@ from src.api import user as user_api
 from src.data import users
 
 user_router = APIRouter(prefix="/user")
-cred_checker = users.CredChecker()
 templates = Jinja2Templates(directory="src/templates")
 
 
@@ -44,23 +43,33 @@ async def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
-    json_response = user_api.create_account(creds, token)
+    json_response = user_api.create_account(
+        creds,
+        token
+    )
     return json_response
 
 
 @user_router.post("/user-token")
 async def login_for_access_token(
-        token: str = Depends(auth_api.check_token),
-        form_data: OAuth2PasswordRequestForm = Depends()
+        token: str=Depends(auth_api.check_token),
+        form_data: OAuth2PasswordRequestForm=Depends()
     ) -> auth_api.Token:
     """
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
     """
-    json_response = user_api.authenticate_user(
-        token,
-        form_data
-    )
+    if form_data.client_id is None:
+        json_response = user_api.authenticate_user(token, form_data)
+    else:
+        # Authenticate the user using OAuth2
+        user = auth_api.authenticate_with_oauth(form_data)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
     return json_response
 
 
@@ -72,14 +81,13 @@ def user_main_page(
     """
     Call the base page of user space.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    response_dict = user_api.load_user_space(
+        request,
+        token
+    )
     return templates.TemplateResponse(
         "user/user_space.html",
-        {
-            'request': request,
-            'token': token,
-            'user_name': user_name
-        }
+        response_dict
     )
 
 

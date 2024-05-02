@@ -6,6 +6,7 @@
 from typing import List
 
 
+
 class FastapiGuesser():
     """
     FastApi UI
@@ -24,16 +25,16 @@ class FastapiGuesser():
         mot_natal = row[2]
         return mot_natal
 
-    def get_user_answer(self) -> bool:
-        """
-        Ask the user to decide if the answer was correct or not.
-        """
-        user_answer = "No"
-        if user_answer == 'Yes':
-            word_guessed = True
-        if user_answer == 'No':
-            word_guessed = False
-        return word_guessed
+    # def get_user_answer(self) -> bool:
+    #     """
+    #     Ask the user to decide if the answer was correct or not.
+    #     """
+    #     user_answer = "No"
+    #     if user_answer == 'Yes':
+    #         word_guessed = True
+    #     if user_answer == 'No':
+    #         word_guessed = False
+    #     return word_guessed
 
     def guess_word(self, row: List[str], i: int, words: int):
         """
@@ -41,4 +42,5 @@ class FastapiGuesser():
         """
         self.ask_word(row)
         self.return_translation(row)
-        self.get_user_answer()
+        # self.get_user_answer()
+        return False

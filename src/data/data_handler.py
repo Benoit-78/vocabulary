@@ -80,9 +80,10 @@ class DbController(DbInterface):
             )
             connection.commit()
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -99,9 +100,10 @@ class DbController(DbInterface):
             connection.commit()
             logger.success(f"User '{user_name}' created on {self.host}.")
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -122,9 +124,10 @@ class DbController(DbInterface):
                 f"User '{user_name}' granted access to '{user_name}_{db_name}'."
             )
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -145,8 +148,10 @@ class DbController(DbInterface):
             df = pd.DataFrame(result, columns=columns)
             df = df[df['Host'] == self.host]
             users_list = df['User'].tolist()
-        except mariadb.Error as err:
-            logger.error(err)
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -163,19 +168,22 @@ class DbController(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         try:
-            cursor.execute(
-                f"INSERT INTO `users`.`voc_users` \
-                (`username`, `password_hash`, `email`, `disabled`) \
-                VALUES('{user_name}', '{hash_password}', '{user_email}', FALSE);"
-            )
+            request_1 = "INSERT INTO `users`.`voc_users`"
+            request_2 = "(`username`, `password_hash`, `email`, `disabled`)"
+            request_3 = f"VALUES('{user_name}', '{hash_password}', '{user_email}', FALSE);"
+            sql_request = " ".join([request_1, request_2, request_3])
+            cursor.execute(sql_request)
             connection.commit()
             logger.success(f"User '{user_name}' added to users table.")
-        except mariadb.Error as err:
-            logger.error(err)
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
-        return True
+        return result
 
     def get_users_list(self) -> List[Dict]:
         """
@@ -184,16 +192,19 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor()
         users_list = []
         try:
-            cursor.execute(
-                "SELECT username, password_hash, email, disabled FROM users.voc_users;"
-            )
+            request_1 = "SELECT username, password_hash, email, disabled"
+            request_2 = "FROM users.voc_users;"
+            sql_request = " ".join([request_1, request_2])
+            cursor.execute(sql_request)
             result = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
             users_df = pd.DataFrame(result, columns=columns)
             users_str = users_df.to_json(orient='records')
             users_list = json.loads(users_str)
-        except mariadb.Error as err:
-            logger.error(err)
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -206,17 +217,19 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor()
         result = None
         try:
-            request_1 = "REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON "
+            request_1 = "REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON"
             request_2 = f"{db_name}.* FROM '{user_name}'@'{self.host}';"
-            cursor.execute(request_1 + request_2)
+            sql_request = " ".join([request_1, request_2])
+            cursor.execute(sql_request)
             connection.commit()
             logger.success(
                 f"User '{user_name}' removed from '{user_name}_{db_name}'."
             )
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -243,9 +256,10 @@ class DbDefiner(DbInterface):
             cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
             connection.commit()
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -256,11 +270,18 @@ class DbDefiner(DbInterface):
         Get the list of databases for the user.
         """
         connection, cursor = self.get_db_cursor()
-        cursor.execute(f"SHOW DATABASES LIKE '{self.user_name}_%';")
-        databases = [db[0] for db in cursor.fetchall()]
-        cursor.close()
-        connection.close()
-        return databases
+        try:
+            cursor.execute(f"SHOW DATABASES LIKE '{self.user_name}_%';")
+            databases = [db[0] for db in cursor.fetchall()]
+            result = databases
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
 
     def create_seven_tables(self, db_name):
         """
@@ -271,7 +292,8 @@ class DbDefiner(DbInterface):
         try:
             cursor.execute(f"USE {sql_db_name};")
             cursor.execute(
-                "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
+                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             cursor.execute(
                 "CREATE TABLE version_perf (test_date DATE, score INT, taux INT);"
@@ -280,7 +302,8 @@ class DbDefiner(DbInterface):
                 "CREATE TABLE version_words_count (test_date DATE, nb INT);"
             )
             cursor.execute(
-                "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
+                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             cursor.execute(
                 "CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);"
@@ -289,13 +312,15 @@ class DbDefiner(DbInterface):
                 "CREATE TABLE theme_words_count (test_date DATE, nb INT);"
             )
             cursor.execute(
-                "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+                "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
+                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
             )
             connection.commit()
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -310,34 +335,33 @@ class DbDefiner(DbInterface):
             cursor.execute(f"USE {db_name};")
             cursor.execute("SHOW TABLES;")
             tables = list(cursor.fetchall())
+            tables = self.rectify_this_strange_result(tables)
             cols_dict = {}
             for table_name in tables:
-                if isinstance(table_name, tuple):
-                    true_table_name = table_name[0]
-                elif isinstance(table_name, str):
-                    true_table_name = table_name
-                cursor.execute(f"SHOW COLUMNS FROM {true_table_name};")
+                cursor.execute(f"SHOW COLUMNS FROM {table_name};")
                 columns = list(cursor.fetchall())
-                # logger.debug(f"columns: {columns}")
                 columns = self.rectify_this_strange_result(columns)
-                # logger.debug(f"columns: {columns}")
-                cols_dict[true_table_name] = columns
-            # logger.debug(f"cols_dict: {cols_dict}")
-        except mariadb.Error as err:
-            logger.error(err)
+                cols_dict[table_name] = columns
+            result = cols_dict
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
-        return cols_dict
+        return result
 
-    def rectify_this_strange_result(self, result):
+    def rectify_this_strange_result(self, columns):
         """
-        Correct the result of the 'SHOW COLUMNS FROM table_name' request.
+        Correct the result of following requests:
+        - 'SHOW TABLES'
+        - 'SHOW COLUMNS FROM table_name'
         """
-        if isinstance(result[0], tuple):
-            result = [col[0] for col in result]
-        elif isinstance(result[0], str):
-            pass
+        if isinstance(columns[0], tuple):
+            result = [col[0] for col in columns]
+        elif isinstance(columns[0], str):
+            result = columns
         return result
 
     def get_tables_names(self, test_type) -> List[str]:
@@ -365,9 +389,10 @@ class DbDefiner(DbInterface):
             cursor.execute(f"DROP DATABASE {db_name};")
             connection.commit()
             result = True
-        except mariadb.Error as err:
-            logger.error(err)
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -444,26 +469,26 @@ class DbManipulator(DbInterface):
         Add a word to the table.
         """
         connection, cursor = self.get_db_cursor()
-        # Create request string
         today_str = str(datetime.today().date())
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
-        logger.debug(f"english: {english}")
         if self.read_word(english) is not None:
             result = 'Word already exists'
             logger.error(result)
             return result
         native = row[1]
+        request_1 = f"INSERT INTO {self.db_name}.{words_table_name}"
+        request_2 = "(english, français, creation_date, nb, score, taux)"
+        request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
+        sql_request = ' '.join([request_1, request_2, request_3])
         try:
-            request_1 = f"INSERT INTO {self.db_name}.{words_table_name}"
-            request_2 = "(english, français, creation_date, nb, score, taux)"
-            request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
-            # Execute request
-            cursor.execute(' '.join([request_1, request_2, request_3]))
+            cursor.execute(sql_request)
             connection.commit()
             result = True
-        except:
-            result = False
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
@@ -474,61 +499,74 @@ class DbManipulator(DbInterface):
         Read the given word
         """
         connection, cursor = self.get_db_cursor()
-        # Create request string
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = "SELECT english, français, score"
         request_2 = f"FROM {self.db_name}.{words_table_name}"
+        logger.debug(f"db_name: {self.db_name}")
         request_3 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2, request_3])
-        logger.debug(f"{self.db_name}.{words_table_name}")
-        # Execute request
+        request_result = None
         try:
-            connection, cursor = self.get_db_cursor()
             request_result = cursor.execute(sql_request)
             request_result = cursor.fetchall()
-            logger.debug(f"request_result: {request_result}")
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = None
+        finally:
+            cursor.close()
+            connection.close()
+        if request_result:
             english, native, score = request_result[0]
             result = (english, native, score)
-        except IndexError:
+        else:
             result = None
-        # cursor.close()
-        connection.close()
         return result
 
     def update_word(self, english: str, new_nb, new_score):
         """
         Update statistics on the given word
         """
-        # Create request string
+        connection, cursor = self.get_db_cursor()
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = f"UPDATE {words_table_name}"
+        request_1 = f"UPDATE {self.db_name }.{words_table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
-        # Execute request
-        connection, cursor = self.get_db_cursor()
-        cursor.execute(sql_request)
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return True
+        try:
+            cursor.execute(sql_request)
+            connection.commit()
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
 
     def delete_word(self, english):
         """
         Delete a word from the words table of the instance database.
         """
-        # Create request string
+        connection, cursor = self.get_db_cursor()
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = f"DELETE FROM {words_table_name}"
+        request_1 = f"DELETE FROM {self.db_name}.{words_table_name}"
         request_2 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2])
-        # Execute request
-        connection, cursor = self.get_db_cursor()
-        cursor.execute(sql_request)
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return True
+        try:
+            cursor.execute(sql_request)
+            connection.commit()
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
 
     def save_table(self, table_name: str, table: pd.DataFrame):
         """
@@ -537,29 +575,31 @@ class DbManipulator(DbInterface):
         connection, cursor = self.get_db_cursor()
         cols = self.db_definer.get_database_cols(self.db_name)
         if table_name == 'output':
-            if self.test_type == 'version':
-                table_name = 'theme_voc'
-            elif self.test_type == 'theme':
-                table_name = 'archives'
-        # logger.debug(f"table_name: {table_name}")
-        # logger.debug(f"table columns: {table.columns}")
-        # logger.debug(f"cols[table_name]: {cols[table_name]}")
+            table_name = self.get_output_table()
         table = table[cols[table_name]]
-        engine = create_engine(
-            ''.join([
-                "mysql+pymysql",
-                "://", 'root',
-                ':', os.getenv('VOC_DB_ROOT_PWD'),
-                '@', self.host,
-                '/', self.db_name.lower()
-            ])
-        )
-        table.to_sql(
-            name=table_name,
-            con=engine,
-            if_exists='replace',
-            method='multi',
-            index=False
-        )
-        cursor.close()
-        connection.close()
+        try:
+            engine = create_engine(
+                ''.join([
+                    "mysql+pymysql",
+                    "://", 'root',
+                    ':', os.getenv('VOC_DB_ROOT_PWD'),
+                    '@', self.host,
+                    '/', self.db_name.lower()
+                ])
+            )
+            table.to_sql(
+                name=table_name,
+                con=engine,
+                if_exists='replace',
+                method='multi',
+                index=False
+            )
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result

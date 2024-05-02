@@ -107,7 +107,7 @@ class TestDbController(unittest.TestCase):
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.data_handler.DbController.get_db_cursor')
-    def test_create_user_in_mysql_ok(self, mock_get_db_cursor):
+    def test_create_user_in_mysql(self, mock_get_db_cursor):
         """
         Should create a user in the mysql database.
         """
@@ -119,91 +119,337 @@ class TestDbController(unittest.TestCase):
         # ----- ACT
         result = self.db_controller.create_user_in_mysql(self.user_name, user_password)
         # ----- ASSERT
-        self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once()
         request_1 = f"CREATE USER '{self.user_name}'@'{self.mock_host}'"
         request_2 = f"IDENTIFIED BY '{user_password}';"
         sql_request_1 = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_with(sql_request_1)
+        self.assertEqual(result, True)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    # @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    # @patch('src.data.data_handler.DbController.get_db_cursor')
-    # def test_create_user_in_mysql_nok(self, mock_get_db_cursor):
-    #     # ----- ARRANGE
-    #     mock_connection = MagicMock()
-    #     mock_cursor = MagicMock()
-    #     mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-    #     user_password = 'test_user_password'
-    #     # ----- ACT
-    #     result = self.db_controller.create_user_in_mysql(self.user_name, user_password)
-    #     # ----- ASSERT
-    #     self.assertEqual(result, True)
-    #     mock_get_db_cursor.assert_called_once()
-    #     request_1 = f"CREATE USER '{self.user_name}'@'{self.mock_host}'"
-    #     request_2 = f"IDENTIFIED BY '{user_password}';"
-    #     sql_request_1 = " ".join([request_1, request_2])
-    #     mock_cursor.execute.assert_called_with(sql_request_1)
-    #     mock_cursor.close.assert_called_once()
-    #     mock_connection.close.assert_called_once()
-
-    # @patch('src.data.data_handler.mariadb')
-    # def test_create_user_failure(self, mock_mariadb):
-    #     # Arrange
-    #     mock_connection = MagicMock()
-    #     mock_cursor = MagicMock()
-        # mock_mariadb.connect.return_value = mock_connection
-        # mock_connection.cursor.return_value = mock_cursor
-    #     mock_cursor.execute.side_effect = mariadb.Error("Mock error")
-    #     user_name = 'test_user'
-    #     user_password = 'test_password'
-    #     # Act
-    #     result = self.db_controller.create_user_in_mysql(user_name, user_password)
-    #     # Assert
-    #     self.assertFalse(result)
-    #     mock_cursor.execute.assert_called_once()
-    #     mock_connection.rollback.assert_called_once()
-    #     mock_cursor.close.assert_called_once()
-    #     mock_connection.close.assert_called_once()
-
+    @patch('src.data.data_handler.logger')
     @patch('src.data.data_handler.mariadb')
-    def test_create_user_error_handling(self, mock_mariadb):
-        # Arrange
+    def test_create_user_error(self, mock_mariadb, mock_logger):
+        # ----- ARRANGE
         mock_connection = MagicMock()
-        mock_cursor = MagicMock()
         mock_mariadb.connect.return_value = mock_connection
-        # mock_connection.cursor.return_value = mock_cursor
-        mock_cursor.execute.side_effect = mariadb.Error("Mock error")
-        mock_mariadb.connect.cursor.return_value = mock_cursor
-        # Act
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_connection.commit.side_effect = mariadb.Error("ER_CANNOT_USER")
+        user_password = 'test_password'
+        # ----- ACT
         result = self.db_controller.create_user_in_mysql("test_user", "test_password")
-        # Assert
+        # ----- ASSERT
+        request_1 = f"CREATE USER '{self.user_name}'@'{self.mock_host}'"
+        request_2 = f"IDENTIFIED BY '{user_password}';"
+        sql_request_1 = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_with(sql_request_1)
+        mock_connection.commit.assert_called_once()
+        mock_logger.error.assert_called_once()
         self.assertEqual(result, False)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_grant_privileges_on_common_database(
+            self,
+            mock_mariadb,
+            mock_logger
+        ):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        # ----- ACT
+        result = self.db_controller.grant_privileges_on_common_database('test_user')
+        # ----- ASSERT
+        mock_cursor.execute.assert_called_once_with(
+            "GRANT SELECT ON common.* TO 'test_user'@'localhost';"
+        )
+        mock_connection.commit.assert_called_once()
+        mock_logger.success.assert_called_once_with(
+            f"User '{self.user_name}' created on {self.db_controller.host}."
+        )
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+        self.assertTrue(result)
 
-    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.DbController.get_db_cursor')
-    def test_grant_privileges(self, mock_get_db_cursor):
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_grant_privileges_on_common_database_error(
+            self,
+            mock_mariadb,
+            mock_logger
+        ):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_connection.commit.side_effect = mariadb.Error("ER_CANNOT_USER")
+        # ----- ACT
+        result = self.db_controller.grant_privileges_on_common_database('test_user')
+        # ----- ASSERT
+        mock_cursor.execute.assert_called_once_with(
+            "GRANT SELECT ON common.* TO 'test_user'@'localhost';"
+        )
+        mock_connection.commit.assert_called_once()
+        # mock_logger.error.assert_called_once_with(mariadb.Error(-1, 'ER_CANNOT_USER', None)²)
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.mariadb')
+    def test_grant_privileges(self, mock_mariadb):
         """
         Should grant all necessary privileges to a user on a database.
         """
-        # Arrange
+        # ----- ARRANGE
         mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
         mock_cursor = MagicMock()
-        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_connection.cursor.return_value = mock_cursor
         db_name = 'test_database_name'
-        # Act
+        # ----- ACT
         result = self.db_controller.grant_privileges(self.user_name, db_name)
-        # Assert
+        # ----- ASSERT
         self.assertEqual(result, True)
-        mock_get_db_cursor.assert_called_once_with()
         request_1 = f"GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON {self.user_name}_{db_name}.*"
         request_2 = f"TO '{self.user_name}'@'{self.mock_host}';"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_grant_privileges_error(self, mock_mariadb, mock_logger):
+        """
+        Should grant all necessary privileges to a user on a database.
+        """
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_connection.commit.side_effect = mariadb.Error("ER_CANNOT_USER")
+        db_name = 'test_database_name'
+        # ----- ACT
+        result = self.db_controller.grant_privileges(self.user_name, db_name)
+        # ----- ASSERT
+        request_1 = f"GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON {self.user_name}_{db_name}.*"
+        request_2 = f"TO '{self.user_name}'@'{self.mock_host}';"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_connection.commit.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertEqual(result, False)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.mariadb')
+    def test_get_users_list_from_mysql(self, mock_mariadb):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [
+            ('user1', 'localhost'),
+            ('user2', 'localhost')
+        ]
+        mock_cursor.description = [
+            ['User', 'some_value'],
+            ['Host', 'some_value']
+        ]
+        # ----- ACT
+        result = self.db_controller.get_users_list_from_mysql()
+        # ----- ASSERT
+        self.assertIsInstance(result, list)
+        self.assertEqual(result, ['user1', 'user2'])
+        mock_cursor.execute.assert_called_once_with("SELECT User, Host FROM mysql.user;")
+        mock_cursor.fetchall.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_get_users_list_from_mysql_error(self, mock_mariadb, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.side_effect = mariadb.Error("ER_CANNOT_USER")
+        # ----- ACT
+        result = self.db_controller.get_users_list_from_mysql()
+        # ----- ASSERT
+        mock_cursor.execute.assert_called_once_with("SELECT User, Host FROM mysql.user;")
+        mock_cursor.fetchall.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.mariadb')
+    def test_add_user_to_users_table(self, mock_mariadb):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        hash_password = 'mock_pwd'
+        user_email = 'mock_email'
+        # ----- ACT
+        result = self.db_controller.add_user_to_users_table(
+            self.user_name,
+            hash_password,
+            user_email
+        )
+        # ----- ASSERT
+        self.assertEqual(result, True)
+        request_1 = "INSERT INTO `users`.`voc_users`"
+        request_2 = "(`username`, `password_hash`, `email`, `disabled`)"
+        request_3 = f"VALUES('{self.user_name}', '{hash_password}', '{user_email}', FALSE);"
+        sql_request = " ".join([request_1, request_2, request_3])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_add_user_to_users_table_error(self, mock_mariadb, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_connection.commit.side_effect = mariadb.Error("ER_CANNOT_USER")
+        hash_password = 'mock_pwd'
+        user_email = 'mock_email'
+        # ----- ACT
+        result = self.db_controller.add_user_to_users_table(
+            self.user_name,
+            hash_password,
+            user_email
+        )
+        # ----- ASSERT
+        request_1 = "INSERT INTO `users`.`voc_users`"
+        request_2 = "(`username`, `password_hash`, `email`, `disabled`)"
+        request_3 = f"VALUES('{self.user_name}', '{hash_password}', '{user_email}', FALSE);"
+        sql_request = " ".join([request_1, request_2, request_3])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_connection.commit.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertEqual(result, False)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.mariadb')
+    def test_get_users_list(self, mock_mariadb):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [
+            ('user1', 'pwd_hash_1', 'mail_1', True),
+            ('user2', 'pwd_hash_2', 'mail_2', False)
+        ]
+        mock_cursor.description = [
+            ['User', 'some_value'],
+            ['Password_hash', 'some_value'],
+            ['Email', 'some_value'],
+            ['Disabled', 'some_value'],
+        ]
+        # ----- ACT
+        result = self.db_controller.get_users_list()
+        # ----- ASSERT
+        self.assertIsInstance(result, list)
+        request_1 = "SELECT username, password_hash, email, disabled"
+        request_2 = "FROM users.voc_users;"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.fetchall.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_get_users_list_error(self, mock_mariadb, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.side_effect = mariadb.Error("ER_CANNOT_USER")
+        # ----- ACT
+        result = self.db_controller.get_users_list()
+        # ----- ASSERT
+        request_1 = "SELECT username, password_hash, email, disabled"
+        request_2 = "FROM users.voc_users;"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.fetchall.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_revoke_privileges(self, mock_mariadb, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        db_name = 'mock_db_name'
+        # ----- ACT
+        result = self.db_controller.revoke_privileges(
+            self.user_name,
+            db_name
+        )
+        # ----- ASSERT
+        self.assertEqual(result, True)
+        request_1 = "REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON"
+        request_2 = f"{db_name}.* FROM '{self.user_name}'@'{self.db_controller.host}';"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_connection.commit.assert_called_once()
+        mock_logger.success.assert_called_once_with(
+            f"User '{self.user_name}' removed from '{self.user_name}_{db_name}'."
+        )
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.mariadb')
+    def test_revoke_privileges_error(self, mock_mariadb, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_mariadb.connect.return_value = mock_connection
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_connection.commit.side_effect = mariadb.Error("ER_CANNOT_USER")
+        db_name = 'mock_db_name'
+        # ----- ACT
+        result = self.db_controller.revoke_privileges(
+            self.user_name,
+            db_name
+        )
+        # ----- ASSERT
+        request_1 = "REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON"
+        request_2 = f"{db_name}.* FROM '{self.user_name}'@'{self.db_controller.host}';"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_connection.commit.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertEqual(result, False)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
@@ -215,7 +461,7 @@ class TestDbDefiner(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        cls.user_name = 'benoit'
+        cls.user_name = 'username'
         cls.db_definer = data_handler.DbDefiner(cls.user_name)
 
     @patch('src.data.data_handler.DbDefiner.get_db_cursor')
@@ -228,6 +474,7 @@ class TestDbDefiner(unittest.TestCase):
         # Act
         result = self.db_definer.create_database(db_name)
         # Assert
+        self.assertEqual(result, True)
         mock_get_db_cursor.assert_called_once()
         sql_request = f"CREATE DATABASE {self.user_name}_{db_name};"
         mock_cursor.execute.assert_called_once_with(sql_request)
@@ -235,14 +482,144 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
+    @patch('src.data.data_handler.logger')
     @patch('src.data.data_handler.DbDefiner.get_db_cursor')
-    def test_get_database_cols(self, mock_get_db_cursor):
-        """
-        Should return the columns that will be used in the tables.
-        """
+    def test_create_database_error(self, mock_get_db_cursor, mock_logger):
         # Arrange
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_connection.commit.side_effect = mariadb.Error("ER_CANNOT_USER")
+        db_name = 'test_db'
+        # Act
+        result = self.db_definer.create_database(db_name)
+        # Assert
+        mock_get_db_cursor.assert_called_once()
+        sql_request = f"CREATE DATABASE {self.user_name}_{db_name};"
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_connection.commit.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_get_user_databases(self, mock_get_db_cursor):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_cursor.fetchall.return_value = [
+            [self.db_definer.user_name + '_' + 'english'],
+            [self.db_definer.user_name + '_' + 'french']
+        ]
+        # ----- ACT
+        result = self.db_definer.get_user_databases()
+        # ----- ASSERT
+        self.assertIsInstance(result, list)
+        self.assertEqual(result, ['username_english', 'username_french'])
+        mock_cursor.execute.assert_called_once_with(
+            f"SHOW DATABASES LIKE '{self.db_definer.user_name}_%';"
+        )
+        mock_cursor.fetchall.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_get_user_databases_error(self, mock_get_db_cursor, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_cursor.fetchall.side_effect = mariadb.Error("ER_CANNOT_USER")
+        # ----- ACT
+        result = self.db_definer.get_user_databases()
+        # ----- ASSERT
+        mock_cursor.execute.assert_called_once_with(
+            f"SHOW DATABASES LIKE '{self.db_definer.user_name}_%';"
+        )
+        mock_cursor.fetchall.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_create_seven_tables(self, mock_get_db_cursor):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        db_name = 'mock_db_name'
+        sql_db_name = f"{self.user_name}_{db_name}"
+        # ----- ACT
+        result = self.db_definer.create_seven_tables(db_name)
+        # ----- ASSERT
+        self.assertTrue(result)
+        mock_cursor.execute.assert_any_call(f"USE {sql_db_name};")
+        mock_cursor.execute.assert_any_call(
+            "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
+            "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+        )
+        mock_cursor.execute.assert_any_call(
+            "CREATE TABLE version_perf (test_date DATE, score INT, taux INT);"
+        )
+        mock_cursor.execute.assert_any_call(
+            "CREATE TABLE version_words_count (test_date DATE, nb INT);"
+        )
+        mock_cursor.execute.assert_any_call(
+            "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
+            "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+        )
+        mock_cursor.execute.assert_any_call(
+            "CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);"
+        )
+        mock_cursor.execute.assert_any_call(
+            "CREATE TABLE theme_words_count (test_date DATE, nb INT);"
+        )
+        mock_cursor.execute.assert_any_call(
+            "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
+            "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
+        )
+        assert mock_cursor.execute.call_count == 8
+        mock_connection.commit.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_create_seven_tables_error(self, mock_get_db_cursor, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        db_name = 'mock_db_name'
+        sql_db_name = f"{self.user_name}_{db_name}"
+        # ----- ACT
+        result = self.db_definer.create_seven_tables(db_name)
+        # ----- ASSERT
+        mock_cursor.execute.assert_called_once_with(f"USE {sql_db_name};")
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.DbDefiner.rectify_this_strange_result')
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_get_database_cols(
+            self,
+            mock_get_db_cursor,
+            mock_rectify
+        ):
+        """
+        Should return the columns that will be used in the tables.
+        """
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         db_name = 'test_db'
         mock_cursor.fetchall.return_value = [[(db_name,)]]  # Mock the USE statement result
@@ -251,36 +628,89 @@ class TestDbDefiner(unittest.TestCase):
             [('col1', 'type1'), ('col2', 'type2')],
             [('col3', 'type3'), ('col4', 'type4')]  # Mock SHOW COLUMNS result
         ]
-        # Act
+        mock_rectify.side_effect = lambda arg1: arg1
+        # ----- ACT
         result = self.db_definer.get_database_cols(db_name)
-        # Assertions
+        # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
+        self.assertEqual(
+            result,
+            {
+                'table1': [('col1', 'type1'), ('col2', 'type2')],
+                'table2': [('col3', 'type3'), ('col4', 'type4')]
+            }
+        )
+        assert mock_cursor.execute.call_count == 4
         mock_cursor.execute.assert_any_call(f"USE {db_name};")
         mock_cursor.execute.assert_any_call("SHOW TABLES;")
         mock_cursor.execute.assert_any_call("SHOW COLUMNS FROM table1;")
         mock_cursor.execute.assert_any_call("SHOW COLUMNS FROM table2;")
-        # self.assertEqual(
-        #     result,
-        #     {
-        #         'table1': [('col1', 'type1'), ('col2', 'type2')],
-        #         'table2': [('col3', 'type3'), ('col4', 'type4')]
-        #     }
-        # )
-        self.assertEqual(
-            result,
-            {
-                'table1': ['col1', 'col2'],
-                'table2': ['col3', 'col4']
-            }
+        assert mock_cursor.fetchall.call_count == 3
+        assert mock_rectify.call_count == 3
+        mock_rectify.assert_any_call(
+            [('col1', 'type1'), ('col2', 'type2')]
+        )
+        mock_rectify.assert_any_call(
+            [('col3', 'type3'), ('col4', 'type4')]
         )
 
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_get_database_cols_error(
+            self,
+            mock_get_db_cursor,
+            mock_logger
+        ):
+        """
+        Should return the columns that will be used in the tables.
+        """
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value = mock_cursor
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        db_name = 'test_db'
+        # ----- ACT
+        result = self.db_definer.get_database_cols(db_name)
+        # ----- ASSERT
+        mock_get_db_cursor.assert_called_once()
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.execute.assert_called_once_with(f"USE {db_name};")
+
+    def test_rectify_this_strange_result(self):
+        # ----- ARRANGE
+        strange_result = [
+            ('col1', 'type1'),
+            ('col2', 'type2')
+        ]
+        # ----- ACT
+        result = self.db_definer.rectify_this_strange_result(strange_result)
+        # ----- ASSERT
+        self.assertIsInstance(result, list)
+        self.assertEqual(result, ['col1', 'col2'])
+
+    def test_rectify_this_strange_result_str(self):
+        # ----- ARRANGE
+        strange_result = [
+            'col1', 'col2'
+        ]
+        # ----- ACT
+        result = self.db_definer.rectify_this_strange_result(strange_result)
+        # ----- ASSERT
+        self.assertIsInstance(result, list)
+        self.assertEqual(result, ['col1', 'col2'])
+
     def test_get_tables_names(self):
-        """Should return a list containing the tables names."""
-        # Arrange
+        """
+        Should return a list containing the tables names.
+        """
+        # ----- ARRANGE
         test_type = 'version'
-        # Act
+        # ----- ACT
         result = self.db_definer.get_tables_names(test_type)
-        # Assert
+        # ----- ASSERT
         expected_result = ['version_voc', 'version_perf', 'version_words_count', 'theme_voc']
         self.assertEqual(result, expected_result)
         for table_name in result[:-1]:
@@ -289,30 +719,106 @@ class TestDbDefiner(unittest.TestCase):
         test_types.remove(test_type)
         self.assertIn(test_types[0], result[-1])
 
+    @patch('src.data.data_handler.logger')
+    def test_get_tables_names_error(self, mock_logger):
+        """
+        Should return a list containing the tables names.
+        """
+        # ----- ARRANGE
+        test_type = 'gnagnagna'
+        # ----- ACT
+        with self.assertRaises(ValueError):
+            self.db_definer.get_tables_names(test_type)
+        # ----- ASSERT
+        mock_logger.error.assert_called_once_with(
+            f"Wrong test_type argument: {test_type}"
+        )
+
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_drop_database(self, mock_get_db_cursor):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        db_name = 'mock_db_name'
+        # ----- ACT
+        result = self.db_definer.drop_database(db_name)
+        # ----- ASSERT
+        self.assertTrue(result)
+        mock_cursor.execute.assert_called_once_with(
+            f"DROP DATABASE {db_name};"
+        )
+        mock_connection.commit.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    def test_drop_database_error(self, mock_get_db_cursor, mock_logger):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        db_name = 'mock_db_name'
+        # ----- ACT
+        result = self.db_definer.drop_database(db_name)
+        # ----- ASSERT
+        mock_cursor.execute.assert_called_once_with(
+            f"DROP DATABASE {db_name};"
+        )
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
 
 
 class TestDbManipulator(unittest.TestCase):
-    """"""
-    @classmethod
-    def setUpClass(cls):
+    """
+    Should provide all necessary methods to modify data.
+    """
+    def setUp(self):
         # Data definition
-        cls.user_name = 'benoit'
-        cls.db_definer = data_handler.DbDefiner(cls.user_name)
+        self.user_name = 'benoit'
+        self.db_definer = data_handler.DbDefiner(self.user_name)
         # Data manipulation
-        cls.table_name = 'version_voc'
-        cls.db_name = 'english'
-        cls.test_type = 'version'
-        cls.password = 'test_password'
-        cls.db_manipulator = data_handler.DbManipulator(
-            cls.user_name,
-            cls.db_name,
-            cls.test_type
+        self.db_name = 'english'
+        self.table_name = self.user_name + '_' + self.db_name + '.' + 'version_voc'
+        self.test_type = 'version'
+        self.password = 'test_password'
+        self.db_manipulator = data_handler.DbManipulator(
+            self.user_name,
+            self.db_name,
+            self.test_type
         )
-        cls.words_df = pd.DataFrame({
+        self.words_df = pd.DataFrame({
             'english': ['test_english'],
             'french': ['test_french'],
             'score': [42]
         })
+
+    def test_init(self):
+        # ----- ARRANGE
+        # ----- ACT
+        # ----- ASSERT
+        self.assertEqual(self.db_manipulator.user_name, self.user_name)
+        self.assertEqual(self.db_manipulator.db_name, f"{self.user_name}_{self.db_name}")
+        self.assertEqual(self.db_manipulator.test_type, self.test_type)
+
+    def test_init_complete_name(self):
+        # ----- ARRANGE
+        self.db_name = f"{self.user_name}_{self.db_name}"
+        # ----- ACT
+        self.db_manipulator = data_handler.DbManipulator(
+            self.user_name,
+            self.db_name,
+            self.test_type
+        )
+        # ----- ASSERT
+        self.assertEqual(self.db_manipulator.user_name, self.user_name)
+        self.assertEqual(self.db_manipulator.db_name, self.db_name)
+        self.assertEqual(self.db_manipulator.test_type, self.test_type)
 
     def test_check_test_type(self):
         """"""
@@ -371,31 +877,135 @@ class TestDbManipulator(unittest.TestCase):
         self.assertIn('output', list(result.keys()))
         mock_get_db_cursor.assert_called_once_with()
 
+    def test_get_output_table(self):
+        """
+        Should go from version to theme
+        """
+        # ----- ARRANGE
+        self.db_manipulator.test_type = 'version'
+        # ----- ACT
+        result = self.db_manipulator.get_output_table()
+        # ----- ASSERT
+        self.assertEqual(result, 'theme_voc')
+
+    def test_get_output_table_theme(self):
+        """
+        Should go from theme to theme archives
+        """
+        # ----- ARRANGE
+        self.db_manipulator.test_type = 'theme'
+        # ----- ACT
+        result = self.db_manipulator.get_output_table()
+        # ----- ASSERT
+        self.assertEqual(result, 'archives')
+
+    @patch('src.data.data_handler.logger')
+    def test_get_output_table_error(self, mock_logger):
+        """
+        Should raise error if test_type is not 'version' or 'theme'.
+        """
+        # ----- ARRANGE
+        self.db_manipulator.test_type = 'vladivostok'
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.db_manipulator.get_output_table()
+        # ----- ASSERT
+        mock_logger.error.assert_called_once_with(
+            f"Wrong test_type argument: {self.db_manipulator.test_type}"
+        )
+
+    @patch('src.data.data_handler.DbManipulator.read_word')
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
-    def test_insert_word(self, mock_get_db_cursor):
+    def test_insert_word(self, mock_get_db_cursor, mock_read_word):
         """
         Should add a word to the table.
         """
-        # Arrange
+        # ----- ARRANGE
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_read_word.return_value = None
         test_row = ['Bugger off', 'Fous moi le camp']
         today_date = datetime.today().date()
-        # Act
+        # ----- ACT
         result = self.db_manipulator.insert_word(test_row)
-        # Assert
-        self.assertIsInstance(result, int)
-        self.assertEqual(result, True)
-        sql_db_name = self.db_manipulator.db_name
+        # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         english = test_row[0]
         native = test_row[1]
-        request_1 = f"INSERT INTO {sql_db_name}.{self.table_name}"
+        request_1 = f"INSERT INTO {self.table_name}"
         request_2 = "(english, français, creation_date, nb, score, taux)"
         request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2, request_3])
-        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.execute.assert_called_with(sql_request)
+        self.assertTrue(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbManipulator.read_word')
+    @patch('src.data.data_handler.DbDefiner.get_tables_names')
+    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    def test_insert_word_already_exists(
+            self,
+            mock_get_db_cursor,
+            mock_get_tables_names,
+            mock_read_word,
+            mock_logger
+        ):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_get_tables_names.return_value = [
+            'version_voc',
+            'version_perf',
+            'version_count_words',
+            'theme_voc'
+        ]
+        mock_read_word.return_value = ('test_english', 'test_french', 42)
+        row = ['Hello', 'Bonjour']
+        # ----- ACT
+        result = self.db_manipulator.insert_word(row)
+        # ----- ASSERT
+        self.assertEqual(result, 'Word already exists')
+        mock_logger.error.assert_called_once_with(
+            result
+        )
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbManipulator.read_word')
+    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    def test_insert_word_error(
+            self,
+            mock_get_db_cursor,
+            mock_read_word,
+            mock_logger
+        ):
+        """
+        Should add a word to the table.
+        """
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_read_word.return_value = None
+        test_row = ['Bugger off', 'Fous moi le camp']
+        today_date = datetime.today().date()
+        # ----- ACT
+        result = self.db_manipulator.insert_word(test_row)
+        # ----- ASSERT
+        mock_get_db_cursor.assert_called_once()
+        english = test_row[0]
+        native = test_row[1]
+        request_1 = f"INSERT INTO {self.table_name}"
+        request_2 = "(english, français, creation_date, nb, score, taux)"
+        request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
+        sql_request = " ".join([request_1, request_2, request_3])
+        mock_cursor.execute.assert_called_with(sql_request)
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
@@ -404,24 +1014,49 @@ class TestDbManipulator(unittest.TestCase):
         # Arrange
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
-        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         mock_cursor.execute.return_value = [('test_english', 'test_french', 42)]
+        mock_cursor.fetchall.return_value = [('test_english', 'test_french', 42)]
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         english = self.words_df['english'][0]
         # Act
         result = self.db_manipulator.read_word(english)
         # Assert
-        mock_get_db_cursor.assert_called_once_with()
+        mock_get_db_cursor.assert_called_once()
         request_1 = f"SELECT english, français, score FROM {self.table_name}"
         request_2 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.fetchall.assert_called_once()
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
         self.assertEqual(result, ('test_english', 'test_french', 42))
 
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    def test_read_word_error(self, mock_get_db_cursor, mock_logger):
+        # Arrange
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        english = self.words_df['english'][0]
+        # Act
+        result = self.db_manipulator.read_word(english)
+        # Assert
+        mock_get_db_cursor.assert_called_once()
+        request_1 = f"SELECT english, français, score FROM {self.table_name}"
+        request_2 = f"WHERE english = '{english}';"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
     def test_update_word(self, mock_get_db_cursor):
-        """"""
+        """
+        Should update the word stats after a test.
+        """
         # Arrange
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
@@ -430,31 +1065,86 @@ class TestDbManipulator(unittest.TestCase):
         new_nb = 4
         new_score = 67
         # Act
-        self.db_manipulator.update_word(english, new_nb, new_score)
+        result = self.db_manipulator.update_word(english, new_nb, new_score)
         # Assert
         request_1 = f"UPDATE {self.table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
         request_3 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         mock_cursor.execute.assert_called_once_with(sql_request)
+        self.assertTrue(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    def test_update_word_error(self, mock_get_db_cursor, mock_logger):
+        """
+        Should update the word stats after a test.
+        """
+        # Arrange
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        english = 'test_word'
+        new_nb = 4
+        new_score = 67
+        # Act
+        result = self.db_manipulator.update_word(english, new_nb, new_score)
+        # Assert
+        request_1 = f"UPDATE {self.table_name}"
+        request_2 = f"SET nb = {new_nb}, score = {new_score}"
+        request_3 = f"WHERE english = {english};"
+        sql_request = " ".join([request_1, request_2, request_3])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
     def test_delete_word(self, mock_get_db_cursor):
-        """"""
-        # Arrange
+        """
+        Should delete a word from the table.
+        """
+        # ----- ARRANGE
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         english = 'test_word'
-        # Act
-        self.db_manipulator.delete_word(english)
-        # Assert
+        # ----- ACT
+        result = self.db_manipulator.delete_word(english)
+        # ----- ASSERT
         request_1 = f"DELETE FROM {self.table_name}"
         request_2 = f"WHERE english = {english};"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
+        self.assertTrue(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    def test_delete_word_error(self, mock_get_db_cursor, mock_logger):
+        """
+        Should delete a word from the table.
+        """
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        english = 'test_word'
+        # ----- ACT
+        result = self.db_manipulator.delete_word(english)
+        # ----- ASSERT
+        request_1 = f"DELETE FROM {self.table_name}"
+        request_2 = f"WHERE english = {english};"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_logger.error.assert_called_once()
+        self.assertFalse(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
@@ -462,12 +1152,16 @@ class TestDbManipulator(unittest.TestCase):
     @patch('src.data.data_handler.DbManipulator.get_db_cursor')
     @patch('src.data.data_handler.DbDefiner.get_database_cols')
     @patch('src.data.data_handler.create_engine')
-    def test_save_table(self, mock_create_engine, mock_get_database_cols, mock_get_db_cursor):
-        # Arrange
+    def test_save_table(
+            self,
+            mock_create_engine,
+            mock_get_database_cols,
+            mock_get_db_cursor
+        ):
+        # ----- ARRANGE
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-        #
         mock_get_database_cols.return_value = {
             'version_voc': ['col_1', 'col_2'],
             'version_perf': ['col_3', 'col_4'],
@@ -477,25 +1171,106 @@ class TestDbManipulator(unittest.TestCase):
             'theme_words_count': ['col_11', 'col_12'],
             'archives': ['col_13', 'col_14']
         }
-        #
         mock_engine = MagicMock()
         mock_create_engine.return_value = mock_engine
         password = 'root_password'
         table_name = 'version_voc'
         table = pd.DataFrame({'col_1': [1, 2], 'col_2': ['a', 'b']})
-        # Act
-        self.db_manipulator.save_table(table_name, table)
-        # Assert
+        # ----- ACT
+        result = self.db_manipulator.save_table(table_name, table)
+        # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
             f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
         )
-        # mock_engine.to_sql.assert_called_once_with(
-        #     name=table_name,
-        #     con=mock_engine,
-        #     if_exists='replace',
-        #     method='multi',
-        #     index=False
-        # )
+        self.assertTrue(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
+    @patch('src.data.data_handler.DbManipulator.get_output_table')
+    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.data_handler.DbDefiner.get_database_cols')
+    @patch('src.data.data_handler.create_engine')
+    def test_save_table_output(
+            self,
+            mock_create_engine,
+            mock_get_database_cols,
+            mock_get_db_cursor,
+            mock_get_output_table
+        ):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_get_database_cols.return_value = {
+            'version_voc': ['english', 'français'],
+            'version_perf': ['test_date', 'score'],
+            'version_words_count': ['test_date', 'words_count'],
+            'theme_voc': ['english', 'français'],
+            'theme_perf': ['test_date', 'score'],
+            'theme_words_count': ['test_date', 'words_count'],
+            'archives': ['english', 'français']
+        }
+        mock_engine = MagicMock()
+        mock_create_engine.return_value = mock_engine
+        mock_get_output_table.return_value = 'theme_voc'
+        self.db_manipulator.test_type = 'version'
+        password = 'root_password'
+        table_name = 'output'
+        table = pd.DataFrame({
+            'english': [1, 2],
+            'français': ['a', 'b']
+        })
+        # ----- ACT
+        self.db_manipulator.save_table(table_name, table)
+        # ----- ASSERT
+        mock_get_db_cursor.assert_called_once()
+        mock_create_engine.assert_called_once_with(
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+        )
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
+    @patch('src.data.data_handler.logger')
+    @patch('src.data.data_handler.create_engine')
+    @patch('src.data.data_handler.DbDefiner.get_database_cols')
+    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    def test_save_table_error(
+            self,
+            mock_get_db_cursor,
+            mock_get_database_cols,
+            mock_create_engine,
+            mock_logger
+        ):
+        # ----- ARRANGE
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_get_database_cols.return_value = {
+            'version_voc': ['col_1', 'col_2'],
+            'version_perf': ['col_3', 'col_4'],
+            'version_words_count': ['col_5', 'col_6'],
+            'theme_voc': ['col_7', 'col_8'],
+            'theme_perf': ['col_9', 'col_10'],
+            'theme_words_count': ['col_11', 'col_12'],
+            'archives': ['col_13', 'col_14']
+        }
+        mock_create_engine.side_effect = mariadb.Error("ER_CANNOT_USER")
+        password = 'root_password'
+        table_name = 'version_voc'
+        table = pd.DataFrame({
+            'col_1': [1, 2],
+            'col_2': ['a', 'b']
+        })
+        # ----- ACT
+        self.db_manipulator.save_table(table_name, table)
+        # ----- ASSERT
+        mock_get_db_cursor.assert_called_once()
+        mock_create_engine.assert_called_once_with(
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+        )
+        mock_logger.error.assert_called_once()
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()

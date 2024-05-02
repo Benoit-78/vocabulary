@@ -1,0 +1,189 @@
+"""
+    Decoupling date:
+        30th March 2024
+    Main purpose:
+        Interaction with csv database.
+"""
+
+import logging
+import os
+import sys
+import unittest
+from io import StringIO
+from unittest.mock import MagicMock, patch, mock_open
+
+import pandas as pd
+from loguru import logger
+
+REPO_NAME = 'vocabulary'
+REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
+sys.path.append(REPO_DIR)
+
+from src.data import csv_interface
+
+
+
+class TestCsvHandler(unittest.TestCase):
+    """
+    The CsvHandler class should serve as an interface with csv data.
+    """
+    @classmethod
+    def setUpClass(cls):
+        """Run once before all tests."""
+        cls.csv_handler_1 = csv_interface.CsvHandler('version')
+        cls.csv_handler_2 = csv_interface.CsvHandler('theme')
+        cls.error_data_handler = None
+
+    def test_set_paths(self):
+        """Data paths should exist"""
+        # Act
+        self.csv_handler_1.set_paths()
+        self.csv_handler_2.set_paths()
+        # Assert
+        for csv_handler in [self.csv_handler_1, self.csv_handler_2]:
+            self.assertIsInstance(csv_handler.paths, dict)
+            self.assertEqual(len(csv_handler.paths), 4)
+            for _, path in csv_handler.paths.items():
+                self.assertIsInstance(path, str)
+
+    def test_set_paths_error(self):
+        """Error should be raised in case of unknown OS."""
+        # Arrange
+        invalid_test_type = "blablabla"
+        self.error_data_handler = csv_interface.CsvHandler(invalid_test_type)
+        mock_logger = MagicMock()
+        logging.basicConfig(level=logging.INFO)
+        with self.assertRaises(SystemExit):
+            # Act
+            self.error_data_handler.set_paths()
+            # Assert
+            mock_logger.error.assert_called_with(f"Wrong test_type argument: {invalid_test_type}")
+            mock_logger.error.assert_called_once()
+
+    @patch('src.data.csv_interface.CsvHandler.set_paths')
+    @patch('src.data.csv_interface.pd.read_csv')
+    def test_set_tables(self, mock_read_csv, mock_set_paths):
+        """
+        Data should be correctly loaded.
+        """
+        # ----- ARRANGE
+        self.csv_handler_1.tables = {}
+        mock_set_paths.return_value = {
+            'version_voc': 'data/version_voc.csv',
+            'version_perf': 'data/version_perf.csv',
+            'version_word_cnt': 'data/version_words_count.csv',
+            'output': 'data/theme_voc.csv'
+        }
+        self.csv_handler_1.test_type = 'version'
+        mock_read_csv.return_value = pd.DataFrame(
+            data={
+                'words': ['word1', 'word2', 'word3'],
+                'integers': [1, 2, 3],
+                'floats': [1.0, 2.0, 3.0],
+                'booleans': [True, False, True]
+            }
+        )
+        # ----- ACT
+        self.csv_handler_1.set_tables()
+        # ----- ASSERT
+        self.assertIsInstance(self.csv_handler_1.tables, dict)
+        self.assertEqual(len(self.csv_handler_1.tables), 4)
+        for df_name, dataframe in self.csv_handler_1.tables.items():
+            self.assertIn(
+                df_name,
+                [
+                    self.csv_handler_1.test_type + '_voc',
+                    self.csv_handler_1.test_type + '_perf',
+                    self.csv_handler_1.test_type + '_word_cnt',
+                    'output'
+                ]
+            )
+            self.assertIsInstance(dataframe, type(pd.DataFrame()))
+            self.assertEqual(dataframe.shape, (3, 4))
+
+    @patch('src.data.csv_interface.CsvHandler.set_paths')
+    def test_get_paths(self, mock_set_paths):
+        """
+        Should return the paths.
+        """
+        # ----- ARRANGE
+        mock_set_paths.return_value = True
+        # ----- ACT
+        paths = self.csv_handler_1.get_paths()
+        # ----- ASSERT
+        self.assertIsInstance(paths, dict)
+        mock_set_paths.assert_called_once()
+
+    @patch('src.data.csv_interface.CsvHandler.set_tables')
+    def test_get_tables(self, mock_set_tables):
+        """
+        Should return the paths.
+        """
+        # ----- ARRANGE
+        mock_set_tables.return_value = True
+        # ----- ACT
+        paths = self.csv_handler_1.get_tables()
+        # ----- ASSERT
+        self.assertIsInstance(paths, dict)
+        mock_set_tables.assert_called_once()
+
+    def test_save_table(self):
+        """
+        Should save the table as a csv file.
+        """
+        # Arrange
+        csv_handler = csv_interface.CsvHandler('version')
+        csv_handler.set_paths()
+        old_df = pd.DataFrame(columns=['words', 'integers', 'floats', 'booleans'])
+        old_df.loc[old_df.shape[0]] = ['a', 0, 0.0, True]
+        old_df.loc[old_df.shape[0]] = ['b', 1, 1.0, False]
+        old_df.loc[old_df.shape[0]] = ['c', 2, 2.0, False]
+        csv_handler.paths['for_test_only'] = csv_handler.os_sep.join(
+            [r'.', 'data', 'for_test_only.csv']
+        )
+        # Act
+        csv_handler.save_table(
+            table_name='for_test_only',
+            table=old_df
+        )
+        new_df = pd.read_csv(csv_handler.paths['for_test_only'], sep=';')
+        # Assert
+        self.assertEqual(old_df.shape, new_df.shape)
+        for column in new_df.columns:
+            self.assertEqual(
+                list(old_df[column]),
+                list(new_df[column])
+            )
+        os.remove(csv_handler.paths['for_test_only'])
+
+    # @patch('builtins.open', new_callable=mock_open)
+    # @patch('pandas.read_csv')
+    # def test_csv_to_sql(self, mock_read_csv, mock_open):
+    #     # ----- ARRANGE
+    #     csv_path = 'test.csv'
+    #     table_name = 'test_table'
+    #     csv_data = '\n'.join([
+    #         "foreign,native,creation_date,nb,score,taux",
+    #         "value1,value2,2022-01-01,10,5,0.5",
+    #         "value3,value4,2022-01-02,20,7,0.35"
+    #     ])
+    #     mock_read_csv.return_value = pd.read_csv(StringIO(csv_data))
+    #     # ----- ACT
+    #     csv_interface.csv_to_sql(csv_path, table_name)
+    #     # ----- ASSERT
+    #     expected_sql = ' '.join([
+    #         "INSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)",
+    #         "VALUES ('value1', 'value2', '2022-01-01', 10, 5, 0.5);",
+    #         "\nINSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)",
+    #         "VALUES ('value3', 'value4', '2022-01-02', 20, 7, 0.35);",
+    #         "\n"
+    #     ])
+    #     mock_open.assert_called_once_with(f'data/{table_name}.sql', 'w', encoding='utf-8')
+    #     logger.debug(mock_open.return_value.write.call_args_list)
+    #     mock_open.return_value.write.assert_called_once()
+    #     # expected_sql = "INSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`) VALUES ('value1', 'value2', '2022-01-01', 10, 5, 0.5);\nINSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`) VALUES ('value3', 'value4', '2022-01-02', 20, 7, 0.35);\n"
+    #     # mock_open.assert_called_once_with(f'data/{table_name}.sql', 'w', encoding='utf-8')
+    #     # mock_open.return_value.write.assert_called_once()
+    #     # write_call_args = mock_open.return_value.write.call_args
+    #     # actual_sql = write_call_args[0][0]  # Extract the content passed to the write method
+    #     # self.assertEqual(actual_sql, expected_sql)

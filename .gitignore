@@ -1,20 +1,31 @@
 # Folders
 
+# Cache folders
 .pytest_cache/*
 .vscode/*
 __pycache__/*
-conf/*
 data/__pycache__/*
-divers/*
-doc/*
-logs/*
-venv/*
-htmlcov/*
-mgmt/*
 src/data/__pycache__/*
+node_modules/*
 
+conf/*
 
+divers/*
+
+doc/*
+
+logs/*
+
+venv/*
+
+htmlcov/*
+
+mgmt/*
+
+# Tests artifacts
 .coverage
+coverage/*
+
 token.txt
 cred.json
 nltk_tries_out.py

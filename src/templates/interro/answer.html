@@ -2,6 +2,8 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interro!</title>
     <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
@@ -16,25 +18,25 @@
         <div class="progress-container">
             <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
-        <div>
+        <div class="white-text">
             <p>{{ count }} / {{ numWords }}</p>
         </div>
-        <div class="row">
+        <div class="row white-text">
             <p>What is the translation for:</p>
         </div>
         <div class="row">
             <div class="flag-box">
-                <div class="box">
+                <div class="box rounded-input">
                     {{ content_box1 }}
                 </div>
             </div>
             <div class="flag-box">
-                <div class="box">
+                <div class="box rounded-input">
                     {{ content_box2 }}
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row white-text">
             <p>Did you get it?</p>
         </div>
         <div class="row">

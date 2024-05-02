@@ -24,7 +24,6 @@ class CsvHandler():
         self.paths = {}
         self.tables = {}
 
-    # Table-level operations
     def set_paths(self):
         """List paths to data csv."""
         self.paths[self.test_type + '_voc'] = self.os_sep.join(
@@ -45,7 +44,9 @@ class CsvHandler():
             raise SystemExit
 
     def set_tables(self):
-        """Load the different tables necessary to the app."""
+        """
+        Load the different tables necessary to the app.
+        """
         self.set_paths()
         self.tables[self.test_type + '_voc'] = pd.read_csv(
             self.paths[self.test_type + '_voc'],
@@ -69,17 +70,23 @@ class CsvHandler():
         )
 
     def get_paths(self) -> Dict[str, str]:
-        """Return the paths"""
+        """
+        Return the paths
+        """
         self.set_paths()
         return self.paths
 
     def get_tables(self) -> Dict[str, pd.DataFrame]:
-        """Load the tables"""
+        """
+        Load the tables
+        """
         self.set_tables()
         return self.tables
 
     def save_table(self, table_name: str, table: pd.DataFrame):
-        """Save given table."""
+        """
+        Save given table.
+        """
         self.set_paths()
         table.to_csv(
             self.paths[table_name],
@@ -87,3 +94,25 @@ class CsvHandler():
             sep=';',
             encoding='utf-8'
         )
+
+
+
+# def csv_to_sql(csv_path: str, table_name: str):
+#     """
+#     Read the CSV file into a DataFrame
+#     and write the SQL insert statements to a .sql file.
+#     """
+#     data_df = pd.read_csv(csv_path, sep=';')
+#     with open(f'data/{table_name}.sql', 'w', encoding='utf-8') as sql_file:
+#         for _, row in data_df.iterrows():
+#             values = ", ".join([
+#                 f"'{value}'"
+#                 if isinstance(value, str)
+#                 else str(value)
+#                 for value in row
+#             ])
+#             request_1 = "INSERT INTO `version_voc` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)"
+#             request_2 = f"VALUES ({values});\n"
+#             insert_statement = request_1 + request_2
+#             logger.debug(f"Writing to SQL file: {insert_statement}")
+#             sql_file.write(insert_statement)

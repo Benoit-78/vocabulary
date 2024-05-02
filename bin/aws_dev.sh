@@ -93,9 +93,8 @@ scp -r -i \
 
 
 
-# =======================
-#  P Y T H O N
-# =======================
+# Python
+# ------
 export PYTHONPATH=/home/ubuntu/vocabulary/src:$PYTHONPATH
 cd vocabulary
 python3 -m venv venv
@@ -103,6 +102,12 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
+
+
+# JavaScript
+# ----------
+npm install --save-dev jest @babel/core @babel/preset-env babel-jest
+npm install --save-dev jest-environment-jsdom
 
 
 # =======================

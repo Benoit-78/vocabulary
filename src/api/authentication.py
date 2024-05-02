@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from loguru import logger
 from passlib.context import CryptContext
@@ -74,13 +74,13 @@ def create_token(
     """
     Function to generate a token for a guest or an existing user.
     """
+    logger.info('african_swallow')
     if data is None:
         data = create_guest_user_name()
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now() + timedelta(minutes=expires_delta)
-    else:
-        expire = datetime.now() + timedelta(minutes=15)
+    if not expires_delta:
+        expires_delta = 15
+    expire = datetime.now() + timedelta(minutes=expires_delta)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode,
@@ -129,13 +129,11 @@ def check_token(token: str):
         if user_name.startswith('guest_'):
             return token
         users_list = get_users_list()
-        # logger.debug(f"users_list: {users_list}")
         user_names = [element['username'] for element in users_list]
         if user_name not in user_names:
             raise credentials_exception
         return token
     except JWTError as exc:
-        # If there's any JWTError, raise credentials_exception
         raise credentials_exception from exc
 
 
@@ -151,7 +149,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_username_from_token(token: str = Depends(oauth2_scheme)):
+def get_user_name_from_token_oauth(token: str = Depends(oauth2_scheme)):
     """
     Given a token, return the user name.
     """
@@ -194,14 +192,11 @@ def authenticate_user(
             users_list: dict,
             username: str
         ) -> UserInDB:
-        # logger.debug(f"users_list: {users_list}")
-        # logger.debug(f"username: {username}")
         user_dict = [
             user_dict
             for user_dict in users_list
             if user_dict['username'] == username
         ]
-        # logger.debug(f"user_dict: {user_dict}")
         try:
             user_dict = user_dict[0]
             user = UserInDB(**user_dict)
@@ -224,13 +219,71 @@ def authenticate_user(
     if user_in_db_model is None:
         user = 'Unknown user'
     else:
-        try:
-            verify_password(
-                password,
-                user_in_db_model.password_hash
-            )
+        password_correct = verify_password(
+            password,
+            user_in_db_model.password_hash
+        )
+        if password_correct:
             user = user_in_db_model
-        except UnknownHashError:
+        else:
             logger.error("Password incorrect")
             user = 'Password incorrect'
     return user
+
+
+def authenticate_with_oauth(
+        form_data: OAuth2PasswordRequestForm
+    ):
+    """
+    Authenticate the user using OAuth2.
+    """
+    user = authenticate_user(
+        users_dict,
+        form_data.username,
+        form_data.password
+    )
+    return user
+
+
+# -------------------------
+#  A P I
+# -------------------------
+def sign_in(
+        request,
+        token,
+        error_message
+    ):
+    name_message, password_message = get_error_messages(error_message)
+    response_dict = {
+        'request': request,
+        'token': token,
+        'nameUnknownErrorMessage': name_message,
+        'passwordIncorrectErrorMessage': password_message
+    }
+    return response_dict
+
+
+def get_error_messages(error_message: str) -> tuple:
+    """
+    Based on the result of the POST method, returns the corresponding error messages
+    that will feed the sign-in html page.
+    """
+    messages = [
+        "Unknown user",
+        "Password incorrect",
+        "User successfully authenticated",
+        ''
+    ]
+    if error_message == messages[0]:
+        result = ("Unknown user name", "")
+    elif error_message == messages[1]:
+        result = ("", "Password incorrect")
+    elif error_message == messages[2]:
+        result = ("", "")
+    elif error_message == messages[3]:
+        result = ("", "")
+    else:
+        logger.error(f"Error message incorrect: {error_message}")
+        logger.error(f"Should be in: {messages}")
+        raise ValueError
+    return result
