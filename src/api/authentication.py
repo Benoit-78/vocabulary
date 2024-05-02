@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from loguru import logger
 from passlib.context import CryptContext
@@ -219,17 +219,30 @@ def authenticate_user(
     if user_in_db_model is None:
         user = 'Unknown user'
     else:
-        try:
-            verify_password(
-                password,
-                user_in_db_model.password_hash
-            )
+        password_correct = verify_password(
+            password,
+            user_in_db_model.password_hash
+        )
+        if password_correct:
             user = user_in_db_model
-        except UnknownHashError:
+        else:
             logger.error("Password incorrect")
             user = 'Password incorrect'
     return user
 
+
+def authenticate_with_oauth(
+        form_data: OAuth2PasswordRequestForm
+    ):
+    """
+    Authenticate the user using OAuth2.
+    """
+    user = authenticate_user(
+        users_dict,
+        form_data.username,
+        form_data.password
+    )
+    return user
 
 
 # -------------------------

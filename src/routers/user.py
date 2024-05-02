@@ -52,17 +52,24 @@ async def create_account(
 
 @user_router.post("/user-token")
 async def login_for_access_token(
-        token: str = Depends(auth_api.check_token),
-        form_data: OAuth2PasswordRequestForm = Depends()
+        token: str=Depends(auth_api.check_token),
+        form_data: OAuth2PasswordRequestForm=Depends()
     ) -> auth_api.Token:
     """
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
     """
-    json_response = user_api.authenticate_user(
-        token,
-        form_data
-    )
+    if form_data.client_id is None:
+        json_response = user_api.authenticate_user(token, form_data)
+    else:
+        # Authenticate the user using OAuth2
+        user = auth_api.authenticate_with_oauth(form_data)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
     return json_response
 
 
