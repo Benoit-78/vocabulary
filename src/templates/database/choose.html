@@ -18,50 +18,50 @@
     <script src="/static/scripts/api/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
 
-<div class="container">
-        <div class="row">
-            <div>
-                <label class="white-text" for="dropdown">Choose an existing database</label>
-                <select class="rounded-input" id="dropdown">
-                    {% for database in databases %}
-                        <option value="{{ database }}">{{ database }}</option>
-                    {% endfor %}
-                </select>
+    <div class="container">
+            <div class="row">
+                <div>
+                    <label class="white-text" for="dropdown">Choose an existing database</label>
+                    <select class="rounded-input" id="dropdown">
+                        {% for database in databases %}
+                            <option value="{{ database }}">{{ database }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <button class="button" onclick="chooseDatabase(`{{ token }}`)">Choose database</button>
-            <!-- <button class="button" onclick="deleteDatabase(`{{ token }}`)">Delete database</button> -->
-        </div>
-
-        <div class="row">
-            <div>
-                <label class="white-text" for="input1">Create a new database</label>
-                <input class="rounded-input" type="text" id="databaseName" name="databaseName">
+            <div class="row">
+                <button class="button" onclick="chooseDatabase(`{{ token }}`)">Choose database</button>
+                <!-- <button class="button" onclick="deleteDatabase(`{{ token }}`)">Delete database</button> -->
             </div>
-            {% if dbAlreadyPresentErrorMessage %}
-                    <p class="error-message">{{ dbAlreadyPresentErrorMessage }}</p>
-            {% endif %}
-        </div>
 
-        <div class="row">
-            <button class="button" onclick="createDatabase(`{{ token }}`)">Create database</button>
-        </div>
-
-        <div class="row">
-            <div>
-                <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+            <div class="row">
+                <div>
+                    <label class="white-text" for="input1">Create a new database</label>
+                    <input class="rounded-input" type="text" id="databaseName" name="databaseName">
+                </div>
+                {% if dbAlreadyPresentErrorMessage %}
+                        <p class="error-message">{{ dbAlreadyPresentErrorMessage }}</p>
+                {% endif %}
             </div>
+
+            <div class="row">
+                <button class="button" onclick="createDatabase(`{{ token }}`)">Create database</button>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+                </div>
+            </div>
+
+        <div class="row">
+            <button class="button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
         </div>
 
-    <div class="row">
-        <button class="button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
     </div>
-
-</div>
 
 </body>
 

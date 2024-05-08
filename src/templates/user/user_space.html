@@ -11,25 +11,21 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <!-- JS -->
-    <script src="/static/scripts/api/main.js"></script>
-    <script src="/static/scripts/api/database.js"></script>
-    <script src="/static/scripts/api/interro.js"></script>
-    <script src="/static/scripts/api/users.js"></script>
+    <script type="module" src="/static/scripts/api/main.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/database.js"></script>
+    <script type="module" src="/static/scripts/ui/interro.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
     <div class="container">
         <h1 class="white-text">Welcome {{ user_name }}</h1>
         <div class="button-list">
-            <!-- <button class="button" onclick="goToInterroSettings(`{{ token }}`)">Interroooo !!!</button> -->
             <button id="interroButton" class="button">Interroooo !!!</button>
-            <!-- <button class="button" onclick="goToUserDatabases(`{{ token }}`)">Add words</button> -->
             <button id="addWordsButton" class="button">Add words</button>
-            <!-- <button class="button" onclick="goToUserDashboards(`{{ token }}`)">Dashboard</button> -->
             <button id="dashboardButton" class="button">Dashboard</button>
-            <!-- <button class="button" onclick="goToUserSettings(`{{ token }}`)">Settings</button> -->
-            <button id="settingsButton" class="button">Settings</button>
-            <!-- <button class="button" onclick="goToRoot()">Sign-out</button> -->
+            <button id="userSettingsButton" class="button">User settings</button>
             <button id="quitButton" class="button">Sign-out</button>
         </div>
     </div>

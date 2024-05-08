@@ -1,3 +1,5 @@
+export { goToRoot, interroGuest };
+
 
 function goToRoot(token) {
     window.location.href = `/?token=${token}`;
@@ -22,5 +24,3 @@ function aboutTheApp(token) {
 function help(token) {
     window.location.href = `/help?token=${token}`;
 }
-
-

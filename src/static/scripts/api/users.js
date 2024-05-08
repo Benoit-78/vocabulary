@@ -1,3 +1,5 @@
+export { signIn, goToUserDashboards, goToUserSettings };
+
 
 async function createAccount(token) {
     const inputName = document.getElementById("inputName").value;

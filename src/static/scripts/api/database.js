@@ -1,3 +1,5 @@
+export { goToUserDatabases };
+
 
 function goToUserDatabases(token) {
     window.location.href = `/database/list-databases?token=${token}`;

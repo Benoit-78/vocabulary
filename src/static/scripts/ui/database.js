@@ -1,17 +1,23 @@
-import { uploadCSV } from "../api/database.js";
+import { goToUserDatabases } from "../api/database.js";
 
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-        // Bind the submit event of the form to the uploadCSV function
-        document.getElementById("csvForm").addEventListener(
-            "submit",
-            function(event) {
-                event.preventDefault(); // Prevent the form from submitting normally
-                var token = document.getElementById("token").value;
-                uploadCSV(token); // Call the uploadCSV function
-            }
-        );
-    }
-);
+document.addEventListener("DOMContentLoaded", function() {
+    const csvForm = document.getElementById("csvForm")
+    const token = document.body.dataset.token;
+
+    csvForm.addEventListener("submit", function(event) {
+        // Prevent the form from submitting normally
+        event.preventDefault();
+        uploadCSV(token);
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const addWordButton = document.getElementById("addWordsButton");
+    const token = document.body.dataset.token;
+
+    addWordButton.addEventListener("click", function() {
+        goToUserDatabases(token);
+    });
+});

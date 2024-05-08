@@ -1,3 +1,5 @@
+export { goToInterroSettings };
+
 
 function goToInterroSettings(token) {
     window.location.href = `/interro/interro-settings?token=${token}`;
