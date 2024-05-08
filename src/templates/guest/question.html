@@ -13,12 +13,19 @@
     <link rel="stylesheet" href="/static/styles/forms.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
-    <script src="/static/scripts/api/main.js"></script>
-    <script src="/static/scripts/api/guest.js"></script>
-    <script src="/static/scripts/ui/guest.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/guest.js"></script>
 </head>
 
 <body data-token="{{ token }}">
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const numWords = `{{ numWords }}`;
+        const count = `{{ count }}`;
+        const score = `{{ score }}`;
+        const language = `{{ language|safe }}`;
+    </script>
+
     <div class="container">
         <div class="progress-container">
             <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
@@ -43,13 +50,12 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
-            <button class="button middle_button" onclick="showTranslation(
-                `{{ numWords }}`, `{{ count }}`, `{{ score }}`, `{{ token }}`, `{{ language|safe }}`
-                )">Show translation</button>
+            <button id="showTranslationButton" class="button middle_button">Show translation</button>
         </div>
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button id="quitButton" class="button quit_button">Quit</button>
         </div>
     </div>
 </body>

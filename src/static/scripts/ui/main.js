@@ -1,14 +1,4 @@
-import { goToRoot, interroGuest } from "../api/main.js";
-
-
-document.addEventListener("DOMContentLoaded", function() {
-    const guestInterroButton = document.getElementById("guestInterroButton");
-    const token = document.body.dataset.token;
-
-    guestInterroButton.addEventListener("click", function() {
-        interroGuest(token);
-    });
-});
+import { goToRoot } from "../api/main.js";
 
 
 document.addEventListener("DOMContentLoaded", function() {

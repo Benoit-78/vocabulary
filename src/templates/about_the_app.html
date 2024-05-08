@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
-    <script src="/static/scripts/api/main.js"></script>
+    <script src="/static/scripts/ui/main.js"></script>
 </head>
 
 <body data-token="{{ token }}">
@@ -25,7 +25,8 @@
         <p class="white-text">Those you have difficulties with will be revisited more frequently</p>
         <p class="white-text">And in the end, these words will be in your memory</p>
 
-        <button class="button" onclick="goToRoot(`{{ token }}`)">Quit</button>
+        <!-- <button class="button" onclick="goToRoot(`{{ token }}`)">Quit</button> -->
+        <button id="quitButton" class="button">Quit</button>
         
         <p class ="white-text">Do NOT store any sensitive data on this app!</p>
     </div>

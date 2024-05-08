@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <!-- JS -->
-    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/welcome.js"></script>
     <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
@@ -25,13 +25,11 @@
             <h3 class="white-text">Keep your words</h3>
 
             <div class="button-list">
-                <!-- <button class="button" onclick="interroGuest(`{{ token }}`)">Try</button> -->
-                <button id="guestInterroButton" class="button">Try</button>
-                <!-- <button class="button" onclick="signIn(`{{ token }}`)">Sign in</button> -->
+                <button id="guestButton" class="button">Try</button>
                 <button id="signInButton" class="button">Sign in</button>
-                <button class="button" onclick="signUp(`{{ token }}`)">Sign up</button>
-                <button class="button" onclick="aboutTheApp(`{{ token }}`)">About</button>
-                <button class="button" onclick="help(`{{ token }}`)">Help</button>
+                <button id="signUpButton" class="button">Sign up</button>
+                <button id="aboutButton" class="button">About</button>
+                <button id="helpButton" class="button">Help</button>
             </div>
 
         </div>

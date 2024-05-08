@@ -1,3 +1,5 @@
+export { sendGuestSettings, showTranslation, sendUserAnswer, nextGuess };
+
 
 function sendGuestSettings(token, language) {
     fetch(
@@ -34,6 +36,9 @@ function showTranslation(numWords, count, score, token, language) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
+    console.log("numWords:", numWords)
+    console.log("count:", count)
+    console.log("score:", score)
     if (!isNaN(numWords)) {
         window.location.href = `/guest/interro-answer/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
     } else {
@@ -42,7 +47,7 @@ function showTranslation(numWords, count, score, token, language) {
 }
 
 
-function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2, token, language) {
+function sendUserAnswer(answer, numWords, count, score, content_box1, content_box2, token, language) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);

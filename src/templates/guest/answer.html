@@ -13,12 +13,21 @@
     <link rel="stylesheet" href="/static/styles/forms.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
-    <script src="/static/scripts/api/main.js"></script>
-    <script src="/static/scripts/api/guest.js"></script>
-    <script src="/static/scripts/ui/guest.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/guest.js"></script>
 </head>
 
 <body data-token="{{ token }}">
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const numWords = `{{ numWords }}`;
+        const count = `{{ count }}`;
+        const score = `{{ score }}`;
+        const content_box1 = `{{ content_box1|safe }}`;
+        const content_box2 = `{{ content_box2|safe }}`;
+        const language = `{{ language|safe }}`;
+    </script>
+
     <div class="container">
         <div class="progress-container">
             <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
@@ -27,7 +36,6 @@
         <div>
             <p class="white-text">{{ count }} / {{ numWords }}</p>
         </div>
-
         <div class="row">
             <p class="white-text">What is the translation for:</p>
         </div>
@@ -52,16 +60,12 @@
         </div>
 
         <div class="row">
-            <button class="button green" id="yes-button" onclick="sendUserAnswer(
-                'Yes', `{{ count }}`, `{{ numWords }}`, `{{ score }}`, `{{ content_box1|safe }}`,`{{ content_box2|safe }}`, `{{ token }}`, `{{ language|safe }}`
-                )">Yes</button>
-            <button class="button red" id="no-button" onclick="sendUserAnswer(
-                'No', `{{ count }}`, `{{ numWords }}`, `{{ score }}`, `{{ content_box1|safe }}`, `{{ content_box2|safe }}`, `{{ token }}`, `{{ language|safe }}`
-                )">No</button>
+            <button id="yesButton" class="button green">Yes</button>
+            <button id="noButton" class="button red">No</button>
         </div>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button id="quitButton" class="button quit_button">Quit</button>
         </div>
 
     </div>

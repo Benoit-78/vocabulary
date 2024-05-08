@@ -12,22 +12,28 @@
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
-    <script src="/static/scripts/api/main.js"></script>
-    <script src="/static/scripts/api/guest.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/guest.js"></script>
 </head>
 
 <body data-token="{{ token }}">
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const newWords = `{{ newWords }}`;
+        const newCount = `{{ newCount }}`;
+        const newScore = `{{ newScore }}`;
+        const language = `{{ language|safe }}`;
+    </script>
+
     <div class="container">
         <div class="row white-text">
             <h1>Your score is: {{ score }} / {{ numWords }}</h1>
         </div>
         <div class="row">
-            <button class="button rattraps_button" onclick="nextGuess(
-                `{{ newWords }}`, `{{ newCount }}`, `{{ newScore }}`, `{{ token }}`, `{{ language|safe }}`
-                )">Take a catch-up test</button>
+            <button id="rattrapsButton" class="button rattraps_button">Take a catch-up test</button>
         </div>
         <div class="row">
-            <button class="button" onclick="goToRoot()">Quit</button>
+            <button id="quitButton" class="button quit_button">Quit</button>
         </div>
     </div>
 </body>
