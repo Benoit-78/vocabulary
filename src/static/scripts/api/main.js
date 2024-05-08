@@ -22,3 +22,5 @@ function aboutTheApp(token) {
 function help(token) {
     window.location.href = `/help?token=${token}`;
 }
+
+

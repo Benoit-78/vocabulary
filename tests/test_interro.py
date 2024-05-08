@@ -149,7 +149,8 @@ class TestCliUser(unittest.TestCase):
 
 class TestLoader(unittest.TestCase):
     """
-    The Loader class should interact with database interfaces, such as CsvHandler or MariaDBHandler.
+    The Loader class should interact with database interfaces,
+    such as csv handler or MariaDB handler.
     """
     def setUp(self):
         self.test_type = 'mock_test_type'

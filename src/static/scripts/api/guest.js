@@ -1,11 +1,3 @@
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-        const progressBar = document.getElementById("progress-bar");
-        progressBar.style.width = `${progressBar}%`;
-    }
-);
-
 
 function sendGuestSettings(token, language) {
     fetch(

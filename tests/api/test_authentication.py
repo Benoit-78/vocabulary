@@ -315,12 +315,14 @@ class TestAuthentication(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(authenticated_user, auth_api.UserInDB)
 
-    def test_user_exists_incorrect_password(self):
+    @patch('src.api.authentication.CryptContext.verify')
+    def test_user_exists_incorrect_password(self, mock_pwt_verify):
         # ----- ARRANGE
         users_list = [
             {'username': 'user1', 'password_hash': 'hashed_password1'},
             {'username': 'user2', 'password_hash': 'hashed_password2'},
         ]
+        mock_pwt_verify.return_value = False
         # ----- ACT
         wrong_password_user = auth_api.authenticate_user(
             users_list,
