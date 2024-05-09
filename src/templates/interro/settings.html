@@ -14,8 +14,8 @@
     <link rel="stylesheet" href="/static/styles/forms.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
-    <script src="/static/scripts/api/interro.js"></script>
-    <script src="/static/scripts/api/users.js"></script>
+    <script type="module" src="/static/scripts/ui/interro.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
 <body data-token="{{ token }}">
@@ -23,10 +23,10 @@
         <form>
 
             <div class="row">
-                <label class="white-text" for="test-type">Choose your database:</label>
+                <label class="white-text" for="testType">Choose your database:</label>
             </div>
             <div class="row">
-                <select id="db_name" name="db_name" class="dropdown-container rounded-input" required>
+                <select id="databaseName" name="databaseName" class="dropdown-container rounded-input" required>
                     {% for database in databases %}
                         <option value="{{ database }}">{{ database }}</option>
                     {% endfor %}
@@ -37,20 +37,20 @@
             </div>
 
             <div class="row">
-                <label class="white-text" for="test-type">Choose your test type:</label>
+                <label class="white-text" for="testType">Choose your test type:</label>
             </div>
             <div class="row">
-                <select id="test-type" name="test-type" class="dropdown-container rounded-input" required>
+                <select id="testType" name="testType" class="dropdown-container rounded-input" required>
                     <option value="Version">Normal</option>
                     <option value="Theme">Reverse</option>
                 </select>
             </div>
 
             <div class="row">
-                <label class="white-text" for="num-words">Number of words:</label>
+                <label class="white-text" for="numWords">Number of words:</label>
             </div>
             <div class="row">
-                <select id="num-words" name="num-words" class="dropdown-container rounded-input" required>
+                <select id="numWords" name="numWords" class="dropdown-container rounded-input" required>
                     <option value="100">100</option>
                     <option value="50">50</option>
                     <option value="20">20</option>
@@ -61,16 +61,11 @@
         </form>
 
         <div class="row">
-            <button class="button" onclick="sendUserSettings(
-                `{{ token }}`,
-                document.getElementById('db_name').value,
-                document.getElementById('test-type').value,
-                document.getElementById('num-words').value
-                )">Start Test</button>
+            <button id="sendUserSettingsButton" class="button">Start test</button>
         </div>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="userSpaceButton" class="button">Back to user space</button>
         </div>
     </div>
 </body>

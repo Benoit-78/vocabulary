@@ -18,10 +18,11 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src import interro, views
+from src import interro
+from src.views import view_api
 from src.api import authentication as auth_api
 from src.api import database as db_api
-from src.data import data_handler
+from src.data import database_interface
 from src.data import redis_interface
 from src.interro import Updater
 
@@ -36,7 +37,7 @@ def load_test(
     """
     Load the interroooo!
     """
-    db_handler = data_handler.DbManipulator(
+    db_handler = database_interface.DbManipulator(
         user_name=user_name,
         db_name=db_name,
         test_type=test_type,
@@ -45,7 +46,7 @@ def load_test(
     loader_ = interro.Loader(db_handler)
     loader_.load_tables()
     test_length = adjust_test_length(test_length, loader_)
-    guesser = views.FastapiGuesser()
+    guesser = view_api.FastapiGuesser()
     test_ = interro.PremierTest(
         loader_.tables[loader_.test_type + '_voc'],
         test_length,
@@ -95,7 +96,7 @@ def save_interro_settings(
     """
     API function to save the interro settings.
     """
-    logger.info('african_swallow')
+    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     db_name = settings.get('databaseName')
     test_type = settings.get('testType').lower()
@@ -244,7 +245,6 @@ def propose_rattraps(
         loader = redis_interface.load_loader_from_redis(token)
         updater = Updater(loader, test)
         updater.update_data()
-        logger.info("User data updated.")
     # Réinitialisation
     response_dict = {
         "request": request,
@@ -273,7 +273,7 @@ def load_rattraps(
         rattraps_cnt = test.rattraps + 1
     else:
         rattraps_cnt = 0
-    guesser = views.FastapiGuesser()
+    guesser = view_api.FastapiGuesser()
     rattrap = interro.Rattrap(
         test.faults_df,
         rattraps_cnt,
@@ -302,7 +302,7 @@ def end_interro(
     """
     End the interro.
     """
-    logger.info("african_swallow")
+    logger.info('')
     test = redis_interface.load_test_from_redis(token)
     # Enregistrer les résultats
     if not hasattr(test, 'rattraps'):
@@ -310,7 +310,6 @@ def end_interro(
         loader = redis_interface.load_loader_from_redis(token)
         updater = Updater(loader, test)
         updater.update_data()
-        logger.info("User data updated.")
     response_dict = {
         "request": request,
         "score": score,

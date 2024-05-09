@@ -11,7 +11,7 @@ import json
 import os
 import sys
 import unittest
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch
 
 import asyncio
 import pytest
@@ -117,7 +117,7 @@ class TestDatabase(unittest.TestCase):
         }
         token = 'mock_token'
         mock_get_user_name_from_token.return_value = 'mock_user'
-        mock_check_if_database_exists.return_value = False
+        mock_check_if_database_exists.return_value = True
         # ----- ACT
         result = db_api.choose_database(
             data,
@@ -151,7 +151,7 @@ class TestDatabase(unittest.TestCase):
         }
         token = 'mock_token'
         mock_get_user_name_from_token.return_value = 'mock_user'
-        mock_check_if_database_exists.return_value = True
+        mock_check_if_database_exists.return_value = False
         # ----- ACT
         result = db_api.choose_database(
             data,

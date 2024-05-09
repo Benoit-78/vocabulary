@@ -36,9 +36,6 @@ function showTranslation(numWords, count, score, token, language) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);
-    console.log("numWords:", numWords)
-    console.log("count:", count)
-    console.log("score:", score)
     if (!isNaN(numWords)) {
         window.location.href = `/guest/interro-answer/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
     } else {

@@ -5,9 +5,13 @@
         B.Delorme
     Main purpose:
         
+        
+        
+        Create a special category for expressions that contains several words,
+        or even a whole and independent sentence.
 """
 # import os
-import pickle
+# import pickle
 # import sys
 
 from abc import ABC, abstractmethod

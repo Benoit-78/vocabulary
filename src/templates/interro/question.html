@@ -13,13 +13,19 @@
     <link rel="stylesheet" href="/static/styles/forms.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
-    <script src="/static/scripts/api/interro.js"></script>
-    <script src="/static/scripts/api/users.js"></script>
-    <script src="/static/scripts/ui/interro.js"></script>
+    <script type="module" src="/static/scripts/ui/interro.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 
 </head>
 
 <body data-token="{{ token }}">
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const numWords = `{{ numWords }}`;
+        const count = `{{ count }}`;
+        const score = `{{ score }}`;
+    </script>
+
     <div class="container">
         <div class="progress-container">
             <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
@@ -47,11 +53,11 @@
         </div>
 
         <div class="row">
-            <button class="button middle_button" onclick="showTranslation(`{{ token }}`, `{{ numWords }}`, `{{ count }}`, `{{ score }}`)">Show translation</button>
+            <button id="showTranslationButton" class="button middle_button">Show translation</button>
         </div>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="userSpaceButton" class="button">Quit interro</button>
         </div>
 
     </div>

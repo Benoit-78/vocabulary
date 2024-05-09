@@ -1,4 +1,4 @@
-export { goToUserDatabases };
+export { goToUserDatabases, chooseDatabase, createDatabase, addWord };
 
 
 function goToUserDatabases(token) {
@@ -6,17 +6,14 @@ function goToUserDatabases(token) {
 }
 
 
-function chooseDatabase(token) {
-    var dropdown = document.getElementById("dropdown");
-    var databaseName = dropdown.value;
+function chooseDatabase(token, databaseName) {
+    console.log(databaseName)
     fetch(
         `/database/choose-database?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                db_name: databaseName
-            }),
+            body: JSON.stringify({db_name: databaseName}),
         }
     )
     .then(answer => answer.json())
@@ -37,8 +34,7 @@ function chooseDatabase(token) {
 }
 
 
-function createDatabase(token) {
-    var databaseName = document.getElementById("databaseName").value;
+function createDatabase(token, databaseName) {
     fetch(
         `/database/create-database?token=${token}`,
         {
@@ -93,9 +89,7 @@ function deleteDatabase(token) {
 }
 
 
-function addWord(token, databaseName) {
-    var foreign = document.getElementById("input1").value;
-    var native = document.getElementById("input2").value;
+function addWord(token, databaseName, foreign, native) {
     fetch(
         `/database/add-word?token=${token}`,
         {

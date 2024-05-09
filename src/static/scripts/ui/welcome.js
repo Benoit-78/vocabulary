@@ -1,4 +1,4 @@
-import { interroGuest, signUp, aboutTheApp, help } from "../api/welcome.js";
+import { interroGuest, signIn, signUp, aboutTheApp, help } from "../api/welcome.js";
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -7,6 +7,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     guestButton.addEventListener("click", function() {
         interroGuest(token);
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const signInButton = document.getElementById("signInButton");
+    const token = document.body.dataset.token;
+
+    signInButton.addEventListener("click", function() {
+        signIn(token);
     });
 });
 

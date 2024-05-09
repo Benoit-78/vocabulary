@@ -13,13 +13,14 @@
     <link rel="stylesheet" href="/static/styles/errors.css">
     <link rel="stylesheet" href="/static/styles/forms.css">
     <!-- JS -->
-    <script type="module" src="/static/scripts/api/main.js"></script>
-    <script type="module" src="/static/scripts/api/users.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
 <body data-token="{{ token }}">
     <div class="container">
-        <form id="signInForm">
+
+        <form id="signUpForm">
             <div class="row">
                 <label class="white-text" for="inputName">User name</label>
                 <input type="text" id="inputName" name="inputName" class="rounded-input" required>
@@ -32,11 +33,13 @@
                 <input type="inputPassword" id="inputPassword" name="inputPassword" class="rounded-input" required>
             </div>
             <div class="row">
-                <button type="button" class="button" onclick="createAccount(`{{ token }}`)">Sign-up</button>
+                <!-- <button type="button" class="button" onclick="createAccount(`{{ token }}`)">Sign-up</button> -->
+                <button id="signUpButton" class="button">Sign-up</button>
             </div>
         </form>
+
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button id="quitButton" class="button">Sign-out</button>
         </div>
     </div>
 </body>

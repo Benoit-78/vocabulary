@@ -12,9 +12,8 @@ import sys
 from datetime import datetime, timedelta
 
 import unittest
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from freezegun import freeze_time
-from jose import JWTError
 from unittest.mock import patch
 
 # from loguru import logger
@@ -115,7 +114,7 @@ class TestAuthentication(unittest.TestCase):
             algorithm=auth_api.ALGORITHM
         )
 
-    @patch('src.data.data_handler.DbController.get_users_list')
+    @patch('src.data.database_interface.DbController.get_users_list')
     def test_get_users_list(self, mock_get_users_list):
         # ----- ARRANGE
         mock_users_list = [
@@ -222,7 +221,7 @@ class TestAuthentication(unittest.TestCase):
         mock_hash.assert_called_once_with(password)
 
     @patch.dict(os.environ, {"SECRET_KEY": "your_secret_key"})
-    @patch('src.data.data_handler.DbController.get_users_list')
+    @patch('src.data.database_interface.DbController.get_users_list')
     @patch('src.api.authentication.jwt.decode')
     def test_get_username_from_token(
             self,
@@ -271,7 +270,7 @@ class TestAuthentication(unittest.TestCase):
         )
 
     @patch.dict(os.environ, {"SECRET_KEY": "your_secret_key"})
-    @patch('src.data.data_handler.DbController.get_users_list')
+    @patch('src.data.database_interface.DbController.get_users_list')
     @patch('src.api.authentication.jwt.decode')
     def test_get_username_from_token_unknown_user(
             self,

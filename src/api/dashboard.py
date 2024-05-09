@@ -22,7 +22,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.data.data_handler import DbManipulator
+from src.data.database_interface import DbManipulator
 
 
 
@@ -342,7 +342,7 @@ def get_user_dashboards(request, user_name, user_password, db_name):
     """
     Get the user dashboards.
     """
-    logger.info('african_swallow')
+    logger.info('')
     graphs = load_graphs(user_name, user_password, db_name)
     request_dict = {
         "request": request,

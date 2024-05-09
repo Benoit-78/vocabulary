@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <!-- JS -->
-    <script src="/static/scripts/api/users.js"></script>
+    <script src="/static/scripts/ui/users.js"></script>
 </head>
 
 <body data-token="{{ token }}">
@@ -19,7 +19,7 @@
         <h1 class="white-text">Settings</h1>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="quitButton" class="button">Sign-out</button>
         </div>
     </div>
 </body>

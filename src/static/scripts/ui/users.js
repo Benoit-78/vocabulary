@@ -1,12 +1,33 @@
-import { signIn, goToUserDashboards, goToUserSettings} from "../api/users.js";
+import { authenticateUser, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace } from "../api/users.js";
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    const signInButton = document.getElementById("signInButton");
+    const authenticateButton = document.getElementById("authenticateButton");
     const token = document.body.dataset.token;
 
-    signInButton.addEventListener("click", function() {
-        signIn(token);
+    authenticateButton.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        const inputName = document.getElementById("inputName").value;
+        const inputPassword = document.getElementById("inputPassword").value;
+        const formData = new URLSearchParams();
+        formData.append("username", inputName);
+        formData.append("password", inputPassword);
+        authenticateUser(token, formData);
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const signUpButton = document.getElementById("signUpButton");
+    const token = document.body.dataset.token;
+
+    signUpButton.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        const inputName = document.getElementById("inputName").value;
+        const inputPassword = document.getElementById("inputPassword").value;
+        createAccount(token, inputName, inputPassword);
     });
 });
 
@@ -27,5 +48,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     userSettingsButton.addEventListener("click", function() {
         goToUserSettings(token);
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const userSpaceButton = document.getElementById("userSpaceButton");
+    const token = document.body.dataset.token;
+
+    userSpaceButton.addEventListener("click", function() {
+        goToUserSpace(token);
     });
 });

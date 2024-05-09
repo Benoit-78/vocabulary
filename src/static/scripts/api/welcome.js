@@ -1,8 +1,13 @@
-export { interroGuest, signUp, aboutTheApp, help };
+export { interroGuest, signIn, signUp, aboutTheApp, help };
 
 
 function interroGuest(token) {
     window.location.href = `/guest/interro-settings?token=${token}`;
+}
+
+
+function signIn(token) {
+    window.location.href = `/sign-in?token=${token}`;
 }
 
 

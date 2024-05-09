@@ -12,8 +12,7 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <!-- JS -->
-    <script src="/static/scripts/api/main.js"></script>
-    <script src="/static/scripts/api/users.js"></script>
+    <script src="/static/scripts/ui/main.js"></script>
     <!--<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
 </head>
 
@@ -42,7 +41,7 @@
         </div>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="quitButton" class="button">Sign-out</button>
         </div>
     </div>
 </body>

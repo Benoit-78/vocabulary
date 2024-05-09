@@ -12,8 +12,8 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from src import interro
-from src import views_local
-from src.data import data_handler
+from src.data import database_interface
+from src.views import view_local
 
 
 def cli_main():
@@ -23,7 +23,7 @@ def cli_main():
     user.get_settings()
     # Load data
     user_name = 'benoit'
-    data_handler_ = data_handler.MariaDBHandler(
+    data_handler_ = database_interface.MariaDBHandler(
         user_name,
         user.settings.type,
         'cli',
@@ -32,7 +32,7 @@ def cli_main():
     loader = interro.Loader(data_handler_)
     loader.load_tables()
     # WeuuAaaInterrooo !!!
-    guesser = views_local.CliGuesser()
+    guesser = view_local.CliGuesser()
     test = interro.PremierTest(
         loader.tables[loader.test_type + '_voc'],
         user.settings.words,

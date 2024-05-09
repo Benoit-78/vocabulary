@@ -25,8 +25,6 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.utils.data import complete_columns
-
 
 
 class CliUser():
@@ -457,3 +455,16 @@ class Updater():
         self.save_words()
         self.save_performances()
         self.save_words_count()
+
+
+
+
+def complete_columns(df_1: pd.DataFrame, df_2: pd.DataFrame):
+    """
+    Guarantee that the well_known_words dataframe contains exactly
+    the columns of the output dataframe
+    """
+    missing_columns = set(df_1.columns).difference(set(df_2.columns))
+    for column in missing_columns:
+        df_2[column] = [0] * df_2.shape[0]
+    return df_2

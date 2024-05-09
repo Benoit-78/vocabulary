@@ -13,9 +13,8 @@
     <link rel="stylesheet" href="/static/styles/errors.css">
     <link rel="stylesheet" href="/static/styles/forms.css">
     <!-- JS -->
-    <script src="/static/scripts/api/main.js"></script>
-    <script src="/static/scripts/api/database.js"></script>
-    <script src="/static/scripts/api/users.js"></script>
+    <script type="module" src="/static/scripts/ui/database.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
 <body data-token="{{ token }}">
@@ -33,8 +32,8 @@
             </div>
 
             <div class="row">
-                <button class="button" onclick="chooseDatabase(`{{ token }}`)">Choose database</button>
-                <!-- <button class="button" onclick="deleteDatabase(`{{ token }}`)">Delete database</button> -->
+                <button id="chooseDatabaseButton" class="button">Choose database</button>
+                <!-- <button id="deleteDatabaseButton" class="button">Delete database</button> -->
             </div>
 
             <div class="row">
@@ -48,7 +47,7 @@
             </div>
 
             <div class="row">
-                <button class="button" onclick="createDatabase(`{{ token }}`)">Create database</button>
+                <button id="createDatabaseButton" class="button">Create database</button>
             </div>
 
             <div class="row">
@@ -58,7 +57,7 @@
             </div>
 
         <div class="row">
-            <button class="button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="userSpaceButton" class="button quit-button">Quit</button>
         </div>
 
     </div>

@@ -21,7 +21,7 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src.api import dashboard as dashboard_api
-from src.data import data_handler
+from src.data import database_interface
 
 
 class TestDashboard(unittest.TestCase):
@@ -100,7 +100,7 @@ class TestWordsGraph1(unittest.TestCase):
         user_name = 'mock_user_name'
         db_name = 'mock_db_name'
         test_type = 'mock_test_type'
-        db_handler = data_handler.DbManipulator(
+        db_handler = database_interface.DbManipulator(
             user_name,
             db_name,
             test_type
@@ -188,7 +188,7 @@ class TestWordsGraph2(unittest.TestCase):
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = data_handler.DbManipulator(
+        db_handler = database_interface.DbManipulator(
             user_name,
             db_name,
             test_type
@@ -241,7 +241,7 @@ class TestWordsGraph3(unittest.TestCase):
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = data_handler.DbManipulator(
+        db_handler = database_interface.DbManipulator(
             user_name,
             db_name,
             test_type
@@ -291,7 +291,7 @@ class TestWordsGraph4(unittest.TestCase):
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = data_handler.DbManipulator(
+        db_handler = database_interface.DbManipulator(
             user_name,
             db_name,
             test_type
@@ -341,7 +341,7 @@ class TestWordsGraph5(unittest.TestCase):
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = data_handler.DbManipulator(
+        db_handler = database_interface.DbManipulator(
             user_name,
             db_name,
             test_type

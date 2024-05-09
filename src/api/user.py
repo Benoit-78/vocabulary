@@ -30,7 +30,7 @@ def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
-    logger.info('african_swallow')
+    logger.info('')
     user_account = users.UserAccount(creds['input_name'])
     result = user_account.create_account(creds['input_password'])
     json_response = {}
@@ -63,7 +63,7 @@ def authenticate_user(
     """
     Authenticate the user.
     """
-    logger.info('african_swallow')
+    logger.info('')
     users_list = auth_api.get_users_list()
     user = auth_api.authenticate_user(
         users_list,
@@ -106,7 +106,7 @@ def load_user_space(
     """
     Call the base page of user space.
     """
-    logger.info('african_swallow')
+    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     json_response = {
         'request': request,

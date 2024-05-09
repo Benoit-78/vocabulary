@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="/static/styles/errors.css">
     <link rel="stylesheet" href="/static/styles/forms.css">
     <!-- JS -->
-    <script type="module" src="/static/scripts/api/main.js"></script>
-    <script type="module" src="/static/scripts/api/users.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("inputPassword").value = "";
@@ -24,6 +24,7 @@
 
 <body data-token="{{ token }}">
     <div class="container">
+
         <form id="signInForm">
             <div class="row">
                 <label class="white-text" for="inputName">User name</label>
@@ -40,12 +41,12 @@
                 {% endif %}
             </div>
             <div class="row">
-                <button type="button" class="button" onclick="authenticateUser(`{{ token }}`)">Sign-in</button>
+                <button id="authenticateButton" class="button">Sign-in</button>
             </div>
         </form>
-        <!-- <p>Do NOT store any confidential data in this app.</p> -->
+
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button id="quitButton" class="button quit_button">Quit</button>
         </div>
     </div>
 

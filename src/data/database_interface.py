@@ -502,7 +502,6 @@ class DbManipulator(DbInterface):
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         request_1 = "SELECT english, français, score"
         request_2 = f"FROM {self.db_name}.{words_table_name}"
-        logger.debug(f"db_name: {self.db_name}")
         request_3 = f"WHERE english = '{english}';"
         sql_request = " ".join([request_1, request_2, request_3])
         request_result = None

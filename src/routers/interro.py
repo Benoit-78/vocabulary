@@ -69,7 +69,6 @@ def load_interro_question(
         score,
         token
     )
-    logger.debug(f"Total: {total}, Count: {count}, Score: {score}")
     return templates.TemplateResponse(
         "interro/question.html",
         response_dict

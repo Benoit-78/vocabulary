@@ -22,8 +22,9 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src import interro, views_local
-from src.data import data_handler
+from src import interro
+from src.views import view_local
+from src.data import database_interface
 
 
 
@@ -154,7 +155,7 @@ class TestLoader(unittest.TestCase):
     """
     def setUp(self):
         self.test_type = 'mock_test_type'
-        self.data_manipulator = data_handler.DbManipulator(
+        self.data_manipulator = database_interface.DbManipulator(
             user_name='mock_user_name',
             db_name='mock_db_name',
             test_type=self.test_type
@@ -177,7 +178,7 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(self.loader.tables, {})
         self.assertEqual(self.loader.output_table, '')
 
-    @patch('src.data.data_handler.DbManipulator.get_tables')
+    @patch('src.data.database_interface.DbManipulator.get_tables')
     def test_load_tables(self, mock_get_tables):
         """
         Input should be a dataframe, and it should be added a query column.
@@ -200,7 +201,7 @@ class TestLoader(unittest.TestCase):
             self.assertEqual(table['taux'].dtype, np.float64)
             self.assertGreater(table.shape[0], 1)
 
-    @patch('src.data.data_handler.DbManipulator.get_tables')
+    @patch('src.data.database_interface.DbManipulator.get_tables')
     def test_load_tables_no_bad_word_column(self, mock_get_tables):
         """
         Input should be a dataframe, and it should be added a query column.
@@ -231,7 +232,7 @@ class TestPremierTest(unittest.TestCase):
         """Run once before all tests."""
         cls.user_1 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.data_handler_1 = data_handler.DbManipulator(
+        cls.data_handler_1 = database_interface.DbManipulator(
             user_name='test_user',
             db_name='test_db',
             test_type='test_type'
@@ -259,7 +260,7 @@ class TestPremierTest(unittest.TestCase):
         self.loader_1.tables = {}
         words = df.shape[0] //  2
         self.loader_1.tables['version_voc'] = df
-        guesser = views_local.CliGuesser()
+        guesser = view_local.CliGuesser()
         self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,
@@ -418,7 +419,7 @@ class TestPremierTest(unittest.TestCase):
         self.assertLess(new_row['taux'], old_row['taux'])
         self.assertEqual(new_row['query'], old_row['query'] + 1)
 
-    @patch('src.views_local.CliGuesser.guess_word')
+    @patch('src.views.view_local.CliGuesser.guess_word')
     @patch('src.interro.PremierTest.update_faults_df')
     @patch('src.interro.PremierTest.update_voc_df')
     def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df, mock_guess_word):
@@ -601,7 +602,7 @@ class TestUpdater(unittest.TestCase):
     def setUp(self):
         self.user_1 = interro.CliUser()
         self.user_1.parse_arguments(['-t', 'version'])
-        self.data_handler_1 = data_handler.DbManipulator(
+        self.data_handler_1 = database_interface.DbManipulator(
             user_name='test_user',
             db_name='test_db',
             test_type=self.user_1.settings.type
@@ -665,7 +666,7 @@ class TestUpdater(unittest.TestCase):
         df['img_good'] = [0] * df.shape[0]
         self.loader_1.tables['version_voc'] = df
         words = 10
-        self.guesser = views_local.CliGuesser()
+        self.guesser = view_local.CliGuesser()
         self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,
@@ -807,7 +808,7 @@ class TestUpdater(unittest.TestCase):
         last_perf = last_perf['test']
         self.assertEqual(last_perf, self.updater_1.interro.perf)
 
-    @patch('src.data.data_handler.DbManipulator.save_table')
+    @patch('src.data.database_interface.DbManipulator.save_table')
     def test_save_words_count(self, mock_save_table):
         """
         Save the number of words recorded on the current date.
@@ -860,3 +861,22 @@ class TestUpdater(unittest.TestCase):
         mock_save_words.assert_called_once()
         mock_save_performances.assert_called_once()
         mock_save_words_count.assert_called_once()
+
+
+
+class TestUtils(unittest.TestCase):
+    """
+    Methods that tests functions of data module.
+    """
+    def test_complete_columns(self):
+        """
+        Guarantee that the well_known_words dataframe contains exactly 
+        the columns of the output dataframe.
+        """
+        # ----- ARRANGE
+        df_1 = pd.DataFrame(columns=['col1', 'col2', 'col3'])
+        df_2 = pd.DataFrame(columns=['col1', 'col4'])
+        # ----- ACT
+        df_1 = interro.complete_columns(df_1, df_2)
+        # ----- ASSERT
+        self.assertIn('col4', df_1)
