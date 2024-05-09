@@ -19,7 +19,7 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src import interro
-from src.views import view_api
+from src.views import api as api_view
 from src.api import authentication as auth_api
 from src.api import database as db_api
 from src.data import database_interface
@@ -46,7 +46,7 @@ def load_test(
     loader_ = interro.Loader(db_handler)
     loader_.load_tables()
     test_length = adjust_test_length(test_length, loader_)
-    guesser = view_api.FastapiGuesser()
+    guesser = api_view.FastapiGuesser()
     test_ = interro.PremierTest(
         loader_.tables[loader_.test_type + '_voc'],
         test_length,
@@ -273,7 +273,7 @@ def load_rattraps(
         rattraps_cnt = test.rattraps + 1
     else:
         rattraps_cnt = 0
-    guesser = view_api.FastapiGuesser()
+    guesser = api_view.FastapiGuesser()
     rattrap = interro.Rattrap(
         test.faults_df,
         rattraps_cnt,

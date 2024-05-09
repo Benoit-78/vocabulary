@@ -10,7 +10,7 @@ from unittest.mock import patch
 REPO_DIR = os.getcwd().split('tests')[0]
 sys.path.append(REPO_DIR)
 
-from src.views import view_local
+from src.views import terminal as terminal_view
 
 
 
@@ -21,13 +21,13 @@ class TestCliGuesser(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        cls.guesser = view_local.CliGuesser()
+        cls.guesser = terminal_view.CliGuesser()
         cls.row = [
             "How fast is an African swallow?",
             "A quelle vitesse vole une mouette africaine ?"
         ]
 
-    @patch('src.views.view_local.messagebox.showinfo')
+    @patch('src.views.terminal.messagebox.showinfo')
     def test_ask_word(self, mock_show_info):
         """
         Should ask the user a translation for the word proposed to him.
@@ -44,7 +44,7 @@ class TestCliGuesser(unittest.TestCase):
         )
 
     @patch('tkinter.messagebox.showinfo')
-    @patch('src.views.view_local.logger')
+    @patch('src.views.terminal.logger')
     def test_ask_word_user_interrupt(self, mock_logger, mock_show_info):
         """
         User should be able to interrupt the test at anytime.
@@ -58,7 +58,7 @@ class TestCliGuesser(unittest.TestCase):
         # ----- ASSERT
         mock_logger.error.assert_called_once_with("Interruption by user")
 
-    @patch('src.views.view_local.messagebox.askyesnocancel')
+    @patch('src.views.terminal.messagebox.askyesnocancel')
     def test_get_user_answer(self, mock_ask_yes_no_cancel):
         # ----- ARRANGE
         title = "Test Title"
@@ -73,8 +73,8 @@ class TestCliGuesser(unittest.TestCase):
             message=message
         )
 
-    @patch('src.views.view_local.messagebox.askyesnocancel')
-    @patch('src.views.view_local.logger')
+    @patch('src.views.terminal.messagebox.askyesnocancel')
+    @patch('src.views.terminal.logger')
     def test_get_user_answer_interrupt(self, mock_logger, mock_ask_yes_no_cancel):
         # ----- ARRANGE
         title = "Test Title"
@@ -90,8 +90,8 @@ class TestCliGuesser(unittest.TestCase):
             message=message
         )
 
-    @patch('src.views.view_local.CliGuesser.get_user_answer')
-    @patch('src.views.view_local.CliGuesser.ask_word')
+    @patch('src.views.terminal.CliGuesser.get_user_answer')
+    @patch('src.views.terminal.CliGuesser.ask_word')
     def test_guess_word(self, mock_ask_word, mock_get_user_answer):
         # ----- ARRANGE
         i = 1
@@ -108,8 +108,8 @@ class TestCliGuesser(unittest.TestCase):
             f"Word {i}/{words}"
         )
 
-    @patch('src.views.view_local.CliGuesser.get_user_answer')
-    @patch('src.views.view_local.CliGuesser.ask_word')
+    @patch('src.views.terminal.CliGuesser.get_user_answer')
+    @patch('src.views.terminal.CliGuesser.ask_word')
     def test_guess_word_error(self, mock_ask_word, mock_get_user_answer):
         # ----- ARRANGE
         i = 1

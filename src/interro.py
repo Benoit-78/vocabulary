@@ -430,6 +430,15 @@ class Updater():
         """
         1) 
         """
+        def correct_words_cnt_df():
+            """
+            Correct the words count dataframe.
+            """
+            real_columns = set(self.interro.word_cnt_df.columns)
+            expected_columns = {'test_date', 'nb'}
+            if real_columns != expected_columns:
+                self.interro.word_cnt_df.reset_index(inplace=True)
+
         count_before = self.interro.word_cnt_df.shape[0]
         new_row = pd.DataFrame(
             data={
@@ -438,6 +447,7 @@ class Updater():
             },
             index=[count_before]
         )
+        correct_words_cnt_df()
         self.interro.word_cnt_df = pd.concat([
             self.interro.word_cnt_df,
             new_row
@@ -449,7 +459,9 @@ class Updater():
         )
 
     def update_data(self):
-        """Main method of Updater class"""
+        """
+        Main method of Updater class
+        """
         self.move_good_words()
         self.flag_bad_words()
         self.save_words()

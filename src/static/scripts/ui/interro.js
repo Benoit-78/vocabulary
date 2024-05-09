@@ -64,3 +64,13 @@ document.addEventListener("DOMContentLoaded", function() {
         );
     });
 });
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const rattrapsButton = document.getElementById("rattrapsButton");
+    const token = document.body.dataset.token;
+
+    rattrapsButton.addEventListener("click", function() {
+        launchRattraps(token, newTotal, newCount, newScore);
+    });
+});

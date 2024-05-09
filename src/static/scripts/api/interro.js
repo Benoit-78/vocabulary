@@ -134,9 +134,9 @@ function launchRattraps(token, newTotal, newCount, newScore) {
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "Rattraps created successfully") {
-            total = data.total;
-            count = data.count;
-            score = data.score;
+            const total = data.total;
+            const count = data.count;
+            const score = data.score;
             window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
         } else {
             console.error("Error with rattraps creation.");

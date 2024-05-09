@@ -23,7 +23,7 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src import interro
-from src.views import view_local
+from src.views import terminal as view_terminal
 from src.data import database_interface
 
 
@@ -260,7 +260,7 @@ class TestPremierTest(unittest.TestCase):
         self.loader_1.tables = {}
         words = df.shape[0] //  2
         self.loader_1.tables['version_voc'] = df
-        guesser = view_local.CliGuesser()
+        guesser = view_terminal.CliGuesser()
         self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,
@@ -419,7 +419,7 @@ class TestPremierTest(unittest.TestCase):
         self.assertLess(new_row['taux'], old_row['taux'])
         self.assertEqual(new_row['query'], old_row['query'] + 1)
 
-    @patch('src.views.view_local.CliGuesser.guess_word')
+    @patch('src.views.terminal.CliGuesser.guess_word')
     @patch('src.interro.PremierTest.update_faults_df')
     @patch('src.interro.PremierTest.update_voc_df')
     def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df, mock_guess_word):
@@ -666,7 +666,7 @@ class TestUpdater(unittest.TestCase):
         df['img_good'] = [0] * df.shape[0]
         self.loader_1.tables['version_voc'] = df
         words = 10
-        self.guesser = view_local.CliGuesser()
+        self.guesser = view_terminal.CliGuesser()
         self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,

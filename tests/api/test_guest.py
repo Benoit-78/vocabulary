@@ -24,7 +24,7 @@ if REPO_DIR not in sys.path:
 
 from src.api import guest as guest_api
 from src.interro import PremierTest
-from src.views import view_api
+from src.views import api as api_view
 
 
 
@@ -136,7 +136,7 @@ class TestGuest(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=view_api.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test
