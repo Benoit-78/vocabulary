@@ -81,8 +81,6 @@ function sendUserAnswer(token, answer, count, numWords, score, content_box1, con
     .then(data => {
         if (data && data.message === "User response stored successfully") {
             const score = data.score;
-            console.log("Score:", score);
-            console.log("NumWords:", numWords);
             if (count < numWords) {
                 nextGuess(token, numWords, count, score);
             } else {

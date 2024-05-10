@@ -101,10 +101,10 @@ class MenuReader():
     """
     Provide with all methods necessary to interact with csv files.
     """
-    def __init__(self, language):
+    def __init__(self, current_page):
         self.os_sep = get_os_separator()
         self.path = ''
-        self.language = language
+        self.page = current_page.split('/')[1] + '.html'
 
     def set_path(self):
         """
@@ -113,10 +113,10 @@ class MenuReader():
         self.path = self.os_sep.join([
             r'.',
             'data',
-            'menu.csv'
+            'menus.csv'
         ])
 
-    def get_menus(self, page) -> pd.DataFrame:
+    def get_translations_dict(self) -> pd.DataFrame:
         """
         Load the tables
         """
@@ -126,7 +126,14 @@ class MenuReader():
             sep=';',
             encoding='utf-8'
         )
-        menus_df = menus_df[['page', self.language]]
-        menus = menus_df[menus_df['page']==page]
-        menus = list(menus[self.language])
-        return menus
+        menus_df = menus_df[menus_df['page']==self.page]
+        translations_dict = {}
+        for _, row in menus_df.iterrows():
+            original_text = row['standard']
+            translated_text_en = row['english']
+            translated_text_fr = row['french']
+            translations_dict[original_text] = {
+                'en': translated_text_en,
+                'fr': translated_text_fr
+            }
+        return translations_dict

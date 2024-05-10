@@ -9,7 +9,7 @@ import os
 import sys
 
 from loguru import logger
-from fastapi import Query, Request, Depends, HTTPException, status
+from fastapi import Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm

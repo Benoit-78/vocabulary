@@ -18,7 +18,6 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
 from src.api import dashboard as dashboard_api
-from src.data import users
 
 dashboard_router = APIRouter(prefix='/dashboard')
 templates = Jinja2Templates(directory="src/templates")

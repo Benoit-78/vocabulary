@@ -23,7 +23,7 @@ from loguru import logger
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
-from src.routers import user_router, interro_router, guest_router, database_router, dashboard_router
+from src.routers import common_router, dashboard_router, database_router, guest_router, interro_router, user_router
 from src.api import authentication
 
 app = FastAPI(
@@ -37,6 +37,7 @@ app.add_middleware(
     secret_key=os.environ.get("SECRET_KEY")
 )
 # Routers
+app.include_router(common_router)
 app.include_router(dashboard_router)
 app.include_router(database_router)
 app.include_router(guest_router)
@@ -52,7 +53,7 @@ app.mount(
 templates = Jinja2Templates(directory="src/templates")
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/welcome", response_class=HTMLResponse)
 async def welcome_page(
         request: Request,
         token: str = Depends(authentication.create_token)

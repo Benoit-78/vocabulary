@@ -1,89 +1,89 @@
-page;english;french
-welcome.html;Keep your words;Retenez vos mots
-welcome.html;Try;Essayer
-welcome.html;Sign in;Connection
-welcome.html;Sign up;Inscription
-welcome.html;About;Infos
-welcome.html;Help;Aide
-about_the_app.html;About the app;Infos
-about_the_app.html;When you discover a new word, save it in the app, along with its translation;Quand vous découvrez un nouveau, enregistrez-le dans l’application, avec sa traduction
-about_the_app.html;The app will ask you, say, 10 random words each day;Vous pouvez ensuite demander à l’application de vous demander 10 mots par jour
-about_the_app.html;As you progress, the words you retain well will be archived;Au fur et à mesure des interros, les mots que vous retenez le mieux seront archivés
-about_the_app.html;Those you have difficulties with will be revisited more frequently;Les mots qui vous posent le plus de difficulté vous seront demandés plus souvent
-about_the_app.html;And in the end, these words will be in your memory;Et au bout du compte, tous ces mots seront dans votre tête
-about_the_app.html;Quit;Quitter
-about_the_app.html;Do NOT store any sensitive data on this app!;Ne laisser aucune information confidentielle sur cette application !
-database/choose.html;Choose database;Choix de la base de données
-database/choose.html;Choose an existing database;Choisissez une base de données
-database/choose.html;Choose database;Confirmer
-database/choose.html;Create a new database;Créer une nouvelle base de données
-database/choose.html;Create database;Créer
-database/choose.html;Quit;Quitter
-database/fill.html;Add words;Ajouter des mots
-database/fill.html;Foreign;Etranger
-database/fill.html;Native;Français
-database/fill.html;Add word;Ajouter
-database/fill.html;Upload CSV File;Charger un csv
-database/fill.html;Upload;Charger
-database/fill.html;Quit;Quitter
-guest/answer.html;Guest interro;Interro invité
-guest/answer.html;What is the translation for:;Quelle traduction donnez-vous pour :
-guest/answer.html;Did you get it?;Vous l’aviez ?
-guest/answer.html;Yes;Oui
-guest/answer.html;No;Non
-guest/answer.html;Quit;Quitter
-guest/end.html;Guest interro;Interro invité
-guest/end.html;You have found all of them, congratulations!;Vous les avez tous trouvés, bravo !
-guest/end.html;Quit;Quitter
-guest/end.html;Guest interro;Interro invité
-guest/question.html;What is the translation for:;Quelle traduction donnez-vous pour :
-guest/question.html;Show translation;Traduction
-guest/question.html;Quit;Quitter
-guest/rattraps.html;Guest interro;Interro invité
-guest/rattraps.html;Your score is: ;Votre score :
-guest/rattraps.html;Take a catch-up test;Rattrapage !
-guest/rattraps.html;Quit;Quitter
-guest/settings.html;Guest interro;Interro invité
-guest/settings.html;Select a language;Choisissez une langue
-guest/settings.html;Quit;Quitter
-interro/answer.html;Guest interro;Interro invité
-interro/answer.html;What is the translation for:;Quelle traduction donnez-vous pour :
-interro/answer.html;Did you get it?;Vous l’aviez ?
-interro/answer.html;Yes;Oui
-interro/answer.html;No;Non
-interro/answer.html;Quit;Quitter
-interro/end.html;Guest interro;Interro invité
-interro/end.html;You have found all of them, congratulations!;Vous les avez tous trouvés, bravo !
-interro/end.html;Quit;Quitter
-interro/end.html;Guest interro;Interro invité
-interro/question.html;What is the translation for:;Quelle traduction donnez-vous pour :
-interro/question.html;Show translation;Traduction
-interro/question.html;Quit;Quitter
-interro/rattraps.html;Guest interro;Interro invité
-interro/rattraps.html;Your score is: ;Votre score :
-interro/rattraps.html;Take a catch-up test;Rattrapage !
-interro/rattraps.html;Quit;Quitter
-interro/settings.html;Guest interro;Interro invité
-interro/settings.html;Select a language;Choisissez une langue
-interro/settings.html;Quit;Quitter
-user/dashboard.html;Dashboard;Tableau de bord
-user/dashboard.html;Quit;Quitter
-user/settings.html;Settings;Réglages
-user/settings.html;Quit;Quitter
-user/sign_in.html;Sign-in;Connexion
-user/sign_in.html;User name;Nom d’utilisateur
-user/sign_in.html;Password;Mot de passe
-user/sign_in.html;Sign-in;Connexion
-user/sign_in.html;Quit;Quitter
-user/sign_up.html;Sign-up;Inscription
-user/sign_up.html;User name;Nom d’utilisateur
-user/sign_up.html;Password;Mot de passe
-user/sign_up.html;Sign-up;Inscription
-user/sign_up.html;Quit;Quitter
-user/user_space.html;Your space;Votre espace
-user/user_space.html;Welcome;Bienvenue
-user/user_space.html;Interroooo !!!;Interroooo !!!
-user/user_space.html;Add a word;Ajouter un mot
-user/user_space.html;Dashboard;Tableau de bord
-user/user_space.html;Settings;Réglages
-user/user_space.html;Sign-out;Déconnexion
+page;standard;english;french
+welcome.html;Keep your words;Keep your words;Retenez vos propres mots
+welcome.html;Try;Try;Essai
+welcome.html;Sign in;Sign in;Connexion
+welcome.html;Sign up;Sign up;Inscription
+welcome.html;About;About;Infos
+welcome.html;Help;Help;Aide
+about_the_app.html;About the app;About the app;Infos
+about_the_app.html;When you discover a new word, save it in the app, along with its translation;When you discover a new word, save it in the app, along with its translation;Quand vous découvrez un nouveau, enregistrez-le dans l’application, avec sa traduction
+about_the_app.html;The app will ask you, say, 10 random words each day;The app will ask you, say, 10 random words each day;Vous pouvez ensuite demander à l’application de vous demander 10 mots par jour
+about_the_app.html;As you progress, the words you retain well will be archived;As you progress, the words you retain well will be archived;Au fur et à mesure des interros, les mots que vous retenez le mieux seront archivés
+about_the_app.html;Those you have difficulties with will be revisited more frequently;Those you have difficulties with will be revisited more frequently;Les mots qui vous posent le plus de difficulté vous seront demandés plus souvent
+about_the_app.html;And in the end, these words will be in your memory;And in the end, these words will be in your memory;Et au bout du compte, tous ces mots seront dans votre tête
+about_the_app.html;Quit;Quit;Quitter
+about_the_app.html;Do NOT store any sensitive data on this app!;Do NOT store any sensitive data on this app!;Ne laisser aucune information confidentielle sur cette application !
+database/choose.html;Choose database;Choose database;Choix de la base de données
+database/choose.html;Choose an existing database;Choose an existing database;Choisissez une base de données
+database/choose.html;Choose database;Choose database;Confirmer
+database/choose.html;Create a new database;Create a new database;Créer une nouvelle base de données
+database/choose.html;Create database;Create database;Créer
+database/choose.html;Quit;Quit;Quitter
+database/fill.html;Add words;Add words;Ajouter des mots
+database/fill.html;Foreign;Foreign;Etranger
+database/fill.html;Native;Native;Français
+database/fill.html;Add word;Add word;Ajouter
+database/fill.html;Upload CSV File;Upload CSV File;Charger un csv
+database/fill.html;Upload;Upload;Charger
+database/fill.html;Quit;Quit;Quitter
+guest/answer.html;Guest interro;Guest interro;Interro invité
+guest/answer.html;What is the translation for:;What is the translation for:;Quelle traduction donnez-vous pour :
+guest/answer.html;Did you get it?;Did you get it?;Vous l’aviez ?
+guest/answer.html;Yes;Yes;Oui
+guest/answer.html;No;No;Non
+guest/answer.html;Quit;Quit;Quitter
+guest/end.html;Guest interro;Guest interro;Interro invité
+guest/end.html;You have found all of them, congratulations!;You have found all of them, congratulations!;Vous les avez tous trouvés, bravo !
+guest/end.html;Quit;Quit;Quitter
+guest/end.html;Guest interro;Guest interro;Interro invité
+guest/question.html;What is the translation for:;What is the translation for:;Quelle traduction donnez-vous pour :
+guest/question.html;Show translation;Show translation;Traduction
+guest/question.html;Quit;Quit;Quitter
+guest/rattraps.html;Guest interro;Guest interro;Interro invité
+guest/rattraps.html;Your score is: ;Your score is: ;Votre score :
+guest/rattraps.html;Take a catch-up test;Take a catch-up test;Rattrapage !
+guest/rattraps.html;Quit;Quit;Quitter
+guest/settings.html;Guest interro;Guest interro;Interro invité
+guest/settings.html;Select a language;Select a language;Choisissez une langue
+guest/settings.html;Quit;Quit;Quitter
+interro/answer.html;Guest interro;Guest interro;Interro invité
+interro/answer.html;What is the translation for:;What is the translation for:;Quelle traduction donnez-vous pour :
+interro/answer.html;Did you get it?;Did you get it?;Vous l’aviez ?
+interro/answer.html;Yes;Yes;Oui
+interro/answer.html;No;No;Non
+interro/answer.html;Quit;Quit;Quitter
+interro/end.html;Guest interro;Guest interro;Interro invité
+interro/end.html;You have found all of them, congratulations!;You have found all of them, congratulations!;Vous les avez tous trouvés, bravo !
+interro/end.html;Quit;Quit;Quitter
+interro/end.html;Guest interro;Guest interro;Interro invité
+interro/question.html;What is the translation for:;What is the translation for:;Quelle traduction donnez-vous pour :
+interro/question.html;Show translation;Show translation;Traduction
+interro/question.html;Quit;Quit;Quitter
+interro/rattraps.html;Guest interro;Guest interro;Interro invité
+interro/rattraps.html;Your score is: ;Your score is: ;Votre score :
+interro/rattraps.html;Take a catch-up test;Take a catch-up test;Rattrapage !
+interro/rattraps.html;Quit;Quit;Quitter
+interro/settings.html;Guest interro;Guest interro;Interro invité
+interro/settings.html;Select a language;Select a language;Choisissez une langue
+interro/settings.html;Quit;Quit;Quitter
+user/dashboard.html;Dashboard;Dashboard;Tableau de bord
+user/dashboard.html;Quit;Quit;Quitter
+user/settings.html;Settings;Settings;Réglages
+user/settings.html;Quit;Quit;Quitter
+user/sign_in.html;Sign-in;Sign-in;Connexion
+user/sign_in.html;User name;User name;Nom d’utilisateur
+user/sign_in.html;Password;Password;Mot de passe
+user/sign_in.html;Sign-in;Sign-in;Connexion
+user/sign_in.html;Quit;Quit;Quitter
+user/sign_up.html;Sign-up;Sign-up;Inscription
+user/sign_up.html;User name;User name;Nom d’utilisateur
+user/sign_up.html;Password;Password;Mot de passe
+user/sign_up.html;Sign-up;Sign-up;Inscription
+user/sign_up.html;Quit;Quit;Quitter
+user/user_space.html;Your space;Your space;Votre espace
+user/user_space.html;Welcome;Welcome;Bienvenue
+user/user_space.html;Interroooo !!!;Interroooo !!!;Interroooo !!!
+user/user_space.html;Add a word;Add a word;Ajouter un mot
+user/user_space.html;Dashboard;Dashboard;Tableau de bord
+user/user_space.html;Settings;Settings;Réglages
+user/user_space.html;Sign-out;Sign-out;Déconnexion
