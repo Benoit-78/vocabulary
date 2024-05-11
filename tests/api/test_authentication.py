@@ -28,7 +28,13 @@ from src.api import authentication as auth_api
 
 
 class TestAuthentication(unittest.TestCase):
+    """
+    Test the functions of the authentication module.
+    """
     def test_create_guest_user_name(self):
+        """
+        Test the creation of a guest user name.
+        """
         # ----- ARRANGE
         # ----- ACT
         result = auth_api.create_guest_user_name()
@@ -49,6 +55,9 @@ class TestAuthentication(unittest.TestCase):
             self,
             mock_jwt_encode
         ):
+        """
+        Test the creation of a token.
+        """
         # ----- ARRANGE
         data = {"user_id": 123}
         expires_delta = 15
@@ -74,6 +83,9 @@ class TestAuthentication(unittest.TestCase):
             mock_create_guest_user_name,
             mock_jwt_encode
         ):
+        """
+        Test the creation of a token with no data.
+        """
         # ----- ARRANGE
         data = None
         expires_delta = 15
@@ -99,6 +111,9 @@ class TestAuthentication(unittest.TestCase):
             self,
             mock_jwt_encode
         ):
+        """
+        Test the creation of a token with the standard expiration delta.
+        """
         # ----- ARRANGE
         data = {"user_id": 123}
         # ----- ACT
@@ -116,6 +131,9 @@ class TestAuthentication(unittest.TestCase):
 
     @patch('src.data.database_interface.DbController.get_users_list')
     def test_get_users_list(self, mock_get_users_list):
+        """
+        Test the retrieval of the users list.
+        """
         # ----- ARRANGE
         mock_users_list = [
             {"user1": "user1"},
@@ -133,6 +151,9 @@ class TestAuthentication(unittest.TestCase):
     @patch.dict(os.environ, {"SECRET_KEY": "your_secret_key"})
     @patch('src.api.authentication.jwt.decode')
     def test_get_user_name_from_token(self, mock_decode):
+        """
+        Test the retrieval of the user name from a token.
+        """
         # ----- ARRANGE
         token = 'mock_token'
         mock_dict = {"sub": "mock_user_name"}
@@ -153,6 +174,9 @@ class TestAuthentication(unittest.TestCase):
             self,
             mock_get_user_name_from_token
         ):
+        """
+        Test the check of a token for a guest user.
+        """
         # ----- ARRANGE
         token = 'mock_token'
         mock_get_user_name_from_token.return_value = 'guest_user1'
@@ -170,6 +194,9 @@ class TestAuthentication(unittest.TestCase):
             mock_get_user_name_from_token,
             mock_get_users_list
         ):
+        """
+        Test the check of a token for a registered user.
+        """
         # ----- ARRANGE
         token = 'mock_token'
         mock_get_users_list.return_value = [
@@ -193,6 +220,9 @@ class TestAuthentication(unittest.TestCase):
             mock_get_user_name_from_token,
             mock_get_users_list
         ):
+        """
+        Test the check of a token for an unknown user.
+        """
         # ----- ARRANGE
         token = 'mock_token'
         mock_get_users_list.return_value = [
@@ -210,6 +240,9 @@ class TestAuthentication(unittest.TestCase):
 
     @patch('src.api.authentication.CryptContext.hash')
     def test_get_password_hash(self, mock_hash):
+        """
+        Test the retrieval of the password hash.
+        """
         # ----- ARRANGE
         password = 'mock_password'
         mock_hash.return_value = 'mock_hash'
@@ -228,6 +261,9 @@ class TestAuthentication(unittest.TestCase):
             mock_decode,
             mock_get_users_list
         ):
+        """
+        Test the retrieval of the user name from a token.
+        """
         # ----- ARRANGE
         token = 'mock_token'
         mock_dict = {"sub": "user1"}
@@ -255,6 +291,10 @@ class TestAuthentication(unittest.TestCase):
             self,
             mock_decode,
         ):
+        """
+        Test the retrieval of the user name from a token
+        that does not contain any user name.
+        """
         # ----- ARRANGE
         token = 'mock_token'
         mock_dict = {"sub": None}
@@ -277,6 +317,9 @@ class TestAuthentication(unittest.TestCase):
             mock_decode,
             mock_get_users_list
         ):
+        """
+        Test the retrieval of the user name from a token if the user is unknown.
+        """
         # ----- ARRANGE
         token = 'mock_token'
         mock_dict = {"sub": "user4"}
@@ -299,6 +342,9 @@ class TestAuthentication(unittest.TestCase):
 
     @patch('src.api.authentication.CryptContext.verify')
     def test_user_exists_correct_password(self, mock_pwt_verify):
+        """
+        Test the authentication of a user with the correct password.
+        """
         # ----- ARRANGE
         users_list = [
             {'username': 'user1', 'password_hash': 'hashed_password1'},
@@ -316,6 +362,9 @@ class TestAuthentication(unittest.TestCase):
 
     @patch('src.api.authentication.CryptContext.verify')
     def test_user_exists_incorrect_password(self, mock_pwt_verify):
+        """
+        Test the authentication of a user with an incorrect password.
+        """
         # ----- ARRANGE
         users_list = [
             {'username': 'user1', 'password_hash': 'hashed_password1'},
@@ -332,6 +381,9 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual(wrong_password_user, 'Password incorrect')
 
     def test_user_does_not_exist(self):
+        """
+        Test the authentication of a user that does not exist.
+        """
         # ----- ARRANGE
         users_list = [
             {'username': 'user1', 'password_hash': 'hashed_password1'},
@@ -347,6 +399,9 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual(unknown_user, 'Unknown user')
 
     def test_get_error_messages_none(self):
+        """
+        Test the retrieval of error messages for a None error message.
+        """
         # ----- ARRANGE
         error_message = 'User successfully authenticated'
         # ----- ACT
@@ -356,6 +411,9 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual(result, ("", ""))
 
     def test_get_error_messages_unknown_user(self):
+        """
+        Test the retrieval of error messages for an unknown user.
+        """
         # ----- ARRANGE
         error_message = 'Unknown user'
         # ----- ACT
@@ -365,6 +423,9 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual(result, ("Unknown user name", ""))
 
     def test_get_error_messages_password_incorrect(self):
+        """
+        Test the retrieval of error messages for an incorrect password.
+        """
         # ----- ARRANGE
         error_message = 'Password incorrect'
         # ----- ACT
@@ -374,6 +435,9 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual(result, ("", "Password incorrect"))
 
     def test_get_error_messages_empty(self):
+        """
+        Test the retrieval of error messages for an empty error message.
+        """
         # ----- ARRANGE
         error_message = ''
         # ----- ACT
@@ -384,6 +448,9 @@ class TestAuthentication(unittest.TestCase):
 
     @patch('src.api.authentication.logger')
     def test_get_error_messages_unknown(self, mock_logger):
+        """
+        Test the retrieval of error messages for an unknown error message.
+        """
         # ----- ARRANGE
         error_message = 'some_strange_message'
         # ----- ACT

@@ -16,7 +16,7 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from fastapi import FastAPI, Depends, Query
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
@@ -51,6 +51,17 @@ app.mount(
 )
 # HTML
 templates = Jinja2Templates(directory="src/templates")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def root_page(
+        request: Request,
+        token: str = Depends(authentication.create_token)
+    ):
+    """
+    Redirects to the welcome page.
+    """
+    return RedirectResponse(url="/welcome")
 
 
 @app.get("/welcome", response_class=HTMLResponse)

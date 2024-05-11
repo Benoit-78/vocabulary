@@ -156,34 +156,64 @@ class TestDataHandler(unittest.TestCase):
             )
         os.remove(csv_handler.paths['for_test_only'])
 
-    # @patch('builtins.open', new_callable=mock_open)
-    # @patch('pandas.read_csv')
-    # def test_csv_to_sql(self, mock_read_csv, mock_open):
-    #     # ----- ARRANGE
-    #     csv_path = 'test.csv'
-    #     table_name = 'test_table'
-    #     csv_data = '\n'.join([
-    #         "foreign,native,creation_date,nb,score,taux",
-    #         "value1,value2,2022-01-01,10,5,0.5",
-    #         "value3,value4,2022-01-02,20,7,0.35"
-    #     ])
-    #     mock_read_csv.return_value = pd.read_csv(StringIO(csv_data))
-    #     # ----- ACT
-    #     csv_interface.csv_to_sql(csv_path, table_name)
-    #     # ----- ASSERT
-    #     expected_sql = ' '.join([
-    #         "INSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)",
-    #         "VALUES ('value1', 'value2', '2022-01-01', 10, 5, 0.5);",
-    #         "\nINSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)",
-    #         "VALUES ('value3', 'value4', '2022-01-02', 20, 7, 0.35);",
-    #         "\n"
-    #     ])
-    #     mock_open.assert_called_once_with(f'data/{table_name}.sql', 'w', encoding='utf-8')
-    #     logger.debug(mock_open.return_value.write.call_args_list)
-    #     mock_open.return_value.write.assert_called_once()
-    #     # expected_sql = "INSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`) VALUES ('value1', 'value2', '2022-01-01', 10, 5, 0.5);\nINSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`) VALUES ('value3', 'value4', '2022-01-02', 20, 7, 0.35);\n"
-    #     # mock_open.assert_called_once_with(f'data/{table_name}.sql', 'w', encoding='utf-8')
-    #     # mock_open.return_value.write.assert_called_once()
-    #     # write_call_args = mock_open.return_value.write.call_args
-    #     # actual_sql = write_call_args[0][0]  # Extract the content passed to the write method
-    #     # self.assertEqual(actual_sql, expected_sql)
+
+
+class TestMenusReader(unittest.TestCase):
+    """
+    The MenuReader class should serve as an interface with csv data.
+    """
+    def setUp(self):
+        """Run once before all tests."""
+        self.menu_reader = csv_interface.MenuReader('user/user_space')
+
+    def test_init(self):
+        """
+        MenuReader should be initialized correctly.
+        """
+        # ----- ARRANGE
+        # ----- ACT
+        # ----- ASSERT
+        self.assertIsInstance(self.menu_reader, csv_interface.MenuReader)
+        self.assertEqual(self.menu_reader.os_sep, os.sep)
+        self.assertEqual(self.menu_reader.path, '')
+        self.assertEqual(self.menu_reader.page, 'user_space.html')
+
+    def test_set_path(self):
+        """
+        Path should be set correctly.
+        """
+        # ----- ARRANGE
+        # ----- ACT
+        self.menu_reader.set_path()
+        # ----- ASSERT
+        self.assertIsInstance(self.menu_reader.path, str)
+        self.assertEqual(self.menu_reader.path, './data/menus.csv')
+
+    @patch('src.data.csv_interface.pd.read_csv')
+    def test_get_translations_dict(self, mock_read_csv):
+        """
+        Should return the translations dictionary.
+        """
+        # ----- ARRANGE
+        mock_df = pd.DataFrame({
+            'page': ['user_space.html', 'user_space.html', 'welcome.html'],
+            'standard': ['pomme', 'banane', 'some_strange_value'],
+            'english': ['apple', 'banana', 'some_value'],
+            'french': ['pomme', 'banane', 'some_strange_value']
+        })
+        mock_read_csv.return_value = mock_df
+        # ----- ACT
+        result = self.menu_reader.get_translations_dict()
+        # ----- ASSERT
+        self.assertIsInstance(result, dict)
+        expected_dict = {
+            'pomme': {
+                'en': 'apple',
+                'fr': 'pomme',
+            },
+            'banane': {
+                'en': 'banana',
+                'fr': 'banane'
+            }
+        }
+        self.assertEqual(result, expected_dict)

@@ -36,3 +36,6 @@ common/secret.yaml
 *.pyc
 *.txt
 *.rdb
+jest.config.js
+package-lock.json
+package.json

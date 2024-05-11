@@ -11,6 +11,7 @@ import os
 import sys
 from typing import Dict
 
+from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -63,6 +64,9 @@ def authenticate_user(
     """
     Authenticate the user.
     """
+    if form_data.client_id is not None:
+        json_response = authenticate_user_with_oauth(token, form_data)
+        return json_response
     logger.info('')
     users_list = auth_api.get_users_list()
     user = auth_api.authenticate_user(
@@ -96,6 +100,27 @@ def authenticate_user(
                     'token': user_token
                 }
             )
+    return json_response
+
+
+def authenticate_user_with_oauth(
+        token: str,
+        form_data
+    ):
+    user = auth_api.authenticate_with_oauth(form_data)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    json_response = JSONResponse(
+        content=
+        {
+            'message': "Vous n'avez pas dis le mot magique, hahaha !",
+            'token': token
+        }
+    )
     return json_response
 
 

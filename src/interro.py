@@ -186,7 +186,7 @@ class PremierTest(Interro):
         i = 0
         while already_asked and i < (self.words_df.shape[0]):
             next_index = random.randint(0, self.words_df.shape[0])
-            next_index = max(next_index, 0)
+            next_index = max(next_index, 1)
             already_asked = self.words_df.loc[next_index, 'query'] == 1
             i += 1
         self.words_df.loc[next_index, 'query'] = 1
@@ -471,7 +471,10 @@ class Updater():
 
 
 
-def complete_columns(df_1: pd.DataFrame, df_2: pd.DataFrame):
+def complete_columns(
+        df_1: pd.DataFrame,
+        df_2: pd.DataFrame
+    ):
     """
     Guarantee that the well_known_words dataframe contains exactly
     the columns of the output dataframe

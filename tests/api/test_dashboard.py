@@ -25,8 +25,14 @@ from src.data import database_interface
 
 
 class TestDashboard(unittest.TestCase):
+    """
+    Test class for the dashboard module functions
+    """
     @patch('src.api.dashboard.load_graphs')
     def test_get_user_dashboards(self, mock_load_graphs):
+        """
+        Test the get_user_dashboards function
+        """
         # ----- ARRANGE
         request = 'mock_request'
         user_name = 'mock_user_name'
@@ -60,7 +66,10 @@ class TestDashboard(unittest.TestCase):
         self.assertEqual(result, expected_dict)
 
     def test_load_graphs(self):
-        # Mock the DbManipulator instance# ----- ARRANGE
+        """
+        Test the load_graphs function
+        """
+        # ----- ARRANGE
         mock_data_manipulator = MagicMock(spec=dashboard_api.DbManipulator)
         mock_graph_1 = MagicMock(spec=dashboard_api.WordsGraph1)
         mock_graph_1.create.return_value = "<div>Graph 1 HTML</div>"
@@ -108,6 +117,9 @@ class TestWordsGraph1(unittest.TestCase):
         self.graph = dashboard_api.WordsGraph1(db_handler)
 
     def test_init(self):
+        """
+        Test the __init__ method
+        """
         # ----- ARRANGE
         # ----- ACT
         # ----- ASSERT
@@ -151,35 +163,6 @@ class TestWordsGraph1(unittest.TestCase):
         logger.debug(f"graph.data : \n{self.graph.data}")
         logger.debug(f"mock_df_after : \n{mock_df_after}")
         pd.testing.assert_frame_equal(self.graph.data, mock_df_after)
-
-    # @patch('src.api.dashboard.px.scatter')
-    # @patch('src.api.dashboard.WordsGraph1.correct_data')
-    # @patch('src.api.dashboard.WordsGraph1.set_data')
-    # def test_create_method(
-    #         self,
-    #         mock_set_data,
-    #         mock_correct_data,
-    #         mock_px_scatter
-    #     ):
-    #     # ----- ARRANGE
-    #     self.graph.data = pd.DataFrame({
-    #         'test_date': [1, 2, 3],
-    #         'test': [4, 5, 6]
-    #     })
-    #     mock_set_data.return_value = True
-    #     mock_correct_data.return_value = True
-    #     mock_px_scatter.return_value = MagicMock()
-    #     # ----- ACT
-    #     graph_html = self.graph.create("test_password")
-    #     # ----- ASSERT
-    #     self.assertTrue('<html>' in graph_html)
-    #     self.assertTrue('<script>' in graph_html)
-    #     # self.assertIn("Graph 1", graph_html)
-    #     # self.assertIn("Test count", graph_html)
-    #     # self.assertIn("Success rate", graph_html)
-    #     # self.assertIn("plotly_dark", graph_html)
-    #     mock_set_data.assert_called_once_with("test_password")
-    #     mock_correct_data.assert_called_once()
 
 
 

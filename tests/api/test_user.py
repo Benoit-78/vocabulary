@@ -13,6 +13,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
+from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 # from loguru import logger
 
@@ -96,6 +97,7 @@ class TestUserApi(unittest.TestCase):
         form_data = MagicMock()
         form_data.username = 'test_user'
         form_data.password = 'test_password'
+        form_data.client_id = None
         mock_get_users_list.return_value = ['test_user', 'some_other_strange_user_name']
         mock_authenticate_user.return_value = 'test_user'
         mock_create_token.return_value = 'user_token'
@@ -137,6 +139,7 @@ class TestUserApi(unittest.TestCase):
         form_data = MagicMock()
         form_data.username = 'test_user'
         form_data.password = 'test_password'
+        form_data.client_id = None
         mock_get_users_list.return_value = ['test_user', 'some_other_strange_user_name']
         mock_authenticate_user.return_value = "Unknown user"
         # ----- ACT
@@ -173,6 +176,7 @@ class TestUserApi(unittest.TestCase):
         form_data = MagicMock()
         form_data.username = 'test_user'
         form_data.password = 'test_password'
+        form_data.client_id = None
         mock_get_users_list.return_value = ['test_user', 'some_other_strange_user_name']
         mock_authenticate_user.return_value = "Password incorrect"
         # ----- ACT
@@ -193,6 +197,52 @@ class TestUserApi(unittest.TestCase):
             'test_user',
             'test_password'
         )
+
+    @patch('src.api.user.authenticate_user_with_oauth')
+    def test_authenticate_user_oauth(self, mock_authenticate_user_with_oauth):
+        """
+        User should be authenticated with OAuth.
+        """
+        # ----- ARRANGE
+        token = 'mock_token'
+        form_data = MagicMock()
+        form_data.client_id = 'test_client_id'
+        mock_authenticate_user_with_oauth.return_value = 'mock_json_response'
+        # ----- ACT
+        result = user_api.authenticate_user_with_oauth(token, form_data)
+        # ----- ASSERT
+        self.assertEqual(result, 'mock_json_response')
+        mock_authenticate_user_with_oauth.assert_called_once_with(token, form_data)
+
+    @patch('src.api.authentication.authenticate_with_oauth')
+    def test_authenticate_user_with_oauth(self, mock_authenticate):
+        # ----- ARRANGE
+        token = 'mock_token'
+        form_data = 'mock_form_data'
+        mock_authenticate.return_value = 'mock_json_response'
+        # ----- ACT
+        result = user_api.authenticate_user_with_oauth(token, form_data)
+        # ----- ASSERT
+        self.assertIsInstance(result, JSONResponse)
+        content = result.body
+        content_dict = content.decode('utf-8')
+        content_dict = json.loads(content_dict)
+        expected_content = {
+            'message': "Vous n'avez pas dis le mot magique, hahaha !",
+            'token': token
+        }
+        self.assertDictEqual(content_dict, expected_content)
+
+    @patch('src.api.authentication.authenticate_with_oauth')
+    def test_authenticate_user_with_oauth_error(self, mock_authenticate):
+        # ----- ARRANGE
+        token = 'mock_token'
+        form_data = 'mock_form_data'
+        mock_authenticate.return_value = None
+        # ----- ASSERT
+        with self.assertRaises(HTTPException):
+            # ----- ACT
+            user_api.authenticate_user_with_oauth(token, form_data)
 
     @patch('src.api.authentication.get_user_name_from_token')
     def test_load_user_space(self, mock_get_user_name_from_token):

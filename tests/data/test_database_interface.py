@@ -783,7 +783,7 @@ class TestDbManipulator(unittest.TestCase):
         self.user_name = 'benoit'
         self.db_definer = database_interface.DbDefiner(self.user_name)
         # Data manipulation
-        self.db_name = 'english'
+        self.db_name = 'English'
         self.table_name = self.user_name + '_' + self.db_name + '.' + 'version_voc'
         self.test_type = 'version'
         self.password = 'test_password'
@@ -1181,7 +1181,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         self.assertTrue(result)
         mock_cursor.close.assert_called_once()
@@ -1227,7 +1227,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
@@ -1269,7 +1269,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         mock_logger.error.assert_called_once()
         mock_cursor.close.assert_called_once()

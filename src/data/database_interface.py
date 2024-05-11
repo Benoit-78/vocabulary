@@ -583,7 +583,7 @@ class DbManipulator(DbInterface):
                     "://", 'root',
                     ':', os.getenv('VOC_DB_ROOT_PWD'),
                     '@', self.host,
-                    '/', self.db_name.lower()
+                    '/', self.db_name
                 ])
             )
             table.to_sql(
