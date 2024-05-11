@@ -22,10 +22,10 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src import views
 from src.api import interro as interro_api
-from src.data.data_handler import DbManipulator
+from src.data.database_interface import DbManipulator
 from src.interro import PremierTest, Rattrap, Loader
+from src.views import api as api_view
 
 
 class TestInterro(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestInterro(unittest.TestCase):
     """
     # @patch('src.interro.PremierTest.set_interro_df')
     # @patch('src.interro.Loader.load_tables')
-    # @patch('src.data.data_handler.DbManipulator.check_test_type')
+    # @patch('src.data.database_interface.DbManipulator.check_test_type')
     # def test_load_test(
     #         self,
     #         mock_check_test_type,
@@ -68,7 +68,7 @@ class TestInterro(unittest.TestCase):
 
     # @patch('src.interro.PremierTest.set_interro_df')
     # @patch('src.interro.Loader.load_tables')
-    # @patch('src.data.data_handler.DbManipulator.check_test_type')
+    # @patch('src.data.database_interface.DbManipulator.check_test_type')
     # def test_load_test(
     #         self,
     #         mock_check_test_type,
@@ -326,7 +326,7 @@ class TestInterro(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test
@@ -373,7 +373,7 @@ class TestInterro(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test
@@ -425,7 +425,7 @@ class TestInterro(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test
@@ -479,7 +479,7 @@ class TestInterro(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test
@@ -533,7 +533,7 @@ class TestInterro(unittest.TestCase):
         mock_rattrap = Rattrap(
             faults_df_=pd.DataFrame(),
             rattraps=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_rattrap.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_rattrap
@@ -595,7 +595,7 @@ class TestInterro(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_test.faults_df = mock_faults_df
@@ -658,7 +658,7 @@ class TestInterro(unittest.TestCase):
         mock_rattrap = Rattrap(
             faults_df_=mock_faults_df_,
             rattraps=2,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_load_test_from_redis.return_value = mock_rattrap
         mock_compute_success_rate.return_value = True
@@ -709,7 +709,7 @@ class TestInterro(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test
@@ -759,7 +759,7 @@ class TestInterro(unittest.TestCase):
         mock_test = Rattrap(
             faults_df_=pd.DataFrame(),
             rattraps=2,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.faults_df_ = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test
@@ -810,7 +810,7 @@ class TestInterro(unittest.TestCase):
         mock_test = PremierTest(
             words_df_=pd.DataFrame(),
             words=10,
-            guesser=views.FastapiGuesser(),
+            guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
         mock_load_test_from_redis.return_value = mock_test

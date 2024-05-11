@@ -2,26 +2,30 @@
 <html>
 
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your space</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/database.js"></script>
-    <script type="text/javascript" src="/static/scripts/interro.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
+    <!-- Title -->
+    <title>Votre espace</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/database.js"></script>
+    <script type="module" src="/static/scripts/ui/interro.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
     <div class="container">
-        <h1 class="white-text">Welcome {{ user_name }}</h1>
+        <h1 class="white-text">Bienvenue {{ user_name }}</h1>
         <div class="button-list">
-            <button class="button" onclick="goToInterroSettings(`{{ token }}`)">Interroooo !!!</button>
-            <button class="button" onclick="goToUserDatabases(`{{ token }}`)">Add words</button>
-            <button class="button" onclick="goToUserDashboards(`{{ token }}`)">Dashboard</button>
-            <button class="button" onclick="goToUserSettings(`{{ token }}`)">Settings</button>
-            <button class="button" onclick="goToRoot()">Sign-out</button>
+            <button id="interroButton" class="button">Interroooo !!!</button>
+            <button id="userDatabasesButton" class="button">Ajouter un mot</button>
+            <button id="dashboardButton" class="button">Tableau de bord</button>
+            <button id="userSettingsButton" class="button">Réglages</button>
+            <button id="quitButton" class="button">Déconnexion</button>
         </div>
     </div>
 </body>

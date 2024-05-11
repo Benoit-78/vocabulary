@@ -2,35 +2,57 @@
 <html>
 
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title -->
     <title>Vocabulary</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/root.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/root.css">
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/welcome.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
     <div>
-        <div class="container">
+        <!-- <div class="container">
+            <label class="white-text" for="languageSelect">Changer la langue</label>
+            <select id="languageSelect" class="rounded-input">
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <!-- {% for language in language %}
+                    <option value="{{ language }}">{{ language }}</option>
+                {% endfor %} -->
+            </select>
+        </div> -->
 
-            <h1 class="white-text">Vocabulary</h1>
+        <div>
+            <div class="container">
 
-            <h3 class="white-text">Keep your words</h3>
+                <h1 class="white-text">Vocabulary</h1>
 
-            <div class="button-list">
-                <button class="button" onclick="interroGuest(`{{ token }}`)">Try</button>
-                <button class="button" onclick="signIn(`{{ token }}`)">Sign in</button>
-                <button class="button" onclick="signUp(`{{ token }}`)">Sign up</button>
-                <button class="button" onclick="aboutTheApp(`{{ token }}`)">About</button>
-                <button class="button" onclick="help(`{{ token }}`)">Help</button>
+                <h3 class="white-text translatable-text">Keep your words</h3>
+
+                <div class="button-list">
+                    <button id="guestButton" class="button translatable-text">Essai</button>
+                    <button id="signInButton" class="button translatable-text">Connexion</button>
+                    <button id="signUpButton" class="button translatable-text">Inscription</button>
+                    <button id="aboutButton" class="button translatable-text">Infos</button>
+                    <button id="helpButton" class="button translatable-text">Aide</button>
+                </div>
+
             </div>
 
         </div>
 
     </div>
+
+    <!-- <script src="/static/scripts/ui/main.js" defer></script> -->
+
 </body>
 
 </html>

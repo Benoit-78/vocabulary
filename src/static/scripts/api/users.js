@@ -1,10 +1,7 @@
+export { authenticateUser, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace };
 
-async function createAccount(token) {
-    const inputName = document.getElementById("inputName").value;
-    const inputPassword = document.getElementById("inputPassword").value;
-    const formData = new URLSearchParams();
-    formData.append("username", inputName);
-    formData.append("password", inputPassword);
+
+async function createAccount(token, inputName, inputPassword) {
     try {
         const response = await fetch(
             `/user/create-user-account?token=${token}`,
@@ -33,17 +30,7 @@ async function createAccount(token) {
 }
 
 
-function signIn(token) {
-    window.location.href = `/sign-in?token=${token}`;
-}
-
-
-async function authenticateUser(token) {
-    const inputName = document.getElementById("inputName").value;
-    const inputPassword = document.getElementById("inputPassword").value;
-    const formData = new URLSearchParams();
-    formData.append("username", inputName);
-    formData.append("password", inputPassword);
+async function authenticateUser(token, formData) {
     try {
         const response = await fetch(
             `/user/user-token?token=${token}`,

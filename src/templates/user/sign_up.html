@@ -2,37 +2,43 @@
 <html>
 
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign-up</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
-    <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
+    <!-- Title -->
+    <title>Inscription</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/errors.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
     <div class="container">
-        <form id="signInForm">
+
+        <form id="signUpForm">
             <div class="row">
-                <label class="white-text" for="inputName">User name</label>
+                <label class="white-text" for="inputName">Nom d’utilisateur</label>
                 <input type="text" id="inputName" name="inputName" class="rounded-input" required>
                 {% if errorMessage %}
                     <p class="error-message">{{ errorMessage }}</p>
                 {% endif %}
             </div>
             <div class="row">
-                <label class="white-text" for="input2">Password</label>
+                <label class="white-text" for="input2">Mot de passe</label>
                 <input type="inputPassword" id="inputPassword" name="inputPassword" class="rounded-input" required>
             </div>
             <div class="row">
-                <button type="button" class="button" onclick="createAccount(`{{ token }}`)">Sign-up</button>
+                <!-- <button type="button" class="button" onclick="createAccount(`{{ token }}`)">Sign-up</button> -->
+                <button id="signUpButton" class="button">Inscription</button>
             </div>
         </form>
+
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button id="quitButton" class="button">Quitter</button>
         </div>
     </div>
 </body>

@@ -36,7 +36,10 @@ def user_databases(
     Call the base page of user databases.
     """
     response_dict = db_api.load_user_databases(request, token, error_message)
-    return templates.TemplateResponse("database/choose.html", response_dict)
+    return templates.TemplateResponse(
+        "database/choose.html",
+        response_dict
+    )
 
 
 @database_router.post("/choose-database")
@@ -112,5 +115,5 @@ async def upload_csv(
     """
     Upload the given CSV file.
     """
-    response_dict = db_api.upload_csv(csv_file, token)
-    return response_dict
+    json_response = db_api.upload_csv(csv_file, token)
+    return json_response

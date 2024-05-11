@@ -2,27 +2,34 @@
 <html>
     
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuration</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
-    <script type="text/javascript" src="/static/scripts/interro.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
+    <!-- Title -->
+    <title>Paramètres</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/errors.css">
+    <link rel="stylesheet" href="/static/styles/interro.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/interro.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
+    <script>
+        const testType = "version";
+    </script>
+
     <div class="container">
         <form>
 
             <div class="row">
-                <label class="white-text" for="test-type">Choose your database:</label>
+                <label class="white-text" for="testType">Choisir une base de données:</label>
             </div>
             <div class="row">
-                <select id="db_name" name="db_name" class="dropdown-container rounded-input" required>
+                <select id="databaseName" name="databaseName" class="dropdown-container rounded-input" required>
                     {% for database in databases %}
                         <option value="{{ database }}">{{ database }}</option>
                     {% endfor %}
@@ -32,21 +39,22 @@
                 {% endif %}
             </div>
 
-            <div class="row">
-                <label class="white-text" for="test-type">Choose your test type:</label>
+            <!-- <div class="row">
+                <label class="white-text" for="testType">Type d'interro:</label>
             </div>
             <div class="row">
-                <select id="test-type" name="test-type" class="dropdown-container rounded-input" required>
-                    <option value="Version">Normal</option>
-                    <option value="Theme">Reverse</option>
+                <select id="testType" name="testType" class="dropdown-container rounded-input" required>
+                    <option value="version">Normale</option>
+                    <option value="theme">Inversée</option>
                 </select>
-            </div>
+                Attention à la balise <script> au début du body !!!
+            </div> -->
 
             <div class="row">
-                <label class="white-text" for="num-words">Number of words:</label>
+                <label class="white-text" for="numWords">Nombre de questions</label>
             </div>
             <div class="row">
-                <select id="num-words" name="num-words" class="dropdown-container rounded-input" required>
+                <select id="numWords" name="numWords" class="dropdown-container rounded-input" required>
                     <option value="100">100</option>
                     <option value="50">50</option>
                     <option value="20">20</option>
@@ -57,16 +65,11 @@
         </form>
 
         <div class="row">
-            <button class="button" onclick="sendUserSettings(
-                `{{ token }}`,
-                document.getElementById('db_name').value,
-                document.getElementById('test-type').value,
-                document.getElementById('num-words').value
-                )">Start Test</button>
+            <button id="sendUserSettingsButton" class="button">Interro !</button>
         </div>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
 </body>

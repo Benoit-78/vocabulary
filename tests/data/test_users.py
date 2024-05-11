@@ -249,8 +249,8 @@ class TestUserAccount(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, bool)
         self.assertEqual(result, False)
-        mock_logger.success.assert_called_once_with(
-            f"Database name {db_name} is available."
+        mock_logger.info.assert_called_once_with(
+            f"Database name {db_name} does not exist"
         )
 
     @patch('src.data.users.logger')
@@ -272,8 +272,8 @@ class TestUserAccount(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, bool)
         self.assertEqual(result, True)
-        mock_logger.error.assert_called_once_with(
-            f"Database name {db_name} already exists."
+        mock_logger.info.assert_called_once_with(
+            f"Database name {db_name} exists"
         )
 
     @patch('src.data.users.DbDefiner.get_user_databases')

@@ -22,8 +22,9 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src import interro, views_local
-from src.data import data_handler
+from src import interro
+from src.views import terminal as view_terminal
+from src.data import database_interface
 
 
 
@@ -149,11 +150,12 @@ class TestCliUser(unittest.TestCase):
 
 class TestLoader(unittest.TestCase):
     """
-    The Loader class should interact with database interfaces, such as CsvHandler or MariaDBHandler.
+    The Loader class should interact with database interfaces,
+    such as csv handler or MariaDB handler.
     """
     def setUp(self):
         self.test_type = 'mock_test_type'
-        self.data_manipulator = data_handler.DbManipulator(
+        self.data_manipulator = database_interface.DbManipulator(
             user_name='mock_user_name',
             db_name='mock_db_name',
             test_type=self.test_type
@@ -176,7 +178,7 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(self.loader.tables, {})
         self.assertEqual(self.loader.output_table, '')
 
-    @patch('src.data.data_handler.DbManipulator.get_tables')
+    @patch('src.data.database_interface.DbManipulator.get_tables')
     def test_load_tables(self, mock_get_tables):
         """
         Input should be a dataframe, and it should be added a query column.
@@ -199,7 +201,7 @@ class TestLoader(unittest.TestCase):
             self.assertEqual(table['taux'].dtype, np.float64)
             self.assertGreater(table.shape[0], 1)
 
-    @patch('src.data.data_handler.DbManipulator.get_tables')
+    @patch('src.data.database_interface.DbManipulator.get_tables')
     def test_load_tables_no_bad_word_column(self, mock_get_tables):
         """
         Input should be a dataframe, and it should be added a query column.
@@ -230,7 +232,7 @@ class TestPremierTest(unittest.TestCase):
         """Run once before all tests."""
         cls.user_1 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.data_handler_1 = data_handler.DbManipulator(
+        cls.data_handler_1 = database_interface.DbManipulator(
             user_name='test_user',
             db_name='test_db',
             test_type='test_type'
@@ -258,7 +260,7 @@ class TestPremierTest(unittest.TestCase):
         self.loader_1.tables = {}
         words = df.shape[0] //  2
         self.loader_1.tables['version_voc'] = df
-        guesser = views_local.CliGuesser()
+        guesser = view_terminal.CliGuesser()
         self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,
@@ -307,24 +309,25 @@ class TestPremierTest(unittest.TestCase):
         self.assertGreater(self.interro_1.step, 0)
         self.assertLess(self.interro_1.step, self.interro_1.words_df.shape[0] + 1)
 
-    def test_get_another_index(self):
+    @patch('src.interro.random.randint')
+    def test_get_another_index_bis(self, mock_randint):
         """
         This function should provide with a new index, corresponding to a new word.
         The new word should not have been already asked within the current test.
         """
-        # Arrange
-        former_index = self.interro_1.index
-        self.interro_1.words_df['query'] = [0] * self.interro_1.words_df.shape[0]
-        self.interro_1.words_df['bad_word'] = [0] * self.interro_1.words_df.shape[0]
-        # Act
+        # ----- ARRANGE
+        mock_randint.side_effect = [1, 2]
+        self.interro_1.words_df = pd.DataFrame({
+            'query': [0, 1, 0]
+        })
+        # ----- ACT
         next_index = self.interro_1.get_another_index()
-        # Assert
-        self.assertIsInstance(next_index, int)
-        self.assertGreater(next_index, 0)
-        self.assertLess(next_index, self.interro_1.words_df.shape[0])
-        self.assertEqual(self.interro_1.words_df['query'].loc[next_index], 1)
-        if next_index != 1: # Case where the first next_index falls on 1
-            self.assertNotEqual(former_index, next_index)
+        # ----- ASSERT
+        self.assertEqual(next_index, 2)
+        self.interro_1.words_df = pd.DataFrame({
+            'query': [0, 1, 1]
+        })
+        mock_randint.call_count = 2
 
     @patch('src.interro.PremierTest.get_another_index')
     def test_get_next_index_if_not_bad_word(self, mock_get_another_index):
@@ -417,7 +420,7 @@ class TestPremierTest(unittest.TestCase):
         self.assertLess(new_row['taux'], old_row['taux'])
         self.assertEqual(new_row['query'], old_row['query'] + 1)
 
-    @patch('src.views_local.CliGuesser.guess_word')
+    @patch('src.views.terminal.CliGuesser.guess_word')
     @patch('src.interro.PremierTest.update_faults_df')
     @patch('src.interro.PremierTest.update_voc_df')
     def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df, mock_guess_word):
@@ -600,7 +603,7 @@ class TestUpdater(unittest.TestCase):
     def setUp(self):
         self.user_1 = interro.CliUser()
         self.user_1.parse_arguments(['-t', 'version'])
-        self.data_handler_1 = data_handler.DbManipulator(
+        self.data_handler_1 = database_interface.DbManipulator(
             user_name='test_user',
             db_name='test_db',
             test_type=self.user_1.settings.type
@@ -664,7 +667,7 @@ class TestUpdater(unittest.TestCase):
         df['img_good'] = [0] * df.shape[0]
         self.loader_1.tables['version_voc'] = df
         words = 10
-        self.guesser = views_local.CliGuesser()
+        self.guesser = view_terminal.CliGuesser()
         self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
             words,
@@ -806,7 +809,7 @@ class TestUpdater(unittest.TestCase):
         last_perf = last_perf['test']
         self.assertEqual(last_perf, self.updater_1.interro.perf)
 
-    @patch('src.data.data_handler.DbManipulator.save_table')
+    @patch('src.data.database_interface.DbManipulator.save_table')
     def test_save_words_count(self, mock_save_table):
         """
         Save the number of words recorded on the current date.
@@ -824,6 +827,36 @@ class TestUpdater(unittest.TestCase):
         new_shape = self.updater_1.interro.word_cnt_df.shape
         self.assertEqual(new_shape[0], old_shape[0] + 1)
         self.assertEqual(new_shape[1], old_shape[1])
+        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+            self.updater_1.loader.test_type + '_words_count',
+            self.updater_1.interro.word_cnt_df
+        )
+        logger.debug(f"A very strange table: \n{self.updater_1.interro.word_cnt_df}")
+        last_count = self.updater_1.interro.word_cnt_df.loc[
+            self.updater_1.interro.word_cnt_df.shape[0] - 1
+        ]
+        last_count = last_count['nb']
+        self.assertEqual(last_count, self.updater_1.interro.words_df.shape[0])
+
+    @patch('src.data.database_interface.DbManipulator.save_table')
+    def test_save_words_count_reset_index(self, mock_save_table):
+        """
+        Save the number of words recorded on the current date.
+        """
+        # ----- ARRANGE
+        self.updater_1.interro.word_cnt_df = pd.DataFrame({
+            'test_date': ['2022-01-01', '2022-02-01'],
+            'nb': [1876, 2341]
+        })
+        self.updater_1.interro.word_cnt_df.set_index('test_date', inplace=True)
+        old_shape = self.updater_1.interro.word_cnt_df.shape
+        mock_save_table.return_value = True
+        # ----- ACT
+        self.updater_1.save_words_count()
+        # ----- ASSERT
+        new_shape = self.updater_1.interro.word_cnt_df.shape
+        self.assertEqual(new_shape[0], old_shape[0] + 1)
+        self.assertEqual(new_shape[1], old_shape[1] + 1)
         self.updater_1.loader.data_handler.save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_words_count',
             self.updater_1.interro.word_cnt_df
@@ -859,3 +892,22 @@ class TestUpdater(unittest.TestCase):
         mock_save_words.assert_called_once()
         mock_save_performances.assert_called_once()
         mock_save_words_count.assert_called_once()
+
+
+
+class TestUtils(unittest.TestCase):
+    """
+    Methods that tests functions of data module.
+    """
+    def test_complete_columns(self):
+        """
+        Guarantee that the well_known_words dataframe contains exactly 
+        the columns of the output dataframe.
+        """
+        # ----- ARRANGE
+        df_1 = pd.DataFrame(columns=['col1', 'col2', 'col3'])
+        df_2 = pd.DataFrame(columns=['col1', 'col4'])
+        # ----- ACT
+        df_1 = interro.complete_columns(df_1, df_2)
+        # ----- ASSERT
+        self.assertIn('col4', df_1)

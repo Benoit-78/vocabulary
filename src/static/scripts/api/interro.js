@@ -1,11 +1,4 @@
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-        const progressBar = document.getElementById("progress-bar");
-        progressBar.style.width = `${progressBar}%`;
-    }
-);
+export { goToInterroSettings, sendUserSettings, showTranslation, sendUserAnswer, launchRattraps };
 
 
 function goToInterroSettings(token) {
@@ -13,17 +6,14 @@ function goToInterroSettings(token) {
 }
 
 
-function sendUserSettings(token, language, testType, numWords) {
-    console.log("Language:", language);
-    console.log("Test type:", testType);
-    console.log("Number of words:", numWords);
+function sendUserSettings(token, databaseName, testType, numWords) {
     fetch(
         `/interro/save-interro-settings?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                databaseName: language,
+                databaseName: databaseName,
                 testType: testType,
                 numWords: numWords
             })
@@ -47,10 +37,9 @@ function sendUserSettings(token, language, testType, numWords) {
 
 
 function startTest(token, numWords) {
-    total = parseInt(numWords, 10);
-    count = 0;
-    score = 0;
-    console.log("Number of words:", total);
+    var total = parseInt(numWords, 10);
+    var count = 0;
+    var score = 0;
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
         window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
@@ -61,10 +50,9 @@ function startTest(token, numWords) {
 
 
 function showTranslation(token, numWords, count, score) {
-    total = parseInt(numWords, 10);
-    count = parseInt(count, 10);
-    score = parseInt(score, 10);
-    console.log("Number of words:", total);
+    var total = parseInt(numWords, 10);
+    var count = parseInt(count, 10);
+    var score = parseInt(score, 10);
     if (!isNaN(numWords)) {
         window.location.href = `/interro/interro-answer?token=${token}&total=${total}&count=${count}&score=${score}`;
     } else {
@@ -74,8 +62,6 @@ function showTranslation(token, numWords, count, score) {
 
 
 function sendUserAnswer(token, answer, count, numWords, score, content_box1, content_box2) {
-    console.log("numWords:", numWords);
-    console.log("Count:", count);
     fetch(
         `/interro/user-answer?token=${token}`,
         {
@@ -111,20 +97,17 @@ function sendUserAnswer(token, answer, count, numWords, score, content_box1, con
 
 
 function nextGuess(token, numWords, count, score) {
-    total = parseInt(numWords, 10);
-    count = parseInt(count, 10);
-    score = parseInt(score, 10);
+    var total = parseInt(numWords, 10);
+    var count = parseInt(count, 10);
+    var score = parseInt(score, 10);
     window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
 }
 
 
 function endInterro(token, numWords, count, score) {
-    total = parseInt(numWords, 10);
-    count = parseInt(count, 10);
-    score = parseInt(score, 10);
-    console.log("Total:", total);
-    console.log("Count:", count);
-    console.log("Score:", score);
+    var total = parseInt(numWords, 10);
+    var count = parseInt(count, 10);
+    var score = parseInt(score, 10);
     if (score === total) {
         window.location.href = `/interro/interro-end?token=${token}&total=${total}&score=${score}`;
     } else {
@@ -134,9 +117,6 @@ function endInterro(token, numWords, count, score) {
 
 
 function launchRattraps(token, newTotal, newCount, newScore) {
-    console.log("Total:", newTotal);
-    console.log("Count:", newCount);
-    console.log("Score:", newScore);
     fetch(
         `/interro/launch-rattraps?token=${token}`,
         {
@@ -152,9 +132,9 @@ function launchRattraps(token, newTotal, newCount, newScore) {
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "Rattraps created successfully") {
-            total = data.total;
-            count = data.count;
-            score = data.score;
+            const total = data.total;
+            const count = data.count;
+            const score = data.score;
             window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
         } else {
             console.error("Error with rattraps creation.");

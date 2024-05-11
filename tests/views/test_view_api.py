@@ -4,7 +4,7 @@
     Creation date:
         20th April 2024
     Main purpose:
-        Test script for views.py
+        Test script for api_view.py
 """
 
 import os
@@ -19,13 +19,13 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src import views
+from src.views import api as api_view
 
 
 
 class TestFastapiGuesser(unittest.TestCase):
     def setUp(self):
-        self.fastapi_guesser = views.FastapiGuesser()
+        self.fastapi_guesser = api_view.FastapiGuesser()
 
     def test_ask_word(self):
         """
@@ -59,9 +59,9 @@ class TestFastapiGuesser(unittest.TestCase):
     #     # ----- ASSERT
     #     self.assertFalse(result)
 
-    # @patch('src.views.FastapiGuesser.get_user_answer')
-    @patch('src.views.FastapiGuesser.return_translation')
-    @patch('src.views.FastapiGuesser.ask_word')
+    # @patch('src.views.api.FastapiGuesser.get_user_answer')
+    @patch('src.views.api.FastapiGuesser.return_translation')
+    @patch('src.views.api.FastapiGuesser.ask_word')
     def test_guess_word(
             self,
             mock_ask_word,

@@ -2,62 +2,64 @@
 <html>
 
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose database</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
-    <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
-    <script type="text/javascript" src="/static/scripts/database.js"></script>
+    <!-- Title -->
+    <title>Choisir une base</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/errors.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/database.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
 
-<div class="container">
-        <div class="row">
-            <div>
-                <label class="white-text" for="dropdown">Choose an existing database</label>
-                <select class="rounded-input" id="dropdown">
-                    {% for database in databases %}
-                        <option value="{{ database }}">{{ database }}</option>
-                    {% endfor %}
-                </select>
+    <div class="container">
+            <div class="row">
+                <div>
+                    <label class="white-text" for="dropdown">Choisir une base de données</label>
+                    <select id="dropdown" class="rounded-input">
+                        {% for database in databases %}
+                            <option value="{{ database }}">{{ database }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <button class="button" onclick="chooseDatabase(`{{ token }}`)">Choose database</button>
-            <!-- <button class="button" onclick="deleteDatabase(`{{ token }}`)">Delete database</button> -->
-        </div>
-
-        <div class="row">
-            <div>
-                <label class="white-text" for="input1">Create a new database</label>
-                <input class="rounded-input" type="text" id="databaseName" name="databaseName">
+            <div class="row">
+                <button id="chooseDatabaseButton" class="button">Confirmer</button>
+                <!-- <button id="deleteDatabaseButton" class="button">Delete database</button> -->
             </div>
-            {% if dbAlreadyPresentErrorMessage %}
-                    <p class="error-message">{{ dbAlreadyPresentErrorMessage }}</p>
-            {% endif %}
-        </div>
 
-        <div class="row">
-            <button class="button" onclick="createDatabase(`{{ token }}`)">Create database</button>
-        </div>
-
-        <div class="row">
-            <div>
-                <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+            <div class="row">
+                <div>
+                    <label class="white-text" for="input1">Créer une nouvelle base de données</label>
+                    <input class="rounded-input" type="text" id="databaseName" name="databaseName">
+                </div>
+                {% if dbAlreadyPresentErrorMessage %}
+                        <p class="error-message">{{ dbAlreadyPresentErrorMessage }}</p>
+                {% endif %}
             </div>
+
+            <div class="row">
+                <button id="createDatabaseButton" class="button">Créer</button>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+                </div>
+            </div>
+
+        <div class="row">
+            <button id="userSpaceButton" class="button quit-button">Quitter</button>
         </div>
 
-    <div class="row">
-        <button class="button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
     </div>
-
-</div>
 
 </body>
 

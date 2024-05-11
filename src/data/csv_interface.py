@@ -14,7 +14,7 @@ from src.utils.os import get_os_separator
 
 
 
-class CsvHandler():
+class DataHandler():
     """
     Provide with all methods necessary to interact with csv files.
     """
@@ -97,22 +97,43 @@ class CsvHandler():
 
 
 
-# def csv_to_sql(csv_path: str, table_name: str):
-#     """
-#     Read the CSV file into a DataFrame
-#     and write the SQL insert statements to a .sql file.
-#     """
-#     data_df = pd.read_csv(csv_path, sep=';')
-#     with open(f'data/{table_name}.sql', 'w', encoding='utf-8') as sql_file:
-#         for _, row in data_df.iterrows():
-#             values = ", ".join([
-#                 f"'{value}'"
-#                 if isinstance(value, str)
-#                 else str(value)
-#                 for value in row
-#             ])
-#             request_1 = "INSERT INTO `version_voc` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)"
-#             request_2 = f"VALUES ({values});\n"
-#             insert_statement = request_1 + request_2
-#             logger.debug(f"Writing to SQL file: {insert_statement}")
-#             sql_file.write(insert_statement)
+class MenuReader():
+    """
+    Provide with all methods necessary to interact with csv files.
+    """
+    def __init__(self, current_page):
+        self.os_sep = get_os_separator()
+        self.path = ''
+        self.page = current_page.split('/')[1] + '.html'
+
+    def set_path(self):
+        """
+        Define the path to the menu csv file.
+        """
+        self.path = self.os_sep.join([
+            r'.',
+            'data',
+            'menus.csv'
+        ])
+
+    def get_translations_dict(self) -> pd.DataFrame:
+        """
+        Load the tables
+        """
+        self.set_path()
+        menus_df = pd.read_csv(
+            self.path,
+            sep=';',
+            encoding='utf-8'
+        )
+        menus_df = menus_df[menus_df['page']==self.page]
+        translations_dict = {}
+        for _, row in menus_df.iterrows():
+            original_text = row['standard']
+            translated_text_en = row['english']
+            translated_text_fr = row['french']
+            translations_dict[original_text] = {
+                'en': translated_text_en,
+                'fr': translated_text_fr
+            }
+        return translations_dict

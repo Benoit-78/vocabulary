@@ -2,25 +2,32 @@
 <html>
 
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add words</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/errors.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/forms.css">
-    <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
-    <script type="text/javascript" src="/static/scripts/database.js"></script>
+    <!-- Title -->
+    <title>Ajouter des mots</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/errors.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/users.js"></script>
+    <script type="module" src="/static/scripts/ui/database.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
     <div class="container">
+
+        <script>
+            // Declare HTML page variables to the JS file that will call them
+            const databaseName = `{{ databaseName }}`;
+        </script>
 
         <div class="row">
 
             <div class="row">
-                <label class="white-text" for="input1">Foreign</label>
+                <label class="white-text" for="input1">Langue étrangère</label>
                 {% if wordAlreadyPresentErrorMessage %}
                     <p class="error-message">{{ wordAlreadyPresentErrorMessage }}</p>
                 {% endif %}
@@ -29,24 +36,25 @@
 
             <div class="row">
                 <input class="rounded-input" type="text" id="input2" name="input2">
-                <label class="white-text" for="input2">Native</label>
+                <label class="white-text" for="input2">Français</label>
             </div>
 
         </div>
 
         <div class="row">
-            <button class="button" onclick="addWord(`{{ token }}`, `{{ databaseName }}`)">Add word</button>
+            <!-- <button class="button" onclick="addWord(`{{ token }}`, `{{ databaseName }}`)">Add word</button> -->
+            <button id="addWordButton" class="button">Ajouter</button>
         </div>
 
-        <h1>Upload CSV File</h1>
+        <h1>Charger un CSV</h1>
         <form id="csvForm" enctype="multipart/form-data">
             <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
             <input type="hidden" id="token" value="{{ token }}">
-            <button class="button" type="submit">Upload</button>
+            <button class="button" type="submit">Charger</button>
         </form>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="userSpaceButton" class="button quit-button">Quitter</button>
         </div>
 
     </div>

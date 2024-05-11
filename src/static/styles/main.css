@@ -1,7 +1,7 @@
 
 body {
     background-attachment: fixed;
-    background-image: url('pictures/wild_forest_10.jpg');
+    background-image: url('pictures/wild_forest_11.jpg');
     background-position: center;
     background-repeat: no-repeat;
     font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@ label {
     margin-bottom: 5px;
 }
 
-
+/* styles/main.css */
 .container {
     text-align: center;
     max-width: 600px;
@@ -92,4 +92,11 @@ input {
 
 .white-text {
     color: #ffffff;
+}
+
+.rounded-input {
+    border-radius: 20px; /* Adjust the value to control the roundness of the corners */
+    padding: 8px; /* Adjust the padding as needed */
+    border: 1px solid #ccc; /* Optional: Add border for better appearance */
+    width: 200px; /* Adjust the width as needed */
 }

@@ -11,7 +11,6 @@ from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 from typing import List
 
-from fastapi import HTTPException
 from loguru import logger
 
 REPO_NAME = 'vocabulary'
@@ -19,7 +18,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.data.data_handler import DbController, DbDefiner, DbManipulator
+from src.data.database_interface import DbController, DbDefiner, DbManipulator
 from src.api import authentication as auth_api
 
 load_dotenv()
@@ -155,9 +154,9 @@ class UserAccount(Account):
         db_names = db_definer.get_user_databases()
         sql_db_name = self.user_name + '_' + db_name
         if sql_db_name in db_names:
-            logger.error(f"Database name {db_name} already exists.")
+            logger.info(f"Database name {db_name} exists")
             return True
-        logger.success(f"Database name {db_name} is available.")
+        logger.info(f"Database name {db_name} does not exist")
         return False
 
     def get_databases_list(self) -> List[str]:

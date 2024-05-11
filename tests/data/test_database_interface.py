@@ -1,6 +1,6 @@
 """
     Main purpose:
-        Tests for data_handler module.
+        Tests for database_interface module.
 """
 
 import os
@@ -17,7 +17,7 @@ REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
-from src.data import data_handler
+from src.data import database_interface
 
 
 
@@ -31,15 +31,15 @@ class TestDbInterface(unittest.TestCase):
     - DbManipulator, for Data Manipulation Language operations.
     """
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb.connect')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb.connect')
     def test_get_db_cursor_host_ok(self, mock_connect, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
         mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
         mock_connect.return_value = mock_connection
         mock_connection.cursor.return_value = mock_cursor
-        db_interface = data_handler.DbInterface()
+        db_interface = database_interface.DbInterface()
         # ----- ACT
         result = db_interface.get_db_cursor()
         # ----- ASSERT
@@ -47,7 +47,7 @@ class TestDbInterface(unittest.TestCase):
         #     user=user_name,
         #     password=password,
         #     database=db_name,
-        #     port=data_handler.PARAMS['MariaDB']['port'],
+        #     port=database_interface.PARAMS['MariaDB']['port'],
         #     host=host
         # )
         mock_connection.cursor.assert_called_once()
@@ -60,15 +60,15 @@ class TestDbInterface(unittest.TestCase):
         mock_logger.assert_not_called()
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb.connect')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb.connect')
     def test_get_db_cursor_host_nok(self, mock_connect, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
         mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
         mock_connect.return_value = mock_connection
         mock_connection.cursor.return_value = mock_cursor
-        db_interface = data_handler.DbInterface()
+        db_interface = database_interface.DbInterface()
         db_interface.host = 'nimportequoi'
         # ----- ACT
         result = db_interface.get_db_cursor()
@@ -77,7 +77,7 @@ class TestDbInterface(unittest.TestCase):
         #     user=user_name,
         #     password=password,
         #     database=db_name,
-        #     port=data_handler.PARAMS['MariaDB']['port'],
+        #     port=database_interface.PARAMS['MariaDB']['port'],
         #     host=host
         # )
         mock_connection.cursor.assert_called_once()
@@ -88,7 +88,7 @@ class TestDbInterface(unittest.TestCase):
         self.assertEqual(result[0], mock_connection)
         self.assertEqual(result[1], mock_cursor)
         mock_logger.warning.assert_called_once_with("host: nimportequoi")
-        mock_logger.error.assert_called_once_with(f"host should be in {data_handler.HOSTS}")
+        mock_logger.error.assert_called_once_with(f"host should be in {database_interface.HOSTS}")
 
 
 
@@ -102,11 +102,11 @@ class TestDbController(unittest.TestCase):
     def setUp(cls):
         cls.mock_host = 'localhost'
         with patch('socket.gethostname', return_value=cls.mock_host):
-            cls.db_controller = data_handler.DbController()
+            cls.db_controller = database_interface.DbController()
         cls.user_name = 'test_user'
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.DbController.get_db_cursor')
+    @patch('src.data.database_interface.DbController.get_db_cursor')
     def test_create_user_in_mysql(self, mock_get_db_cursor):
         """
         Should create a user in the mysql database.
@@ -128,8 +128,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_create_user_error(self, mock_mariadb, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -151,8 +151,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_grant_privileges_on_common_database(
             self,
             mock_mariadb,
@@ -177,8 +177,8 @@ class TestDbController(unittest.TestCase):
         mock_connection.close.assert_called_once()
         self.assertTrue(result)
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_grant_privileges_on_common_database_error(
             self,
             mock_mariadb,
@@ -203,7 +203,7 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.mariadb')
     def test_grant_privileges(self, mock_mariadb):
         """
         Should grant all necessary privileges to a user on a database.
@@ -225,8 +225,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_grant_privileges_error(self, mock_mariadb, mock_logger):
         """
         Should grant all necessary privileges to a user on a database.
@@ -251,7 +251,7 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.mariadb')
     def test_get_users_list_from_mysql(self, mock_mariadb):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -276,8 +276,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_get_users_list_from_mysql_error(self, mock_mariadb, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -295,7 +295,7 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.mariadb')
     def test_add_user_to_users_table(self, mock_mariadb):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -320,8 +320,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_add_user_to_users_table_error(self, mock_mariadb, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -349,7 +349,7 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.mariadb')
     def test_get_users_list(self, mock_mariadb):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -378,8 +378,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_get_users_list_error(self, mock_mariadb, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -400,8 +400,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_revoke_privileges(self, mock_mariadb, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -427,8 +427,8 @@ class TestDbController(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.mariadb')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.mariadb')
     def test_revoke_privileges_error(self, mock_mariadb, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -462,9 +462,9 @@ class TestDbDefiner(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.user_name = 'username'
-        cls.db_definer = data_handler.DbDefiner(cls.user_name)
+        cls.db_definer = database_interface.DbDefiner(cls.user_name)
 
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_create_database(self, mock_get_db_cursor):
         # Arrange
         mock_connection = MagicMock()
@@ -482,8 +482,8 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_create_database_error(self, mock_get_db_cursor, mock_logger):
         # Arrange
         mock_connection = MagicMock()
@@ -503,7 +503,7 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_get_user_databases(self, mock_get_db_cursor):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -525,8 +525,8 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_get_user_databases_error(self, mock_get_db_cursor, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -545,7 +545,7 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_create_seven_tables(self, mock_get_db_cursor):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -587,8 +587,8 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_create_seven_tables_error(self, mock_get_db_cursor, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -606,8 +606,8 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.DbDefiner.rectify_this_strange_result')
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.rectify_this_strange_result')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_get_database_cols(
             self,
             mock_get_db_cursor,
@@ -654,8 +654,8 @@ class TestDbDefiner(unittest.TestCase):
             [('col3', 'type3'), ('col4', 'type4')]
         )
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_get_database_cols_error(
             self,
             mock_get_db_cursor,
@@ -719,7 +719,7 @@ class TestDbDefiner(unittest.TestCase):
         test_types.remove(test_type)
         self.assertIn(test_types[0], result[-1])
 
-    @patch('src.data.data_handler.logger')
+    @patch('src.data.database_interface.logger')
     def test_get_tables_names_error(self, mock_logger):
         """
         Should return a list containing the tables names.
@@ -734,7 +734,7 @@ class TestDbDefiner(unittest.TestCase):
             f"Wrong test_type argument: {test_type}"
         )
 
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_drop_database(self, mock_get_db_cursor):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -752,8 +752,8 @@ class TestDbDefiner(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbDefiner.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_drop_database_error(self, mock_get_db_cursor, mock_logger):
         # ----- ARRANGE
         mock_connection = MagicMock()
@@ -781,13 +781,13 @@ class TestDbManipulator(unittest.TestCase):
     def setUp(self):
         # Data definition
         self.user_name = 'benoit'
-        self.db_definer = data_handler.DbDefiner(self.user_name)
+        self.db_definer = database_interface.DbDefiner(self.user_name)
         # Data manipulation
-        self.db_name = 'english'
+        self.db_name = 'English'
         self.table_name = self.user_name + '_' + self.db_name + '.' + 'version_voc'
         self.test_type = 'version'
         self.password = 'test_password'
-        self.db_manipulator = data_handler.DbManipulator(
+        self.db_manipulator = database_interface.DbManipulator(
             self.user_name,
             self.db_name,
             self.test_type
@@ -810,7 +810,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ARRANGE
         self.db_name = f"{self.user_name}_{self.db_name}"
         # ----- ACT
-        self.db_manipulator = data_handler.DbManipulator(
+        self.db_manipulator = database_interface.DbManipulator(
             self.user_name,
             self.db_name,
             self.test_type
@@ -831,8 +831,8 @@ class TestDbManipulator(unittest.TestCase):
         self.assertEqual(self.db_manipulator.test_type, 'version')
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.DbDefiner.get_database_cols')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.get_database_cols')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_get_tables(self, mock_get_db_cursor, mock_get_database_cols):
         """"""
         # Arrange
@@ -899,7 +899,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         self.assertEqual(result, 'archives')
 
-    @patch('src.data.data_handler.logger')
+    @patch('src.data.database_interface.logger')
     def test_get_output_table_error(self, mock_logger):
         """
         Should raise error if test_type is not 'version' or 'theme'.
@@ -914,8 +914,8 @@ class TestDbManipulator(unittest.TestCase):
             f"Wrong test_type argument: {self.db_manipulator.test_type}"
         )
 
-    @patch('src.data.data_handler.DbManipulator.read_word')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.DbManipulator.read_word')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_insert_word(self, mock_get_db_cursor, mock_read_word):
         """
         Should add a word to the table.
@@ -942,10 +942,10 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbManipulator.read_word')
-    @patch('src.data.data_handler.DbDefiner.get_tables_names')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbManipulator.read_word')
+    @patch('src.data.database_interface.DbDefiner.get_tables_names')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_insert_word_already_exists(
             self,
             mock_get_db_cursor,
@@ -973,9 +973,9 @@ class TestDbManipulator(unittest.TestCase):
             result
         )
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbManipulator.read_word')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbManipulator.read_word')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_insert_word_error(
             self,
             mock_get_db_cursor,
@@ -1009,7 +1009,7 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_read_word(self, mock_get_db_cursor):
         # Arrange
         mock_connection = MagicMock()
@@ -1031,8 +1031,8 @@ class TestDbManipulator(unittest.TestCase):
         mock_connection.close.assert_called_once()
         self.assertEqual(result, ('test_english', 'test_french', 42))
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_read_word_error(self, mock_get_db_cursor, mock_logger):
         # Arrange
         mock_connection = MagicMock()
@@ -1052,7 +1052,7 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_update_word(self, mock_get_db_cursor):
         """
         Should update the word stats after a test.
@@ -1076,8 +1076,8 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_update_word_error(self, mock_get_db_cursor, mock_logger):
         """
         Should update the word stats after a test.
@@ -1103,7 +1103,7 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_delete_word(self, mock_get_db_cursor):
         """
         Should delete a word from the table.
@@ -1124,8 +1124,8 @@ class TestDbManipulator(unittest.TestCase):
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_delete_word_error(self, mock_get_db_cursor, mock_logger):
         """
         Should delete a word from the table.
@@ -1149,9 +1149,9 @@ class TestDbManipulator(unittest.TestCase):
         mock_connection.close.assert_called_once()
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
-    @patch('src.data.data_handler.DbDefiner.get_database_cols')
-    @patch('src.data.data_handler.create_engine')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.get_database_cols')
+    @patch('src.data.database_interface.create_engine')
     def test_save_table(
             self,
             mock_create_engine,
@@ -1181,17 +1181,17 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         self.assertTrue(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.DbManipulator.get_output_table')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
-    @patch('src.data.data_handler.DbDefiner.get_database_cols')
-    @patch('src.data.data_handler.create_engine')
+    @patch('src.data.database_interface.DbManipulator.get_output_table')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.DbDefiner.get_database_cols')
+    @patch('src.data.database_interface.create_engine')
     def test_save_table_output(
             self,
             mock_create_engine,
@@ -1227,16 +1227,16 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.data_handler.logger')
-    @patch('src.data.data_handler.create_engine')
-    @patch('src.data.data_handler.DbDefiner.get_database_cols')
-    @patch('src.data.data_handler.DbManipulator.get_db_cursor')
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.create_engine')
+    @patch('src.data.database_interface.DbDefiner.get_database_cols')
+    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_save_table_error(
             self,
             mock_get_db_cursor,
@@ -1269,7 +1269,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name.lower()}"
+            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         mock_logger.error.assert_called_once()
         mock_cursor.close.assert_called_once()

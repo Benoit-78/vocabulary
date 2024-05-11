@@ -17,10 +17,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from loguru import logger
 from passlib.context import CryptContext
-from passlib.exc import UnknownHashError
 from pydantic import BaseModel
 
-from src.data.data_handler import DbController
+from src.data.database_interface import DbController
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -74,7 +73,7 @@ def create_token(
     """
     Function to generate a token for a guest or an existing user.
     """
-    logger.info('african_swallow')
+    logger.info('')
     if data is None:
         data = create_guest_user_name()
     to_encode = data.copy()

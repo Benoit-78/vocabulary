@@ -22,9 +22,8 @@ from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
-
-from src.utils.data import complete_columns
+if REPO_DIR not in sys.path:
+    sys.path.append(REPO_DIR)
 
 
 
@@ -187,7 +186,7 @@ class PremierTest(Interro):
         i = 0
         while already_asked and i < (self.words_df.shape[0]):
             next_index = random.randint(0, self.words_df.shape[0])
-            next_index = max(next_index, 0)
+            next_index = max(next_index, 1)
             already_asked = self.words_df.loc[next_index, 'query'] == 1
             i += 1
         self.words_df.loc[next_index, 'query'] = 1
@@ -431,6 +430,15 @@ class Updater():
         """
         1) 
         """
+        def correct_words_cnt_df():
+            """
+            Correct the words count dataframe.
+            """
+            real_columns = set(self.interro.word_cnt_df.columns)
+            expected_columns = {'test_date', 'nb'}
+            if real_columns != expected_columns:
+                self.interro.word_cnt_df.reset_index(inplace=True)
+
         count_before = self.interro.word_cnt_df.shape[0]
         new_row = pd.DataFrame(
             data={
@@ -439,6 +447,7 @@ class Updater():
             },
             index=[count_before]
         )
+        correct_words_cnt_df()
         self.interro.word_cnt_df = pd.concat([
             self.interro.word_cnt_df,
             new_row
@@ -450,9 +459,27 @@ class Updater():
         )
 
     def update_data(self):
-        """Main method of Updater class"""
+        """
+        Main method of Updater class
+        """
         self.move_good_words()
         self.flag_bad_words()
         self.save_words()
         self.save_performances()
         self.save_words_count()
+
+
+
+
+def complete_columns(
+        df_1: pd.DataFrame,
+        df_2: pd.DataFrame
+    ):
+    """
+    Guarantee that the well_known_words dataframe contains exactly
+    the columns of the output dataframe
+    """
+    missing_columns = set(df_1.columns).difference(set(df_2.columns))
+    for column in missing_columns:
+        df_2[column] = [0] * df_2.shape[0]
+    return df_2

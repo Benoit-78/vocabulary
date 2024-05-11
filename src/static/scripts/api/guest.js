@@ -1,10 +1,4 @@
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-        const progressBar = document.getElementById("progress-bar");
-        progressBar.style.width = `${progressBar}%`;
-    }
-);
+export { sendGuestSettings, showTranslation, sendUserAnswer, nextGuess };
 
 
 function sendGuestSettings(token, language) {
@@ -50,7 +44,7 @@ function showTranslation(numWords, count, score, token, language) {
 }
 
 
-function sendUserAnswer(answer, count, numWords, score, content_box1, content_box2, token, language) {
+function sendUserAnswer(answer, numWords, count, score, content_box1, content_box2, token, language) {
     numWords = parseInt(numWords, 10);
     count = parseInt(count, 10);
     score = parseInt(score, 10);

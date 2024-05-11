@@ -11,6 +11,7 @@ import os
 import sys
 from typing import Dict
 
+from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -30,7 +31,7 @@ def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
-    logger.info('african_swallow')
+    logger.info('')
     user_account = users.UserAccount(creds['input_name'])
     result = user_account.create_account(creds['input_password'])
     json_response = {}
@@ -63,7 +64,10 @@ def authenticate_user(
     """
     Authenticate the user.
     """
-    logger.info('african_swallow')
+    if form_data.client_id is not None:
+        json_response = authenticate_user_with_oauth(token, form_data)
+        return json_response
+    logger.info('')
     users_list = auth_api.get_users_list()
     user = auth_api.authenticate_user(
         users_list,
@@ -99,6 +103,27 @@ def authenticate_user(
     return json_response
 
 
+def authenticate_user_with_oauth(
+        token: str,
+        form_data
+    ):
+    user = auth_api.authenticate_with_oauth(form_data)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    json_response = JSONResponse(
+        content=
+        {
+            'message': "Vous n'avez pas dis le mot magique, hahaha !",
+            'token': token
+        }
+    )
+    return json_response
+
+
 def load_user_space(
         request,
         token
@@ -106,7 +131,7 @@ def load_user_space(
     """
     Call the base page of user space.
     """
-    logger.info('african_swallow')
+    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     json_response = {
         'request': request,

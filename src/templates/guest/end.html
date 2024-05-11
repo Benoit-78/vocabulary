@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html>
-    
+
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guest interro</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <script type="text/javascript" src="/static/scripts/main.js"></script>
+    <!-- Title -->
+    <title>Interro invité</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/main.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
     <div class="container">
         <div class="row white-text">
-            <h1">You have found all of them, congratulations!</h1>
+            <h1">Oh, vous les avez tous trouvés, bravo !</h1>
         </div>
         <div class="row">
-            <button class="button quit-button" onclick="goToRoot()">Quit</button>
+            <button id="quitButton" class="button quit_button">Quitter</button>
         </div>
     </div>
 </body>

@@ -23,15 +23,15 @@ from src.data import csv_interface
 
 
 
-class TestCsvHandler(unittest.TestCase):
+class TestDataHandler(unittest.TestCase):
     """
-    The CsvHandler class should serve as an interface with csv data.
+    The DataHandler class should serve as an interface with csv data.
     """
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
-        cls.csv_handler_1 = csv_interface.CsvHandler('version')
-        cls.csv_handler_2 = csv_interface.CsvHandler('theme')
+        cls.csv_handler_1 = csv_interface.DataHandler('version')
+        cls.csv_handler_2 = csv_interface.DataHandler('theme')
         cls.error_data_handler = None
 
     def test_set_paths(self):
@@ -50,7 +50,7 @@ class TestCsvHandler(unittest.TestCase):
         """Error should be raised in case of unknown OS."""
         # Arrange
         invalid_test_type = "blablabla"
-        self.error_data_handler = csv_interface.CsvHandler(invalid_test_type)
+        self.error_data_handler = csv_interface.DataHandler(invalid_test_type)
         mock_logger = MagicMock()
         logging.basicConfig(level=logging.INFO)
         with self.assertRaises(SystemExit):
@@ -60,7 +60,7 @@ class TestCsvHandler(unittest.TestCase):
             mock_logger.error.assert_called_with(f"Wrong test_type argument: {invalid_test_type}")
             mock_logger.error.assert_called_once()
 
-    @patch('src.data.csv_interface.CsvHandler.set_paths')
+    @patch('src.data.csv_interface.DataHandler.set_paths')
     @patch('src.data.csv_interface.pd.read_csv')
     def test_set_tables(self, mock_read_csv, mock_set_paths):
         """
@@ -101,7 +101,7 @@ class TestCsvHandler(unittest.TestCase):
             self.assertIsInstance(dataframe, type(pd.DataFrame()))
             self.assertEqual(dataframe.shape, (3, 4))
 
-    @patch('src.data.csv_interface.CsvHandler.set_paths')
+    @patch('src.data.csv_interface.DataHandler.set_paths')
     def test_get_paths(self, mock_set_paths):
         """
         Should return the paths.
@@ -114,7 +114,7 @@ class TestCsvHandler(unittest.TestCase):
         self.assertIsInstance(paths, dict)
         mock_set_paths.assert_called_once()
 
-    @patch('src.data.csv_interface.CsvHandler.set_tables')
+    @patch('src.data.csv_interface.DataHandler.set_tables')
     def test_get_tables(self, mock_set_tables):
         """
         Should return the paths.
@@ -132,7 +132,7 @@ class TestCsvHandler(unittest.TestCase):
         Should save the table as a csv file.
         """
         # Arrange
-        csv_handler = csv_interface.CsvHandler('version')
+        csv_handler = csv_interface.DataHandler('version')
         csv_handler.set_paths()
         old_df = pd.DataFrame(columns=['words', 'integers', 'floats', 'booleans'])
         old_df.loc[old_df.shape[0]] = ['a', 0, 0.0, True]
@@ -156,34 +156,64 @@ class TestCsvHandler(unittest.TestCase):
             )
         os.remove(csv_handler.paths['for_test_only'])
 
-    # @patch('builtins.open', new_callable=mock_open)
-    # @patch('pandas.read_csv')
-    # def test_csv_to_sql(self, mock_read_csv, mock_open):
-    #     # ----- ARRANGE
-    #     csv_path = 'test.csv'
-    #     table_name = 'test_table'
-    #     csv_data = '\n'.join([
-    #         "foreign,native,creation_date,nb,score,taux",
-    #         "value1,value2,2022-01-01,10,5,0.5",
-    #         "value3,value4,2022-01-02,20,7,0.35"
-    #     ])
-    #     mock_read_csv.return_value = pd.read_csv(StringIO(csv_data))
-    #     # ----- ACT
-    #     csv_interface.csv_to_sql(csv_path, table_name)
-    #     # ----- ASSERT
-    #     expected_sql = ' '.join([
-    #         "INSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)",
-    #         "VALUES ('value1', 'value2', '2022-01-01', 10, 5, 0.5);",
-    #         "\nINSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`)",
-    #         "VALUES ('value3', 'value4', '2022-01-02', 20, 7, 0.35);",
-    #         "\n"
-    #     ])
-    #     mock_open.assert_called_once_with(f'data/{table_name}.sql', 'w', encoding='utf-8')
-    #     logger.debug(mock_open.return_value.write.call_args_list)
-    #     mock_open.return_value.write.assert_called_once()
-    #     # expected_sql = "INSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`) VALUES ('value1', 'value2', '2022-01-01', 10, 5, 0.5);\nINSERT INTO `test_table` (`foreign`, `native`, `creation_date`, `nb`, `score`, `taux`) VALUES ('value3', 'value4', '2022-01-02', 20, 7, 0.35);\n"
-    #     # mock_open.assert_called_once_with(f'data/{table_name}.sql', 'w', encoding='utf-8')
-    #     # mock_open.return_value.write.assert_called_once()
-    #     # write_call_args = mock_open.return_value.write.call_args
-    #     # actual_sql = write_call_args[0][0]  # Extract the content passed to the write method
-    #     # self.assertEqual(actual_sql, expected_sql)
+
+
+class TestMenusReader(unittest.TestCase):
+    """
+    The MenuReader class should serve as an interface with csv data.
+    """
+    def setUp(self):
+        """Run once before all tests."""
+        self.menu_reader = csv_interface.MenuReader('user/user_space')
+
+    def test_init(self):
+        """
+        MenuReader should be initialized correctly.
+        """
+        # ----- ARRANGE
+        # ----- ACT
+        # ----- ASSERT
+        self.assertIsInstance(self.menu_reader, csv_interface.MenuReader)
+        self.assertEqual(self.menu_reader.os_sep, os.sep)
+        self.assertEqual(self.menu_reader.path, '')
+        self.assertEqual(self.menu_reader.page, 'user_space.html')
+
+    def test_set_path(self):
+        """
+        Path should be set correctly.
+        """
+        # ----- ARRANGE
+        # ----- ACT
+        self.menu_reader.set_path()
+        # ----- ASSERT
+        self.assertIsInstance(self.menu_reader.path, str)
+        self.assertEqual(self.menu_reader.path, './data/menus.csv')
+
+    @patch('src.data.csv_interface.pd.read_csv')
+    def test_get_translations_dict(self, mock_read_csv):
+        """
+        Should return the translations dictionary.
+        """
+        # ----- ARRANGE
+        mock_df = pd.DataFrame({
+            'page': ['user_space.html', 'user_space.html', 'welcome.html'],
+            'standard': ['pomme', 'banane', 'some_strange_value'],
+            'english': ['apple', 'banana', 'some_value'],
+            'french': ['pomme', 'banane', 'some_strange_value']
+        })
+        mock_read_csv.return_value = mock_df
+        # ----- ACT
+        result = self.menu_reader.get_translations_dict()
+        # ----- ASSERT
+        self.assertIsInstance(result, dict)
+        expected_dict = {
+            'pomme': {
+                'en': 'apple',
+                'fr': 'pomme',
+            },
+            'banane': {
+                'en': 'banana',
+                'fr': 'banane'
+            }
+        }
+        self.assertEqual(result, expected_dict)

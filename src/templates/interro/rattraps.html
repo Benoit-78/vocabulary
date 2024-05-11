@@ -2,28 +2,41 @@
 <html>
 
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interro!</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
-    <script type="text/javascript" src="/static/scripts/interro.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
+    <!-- Title -->
+    <title>Interro !</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/interro.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/interro.js"></script>
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
+
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const newTotal = `{{ newTotal }}`;
+        const newCount = `{{ newCount }}`;
+        const newScore = `{{ newScore }}`;
+    </script>
+
     <div class="container">
         <div class="row white-text">
-            <h1>Score: {{ score }} / {{ numWords }}</h1>
+            <h1>Votre score: {{ score }} / {{ numWords }}</h1>
         </div>
         <div class="row">
-            <button class="button rattraps_button" onclick="launchRattraps(`{{ token }}`, `{{ newTotal }}`, `{{ newCount }}`, `{{ newScore }}`)">Take a catch-up test</button>
+            <button id="rattrapsButton" class="button rattraps_button">Passer le rattrapage</button>
         </div>
         <div class="row">
-            <button class="button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
+
 </body>
 
 </html>

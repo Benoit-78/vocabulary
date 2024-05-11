@@ -36,7 +36,10 @@ def interro_settings(
     Call the page that gets the user settings for one interro.
     """
     response_dict = interro_api.get_interro_settings(request, token, error_message)
-    return templates.TemplateResponse("interro/settings.html", response_dict)
+    return templates.TemplateResponse(
+        "interro/settings.html",
+        response_dict
+    )
 
 
 @interro_router.post("/save-interro-settings")
@@ -69,7 +72,6 @@ def load_interro_question(
         score,
         token
     )
-    logger.debug(f"Total: {total}, Count: {count}, Score: {score}")
     return templates.TemplateResponse(
         "interro/question.html",
         response_dict

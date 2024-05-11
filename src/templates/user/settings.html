@@ -2,22 +2,24 @@
 <html>
 
 <head>
+    <!-- Others -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/buttons.css">
-    <link rel="stylesheet" type="text/css" href="/static/styles/interro.css">
-    <script type="text/javascript" src="/static/scripts/main.js"></script>
-    <script type="text/javascript" src="/static/scripts/users.js"></script>
+    <!-- Title -->
+    <title>Réglages</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/buttons.css">
+    <!-- JS -->
+    <script type="module" src="/static/scripts/ui/users.js"></script>
 </head>
 
-<body>
+<body data-token="{{ token }}">
     <div class="container">
-        <h1 class="white-text">Settings</h1>
+        <h1 class="white-text">Réglages</h1>
 
         <div class="row">
-            <button class="button quit-button" onclick="goToUserSpace(`{{ token }}`)">Quit</button>
+            <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
 </body>

@@ -197,7 +197,7 @@ def end_interro_guest(
         words,
         token
     ):
-    logger.info('african_swallow')
+    logger.info('')
     response_dict = {
         'request': request,
         'score': score,

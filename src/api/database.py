@@ -52,19 +52,19 @@ def choose_database(data, token: str):
     """
     Choose the given database.
     """
-    logger.info('african_swallow')
+    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     user_account = users.UserAccount(user_name)
     db_name = data['db_name']
     db_exists = user_account.check_if_database_exists(db_name)
-    if db_exists:
+    if not db_exists:
         json_response = JSONResponse(
             content=
             {
                 "message": f"Database name {db_name} not available",
             }
         )
-    if not db_exists:
+    if db_exists:
         json_response = JSONResponse(
             content=
             {
@@ -78,7 +78,7 @@ def create_database(data: dict, token: str):
     """
     Create the given database.
     """
-    logger.info('african_swallow')
+    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     user_account = users.UserAccount(user_name)
     db_name = data['db_name']
@@ -183,7 +183,7 @@ def delete_database(data: dict, token: str):
     """
     Remove the given database.
     """
-    logger.info('african_swallow')
+    logger.info('')
     db_name = data['db_name']
     user_name = auth_api.get_user_name_from_token(token)
     user_account = users.UserAccount(user_name)
