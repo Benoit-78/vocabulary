@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Title -->
-    <title>Sign-in</title>
+    <title>Connexion</title>
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
@@ -26,26 +26,26 @@
 
         <form id="signInForm">
             <div class="row">
-                <label class="white-text" for="inputName">User name</label>
+                <label class="white-text" for="inputName">Nom d’utilisateur</label>
                 <input type="text" id="inputName" name="inputName" class="rounded-input" required>
                 {% if nameUnknownErrorMessage %}
                     <p class="error-message">{{ nameUnknownErrorMessage }}</p>
                 {% endif %}
             </div>
             <div class="row">
-                <label class="white-text" for="input2">Password</label>
+                <label class="white-text" for="input2">Mot de passe</label>
                 <input type="inputPassword" id="inputPassword" name="inputPassword" class="rounded-input" autocomplete="off" required>
                 {% if passwordIncorrectErrorMessage %}
                     <p class="error-message">{{ passwordIncorrectErrorMessage }}</p>
                 {% endif %}
             </div>
             <div class="row">
-                <button id="authenticateButton" class="button">Sign-in</button>
+                <button id="authenticateButton" class="button">Connexion</button>
             </div>
         </form>
 
         <div class="row">
-            <button id="quitButton" class="button quit_button">Quit</button>
+            <button id="quitButton" class="button quit_button">Quitter</button>
         </div>
     </div>
 

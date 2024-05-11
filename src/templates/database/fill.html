@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Title -->
-    <title>Add words</title>
+    <title>Ajouter des mots</title>
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
@@ -27,7 +27,7 @@
         <div class="row">
 
             <div class="row">
-                <label class="white-text" for="input1">Foreign</label>
+                <label class="white-text" for="input1">Langue étrangère</label>
                 {% if wordAlreadyPresentErrorMessage %}
                     <p class="error-message">{{ wordAlreadyPresentErrorMessage }}</p>
                 {% endif %}
@@ -36,25 +36,25 @@
 
             <div class="row">
                 <input class="rounded-input" type="text" id="input2" name="input2">
-                <label class="white-text" for="input2">Native</label>
+                <label class="white-text" for="input2">Français</label>
             </div>
 
         </div>
 
         <div class="row">
             <!-- <button class="button" onclick="addWord(`{{ token }}`, `{{ databaseName }}`)">Add word</button> -->
-            <button id="addWordButton" class="button">Add word</button>
+            <button id="addWordButton" class="button">Ajouter</button>
         </div>
 
-        <h1>Upload CSV File</h1>
+        <h1>Charger un CSV</h1>
         <form id="csvForm" enctype="multipart/form-data">
             <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
             <input type="hidden" id="token" value="{{ token }}">
-            <button class="button" type="submit">Upload</button>
+            <button class="button" type="submit">Charger</button>
         </form>
 
         <div class="row">
-            <button id="userSpaceButton" class="button quit-button">Quit</button>
+            <button id="userSpaceButton" class="button quit-button">Quitter</button>
         </div>
 
     </div>

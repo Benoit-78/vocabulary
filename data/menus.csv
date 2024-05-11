@@ -1,4 +1,5 @@
 page;standard;english;french
+common;Changer la langue;Change language;Changer la langue
 welcome.html;Keep your words;Keep your words;Retenez vos propres mots
 welcome.html;Try;Try;Essai
 welcome.html;Sign in;Sign in;Connexion
@@ -6,22 +7,23 @@ welcome.html;Sign up;Sign up;Inscription
 welcome.html;About;About;Infos
 welcome.html;Help;Help;Aide
 about_the_app.html;About the app;About the app;Infos
-about_the_app.html;When you discover a new word, save it in the app, along with its translation;When you discover a new word, save it in the app, along with its translation;Quand vous découvrez un nouveau, enregistrez-le dans l’application, avec sa traduction
-about_the_app.html;The app will ask you, say, 10 random words each day;The app will ask you, say, 10 random words each day;Vous pouvez ensuite demander à l’application de vous demander 10 mots par jour
+about_the_app.html;When you discover a new word, save it in the app, along with its translation;When you discover a new word, save it in the app, along with its translation;Quand vous tombez sur un nouveau mot d'une langue étrangère, enregistrez-le dans l’application, avec sa traduction
+about_the_app.html;The app will ask you, say, 10 random words each day;The app will ask you, say, 10 random words each day;Passez ensuite une interro sur vos propres mots
+;;Keep up the pace of one quiz per day;Gardez le rythme d'une interro par jour
 about_the_app.html;As you progress, the words you retain well will be archived;As you progress, the words you retain well will be archived;Au fur et à mesure des interros, les mots que vous retenez le mieux seront archivés
-about_the_app.html;Those you have difficulties with will be revisited more frequently;Those you have difficulties with will be revisited more frequently;Les mots qui vous posent le plus de difficulté vous seront demandés plus souvent
+about_the_app.html;Those you have difficulties with will be revisited more frequently;Those you have difficulties with will be revisited more frequently;Les mots difficiles, eux, vous seront demandés plus souvent
 about_the_app.html;And in the end, these words will be in your memory;And in the end, these words will be in your memory;Et au bout du compte, tous ces mots seront dans votre tête
 about_the_app.html;Quit;Quit;Quitter
 about_the_app.html;Do NOT store any sensitive data on this app!;Do NOT store any sensitive data on this app!;Ne laisser aucune information confidentielle sur cette application !
-database/choose.html;Choose database;Choose database;Choix de la base de données
-database/choose.html;Choose an existing database;Choose an existing database;Choisissez une base de données
+database/choose.html;Choose database;Choose database;Choisir une base de données
+database/choose.html;Choose an existing database;Choose an existing database;Choisir une base de données
 database/choose.html;Choose database;Choose database;Confirmer
 database/choose.html;Create a new database;Create a new database;Créer une nouvelle base de données
 database/choose.html;Create database;Create database;Créer
 database/choose.html;Quit;Quit;Quitter
 database/fill.html;Add words;Add words;Ajouter des mots
-database/fill.html;Foreign;Foreign;Etranger
-database/fill.html;Native;Native;Français
+database/fill.html;Foreign;Foreign language;Langue étrangère
+database/fill.html;Native;English;Français
 database/fill.html;Add word;Add word;Ajouter
 database/fill.html;Upload CSV File;Upload CSV File;Charger un csv
 database/fill.html;Upload;Upload;Charger
@@ -33,15 +35,15 @@ guest/answer.html;Yes;Yes;Oui
 guest/answer.html;No;No;Non
 guest/answer.html;Quit;Quit;Quitter
 guest/end.html;Guest interro;Guest interro;Interro invité
-guest/end.html;You have found all of them, congratulations!;You have found all of them, congratulations!;Vous les avez tous trouvés, bravo !
+guest/end.html;You have found all of them, congratulations!;You have found all of them, congratulations!;Oh, vous les avez tous trouvés, bravo !
 guest/end.html;Quit;Quit;Quitter
 guest/end.html;Guest interro;Guest interro;Interro invité
 guest/question.html;What is the translation for:;What is the translation for:;Quelle traduction donnez-vous pour :
-guest/question.html;Show translation;Show translation;Traduction
+guest/question.html;Translation;Translation;Traduction
 guest/question.html;Quit;Quit;Quitter
 guest/rattraps.html;Guest interro;Guest interro;Interro invité
 guest/rattraps.html;Your score is: ;Your score is: ;Votre score :
-guest/rattraps.html;Take a catch-up test;Take a catch-up test;Rattrapage !
+guest/rattraps.html;Take a catch-up test;Take the catch-up quiz;Passer le rattrapage
 guest/rattraps.html;Quit;Quit;Quitter
 guest/settings.html;Guest interro;Guest interro;Interro invité
 guest/settings.html;Select a language;Select a language;Choisissez une langue
@@ -51,20 +53,22 @@ interro/answer.html;What is the translation for:;What is the translation for:;Qu
 interro/answer.html;Did you get it?;Did you get it?;Vous l’aviez ?
 interro/answer.html;Yes;Yes;Oui
 interro/answer.html;No;No;Non
-interro/answer.html;Quit;Quit;Quitter
+interro/answer.html;Quit;Quit interro;Quitter
 interro/end.html;Guest interro;Guest interro;Interro invité
-interro/end.html;You have found all of them, congratulations!;You have found all of them, congratulations!;Vous les avez tous trouvés, bravo !
-interro/end.html;Quit;Quit;Quitter
+interro/end.html;You have found all of them, congratulations!;You have found all of them, congratulations!;Oh, vous les avez tous trouvés, bravo !
+interro/end.html;Quit;Quit;Retour
 interro/end.html;Guest interro;Guest interro;Interro invité
 interro/question.html;What is the translation for:;What is the translation for:;Quelle traduction donnez-vous pour :
 interro/question.html;Show translation;Show translation;Traduction
 interro/question.html;Quit;Quit;Quitter
 interro/rattraps.html;Guest interro;Guest interro;Interro invité
 interro/rattraps.html;Your score is: ;Your score is: ;Votre score :
-interro/rattraps.html;Take a catch-up test;Take a catch-up test;Rattrapage !
+interro/rattraps.html;Take a catch-up test;Take the catch-up quiz;Passer le rattrapage
 interro/rattraps.html;Quit;Quit;Quitter
-interro/settings.html;Guest interro;Guest interro;Interro invité
-interro/settings.html;Select a language;Select a language;Choisissez une langue
+interro/settings.html;Interro !;Quiz;Interro !
+interro/settings.html;Select a language;Select a language;Choisir une base de données:
+interro/settings.html;Nombre de questions;Number of words:;Nombre de questions
+interro/settings.html;Interro !;Quiz;Interro !
 interro/settings.html;Quit;Quit;Quitter
 user/dashboard.html;Dashboard;Dashboard;Tableau de bord
 user/dashboard.html;Quit;Quit;Quitter

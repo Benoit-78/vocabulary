@@ -26,10 +26,6 @@ function changeLanguage(token, selectedLanguage, textData, currentPath) {
         console.log("Language changed successfully");
     })
     .catch(error => {
-        console.log(token);
-        console.log(selectedLanguage);
-        console.log(textData);
-        console.log(currentPath);
         console.error("Error changing language:", error);
     });
 }

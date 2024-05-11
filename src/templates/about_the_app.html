@@ -12,23 +12,24 @@
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
-    <script src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
 </head>
 
 <body data-token="{{ token }}">
     <div class="container">
-        <h1 class="white-text">About the app</h1>
+        <h1 class="white-text">Infos</h1>
 
-        <p class="white-text">When you discover a new word, save it in the app, along with its translation</p>
-        <p class="white-text">The app will ask you, say, 10 random words each day</p>
-        <p class="white-text">As you progress, the words you retain well will be archived</p>
-        <p class="white-text">Those you have difficulties with will be revisited more frequently</p>
-        <p class="white-text">And in the end, these words will be in your memory</p>
+        <p class="white-text">Quand vous tombez sur un nouveau mot d'une langue étrangère, enregistrez-le dans l’application, avec sa traduction</p>
+        <p class="white-text">Passez ensuite une interro sur vos propres mots</p>
+        <p class="white-text">Gardez le rythme d'une interro par jour</p>
+        <p class="white-text">Au fur et à mesure des interros, les mots que vous retenez le mieux seront archivés</p>
+        <p class="white-text">Les mots difficiles, eux, vous seront demandés plus souvent</p>
+        <p class="white-text">Et en fin de compte, vous aurez tous ces mots dans la tête</p>
 
         <!-- <button class="button" onclick="goToRoot(`{{ token }}`)">Quit</button> -->
-        <button id="quitButton" class="button">Quit</button>
+        <button id="quitButton" class="button">Quitter</button>
         
-        <p class ="white-text">Do NOT store any sensitive data on this app!</p>
+        <p class ="white-text">Ne laisser aucune information confidentielle sur cette application !</p>
     </div>
 </body>
 

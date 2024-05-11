@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Title -->
-    <title>Configuration</title>
+    <title>Paramètres</title>
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
@@ -18,11 +18,15 @@
 </head>
 
 <body data-token="{{ token }}">
+    <script>
+        const testType = "version";
+    </script>
+
     <div class="container">
         <form>
 
             <div class="row">
-                <label class="white-text" for="testType">Choose your database:</label>
+                <label class="white-text" for="testType">Choisir une base de données:</label>
             </div>
             <div class="row">
                 <select id="databaseName" name="databaseName" class="dropdown-container rounded-input" required>
@@ -35,18 +39,19 @@
                 {% endif %}
             </div>
 
-            <div class="row">
-                <label class="white-text" for="testType">Choose your test type:</label>
+            <!-- <div class="row">
+                <label class="white-text" for="testType">Type d'interro:</label>
             </div>
             <div class="row">
                 <select id="testType" name="testType" class="dropdown-container rounded-input" required>
-                    <option value="Version">Normal</option>
-                    <option value="Theme">Reverse</option>
+                    <option value="version">Normale</option>
+                    <option value="theme">Inversée</option>
                 </select>
-            </div>
+                Attention à la balise <script> au début du body !!!
+            </div> -->
 
             <div class="row">
-                <label class="white-text" for="numWords">Number of words:</label>
+                <label class="white-text" for="numWords">Nombre de questions</label>
             </div>
             <div class="row">
                 <select id="numWords" name="numWords" class="dropdown-container rounded-input" required>
@@ -60,11 +65,11 @@
         </form>
 
         <div class="row">
-            <button id="sendUserSettingsButton" class="button">Start test</button>
+            <button id="sendUserSettingsButton" class="button">Interro !</button>
         </div>
 
         <div class="row">
-            <button id="userSpaceButton" class="button">Back to user space</button>
+            <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
 </body>

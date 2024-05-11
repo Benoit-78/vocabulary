@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     sendUserSettingsButton.addEventListener("click", function() {
         const databaseName = document.getElementById('databaseName').value
-        const testType = document.getElementById('testType').value
+        // const testType = document.getElementById('testType').value
         const numWords = document.getElementById('numWords').value
         sendUserSettings(token, databaseName, testType, numWords);
     });

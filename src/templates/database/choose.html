@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Title -->
-    <title>Choose database</title>
+    <title>Choisir une base</title>
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
@@ -21,7 +21,7 @@
     <div class="container">
             <div class="row">
                 <div>
-                    <label class="white-text" for="dropdown">Choose an existing database</label>
+                    <label class="white-text" for="dropdown">Choisir une base de données</label>
                     <select id="dropdown" class="rounded-input">
                         {% for database in databases %}
                             <option value="{{ database }}">{{ database }}</option>
@@ -31,13 +31,13 @@
             </div>
 
             <div class="row">
-                <button id="chooseDatabaseButton" class="button">Choose database</button>
+                <button id="chooseDatabaseButton" class="button">Confirmer</button>
                 <!-- <button id="deleteDatabaseButton" class="button">Delete database</button> -->
             </div>
 
             <div class="row">
                 <div>
-                    <label class="white-text" for="input1">Create a new database</label>
+                    <label class="white-text" for="input1">Créer une nouvelle base de données</label>
                     <input class="rounded-input" type="text" id="databaseName" name="databaseName">
                 </div>
                 {% if dbAlreadyPresentErrorMessage %}
@@ -46,7 +46,7 @@
             </div>
 
             <div class="row">
-                <button id="createDatabaseButton" class="button">Create database</button>
+                <button id="createDatabaseButton" class="button">Créer</button>
             </div>
 
             <div class="row">
@@ -56,7 +56,7 @@
             </div>
 
         <div class="row">
-            <button id="userSpaceButton" class="button quit-button">Quit</button>
+            <button id="userSpaceButton" class="button quit-button">Quitter</button>
         </div>
 
     </div>

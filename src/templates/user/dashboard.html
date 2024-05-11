@@ -7,18 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
     <!-- Title -->
-    <title>Dashboard</title>
+    <title>Tableau de bord</title>
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <!-- JS -->
-    <script src="/static/scripts/ui/main.js"></script>
+    <script type="module" src="/static/scripts/ui/main.js"></script>
     <!--<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
 </head>
 
 <body data-token="{{ token }}">
     <div class="container">
-        <h1 class="white-text">Dashboard</h1>
+        <h1 class="white-text">Tableau de bord</h1>
 
         <div id="plotly-graph-container">
             {{ graph_1|safe }}
@@ -41,7 +41,7 @@
         </div>
 
         <div class="row">
-            <button id="quitButton" class="button">Sign-out</button>
+            <button id="userSpaceButton" class="button">Quit</button>
         </div>
     </div>
 </body>
