@@ -1,0 +1,27 @@
+/* Define the container for the double line */
+.double-line-container {
+    position: relative;
+    width: 80%; /* Adjust this value to control how much the lines should span */
+    margin: 0 auto; /* Center the container horizontally */
+    height: 5px; /* Adjust height as needed */
+    padding: 10px 10px; /* Optional: Add some padding for spacing */
+}
+
+/* Style for the double lines */
+.double-line-container::before,
+.double-line-container::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px; /* Adjust height for line thickness */
+    background-color: orange; /* Line color */
+}
+
+.double-line-container::before {
+    top: 0; /* Position the first line */
+}
+
+.double-line-container::after {
+    bottom: 5; /* Position the second line */
+}

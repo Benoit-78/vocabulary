@@ -20,6 +20,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
@@ -28,13 +29,30 @@ from src.api import authentication
 
 app = FastAPI(
     title="vocabulary",
-    docs_url="/docs",
-    # servers=[{"url": "https://www.vocabulary-app.com"}],
+    docs_url="/docs"
 )
+
+
+
+class CacheControlMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to set the cache control header for static files.
+    """
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "public, max-age=31536000"
+        return response
+
+
+
 # Sessions
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.environ.get("SECRET_KEY")
+)
+app.add_middleware(
+    CacheControlMiddleware
 )
 # Routers
 app.include_router(common_router)

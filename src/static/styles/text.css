@@ -1,0 +1,13 @@
+.p-background::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 66, 0, 0.6); /* Green color with transparency */
+    border-radius: 0px; /* Adjust this value for more or less rounded corners */
+    z-index: -1; /* Place the rectangle behind the text */
+    padding: 10px; /* Optional: Adjust the padding to ensure the rectangle is larger than the text */
+    margin: -10px; /* Optional: Adjust the margin to ensure the rectangle is larger than the text */
+}

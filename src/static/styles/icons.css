@@ -1,0 +1,25 @@
+
+.flag-box {
+    display: flex;
+    align-items: center;
+}
+
+.flag {
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.flag-us {
+    color: #0055a4;
+    font-weight: bold;
+}
+
+.flag-fr {
+    color: #0055a4;
+    font-weight: bold;
+}
+
+
+.flag-latin {
+    background-color: red;
+}

@@ -10,6 +10,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/edges.css">
     <link rel="stylesheet" href="/static/styles/errors.css">
     <!-- JS -->
     <script type="module" src="/static/scripts/ui/database.js"></script>
@@ -35,10 +36,18 @@
                 <!-- <button id="deleteDatabaseButton" class="button">Delete database</button> -->
             </div>
 
+            <div class="double-line-container"></div>
+
             <div class="row">
                 <div>
-                    <label class="white-text" for="input1">Créer une nouvelle base de données</label>
-                    <input class="rounded-input" type="text" id="databaseName" name="databaseName">
+                    <!-- <label class="white-text" for="input1">Créer une nouvelle base de données</label> -->
+                    <input
+                        class="rounded-input"
+                        id="databaseName"
+                        name="databaseName"
+                        placeholder="Nouvelle base de données"
+                        type="text"
+                    >
                 </div>
                 {% if createDatabaseErrorMessage %}
                         <p class="error-message">{{ createDatabaseErrorMessage }}</p>

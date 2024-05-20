@@ -15,6 +15,12 @@ body {
 }
 
 
+p {
+    position: relative;
+    z-index: 1; /* Ensure the text is above the rectangle */
+}
+
+
 label {
     display: block;
     margin-bottom: 5px;
@@ -59,36 +65,12 @@ label {
     width: 300px;
 }
 
-.flag-box {
-    display: flex;
-    align-items: center;
-}
-
-.flag {
-    font-size: 20px;
-    margin-right: 5px;
-}
-
-.flag-us {
-    color: #0055a4;
-    font-weight: bold;
-}
-
-.flag-fr {
-    color: #0055a4;
-    font-weight: bold;
-}
-
 input {
     padding: 5px;
     margin-bottom: 10px;
     width: 100%;
 }
 
-
-.flag-latin {
-    background-color: red;
-}
 
 .white-text {
     color: #ffffff;
