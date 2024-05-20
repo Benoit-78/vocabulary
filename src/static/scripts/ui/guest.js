@@ -13,7 +13,6 @@ document.addEventListener(
 document.addEventListener("DOMContentLoaded", function() {
     const englishButton = document.getElementById("englishButton");
     const token = document.body.dataset.token;
-    console.log(token)
 
     englishButton.addEventListener("click", function() {
         sendGuestSettings(token, "English");

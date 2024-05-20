@@ -42,7 +42,6 @@ async function authenticateUser(token, formData) {
         );
         const data = await response.json();
         if (data && data.message === "User successfully authenticated") {
-            console.log(data.access_token)
             window.location.href = `/user/user-space?token=${data.token}`;
         } else if (data && data.message === "Unknown user") {
             window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;

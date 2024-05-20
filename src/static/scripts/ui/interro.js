@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const sendUserSettingsButton = document.getElementById("sendUserSettingsButton");
     const token = document.body.dataset.token;
-    console.log("Token:", token)
 
     sendUserSettingsButton.addEventListener("click", function() {
         const databaseName = document.getElementById('databaseName').value

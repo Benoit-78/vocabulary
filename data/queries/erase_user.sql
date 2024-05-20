@@ -1,6 +1,6 @@
 
 -- Erase
-SET @username = 'usr';
+SET @username = 'usr_29';
 SET @query = CONCAT('DROP USER ', @username, '@localhost');
 PREPARE stmt FROM @query;
 EXECUTE stmt;

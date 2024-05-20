@@ -43,7 +43,7 @@ def load_user_databases(request, token, error_message):
         'request': request,
         'token': token,
         'databases': databases,
-        'dbAlreadyPresentErrorMessage': db_message
+        'createDatabaseErrorMessage': db_message
     }
     return response_dict
 
@@ -81,17 +81,32 @@ def create_database(data: dict, token: str):
     logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     user_account = users.UserAccount(user_name)
-    db_name = data['db_name']
-    result = user_account.create_database(db_name)
+    logger.debug(f"Creating database: {data}")
+    if data['db_name'] == '':
+        db_name = None
+        result = False
+    else:
+        db_name = data['db_name']
+        result = user_account.create_database(db_name)
     if result is False:
-        json_response = JSONResponse(
-            content=
-            {
-                'message': "Database name not available",
-                'token': token,
-                'databaseName': db_name
-            }
-        )
+        if db_name is None:
+            json_response = JSONResponse(
+                content=
+                {
+                    'message': "No database name given",
+                    'token': token,
+                    'databaseName': db_name
+                }
+            )
+        else:
+            json_response = JSONResponse(
+                content=
+                {
+                    'message': "Database name not available",
+                    'token': token,
+                    'databaseName': db_name
+                }
+            )
     if result is True:
         json_response = JSONResponse(
             content=
@@ -109,15 +124,18 @@ def get_error_messages(error_message: str):
     Get the error messages from the error message.
     """
     messages = [
+        "No database name given",
         "Database name not available",
         "Database created successfully",
         ''
     ]
     if error_message == messages[0]:
-        result = 'A database of this name already exists'
+        result = 'No database name given'
     elif error_message == messages[1]:
-        result = ''
+        result = 'A database of this name already exists'
     elif error_message == messages[2]:
+        result = ''
+    elif error_message == messages[3]:
         result = ''
     else:
         logger.error(f"Error message incorrect: {error_message}")

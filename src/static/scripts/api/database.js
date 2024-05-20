@@ -7,7 +7,6 @@ function goToUserDatabases(token) {
 
 
 function chooseDatabase(token, databaseName) {
-    console.log(databaseName)
     fetch(
         `/database/choose-database?token=${token}`,
         {
@@ -49,9 +48,12 @@ function createDatabase(token, databaseName) {
     .then(data => {
         if (data && data.message === "Database created successfully") {
             window.location.href = `/database/fill-database?token=${token}&databaseName=${databaseName}`;
-        } else if (data && data.message === "Database name not available") {
+        } else if (data && data.message === "No database name given") {
+            console.error("No database name given");
             window.location.href = `/database/list-databases?token=${token}&errorMessage=${data.message}`;
+        } else if (data && data.message === "Database name not available") {
             console.error("Database name not available");
+            window.location.href = `/database/list-databases?token=${token}&errorMessage=${data.message}`;
         } else {
             console.error("Error with the database creation");
         }
@@ -138,7 +140,7 @@ function uploadCSV(token) {
     })
     .then(data => {
         // Handle response from the server
-        console.log(data);
+        console.log("Data extracted from the server");
     })
     .catch(error => {
         // Handle errors

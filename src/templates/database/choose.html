@@ -40,8 +40,8 @@
                     <label class="white-text" for="input1">Créer une nouvelle base de données</label>
                     <input class="rounded-input" type="text" id="databaseName" name="databaseName">
                 </div>
-                {% if dbAlreadyPresentErrorMessage %}
-                        <p class="error-message">{{ dbAlreadyPresentErrorMessage }}</p>
+                {% if createDatabaseErrorMessage %}
+                        <p class="error-message">{{ createDatabaseErrorMessage }}</p>
                 {% endif %}
             </div>
 
