@@ -223,19 +223,19 @@ class PremierTest(Interro):
         """
         Update the vocabulary dataframe
         """
-        # -----
+        # Nb
         self.words_df.loc[self.index, 'nb'] += 1
-        # -----
+        # Score
         if word_guessed:
             self.words_df.loc[self.index, 'score'] += 1
         else:
             self.words_df.loc[self.index, 'score'] -= 1
-        # -----
+        # Taux
         nombre = self.words_df.loc[self.index, 'nb']
         score = self.words_df.loc[self.index, 'score']
         taux = int(score / nombre * 100)
         self.words_df.loc[self.index, 'taux'] = taux
-        # -----
+        # Query
         self.words_df.loc[self.index, 'query'] += 1
 
     def ask_series_of_guesses(self):

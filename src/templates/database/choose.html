@@ -22,7 +22,7 @@
     <div class="container">
             <div class="row">
                 <div>
-                    <label class="white-text" for="dropdown">Choisir une base de données</label>
+                    <label class="white-text" for="dropdown">Choisir un dictionnaire</label>
                     <select id="dropdown" class="rounded-input">
                         {% for database in databases %}
                             <option value="{{ database }}">{{ database }}</option>
@@ -32,7 +32,7 @@
             </div>
 
             <div class="row">
-                <button id="chooseDatabaseButton" class="button">Confirmer</button>
+                <button id="chooseDatabaseButton" class="button">Ajouter un mot</button>
                 <!-- <button id="deleteDatabaseButton" class="button">Delete database</button> -->
             </div>
 
@@ -45,7 +45,7 @@
                         class="rounded-input"
                         id="databaseName"
                         name="databaseName"
-                        placeholder="Nouvelle base de données"
+                        placeholder="Nouveau dictionnaire"
                         type="text"
                     >
                 </div>

@@ -117,7 +117,6 @@ def save_interro_settings(
                 'test_length': test_length
             }
         )
-    test_length = test.words
     redis_interface.save_test_in_redis(test, token)
     redis_interface.save_loader_in_redis(loader, token)
     return JSONResponse(
@@ -125,7 +124,7 @@ def save_interro_settings(
         {
             'message': "Settings saved successfully",
             'token': token,
-            'test_length': test_length
+            'test_length': test.words
         }
     )
 
