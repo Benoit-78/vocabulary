@@ -111,10 +111,7 @@ async def get_user_response(
     """
     Acquire the user decision: was his answer right or wrong.
     """
-    json_response = interro_api.get_user_response(
-        data,
-        token
-    )
+    json_response = interro_api.get_user_response(data, token)
     return json_response
 
 
@@ -148,10 +145,7 @@ async def launch_rattraps(
     """
     Load the rattraps page.
     """
-    json_response = interro_api.load_rattraps(
-        token,
-        data
-    )
+    json_response = interro_api.load_rattraps(token, data)
     return json_response
 
 

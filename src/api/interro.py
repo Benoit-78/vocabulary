@@ -273,6 +273,8 @@ def load_rattraps(
     else:
         rattraps_cnt = 0
     guesser = api_view.FastapiGuesser()
+    test.faults_df = test.faults_df.sample(frac=1)
+    test.faults_df = test.faults_df.reset_index(drop=True)
     rattrap = interro.Rattrap(
         test.faults_df,
         rattraps_cnt,

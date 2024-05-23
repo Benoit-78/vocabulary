@@ -27,11 +27,11 @@
     </script>
 
     <div class="container">
-        <div class="progress-container">
-            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
-        </div>
         <div>
             <p class="white-text">{{ count }} / {{ numWords }}</p>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
         <div class="row">
             <p class="white-text">Quelle traduction donnez-vous pour :</p>
@@ -43,12 +43,12 @@
                 </div>
                 <span class="flag">{{ flag|safe }}</span>
             </div>
-            <div class="flag-box">
+            <!-- <div class="flag-box">
                 <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
                 <div class="box rounded-input">
                     ?
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <div class="row">

@@ -17,7 +17,7 @@ import asyncio
 import pytest
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
-# from loguru import logger
+from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -96,7 +96,7 @@ class TestDatabase(unittest.TestCase):
             'request': request,
             'token': token,
             'databases': ['db1', 'db2'],
-            'dbAlreadyPresentErrorMessage': 'mock_db_message'
+            'createDatabaseErrorMessage': 'mock_db_message'
         }
         self.assertEqual(result, expected_result)
         mock_get_user_databases.assert_called_once_with(token)
@@ -290,6 +290,7 @@ class TestDatabase(unittest.TestCase):
         # ----- ASSERT
         mock_logger.error.assert_any_call(f"Error message incorrect: {error_message}")
         expected_list = [
+            "No database name given",
             "Database name not available",
             "Database created successfully",
             ''

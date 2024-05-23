@@ -175,6 +175,8 @@ def propose_rattraps_guest(
     new_score = 0
     new_words = test.faults_df.shape[0]
     test.interro_df = test.faults_df
+    test.interro_df = test.interro_df.sample(frac=1)
+    test.interro_df = test.interro_df.reset_index(drop=True)
     test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
     save_test_in_redis(test, token)
     response_dict = {

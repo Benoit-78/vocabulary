@@ -24,7 +24,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
-from src.routers import common_router, dashboard_router, database_router, guest_router, interro_router, user_router
+from src.routers import common_router, dashboard_router, database_router
+from src.routers import guest_router, interro_router, user_router
 from src.api import authentication
 
 app = FastAPI(

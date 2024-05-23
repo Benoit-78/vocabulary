@@ -290,10 +290,21 @@ class Rattrap(Interro):
         self.rattraps = int(rattraps)
         self.interro_df = faults_df_.copy()
 
+    def reshuffle_words_table(self):
+        """
+        Shuffle the words table, so that the words are asked
+        in a different order than the precedent test.
+        """
+        self.words_df = self.words_df.sample(frac=1)
+        self.words_df = self.words_df.reset_index(drop=True)
+
     def run(self):
         """
         Launch a rattraps.
         """
+        logger.debug(f"Words table 1: \n{self.words_df}")
+        self.reshuffle_words_table()
+        logger.debug(f"Words table 2: \n{self.words_df}")
         words_total = self.words_df.shape[0]
         for j in range(0, words_total):
             self.index = j
@@ -307,6 +318,7 @@ class Rattrap(Interro):
         """
         Start rattraps loop.
         """
+        logger.debug("Start loop called")
         if self.rattraps == -1:
             while self.words_df.shape[0] > 0:
                 self.run()
