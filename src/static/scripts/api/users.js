@@ -21,6 +21,8 @@ async function createAccount(token, inputName, inputPassword) {
             window.location.href = `/user/user-space?token=${data.token}`;
         } else if (data && data.message === "User name not available") {
             window.location.href = `/sign-up?token=${data.token}&errorMessage=${data.message}`;
+        } else if (data && data.message === "User name or password not provided") {
+            window.location.href = `/sign-up?token=${data.token}&errorMessage=${data.message}`;
         } else {
             console.error("Error in sign-up");
         }
@@ -31,6 +33,9 @@ async function createAccount(token, inputName, inputPassword) {
 
 
 async function authenticateUser(token, formData) {
+    console.log("formData:", formData.toString());
+    console.log("username:", formData.get("username"));
+    console.log("password:", formData.get("password"));
     try {
         const response = await fetch(
             `/user/user-token?token=${token}`,
@@ -41,11 +46,14 @@ async function authenticateUser(token, formData) {
             }
         );
         const data = await response.json();
+        console.log(data);
         if (data && data.message === "User successfully authenticated") {
             window.location.href = `/user/user-space?token=${data.token}`;
         } else if (data && data.message === "Unknown user") {
             window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else if (data && data.message === "Password incorrect") {
+            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
+        } else if (data && data.message === "User name or password not provided") {
             window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else {
             console.error("Error in sign-in");

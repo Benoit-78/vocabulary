@@ -2,10 +2,10 @@ import { authenticateUser, goToUserDashboards, goToUserSettings, createAccount, 
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    const authenticateButton = document.getElementById("authenticateButton");
+    const signInButton = document.getElementById("signInButton");
     const token = document.body.dataset.token;
 
-    authenticateButton.addEventListener("click", function(event) {
+    signInButton.addEventListener("click", function(event) {
         event.preventDefault();
 
         const inputName = document.getElementById("inputName").value;

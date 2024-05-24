@@ -32,6 +32,16 @@ def create_account(
     Create the user account if the given user name does not exist yet.
     """
     logger.info('')
+    if creds['input_name'] == '' or creds['input_password'] == '':
+        json_response = JSONResponse(
+            content=
+            {
+                'message': "User name or password not provided",
+                'token': token
+            }
+        )
+        logger.debug(f"json_response: {json_response}")
+        return json_response
     user_account = users.UserAccount(creds['input_name'])
     result = user_account.create_account(creds['input_password'])
     json_response = {}
@@ -66,6 +76,16 @@ def authenticate_user(
     """
     if form_data.client_id is not None:
         json_response = authenticate_user_with_oauth(token, form_data)
+        return json_response
+    if '' in [form_data.username, form_data.password]:
+        json_response = JSONResponse(
+            content=
+            {
+                'message': "User name or password not provided",
+                'token': token
+            }
+        )
+        logger.debug(f"json_response: {json_response}")
         return json_response
     logger.info('')
     users_list = auth_api.get_users_list()

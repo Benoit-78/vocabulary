@@ -252,37 +252,9 @@ def sign_in(
         token,
         error_message
     ):
-    name_message, password_message = get_error_messages(error_message)
     response_dict = {
         'request': request,
         'token': token,
-        'nameUnknownErrorMessage': name_message,
-        'passwordIncorrectErrorMessage': password_message
+        'errorMessage': error_message,
     }
     return response_dict
-
-
-def get_error_messages(error_message: str) -> tuple:
-    """
-    Based on the result of the POST method, returns the corresponding error messages
-    that will feed the sign-in html page.
-    """
-    messages = [
-        "Unknown user",
-        "Password incorrect",
-        "User successfully authenticated",
-        ''
-    ]
-    if error_message == messages[0]:
-        result = ("Unknown user name", "")
-    elif error_message == messages[1]:
-        result = ("", "Password incorrect")
-    elif error_message == messages[2]:
-        result = ("", "")
-    elif error_message == messages[3]:
-        result = ("", "")
-    else:
-        logger.error(f"Error message incorrect: {error_message}")
-        logger.error(f"Should be in: {messages}")
-        raise ValueError
-    return result

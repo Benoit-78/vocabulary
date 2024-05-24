@@ -35,9 +35,6 @@
                     placeholder="Nom d'utilisateur *"
                     required
                 >
-                {% if nameUnknownErrorMessage %}
-                    <p class="error-message">{{ nameUnknownErrorMessage }}</p>
-                {% endif %}
             </div>
             <div class="row">
                 <!-- <label class="white-text" for="input2">Mot de passe</label> -->
@@ -50,12 +47,12 @@
                     placeholder="Mot de passe *"
                     required
                 >
-                {% if passwordIncorrectErrorMessage %}
-                    <p class="error-message">{{ passwordIncorrectErrorMessage }}</p>
+                {% if errorMessage %}
+                    <p class="error-message">{{ errorMessage }}</p>
                 {% endif %}
             </div>
             <div class="row">
-                <button id="authenticateButton" class="button">Connexion</button>
+                <button id="signInButton" class="button">Connexion</button>
             </div>
         </form>
 

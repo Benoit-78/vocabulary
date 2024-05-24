@@ -26,7 +26,7 @@ from starlette.requests import Request
 
 from src.routers import common_router, dashboard_router, database_router
 from src.routers import guest_router, interro_router, user_router
-from src.api import authentication
+from src.api import authentication as auth_api
 
 app = FastAPI(
     title="vocabulary",
@@ -75,7 +75,7 @@ templates = Jinja2Templates(directory="src/templates")
 @app.get("/", response_class=HTMLResponse)
 async def root_page(
         request: Request,
-        token: str = Depends(authentication.create_token)
+        token: str = Depends(auth_api.create_token)
     ):
     """
     Redirects to the welcome page.
@@ -86,7 +86,7 @@ async def root_page(
 @app.get("/welcome", response_class=HTMLResponse)
 async def welcome_page(
         request: Request,
-        token: str = Depends(authentication.create_token)
+        token: str = Depends(auth_api.create_token)
     ):
     """
     Call the welcome page and assign a token to the guest.
@@ -101,13 +101,14 @@ async def welcome_page(
 @app.get("/sign-in", response_class=HTMLResponse)
 def sign_in(
         request: Request,
-        token: str = Depends(authentication.check_token),
+        token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
     ):
     """
     Call the sign-in page.
     """
-    response_dict = authentication.sign_in(request, token, error_message)
+    response_dict = auth_api.sign_in(request, token, error_message)
+    logger.debug(f"response_dict: {response_dict}")
     return templates.TemplateResponse(
         "user/sign_in.html",
         response_dict
@@ -117,7 +118,7 @@ def sign_in(
 @app.get("/sign-up", response_class=HTMLResponse)
 def sign_up(
         request: Request,
-        token: str = Depends(authentication.check_token),
+        token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
     ):
     """
@@ -133,7 +134,7 @@ def sign_up(
 @app.get("/about-the-app", response_class=HTMLResponse)
 def about_the_app(
         request: Request,
-        token: str = Depends(authentication.check_token)
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Call the page that helps the user to get started.
@@ -148,7 +149,7 @@ def about_the_app(
 @app.get("/help", response_class=HTMLResponse)
 def get_help(
         request: Request,
-        token: str = Depends(authentication.check_token)
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Help!

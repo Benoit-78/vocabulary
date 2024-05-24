@@ -27,7 +27,6 @@ user_router = APIRouter(prefix="/user")
 templates = Jinja2Templates(directory="src/templates")
 
 
-
 @user_router.post("/create-user-account")
 async def create_account(
         creds: dict,
@@ -36,7 +35,9 @@ async def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
+    logger.debug("Router before")
     json_response = user_api.create_account(creds, token)
+    logger.debug("Router after")
     return json_response
 
 
@@ -49,6 +50,7 @@ async def login_for_access_token(
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
     """
+    logger.debug(f"form_data: {form_data}")
     json_response = user_api.authenticate_user(token, form_data)
     return json_response
 

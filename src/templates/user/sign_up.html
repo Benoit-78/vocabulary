@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <link rel="stylesheet" href="/static/styles/errors.css">
+    <link rel="stylesheet" href="/static/styles/text.css">
     <!-- JS -->
     <script type="module" src="/static/scripts/ui/main.js"></script>
     <script type="module" src="/static/scripts/ui/users.js"></script>
@@ -30,12 +31,9 @@
                     required
                     type="text"
                 >
-                {% if errorMessage %}
-                    <p class="error-message">{{ errorMessage }}</p>
-                {% endif %}
             </div>
+
             <div class="row">
-                <!-- <label class="white-text" for="input2">Mot de passe</label> -->
                 <input
                     class="rounded-input"
                     id="inputPassword"
@@ -45,8 +43,12 @@
                     type="password"
                 >
             </div>
+
+            {% if errorMessage %}
+                <p class="error-message p-background">{{ errorMessage }}</p>
+            {% endif %}
+
             <div class="row">
-                <!-- <button type="button" class="button" onclick="createAccount(`{{ token }}`)">Sign-up</button> -->
                 <button id="signUpButton" class="button">Inscription</button>
             </div>
         </form>
