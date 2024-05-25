@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     sendUserSettingsButton.addEventListener("click", function() {
         const databaseName = document.getElementById('databaseName').value
-        // const testType = document.getElementById('testType').value
         const numWords = document.getElementById('numWords').value
         sendUserSettings(token, databaseName, testType, numWords);
     });
@@ -36,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const token = document.body.dataset.token;
 
     showTranslationButton.addEventListener("click", function() {
-        showTranslation(token, numWords, count, score);
+        showTranslation(token, interroCategory, numWords, count, score);
     });
 });
 
@@ -47,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     yesButton.addEventListener("click", function() {
         sendUserAnswer(
-            token, 'Yes', count, numWords, score, content_box1, content_box2
+            token, interroCategory, 'Yes', count, numWords, score, content_box1, content_box2
         );
     });
 });
@@ -59,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     noButton.addEventListener("click", function() {
         sendUserAnswer(
-            token, 'No', count, numWords, score, content_box1, content_box2
+            token, interroCategory, 'No', count, numWords, score, content_box1, content_box2
         );
     });
 });
@@ -70,6 +69,44 @@ document.addEventListener("DOMContentLoaded", function() {
     const token = document.body.dataset.token;
 
     rattrapsButton.addEventListener("click", function() {
-        launchRattraps(token, newTotal, newCount, newScore);
+        launchRattraps(token, interroCategory, newTotal, newCount, newScore);
     });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const tableContainer = document.getElementById("table-container");
+    const tableData = JSON.parse(document.getElementById('table-data').textContent);
+    const table = document.createElement('table');
+    table.className = "data-table";
+    // HEADER
+    // const thead = document.createElement('thead');
+    // const headerRow = document.createElement('tr');
+    // tableData.headers.forEach(header => {
+    //     const th = document.createElement('th');
+    //     th.textContent = header;
+    //     headerRow.appendChild(th);
+    // });
+    // thead.appendChild(headerRow);
+    // table.appendChild(thead);
+    // BODY
+    const tbody = document.createElement('tbody');
+    tableData.rows.forEach(rowData => {
+        const row = document.createElement('tr');
+        rowData.forEach(cellData => {
+            const td = document.createElement('td');
+            td.textContent = cellData;
+            row.appendChild(td);
+        });
+        tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    // Append table to container
+    tableContainer.appendChild(table);
+    // Apply fade-in effect
+    tableContainer.style.opacity = 0;
+    tableContainer.style.transition = "opacity 2s";
+    setTimeout(() => {
+        tableContainer.style.opacity = 1;
+    }, 500); // Delay before fade-in starts
 });

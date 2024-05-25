@@ -17,21 +17,23 @@ REDIS_DB = redis.Redis(
 )
 
 
-def save_test_in_redis(test, token, redis_db=REDIS_DB):
+def save_interro_in_redis(interro, token, interro_category, redis_db=REDIS_DB):
     """
     Save a test object in redis using token as key.
     """
-    test = pickle.dumps(test)
-    redis_db.set(token  + '_test', test)
+    interro = pickle.dumps(interro)
+    key = token + '_' + interro_category
+    redis_db.set(key, interro)
 
 
-def load_test_from_redis(token, redis_db=REDIS_DB):
+def load_interro_from_redis(token, interro_category, redis_db=REDIS_DB):
     """
     Load a test object from redis using token as key.
     """
-    pickelized_test = redis_db.get(token + '_test')
-    test = pickle.loads(pickelized_test)
-    return test
+    key = token + '_' + interro_category
+    pickelized_test = redis_db.get(key)
+    interro = pickle.loads(pickelized_test)
+    return interro
 
 
 def save_loader_in_redis(loader, token, redis_db=REDIS_DB):

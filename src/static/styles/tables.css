@@ -1,0 +1,43 @@
+@keyframes reveal {
+    from {
+        clip-path: inset(0 0 100% 0);
+    }
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+#table-container {
+    animation: reveal 0.25s ease-out;
+    position: relative;
+    overflow: hidden; /* Ensure content is hidden until revealed */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(128, 66, 0, 0.6);
+}
+
+ /* Inner lines */
+.data-table td {
+    border: 1px solid orange;
+    color: white;
+    padding: 8px;
+}
+
+.data-table tr:first-child td {
+    border-top: none;
+}
+
+.data-table tr td:first-child {
+    border-left: none;
+}
+
+.data-table tr td:last-child {
+    border-right: none;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}

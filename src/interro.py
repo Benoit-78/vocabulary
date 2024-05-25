@@ -122,7 +122,12 @@ class Interro(ABC):
     """
     Abstract class for interrooooo!!!! !!! !
     """
-    def __init__(self, words_df_: pd.DataFrame, words: int, guesser):
+    def __init__(
+            self,
+            words_df_: pd.DataFrame,
+            words: int,
+            guesser
+        ):
         self.words_df = words_df_
         self.words = words
         self.guesser = guesser

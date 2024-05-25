@@ -57,6 +57,7 @@ async def save_interro_settings(
 @interro_router.get("/interro-question", response_class=HTMLResponse)
 def load_interro_question(
         request: Request,
+        interro_category: str=Query(None, alias="interroCategory"),
         total: str=Query(None, alias="total"),
         count: str=Query(None, alias="count"),
         score: str=Query(None, alias="score"),
@@ -67,6 +68,7 @@ def load_interro_question(
     """
     response_dict = interro_api.get_interro_question(
         request,
+        interro_category,
         total,
         count,
         score,
@@ -81,6 +83,7 @@ def load_interro_question(
 @interro_router.get("/interro-answer", response_class=HTMLResponse)
 def load_interro_answer(
         request: Request,
+        interro_category: str=Query(None, alias="interroCategory"),
         total: str=Query(None, alias="total"),
         count: str=Query(None, alias="count"),
         score: str=Query(None, alias="score"),
@@ -92,6 +95,7 @@ def load_interro_answer(
     """
     request_dict = interro_api.load_interro_answer(
         request,
+        interro_category,
         total,
         count,
         score,
@@ -104,20 +108,21 @@ def load_interro_answer(
 
 
 @interro_router.post("/user-answer")
-async def get_user_response(
+async def get_user_answer(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
     ):
     """
     Acquire the user decision: was his answer right or wrong.
     """
-    json_response = interro_api.get_user_response(data, token)
+    json_response = interro_api.get_user_answer(data, token)
     return json_response
 
 
 @interro_router.get("/propose-rattraps", response_class=HTMLResponse)
 def propose_rattraps(
         request: Request,
+        interro_category: str=Query(None, alias="interroCategory"),
         total: str = Query(None, alias="total"),
         score: str = Query(None, alias="score"),
         token: str = Depends(auth_api.check_token)
@@ -127,6 +132,7 @@ def propose_rattraps(
     """
     response_dict = interro_api.propose_rattraps(
         request,
+        interro_category,
         total,
         score,
         token
@@ -152,6 +158,7 @@ async def launch_rattraps(
 @interro_router.get("/interro-end", response_class=HTMLResponse)
 def end_interro(
         request: Request,
+        interro_category: str=Query(None, alias="interroCategory"),
         total: str=Query(None, alias="total"),
         score: str=Query(None, alias="score"),
         token: str=Depends(auth_api.check_token)
@@ -162,6 +169,7 @@ def end_interro(
     """
     response_dict = interro_api.end_interro(
         request,
+        interro_category,
         total,
         score,
         token

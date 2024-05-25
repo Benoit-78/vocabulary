@@ -23,7 +23,7 @@ function sendUserSettings(token, databaseName, testType, numWords) {
     .then(data => {
         if (data && data.message === "Settings saved successfully") {
             numWords = data.test_length;
-            startTest(token, numWords)
+            startTest(token, numWords, data.interro_category)
         } else if (data && data.message === "Empty table") {
             window.location.href = `/interro/interro-settings?token=${token}&errorMessage=${data.message}`;
         } else {
@@ -36,38 +36,42 @@ function sendUserSettings(token, databaseName, testType, numWords) {
 }
 
 
-function startTest(token, numWords) {
+function startTest(token, numWords, interroCategory) {
     var total = parseInt(numWords, 10);
     var count = 0;
     var score = 0;
     // Check if the conversion was successful
     if (!isNaN(numWords)) {
-        window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
+        window.location.href = `/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
 }
 
 
-function showTranslation(token, numWords, count, score) {
+function showTranslation(token, interroCategory, numWords, count, score) {
     var total = parseInt(numWords, 10);
     var count = parseInt(count, 10);
     var score = parseInt(score, 10);
     if (!isNaN(numWords)) {
-        window.location.href = `/interro/interro-answer?token=${token}&total=${total}&count=${count}&score=${score}`;
+        window.location.href = `/interro/interro-answer?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
     } else {
         console.error("Invalid numWords:", numWords);
     }
 }
 
 
-function sendUserAnswer(token, answer, count, numWords, score, content_box1, content_box2) {
+function sendUserAnswer(token, interroCategory, answer, count, numWords, score, content_box1, content_box2) {
+    var total = parseInt(numWords, 10);
+    var count = parseInt(count, 10);
+    // console.log("Total:", total, "Count:", count);
     fetch(
         `/interro/user-answer?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
+                interroCategory,
                 answer: answer,
                 count: count,
                 number_of_questions: numWords,
@@ -80,11 +84,13 @@ function sendUserAnswer(token, answer, count, numWords, score, content_box1, con
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "User response stored successfully") {
-            const score = data.score;
-            if (count < numWords) {
-                nextGuess(token, numWords, count, score);
+            // console.log("Total:", total, "Count:", count);
+            // console.log(count < total)
+            var score = parseInt(data.score, 10);
+            if (count < total) {
+                nextGuess(token, interroCategory, total, count, score);
             } else {
-                endInterro(token, numWords, count, score);
+                endInterro(token, interroCategory, total, count, score);
             }
         } else {
             console.error("Error with user answer acquisition");
@@ -96,33 +102,35 @@ function sendUserAnswer(token, answer, count, numWords, score, content_box1, con
 }
 
 
-function nextGuess(token, numWords, count, score) {
+function nextGuess(token, interroCategory, numWords, count, score) {
     var total = parseInt(numWords, 10);
     var count = parseInt(count, 10);
     var score = parseInt(score, 10);
-    window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
+    console.log("Total:", total, "Count:", count);
+    window.location.href = `/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
 }
 
 
-function endInterro(token, numWords, count, score) {
+function endInterro(token, interroCategory, numWords, count, score) {
     var total = parseInt(numWords, 10);
     var count = parseInt(count, 10);
     var score = parseInt(score, 10);
     if (score === total) {
-        window.location.href = `/interro/interro-end?token=${token}&total=${total}&score=${score}`;
+        window.location.href = `/interro/interro-end?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
     } else {
-        window.location.href = `/interro/propose-rattraps?token=${token}&total=${total}&score=${score}`;
+        window.location.href = `/interro/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
     }
 }
 
 
-function launchRattraps(token, newTotal, newCount, newScore) {
+function launchRattraps(token, interroCategory, newTotal, newCount, newScore) {
     fetch(
         `/interro/launch-rattraps?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
+                interroCategory: interroCategory,
                 count: newCount,
                 total: newTotal,
                 score: newScore,
@@ -132,10 +140,11 @@ function launchRattraps(token, newTotal, newCount, newScore) {
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "Rattraps created successfully") {
+            const interroCategory = data.interroCategory;
             const total = data.total;
             const count = data.count;
             const score = data.score;
-            window.location.href = `/interro/interro-question?token=${token}&total=${total}&count=${count}&score=${score}`;
+            window.location.href = `/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
         } else {
             console.error("Error with rattraps creation.");
         }

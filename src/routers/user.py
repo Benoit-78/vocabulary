@@ -50,7 +50,6 @@ async def login_for_access_token(
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
     """
-    logger.debug(f"form_data: {form_data}")
     json_response = user_api.authenticate_user(token, form_data)
     return json_response
 

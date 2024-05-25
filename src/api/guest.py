@@ -13,7 +13,7 @@ sys.path.append(REPO_DIR)
 
 from fastapi.responses import JSONResponse
 from src.api.interro import load_test
-from src.data.redis_interface import save_test_in_redis, load_test_from_redis
+from src.data.redis_interface import save_interro_in_redis, load_interro_from_redis
 
 WORDS = 10
 
@@ -53,7 +53,7 @@ def save_interro_settings_guest(language, token):
         test_type=test_type,
         test_length=WORDS
     )
-    save_test_in_redis(test, token)
+    save_interro_in_redis(test, token)
     json_response = JSONResponse(
         content=
         {
@@ -78,9 +78,10 @@ def load_interro_question_guest(
     count = int(count)
     score = int(score)
     progress_percent = int(count / int(words) * 100)
-    test = load_test_from_redis(token)
-    index = test.interro_df.index[count]
-    english = test.interro_df.loc[index][0]
+    interro_category = "un_truc_vraiment_pas_beau_du_tout_mais_alors_pas_du_tout"
+    interro = load_interro_from_redis(token, interro_category)
+    index = interro.interro_df.index[count]
+    english = interro.interro_df.loc[index][0]
     english = english.replace("'", "\'")
     count += 1
     flags_dict = get_flags_dict()
@@ -108,7 +109,7 @@ def load_interro_answer_guest(
     ):
     count = int(count)
     score = int(score)
-    test = load_test_from_redis(token)
+    test = load_interro_from_redis(token)
     index = test.interro_df.index[count - 1]
     english = test.interro_df.loc[index][0]
     french = test.interro_df.loc[index][1]
@@ -135,7 +136,7 @@ def get_user_response_guest(
         data,
         token
     ):
-    test = load_test_from_redis(token)
+    test = load_interro_from_redis(token)
     score = data.get('score')
     score = int(score)
     if data["answer"] == 'Yes':
@@ -150,7 +151,7 @@ def get_user_response_guest(
                 data.get('french')
             ]
         )
-    save_test_in_redis(test, token)
+    save_interro_in_redis(test, token)
     json_response = JSONResponse(
         content=
         {
@@ -170,7 +171,7 @@ def propose_rattraps_guest(
         token,
         language
     ):
-    test = load_test_from_redis(token)
+    test = load_interro_from_redis(token)
     new_count = 0
     new_score = 0
     new_words = test.faults_df.shape[0]
@@ -178,7 +179,7 @@ def propose_rattraps_guest(
     test.interro_df = test.interro_df.sample(frac=1)
     test.interro_df = test.interro_df.reset_index(drop=True)
     test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
-    save_test_in_redis(test, token)
+    save_interro_in_redis(test, token)
     response_dict = {
         'request': request,
         'score': score,

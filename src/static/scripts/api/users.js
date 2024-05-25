@@ -33,9 +33,6 @@ async function createAccount(token, inputName, inputPassword) {
 
 
 async function authenticateUser(token, formData) {
-    console.log("formData:", formData.toString());
-    console.log("username:", formData.get("username"));
-    console.log("password:", formData.get("password"));
     try {
         const response = await fetch(
             `/user/user-token?token=${token}`,

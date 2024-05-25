@@ -82,3 +82,17 @@ input {
     border: 1px solid #ccc; /* Optional: Add border for better appearance */
     width: 200px; /* Adjust the width as needed */
 }
+
+/* @keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+} */
+
+/* Slide in effect */
+/* #table-container {
+    animation: slideIn 1s ease-out;
+} */
