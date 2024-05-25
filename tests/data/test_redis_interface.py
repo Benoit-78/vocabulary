@@ -39,14 +39,14 @@ class TestRedisInterface(unittest.TestCase):
             'load': 'TestLoader loaded'
         }
 
-    def test_save_test_in_redis(self):
+    def test_save_interro_in_redis(self):
         """
         Should save a test object in redis database.
         """
         # ----- ARRANGE
         token = 'test_token'
         # ----- ACT
-        redis_interface.save_test_in_redis(
+        redis_interface.save_interro_in_redis(
             self.test_object,
             token,
             redis_db=self.mock_redis_db
@@ -57,7 +57,7 @@ class TestRedisInterface(unittest.TestCase):
             pickle.dumps(self.test_object)
         )
 
-    def test_load_test_from_redis(self):
+    def test_load_interro_from_redis(self):
         """
         Should load a test object from redis database.
         """
@@ -66,7 +66,7 @@ class TestRedisInterface(unittest.TestCase):
         pickled_test_object = pickle.dumps(self.test_object)
         self.mock_redis_db.get.return_value = pickled_test_object
         # ----- ACT
-        result = redis_interface.load_test_from_redis(
+        result = redis_interface.load_interro_from_redis(
             token,
             redis_db=self.mock_redis_db
         )

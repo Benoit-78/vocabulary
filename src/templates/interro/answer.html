@@ -18,28 +18,30 @@
 </head>
 
 <body data-token="{{ token }}">
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const interroCategory = `{{ interroCategory }}`;
+        const numWords = `{{ numWords }}`;
+        const count = `{{ count }}`;
+        const score = `{{ score }}`;
+        const content_box1 = `{{ content_box1|safe }}`;
+        const content_box2 = `{{ content_box2|safe }}`;
+        const language = `{{ language|safe }}`;
+    </script>
+    
     <div class="container">
-        <script>
-            // Declare HTML page variables to the JS file that will call them
-            const interroCategory = `{{ interroCategory }}`;
-            const numWords = `{{ numWords }}`;
-            const count = `{{ count }}`;
-            const score = `{{ score }}`;
-            const content_box1 = `{{ content_box1|safe }}`;
-            const content_box2 = `{{ content_box2|safe }}`;
-            const language = `{{ language|safe }}`;
-        </script>
-
         <div class="white-text">
             <p>{{ count }} / {{ numWords }}</p>
         </div>
+
         <div class="progress-container">
-            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
+            <div class="progress-bar" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
 
-        <div class="row white-text">
-            <p>Quelle traduction donnez-vous pour :</p>
+        <div class="row">
+            <p class="white-text">Quelle traduction donnez-vous pour :</p>
         </div>
+
         <div class="row">
             <div class="flag-box">
                 <div class="box rounded-input">
@@ -52,8 +54,8 @@
                 </div>
             </div>
         </div>
-        <div class="row white-text">
-            <p>Vous l’aviez ?</p>
+        <div class="row">
+            <p class="white-text">Vous l’aviez ?</p>
         </div>
         <div class="row">
             <button id="yesButton" class="button green">Oui</button>

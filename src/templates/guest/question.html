@@ -20,6 +20,7 @@
 <body data-token="{{ token }}">
     <script>
         // Declare HTML page variables to the JS file that will call them
+        const interroCategory = `{{ interroCategory }}`;
         const numWords = `{{ numWords }}`;
         const count = `{{ count }}`;
         const score = `{{ score }}`;
@@ -30,12 +31,15 @@
         <div>
             <p class="white-text">{{ count }} / {{ numWords }}</p>
         </div>
+
         <div class="progress-container">
-            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
+            <div class="progress-bar" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
+
         <div class="row">
             <p class="white-text">Quelle traduction donnez-vous pour :</p>
         </div>
+
         <div class="row">
             <div class="flag-box">
                 <div class="box rounded-input">
@@ -43,12 +47,6 @@
                 </div>
                 <span class="flag">{{ flag|safe }}</span>
             </div>
-            <!-- <div class="flag-box">
-                <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
-                <div class="box rounded-input">
-                    ?
-                </div>
-            </div> -->
         </div>
 
         <div class="row">

@@ -79,12 +79,12 @@ class TestGuest(unittest.TestCase):
         mock_get_flags_dict.assert_called_once()
 
     @patch.dict(os.environ, {'VOC_GUEST_NAME': 'some_name'})
-    @patch('src.api.guest.save_test_in_redis')
+    @patch('src.api.guest.save_interro_in_redis')
     @patch('src.api.guest.load_test')
     def test_save_interro_settings_guest(
             self,
             mock_load_test,
-            mock_save_test_in_redis
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         language = {
@@ -92,7 +92,7 @@ class TestGuest(unittest.TestCase):
         }
         token = 'mock_token'
         mock_load_test.return_value = 'mock_loader', 'mock_test'
-        mock_save_test_in_redis.return_value = True
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.save_interro_settings_guest(language, token)
         # ----- ASSERT
@@ -111,13 +111,13 @@ class TestGuest(unittest.TestCase):
             test_type='version',
             test_length=10
         )
-        mock_save_test_in_redis.assert_called_once_with('mock_test', token)
+        mock_save_interro_in_redis.assert_called_once_with('mock_test', token)
 
     @patch('src.api.guest.get_flags_dict')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_load_interro_question_guest(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_get_flags_dict
         ):
         # ----- ARRANGE
@@ -139,7 +139,7 @@ class TestGuest(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_get_flags_dict.return_value = {
             'en': '1',
             'fr': '2',
@@ -170,13 +170,13 @@ class TestGuest(unittest.TestCase):
         }
         self.assertEqual(result, expected_result)
         mock_get_flags_dict.assert_called_once()
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
 
     @patch('src.api.guest.get_flags_dict')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_load_interro_answer_guest(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_get_flags_dict
         ):
         # ----- ARRANGE
@@ -194,7 +194,7 @@ class TestGuest(unittest.TestCase):
             },
             index=[0, 1, 2]
         )
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_get_flags_dict.return_value = {
             'fr': '2',
             'es': '3',
@@ -224,17 +224,17 @@ class TestGuest(unittest.TestCase):
             'flag': 'flag_id'
         }
         self.assertEqual(result, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         mock_get_flags_dict.assert_called_once()
 
-    @patch('src.api.guest.save_test_in_redis')
+    @patch('src.api.guest.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_get_user_response_guest_yes(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_update_voc_df,
-            mock_save_test_in_redis
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         data = {
@@ -244,9 +244,9 @@ class TestGuest(unittest.TestCase):
             'french': 'Salut'
         }
         token = 'mock_token'
-        mock_load_test_from_redis.return_value = MagicMock()
+        mock_load_interro_from_redis.return_value = MagicMock()
         mock_update_voc_df.return_value = True
-        mock_save_test_in_redis.return_value = True
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.get_user_response_guest(data, token)
         # ----- ASSERT
@@ -260,23 +260,23 @@ class TestGuest(unittest.TestCase):
             'token': 'mock_token'
         }
         self.assertEqual(content_dict, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         # mock_update_voc_df.assert_called_once_with(True)
-        mock_save_test_in_redis.assert_called_once_with(
-            mock_load_test_from_redis.return_value,
+        mock_save_interro_in_redis.assert_called_once_with(
+            mock_load_interro_from_redis.return_value,
             token
         )
 
-    @patch('src.api.guest.save_test_in_redis')
+    @patch('src.api.guest.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_faults_df')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_get_user_response_guest_no(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_update_voc_df,
             mock_update_faults_df,
-            mock_save_test_in_redis
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         data = {
@@ -287,10 +287,10 @@ class TestGuest(unittest.TestCase):
         }
         token = 'mock_token'
         mock_test = MagicMock()
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_update_voc_df.return_value = True
         mock_update_faults_df.return_value = True
-        mock_save_test_in_redis.return_value = True
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.get_user_response_guest(data, token)
         # ----- ASSERT
@@ -304,24 +304,24 @@ class TestGuest(unittest.TestCase):
             'token': 'mock_token'
         }
         self.assertEqual(content_dict, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         # mock_update_voc_df.assert_called_once_with(False)
         # mock_update_faults_df.assert_called_once_with(
         #     False,
         #     'Hi',
         #     'Salut'
         # )
-        mock_save_test_in_redis.assert_called_once_with(
-            mock_load_test_from_redis.return_value,
+        mock_save_interro_in_redis.assert_called_once_with(
+            mock_load_interro_from_redis.return_value,
             token
         )
 
-    @patch('src.api.guest.save_test_in_redis')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.save_interro_in_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_propose_rattraps_guest(
             self,
-            mock_load_test_from_redis,
-            mock_save_test_in_redis
+            mock_load_interro_from_redis,
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         request = 'mock_request'
@@ -339,8 +339,8 @@ class TestGuest(unittest.TestCase):
             index=[0, 1, 2]
         )
         mock_test.interro_df = pd.DataFrame()
-        mock_load_test_from_redis.return_value = mock_test
-        mock_save_test_in_redis.return_value = True
+        mock_load_interro_from_redis.return_value = mock_test
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.propose_rattraps_guest(
             request,
@@ -364,8 +364,8 @@ class TestGuest(unittest.TestCase):
             'language': language
         }
         self.assertEqual(result, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
-        mock_save_test_in_redis.assert_called_once_with(
+        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_save_interro_in_redis.assert_called_once_with(
             mock_test,
             token
         )

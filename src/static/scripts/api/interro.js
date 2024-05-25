@@ -90,7 +90,7 @@ function sendUserAnswer(token, interroCategory, answer, count, numWords, score, 
             if (count < total) {
                 nextGuess(token, interroCategory, total, count, score);
             } else {
-                endInterro(token, interroCategory, total, count, score);
+                endInterro(token, interroCategory, total, score);
             }
         } else {
             console.error("Error with user answer acquisition");
@@ -106,20 +106,8 @@ function nextGuess(token, interroCategory, numWords, count, score) {
     var total = parseInt(numWords, 10);
     var count = parseInt(count, 10);
     var score = parseInt(score, 10);
-    console.log("Total:", total, "Count:", count);
+    // console.log("Total:", total, "Count:", count);
     window.location.href = `/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
-}
-
-
-function endInterro(token, interroCategory, numWords, count, score) {
-    var total = parseInt(numWords, 10);
-    var count = parseInt(count, 10);
-    var score = parseInt(score, 10);
-    if (score === total) {
-        window.location.href = `/interro/interro-end?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
-    } else {
-        window.location.href = `/interro/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
-    }
 }
 
 
@@ -152,4 +140,15 @@ function launchRattraps(token, interroCategory, newTotal, newCount, newScore) {
     .catch(error => {
         console.error("Error sending user response:", error);
     })
+}
+
+
+function endInterro(token, interroCategory, numWords, score) {
+    var total = parseInt(numWords, 10);
+    var score = parseInt(score, 10);
+    if (score === total) {
+        window.location.href = `/interro/interro-end?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
+    } else {
+        window.location.href = `/interro/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
+    }
 }

@@ -1,21 +1,29 @@
+"""
+    Creation date:
+        How fast is an African swallow?
+    Creator:
+        B. Delorme
+    Main purpose:
+        Hosts the functions of guest interro API.
+"""
 
 import json
 import os
 import sys
 
-import pandas as pd
+from fastapi.responses import JSONResponse
 from loguru import logger
 from typing import Dict
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
+if REPO_DIR not in sys.path:
+    sys.path.append(REPO_DIR)
 
-from fastapi.responses import JSONResponse
-from src.api.interro import load_test
+from src import interro as core_interro
+from src.api.interro import load_test, get_interro_category, turn_df_into_dict
 from src.data.redis_interface import save_interro_in_redis, load_interro_from_redis
-
-WORDS = 10
+from src.views import api as api_view
 
 
 def get_flags_dict() -> Dict:
@@ -35,10 +43,10 @@ def get_flags_dict() -> Dict:
 
 def load_guest_settings(request, token):
     flags_dict = get_flags_dict()
-    response_dict = flags_dict.copy()
-    response_dict['request'] = request
-    response_dict['token'] = token
-    return response_dict
+    settings_dict = flags_dict.copy()
+    settings_dict['request'] = request
+    settings_dict['token'] = token
+    return settings_dict
 
 
 def save_interro_settings_guest(language, token):
@@ -51,14 +59,16 @@ def save_interro_settings_guest(language, token):
         user_name=os.environ['VOC_GUEST_NAME'],
         db_name=language,
         test_type=test_type,
-        test_length=WORDS
+        test_length=10
     )
-    save_interro_in_redis(test, token)
+    interro_category = get_interro_category(test)
+    save_interro_in_redis(test, token, interro_category)
     json_response = JSONResponse(
         content=
         {
             'message': "Guest user settings stored successfully",
-            'token': token
+            'token': token,
+            "interro_category": interro_category
         }
     )
     return json_response
@@ -66,7 +76,8 @@ def save_interro_settings_guest(language, token):
 
 def load_interro_question_guest(
         request,
-        words,
+        interro_category,
+        total,
         count,
         score,
         language,
@@ -75,10 +86,10 @@ def load_interro_question_guest(
     """
     Load the interro question for the guest user.
     """
+    total = int(total)
     count = int(count)
     score = int(score)
-    progress_percent = int(count / int(words) * 100)
-    interro_category = "un_truc_vraiment_pas_beau_du_tout_mais_alors_pas_du_tout"
+    progress_percent = int(count / int(total) * 100)
     interro = load_interro_from_redis(token, interro_category)
     index = interro.interro_df.index[count]
     english = interro.interro_df.loc[index][0]
@@ -87,12 +98,13 @@ def load_interro_question_guest(
     flags_dict = get_flags_dict()
     response_dict = {
         'request': request,
-        'numWords': words,
+        'token': token,
+        "interroCategory": interro_category,
+        'numWords': total,
         'count': count,
         'score': score,
         'progressPercent': progress_percent,
         'content_box1': english,
-        'token': token,
         'language': language,
         'flag': flags_dict[language]
     }
@@ -101,31 +113,34 @@ def load_interro_question_guest(
 
 def load_interro_answer_guest(
         request,
-        words,
+        interro_category,
+        total,
         count,
         score,
         token,
         language
     ):
+    total = int(total)
     count = int(count)
     score = int(score)
-    test = load_interro_from_redis(token)
-    index = test.interro_df.index[count - 1]
-    english = test.interro_df.loc[index][0]
-    french = test.interro_df.loc[index][1]
+    progress_percent = int(count / total * 100)
+    interro = load_interro_from_redis(token, interro_category)
+    index = interro.interro_df.index[count - 1]
+    english = interro.interro_df.loc[index][0]
     english = english.replace("'", "\'")
+    french = interro.interro_df.loc[index][1]
     french = french.replace("'", "\'")
-    progress_percent = int(count / int(words) * 100)
     flags_dict = get_flags_dict()
     response_dict = {
         "request": request,
-        "numWords": words,
+        'token': token,
+        "interroCategory": interro_category,
+        "numWords": total,
         "count": count,
         "score": score,
         "progressPercent": progress_percent,
         "content_box1": english,
         "content_box2": french,
-        'token': token,
         'language': language,
         'flag': flags_dict[language]
     }
@@ -136,28 +151,32 @@ def get_user_response_guest(
         data,
         token
     ):
-    test = load_interro_from_redis(token)
+    interro_category = data.get('interroCategory')
+    interro = load_interro_from_redis(token, interro_category)
     score = data.get('score')
+    # logger.debug(f"Data: {data}")
+    total = data.get('total')
     score = int(score)
+    total = int(total)
     if data["answer"] == 'Yes':
         score += 1
-        test.update_voc_df(True)
     elif data["answer"] == 'No':
-        test.update_voc_df(False)
-        test.update_faults_df(
+        interro.update_faults_df(
             False,
             [
                 data.get('english'),
                 data.get('french')
             ]
         )
-    save_interro_in_redis(test, token)
+    save_interro_in_redis(interro, token, interro_category)
     json_response = JSONResponse(
         content=
         {
-            'score': score,
             'message': "User response stored successfully.",
-            'token': token
+            'token': token,
+            "interroCategory": interro_category,
+            'score': score,
+            'total': total
         }
     )
     return json_response
@@ -165,46 +184,85 @@ def get_user_response_guest(
 
 def propose_rattraps_guest(
         request,
-        words,
-        count,
+        interro_category,
+        total,
         score,
         token,
         language
     ):
-    test = load_interro_from_redis(token)
-    new_count = 0
-    new_score = 0
-    new_words = test.faults_df.shape[0]
-    test.interro_df = test.faults_df
-    test.interro_df = test.interro_df.sample(frac=1)
-    test.interro_df = test.interro_df.reset_index(drop=True)
-    test.faults_df = pd.DataFrame(columns=[['Foreign', 'Native']])
-    save_interro_in_redis(test, token)
+    """
+    Propose the rattraps.
+    """
+    interro = load_interro_from_redis(token, interro_category)
+    new_total = interro.faults_df.shape[0]
     response_dict = {
         'request': request,
-        'score': score,
-        'numWords': words,
-        'count': count,
-        'newScore': new_score,
-        'newWords': new_words,
-        'newCount': new_count,
         'token': token,
+        "interroCategory": interro_category,
+        "newWords": new_total,
+        "newScore": 0,
+        "newCount": 0,
+        "score": score,
+        "numWords": total,
         'language': language
     }
     return response_dict
 
 
+def load_rattraps(
+        token,
+        data
+    ):
+    """
+    Load the rattraps!
+    """
+    interro_category = data.get('interroCategory')
+    interro = load_interro_from_redis(token, interro_category)
+    if interro_category == 'rattrap':
+        rattraps_cnt = interro.rattraps + 1
+    else:
+        rattraps_cnt = 0
+    guesser = api_view.FastapiGuesser()
+    interro.faults_df = interro.faults_df.sample(frac=1)
+    interro.faults_df = interro.faults_df.reset_index(drop=True)
+    rattrap = core_interro.Rattrap(
+        interro.faults_df,
+        rattraps_cnt,
+        guesser
+    )
+    new_interro_category = get_interro_category(rattrap)
+    save_interro_in_redis(rattrap, token, new_interro_category)
+    count = int(data.get('count'))
+    total = int(data.get('total'))
+    score = int(data.get('score'))
+    return JSONResponse(
+        content=
+        {
+            'message': "Guest rattraps created successfully",
+            'token': token,
+            'interroCategory': new_interro_category,
+            'total': total,
+            'score': score,
+            'count': count
+        }
+    )
+
+
 def end_interro_guest(
         request,
+        total,
         score,
-        words,
         token
     ):
     logger.info('')
+    premier_test = load_interro_from_redis(token, 'test')
+    headers, rows = turn_df_into_dict(premier_test.interro_df)
     response_dict = {
         'request': request,
+        'token': token,
+        "headers": headers,
+        "rows": rows,
         'score': score,
-        'numWords': words,
-        'token': token
+        'numWords': total
     }
     return response_dict

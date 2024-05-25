@@ -8,8 +8,8 @@
 import os
 import sys
 
-from loguru import logger
-from fastapi import Query, Request, Depends, Body
+# from loguru import logger
+from fastapi import Body, Depends, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates

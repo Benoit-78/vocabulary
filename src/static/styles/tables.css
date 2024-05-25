@@ -8,15 +8,24 @@
 }
 
 #table-container {
-    animation: reveal 0.25s ease-out;
-    position: relative;
+    animation: reveal 0.5s ease-out;
     overflow: hidden; /* Ensure content is hidden until revealed */
+    position: relative;
 }
 
 .data-table {
-    width: 100%;
+    border-radius: 10px;
     border-collapse: collapse;
-    background-color: rgba(128, 66, 0, 0.6);
+    width: 100%;
+    background-color: rgba(183, 98, 6, 0.6);
+}
+
+.data-table tr {
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    width: 100%;
+    text-align: center;
 }
 
  /* Inner lines */
@@ -24,9 +33,13 @@
     border: 1px solid orange;
     color: white;
     padding: 8px;
+    text-align: center;
+    width: 50%;
+    box-sizing: border-box;
 }
 
 .data-table tr:first-child td {
+    border-bottom: none;
     border-top: none;
 }
 
@@ -40,4 +53,24 @@
 
 .data-table tr:last-child td {
     border-bottom: none;
+    border-top: none;
+}
+
+/* ------------------------- */
+.data-table tbody tr {
+    display: block;
+    justify-content: center;
+    margin-bottom: 5px; /* Adjust as needed for spacing */
+}
+
+.data-table tbody tr:last-child {
+    margin-bottom: 0; /* Remove margin from the last row */
+}
+
+.data-table tbody {
+    display: block; /* Makes sure the margins between rows apply correctly */
+}
+
+.data-table tbody tr td {
+    flex: 1; /* Make each cell take up equal space */
 }

@@ -4,7 +4,7 @@
     Creator:
         B. Delorme
     Main purpose:
-        Hosts the functions of interro router.
+        Hosts the functions of interro API.
 """
 
 import os
@@ -25,7 +25,8 @@ from src.views import api as api_view
 from src.api import authentication as auth_api
 from src.api import database as db_api
 from src.data import database_interface
-from src.data import redis_interface
+from src.data.redis_interface import load_interro_from_redis, save_interro_in_redis
+from src.data.redis_interface import load_loader_from_redis, save_loader_in_redis
 from src.interro import Updater
 
 
@@ -81,13 +82,13 @@ def get_interro_settings(
     """
     databases = db_api.get_user_databases(token)
     db_message = get_error_messages(error_message)
-    request_dict = {
+    settings_dict = {
         'request': request,
         'token': token,
         'databases': databases,
         'emptyTableErrorMessage': db_message,
     }
-    return request_dict
+    return settings_dict
 
 
 def save_interro_settings(
@@ -119,9 +120,9 @@ def save_interro_settings(
             }
         )
     interro_category = get_interro_category(premier_test)
-    redis_interface.save_interro_in_redis(premier_test, token, interro_category)
-    redis_interface.save_loader_in_redis(loader, token)
-    return JSONResponse(
+    save_interro_in_redis(premier_test, token, interro_category)
+    save_loader_in_redis(loader, token)
+    json_response = JSONResponse(
         content=
         {
             'message': "Settings saved successfully",
@@ -130,6 +131,7 @@ def save_interro_settings(
             "interro_category": interro_category
         }
     )
+    return json_response
 
 
 def get_interro_question(
@@ -146,7 +148,7 @@ def get_interro_question(
     user_name = auth_api.get_user_name_from_token(token)
     count = int(count)
     score = int(score)
-    interro = redis_interface.load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(token, interro_category)
     progress_percent = int(count / int(total) * 100)
     index = interro.interro_df.index[count]
     english = interro.interro_df.loc[index][0]
@@ -177,9 +179,11 @@ def load_interro_answer(
     """
     Load the interro answer.
     """
+    total = int(total)
     count = int(count)
-    interro = redis_interface.load_interro_from_redis(token, interro_category)
-    progress_percent = int(count / int(total) * 100)
+    score = int(score)
+    progress_percent = int(count / total * 100)
+    interro = load_interro_from_redis(token, interro_category)
     index = interro.interro_df.index[count - 1]
     english = interro.interro_df.loc[index][0]
     english = english.replace("'", "\'")
@@ -207,7 +211,7 @@ def get_user_answer(
     Get the user response.
     """
     interro_category = data.get('interroCategory')
-    interro = redis_interface.load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(token, interro_category)
     score = data.get('score')
     score = int(score)
     if data["answer"] == 'Yes':
@@ -224,13 +228,14 @@ def get_user_answer(
         )
     if interro_category == 'test':
         interro.update_voc_df(update)
-    redis_interface.save_interro_in_redis(interro, token, interro_category)
+    save_interro_in_redis(interro, token, interro_category)
     json_response = JSONResponse(
         content=
         {
-            "score": score,
             "message": "User response stored successfully",
+            'token': token,
             "interroCategory": interro_category,
+            "score": score,
         }
     )
     return json_response
@@ -246,12 +251,12 @@ def propose_rattraps(
     """
     Propose the rattraps.
     """
-    interro = redis_interface.load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(token, interro_category)
     new_total = interro.faults_df.shape[0]
     # Enregistrer les résultats
     if interro_category == 'test':
         interro.compute_success_rate()
-        loader = redis_interface.load_loader_from_redis(token)
+        loader = load_loader_from_redis(token)
         updater = Updater(loader, interro)
         updater.update_data()
     # Réinitialisation
@@ -276,7 +281,7 @@ def load_rattraps(
     Load the rattraps!
     """
     interro_category = data.get('interroCategory')
-    interro = redis_interface.load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(token, interro_category)
     if interro_category == 'rattrap':
         rattraps_cnt = interro.rattraps + 1
     else:
@@ -290,15 +295,14 @@ def load_rattraps(
         guesser
     )
     new_interro_category = get_interro_category(rattrap)
-    redis_interface.save_interro_in_redis(rattrap, token, new_interro_category)
-    message = "Rattraps created successfully"
+    save_interro_in_redis(rattrap, token, new_interro_category)
     count = int(data.get('count'))
     total = int(data.get('total'))
     score = int(data.get('score'))
     return JSONResponse(
         content=
         {
-            'message': message,
+            'message': "Rattraps created successfully",
             'token': token,
             'interroCategory': new_interro_category,
             'total': total,
@@ -321,20 +325,20 @@ def end_interro(
     logger.info('')
     # Enregistrer les résultats
     if interro_category == 'test':
-        interro = redis_interface.load_interro_from_redis(token, interro_category)
+        interro = load_interro_from_redis(token, interro_category)
         interro.compute_success_rate()
-        loader = redis_interface.load_loader_from_redis(token)
+        loader = load_loader_from_redis(token)
         updater = Updater(loader, interro)
         updater.update_data()
-    premier_test = redis_interface.load_interro_from_redis(token, 'test')
+    premier_test = load_interro_from_redis(token, 'test')
     headers, rows = turn_df_into_dict(premier_test.interro_df)
     response_dict = {
         "request": request,
+        "token": token,
         "headers": headers,
         "rows": rows,
         "score": score,
         "numWords": total,
-        "token": token
     }
     return response_dict
 

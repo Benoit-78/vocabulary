@@ -11,18 +11,17 @@
 import os
 import sys
 
-# import base64
-import pandas as pd
-from fastapi import Request, Depends, Query
+# from loguru import logger
+from fastapi import Body, Depends, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
+if REPO_DIR not in sys.path:
+    sys.path.append(REPO_DIR)
 
-from src.data import users
 from src.api import authentication as auth_api
 from src.api import guest as guest_api
 
@@ -57,12 +56,13 @@ async def save_interro_settings_guest(
     return json_response
 
 
-@guest_router.get("/interro-question/{words}/{count}/{score}", response_class=HTMLResponse)
+@guest_router.get("/interro-question", response_class=HTMLResponse)
 def load_interro_question_guest(
         request: Request,
-        words: int,
-        count=None,
-        score=None,
+        interro_category: str=Query(None, alias="interroCategory"),
+        total: str=Query(None, alias="total"),
+        count: str=Query(None, alias="count"),
+        score: str=Query(None, alias="score"),
         token: str = Depends(auth_api.check_token),
         language: str = Query('', alias='language')
     ):
@@ -71,7 +71,8 @@ def load_interro_question_guest(
     """
     response_dict = guest_api.load_interro_question_guest(
         request,
-        words,
+        interro_category,
+        total,
         count,
         score,
         language,
@@ -83,12 +84,13 @@ def load_interro_question_guest(
     )
 
 
-@guest_router.get("/interro-answer/{words}/{count}/{score}", response_class=HTMLResponse)
+@guest_router.get("/interro-answer", response_class=HTMLResponse)
 def load_interro_answer_guest(
         request: Request,
-        words: int,
-        count: int,
-        score: int,
+        interro_category: str=Query(None, alias="interroCategory"),
+        total: str=Query(None, alias="total"),
+        count: str=Query(None, alias="count"),
+        score: str=Query(None, alias="score"),
         token: str = Depends(auth_api.check_token),
         language: str = Query('', alias='language')
     ):
@@ -98,7 +100,8 @@ def load_interro_answer_guest(
     """
     response_dict = guest_api.load_interro_answer_guest(
         request,
-        words,
+        interro_category,
+        total,
         count,
         score,
         token,
@@ -112,7 +115,7 @@ def load_interro_answer_guest(
 
 @guest_router.post("/user-answer")
 async def get_user_response_guest(
-        data: dict,
+        data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
     ):
     """
@@ -122,12 +125,12 @@ async def get_user_response_guest(
     return json_response
 
 
-@guest_router.get("/propose-rattraps/{words}/{count}/{score}", response_class=HTMLResponse)
+@guest_router.get("/propose-rattraps", response_class=HTMLResponse)
 def propose_rattraps_guest(
         request: Request,
-        words: int,
-        count: int,
-        score: int,
+        interro_category: str=Query(None, alias="interroCategory"),
+        total: str = Query(None, alias="total"),
+        score: str = Query(None, alias="score"),
         token: str = Depends(auth_api.check_token),
         language: str = Query('', alias='language')
     ):
@@ -136,8 +139,8 @@ def propose_rattraps_guest(
     """
     response_dict = guest_api.propose_rattraps_guest(
         request,
-        words,
-        count,
+        interro_category,
+        total,
         score,
         token,
         language
@@ -148,11 +151,23 @@ def propose_rattraps_guest(
     )
 
 
-@guest_router.get("/interro-end/{words}/{score}", response_class=HTMLResponse)
+@guest_router.post("/launch-guest-rattraps", response_class=HTMLResponse)
+async def launch_rattraps(
+        data: dict = Body(...),
+        token: str = Depends(auth_api.check_token)
+    ):
+    """
+    Load the rattraps page.
+    """
+    json_response = guest_api.load_rattraps(token, data)
+    return json_response
+
+
+@guest_router.get("/interro-end/", response_class=HTMLResponse)
 def end_interro_guest(
         request: Request,
-        words: int,
-        score: int,
+        total: str=Query(None, alias="total"),
+        score: str=Query(None, alias="score"),
         token: str = Depends(auth_api.check_token)
     ):
     """
@@ -161,8 +176,8 @@ def end_interro_guest(
     """
     response_dict = guest_api.end_interro_guest(
         request,
+        total,
         score,
-        words,
         token
     )
     return templates.TemplateResponse(

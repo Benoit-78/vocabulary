@@ -1,4 +1,4 @@
-export { sendGuestSettings, showTranslation, sendUserAnswer, nextGuess };
+export { sendGuestSettings, showTranslation, sendUserAnswer, nextGuess, launchRattraps };
 
 
 function sendGuestSettings(token, language) {
@@ -13,13 +13,14 @@ function sendGuestSettings(token, language) {
         }
     )
     .then(response => {
-        if (!response.ok) { // Check if the response status is NOK (outside the range 200-299)
+        // Check if the response status is NOK (outside the range 200-299)
+        if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
-        startTest(token, language.toLowerCase())
+        startTest(token, language.toLowerCase(), data.interro_category)
     })
     .catch(error => {
         console.error("Error sending guest settings:", error);
@@ -27,36 +28,41 @@ function sendGuestSettings(token, language) {
 }
 
 
-function startTest(token, language) {
-    window.location.href = `/guest/interro-question/10/0/0?token=${token}&language=${language.toLowerCase()}`;
+function startTest(token, language, interroCategory) {
+    var total = 10;
+    var count = 0;
+    var score = 0;
+    window.location.href = `/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
 }
 
 
-function showTranslation(numWords, count, score, token, language) {
-    numWords = parseInt(numWords, 10);
-    count = parseInt(count, 10);
-    score = parseInt(score, 10);
-    if (!isNaN(numWords)) {
-        window.location.href = `/guest/interro-answer/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
+function showTranslation(token, interroCategory, numWords, count, score, language) {
+    var total = parseInt(numWords, 10);
+    var count = parseInt(count, 10);
+    var score = parseInt(score, 10);
+    if (!isNaN(total)) {
+        window.location.href = `/guest/interro-answer?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
     } else {
-        console.error("Invalid numWords:", numWords);
+        console.error("Invalid numWords:", total);
     }
 }
 
 
-function sendUserAnswer(answer, numWords, count, score, content_box1, content_box2, token, language) {
-    numWords = parseInt(numWords, 10);
-    count = parseInt(count, 10);
-    score = parseInt(score, 10);
+function sendUserAnswer(token, interroCategory, answer, count, numWords, score, content_box1, content_box2, language) {
+    var total = parseInt(numWords, 10);
+    var count = parseInt(count, 10);
+    var score = parseInt(score, 10);
+    var language = String(language);
     fetch(
         `/guest/user-answer?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
+                interroCategory,
                 answer: answer,
                 count: count,
-                number_of_questions: numWords,
+                total: total,
                 score: score,
                 english: content_box1,
                 french: content_box2
@@ -65,12 +71,13 @@ function sendUserAnswer(answer, numWords, count, score, content_box1, content_bo
     )
     .then(answer => answer.json())
     .then(data => {
-        // Extract the updated score from the JSON response
         const score = data.score;
-        if (count < numWords) {
-            nextGuess(numWords, count, score, token, language.toLowerCase());
+        const total = data.total;
+        // console.log("Score:", score, "Total:", total, "Count:", count);
+        if (count < total) {
+            nextGuess(token, interroCategory, total, count, score, language.toLowerCase());
         } else {
-            endInterro(numWords, count, score, token, language.toLowerCase());
+            endInterro(token, interroCategory, total, score, language.toLowerCase());
         }
     })
     .catch(error => {
@@ -79,21 +86,57 @@ function sendUserAnswer(answer, numWords, count, score, content_box1, content_bo
 }
 
 
-function nextGuess(numWords, count, score, token, language) {
-    numWords = parseInt(numWords, 10);
-    count = parseInt(count, 10);
-    score = parseInt(score, 10);
-    window.location.href = `/guest/interro-question/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
+function nextGuess(token, interroCategory, numWords, count, score, language) {
+    var total = parseInt(numWords, 10);
+    var count = parseInt(count, 10);
+    var score = parseInt(score, 10);
+    window.location.href = `/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
 }
 
 
-function endInterro(numWords, count, score, token, language) {
-    numWords = parseInt(numWords, 10);
-    count = parseInt(count, 10);
-    score = parseInt(score, 10);
-    if (score === numWords) {
-        window.location.href = `/guest/interro-end/${numWords}/${score}?token=${token}`;
+function launchRattraps(token, interroCategory, newWords, newCount, newScore, language) {
+    var total = parseInt(newWords, 10);
+    var count = parseInt(newCount, 10);
+    var score = parseInt(newScore, 10);
+    console.log("Total:", total, "Count:", count, "Score:", score);
+    fetch(
+        `/guest/launch-guest-rattraps?token=${token}`,
+        {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                interroCategory: interroCategory,
+                count: count,
+                total: total,
+                score: score,
+            }),
+        }
+    )
+    .then(answer => answer.json())
+    .then(data => {
+        if (data && data.message === "Guest rattraps created successfully") {
+            const interroCategory = data.interroCategory;
+            const total = data.total;
+            const count = data.count;
+            const score = data.score;
+            // console.log("Total:", total, "Count:", count, "Score:", score);
+            window.location.href = `/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language}`;
+        } else {
+            console.error("Error with guest rattraps creation.");
+        }
+    })
+    .catch(error => {
+        console.error("Error sending guest response:", error);
+    })
+}
+
+
+function endInterro(token, interroCategory, numWords, score, language) {
+    var total = parseInt(numWords, 10);
+    var score = parseInt(score, 10);
+    if (score === total) {
+        window.location.href = `/guest/interro-end?token=${token}&total=${total}&score=${score}`;
     } else {
-        window.location.href = `/guest/propose-rattraps/${numWords}/${count}/${score}?token=${token}&language=${language.toLowerCase()}`;
+        window.location.href = `/guest/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}&language=${language.toLowerCase()}`;
     }
 }

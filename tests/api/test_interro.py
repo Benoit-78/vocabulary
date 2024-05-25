@@ -230,14 +230,14 @@ class TestInterro(unittest.TestCase):
         mock_get_error_messages.assert_called_once_with(error_message)
 
     @patch('src.data.redis_interface.save_loader_in_redis')
-    @patch('src.data.redis_interface.save_test_in_redis')
+    @patch('src.data.redis_interface.save_interro_in_redis')
     @patch('src.api.interro.load_test')
     @patch('src.api.authentication.get_user_name_from_token')
     def test_save_interro_settings(
             self,
             mock_get_user_name_from_token,
             mock_load_test,
-            mock_save_test_in_redis,
+            mock_save_interro_in_redis,
             mock_save_loader_in_redis
         ):
         """
@@ -254,7 +254,7 @@ class TestInterro(unittest.TestCase):
         mock_test = MagicMock()
         mock_test.words = 1
         mock_load_test.return_value = ('mock_loader', mock_test)
-        mock_save_test_in_redis.return_value = True
+        mock_save_interro_in_redis.return_value = True
         mock_save_loader_in_redis.return_value = True
         # ----- ACT
         result = interro_api.save_interro_settings(
@@ -303,12 +303,12 @@ class TestInterro(unittest.TestCase):
         assert content_dict['message'] == "Empty table"
         assert content_dict['token'] == token
 
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     @patch('src.api.authentication.get_user_name_from_token')
     def test_get_interro_question(
             self,
             mock_get_user_name_from_token,
-            mock_load_test_from_redis
+            mock_load_interro_from_redis
         ):
         # ----- ARRANGE
         request = 'mock_request'
@@ -329,7 +329,7 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         # ----- ACT
         result = interro_api.get_interro_question(
             request,
@@ -353,10 +353,10 @@ class TestInterro(unittest.TestCase):
                 "content_box1": 'Hello'
             }
         )
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
 
-    @patch('src.data.redis_interface.load_test_from_redis')
-    def test_load_interro_answer(self, mock_load_test_from_redis):
+    @patch('src.data.redis_interface.load_interro_from_redis')
+    def test_load_interro_answer(self, mock_load_interro_from_redis):
         # ----- ARRANGE
         request = 'mock_request'
         total = 10
@@ -376,7 +376,7 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         # ----- ACT
         result = interro_api.load_interro_answer(
             request,
@@ -400,16 +400,16 @@ class TestInterro(unittest.TestCase):
                 "content_box2": 'Salut'
             }
         )
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
 
-    @patch('src.data.redis_interface.save_test_in_redis')
+    @patch('src.data.redis_interface.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_get_user_response_test_yes(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_update_voc_df,
-            mock_save_test_in_redis
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         data = {
@@ -428,9 +428,9 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_update_voc_df.return_value = True
-        mock_save_test_in_redis.return_value = True
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = interro_api.get_user_response(
             data,
@@ -448,20 +448,20 @@ class TestInterro(unittest.TestCase):
                 'message': 'User response stored successfully',
             }
         )
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         mock_update_voc_df.assert_called_once_with(True)
-        mock_save_test_in_redis.assert_called_once_with(mock_test, token)
+        mock_save_interro_in_redis.assert_called_once_with(mock_test, token)
 
-    @patch('src.data.redis_interface.save_test_in_redis')
+    @patch('src.data.redis_interface.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_faults_df')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_get_user_response_test_no(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_update_voc_df,
             mock_update_faults_df,
-            mock_save_test_in_redis
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         data = {
@@ -482,10 +482,10 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_update_voc_df.return_value = True
         mock_update_faults_df.return_value = True
-        mock_save_test_in_redis.return_value = True
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = interro_api.get_user_response(
             data,
@@ -503,19 +503,19 @@ class TestInterro(unittest.TestCase):
                 'message': 'User response stored successfully',
             }
         )
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         mock_update_faults_df.assert_called_once_with(False, ['Hello', 'Bonjour'])
         mock_update_voc_df.assert_called_once_with(False)
-        mock_save_test_in_redis.assert_called_once_with(mock_test, token)
+        mock_save_interro_in_redis.assert_called_once_with(mock_test, token)
 
-    @patch('src.data.redis_interface.save_test_in_redis')
+    @patch('src.data.redis_interface.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_get_user_response_rattraps_yes(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_update_voc_df,
-            mock_save_test_in_redis
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         data = {
@@ -536,9 +536,9 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_rattrap.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_rattrap
+        mock_load_interro_from_redis.return_value = mock_rattrap
         mock_update_voc_df.return_value = True
-        mock_save_test_in_redis.return_value = True
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = interro_api.get_user_response(
             data,
@@ -556,18 +556,18 @@ class TestInterro(unittest.TestCase):
                 'message': 'User response stored successfully',
             }
         )
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         assert not mock_update_voc_df.called
-        mock_save_test_in_redis.assert_called_once_with(mock_rattrap, token)
+        mock_save_interro_in_redis.assert_called_once_with(mock_rattrap, token)
 
     @patch('src.interro.logger')
     @patch('src.interro.Updater.update_data')
     @patch('src.data.redis_interface.load_loader_from_redis')
     @patch('src.interro.PremierTest.compute_success_rate')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_propose_rattraps(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_compute_success_rate,
             mock_load_loader_from_redis,
             mock_update_data,
@@ -599,7 +599,7 @@ class TestInterro(unittest.TestCase):
         )
         mock_test.interro_df = mock_interro_df
         mock_test.faults_df = mock_faults_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_compute_success_rate.return_value = True
         mock_db_interface = DbManipulator(
             'mock_user_name',
@@ -628,17 +628,17 @@ class TestInterro(unittest.TestCase):
             "numWords": total
         }
         self.assertEqual(result, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         mock_compute_success_rate.assert_called_once()
         mock_load_loader_from_redis.assert_called_once_with(token)
         mock_update_data.assert_called_once()
         # mock_logger.info.assert_called_once_with("User data updated.")
 
     @patch('src.interro.PremierTest.compute_success_rate')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_propose_rattraps_rattraps(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_compute_success_rate
         ):
         """
@@ -660,7 +660,7 @@ class TestInterro(unittest.TestCase):
             rattraps=2,
             guesser=api_view.FastapiGuesser(),
         )
-        mock_load_test_from_redis.return_value = mock_rattrap
+        mock_load_interro_from_redis.return_value = mock_rattrap
         mock_compute_success_rate.return_value = True
         # ----- ACT
         result = interro_api.propose_rattraps(
@@ -681,15 +681,15 @@ class TestInterro(unittest.TestCase):
             "numWords": total
         }
         self.assertEqual(result, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         assert mock_compute_success_rate.called is False
 
-    @patch('src.data.redis_interface.save_test_in_redis')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.save_interro_in_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_load_rattraps(
             self,
-            mock_load_test_from_redis,
-            mock_save_test_in_redis,
+            mock_load_interro_from_redis,
+            mock_save_interro_in_redis,
         ):
         """
         Should load the rattraps.
@@ -712,8 +712,8 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
-        mock_save_test_in_redis.return_value = True
+        mock_load_interro_from_redis.return_value = mock_test
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = interro_api.load_rattraps(
             token,
@@ -734,12 +734,12 @@ class TestInterro(unittest.TestCase):
         self.assertEqual(actual_dict, expected_dict)
 
 
-    @patch('src.data.redis_interface.save_test_in_redis')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.save_interro_in_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_load_rattraps_rattraps(
             self,
-            mock_load_test_from_redis,
-            mock_save_test_in_redis,
+            mock_load_interro_from_redis,
+            mock_save_interro_in_redis,
         ):
         """
         Should load the rattraps.
@@ -762,8 +762,8 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.faults_df_ = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
-        mock_save_test_in_redis.return_value = True
+        mock_load_interro_from_redis.return_value = mock_test
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = interro_api.load_rattraps(
             token,
@@ -786,10 +786,10 @@ class TestInterro(unittest.TestCase):
     @patch('src.interro.logger')
     @patch('src.interro.Updater.update_data')
     @patch('src.data.redis_interface.load_loader_from_redis')
-    @patch('src.data.redis_interface.load_test_from_redis')
+    @patch('src.data.redis_interface.load_interro_from_redis')
     def test_end_interro(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_load_loader_from_redis,
             mock_update_data,
             mock_logger
@@ -813,7 +813,7 @@ class TestInterro(unittest.TestCase):
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_db_interface = DbManipulator(
             'mock_user_name',
             'mock_db_name',
@@ -838,7 +838,7 @@ class TestInterro(unittest.TestCase):
             "token": token
         }
         self.assertEqual(result, expected_dict)
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token)
         mock_load_loader_from_redis.assert_called_once_with(token)
         mock_update_data.assert_called_once()
         # mock_logger.info.assert_called_once_with("User data updated.")
