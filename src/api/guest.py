@@ -81,7 +81,7 @@ def load_interro_question_guest(
         count,
         score,
         language,
-        token: str
+        token: str,
     ):
     """
     Load the interro question for the guest user.
@@ -154,9 +154,8 @@ def get_user_response_guest(
     interro_category = data.get('interroCategory')
     interro = load_interro_from_redis(token, interro_category)
     score = data.get('score')
-    # logger.debug(f"Data: {data}")
-    total = data.get('total')
     score = int(score)
+    total = data.get('total')
     total = int(total)
     if data["answer"] == 'Yes':
         score += 1
@@ -187,8 +186,8 @@ def propose_rattraps_guest(
         interro_category,
         total,
         score,
+        language,
         token,
-        language
     ):
     """
     Propose the rattraps.

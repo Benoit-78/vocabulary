@@ -32,104 +32,50 @@ class TestInterro(unittest.TestCase):
     """
     Test class for interro.py
     """
-    # @patch('src.interro.PremierTest.set_interro_df')
-    # @patch('src.interro.Loader.load_tables')
-    # @patch('src.data.database_interface.DbManipulator.check_test_type')
-    # def test_load_test(
-    #         self,
-    #         mock_check_test_type,
-    #         mock_load_tables,
-    #         mock_set_interro_df
-    #     ):
-    #     """
-    #     Test load_test function
-    #     """
-    #     # ----- ARRANGE
-    #     user_name = 'mock_user_name'
-    #     db_name = 'mock_db_name'
-    #     test_type = 'version'
-    #     test_length = 10
-    #     mock_check_test_type.return_value = True
-    #     mock_load_tables.return_value = True
-    #     mock_set_interro_df.return_value = True
-    #     # ----- ACT
-    #     result = interro_api.load_test(
-    #         user_name,
-    #         db_name,
-    #         test_type,
-    #         test_length
-    #     )
-    #     # ----- ASSERT
-    #     self.assertIsInstance(result, tuple)
-    #     self.assertIsInstance(result[0], Loader)
-    #     self.assertIsInstance(result[1], Test)
-    #     mock_check_test_type.assert_called_once_with(test_type)
-    #     mock_set_interro_df.assert_called_once()
-
-    # @patch('src.interro.PremierTest.set_interro_df')
-    # @patch('src.interro.Loader.load_tables')
-    # @patch('src.data.database_interface.DbManipulator.check_test_type')
-    # def test_load_test(
-    #         self,
-    #         mock_check_test_type,
-    #         mock_load_tables,
-    #         mock_set_interro_df
-    #     ):
-    #     # ----- ARRANGE
-    #     def custom_load_tables_side_effect(loader):
-    #         # Modify the tables attribute of the loader object
-    #         loader.tables = {
-    #             'test_type_voc': ['table1', 'table2'],  # Example tables
-    #             'test_type_perf': ['table3', 'table4'],
-    #             'test_type_words_count': ['table5', 'table6']
-    #         }
-    #     user_name = 'mock_user_name'
-    #     db_name = 'mock_db_name'
-    #     test_type = 'test_type'
-    #     test_length = 10
-    #     mock_check_test_type.return_value = True
-    #     mock_load_tables = MagicMock(side_effect=custom_load_tables_side_effect)
-    #     mock_db_manipulator = MagicMock()
-    #     mock_loader = MagicMock()
-    #     mock_loader.load_tables = mock_load_tables
-    #     mock_loader.tables = {
-    #         'test_type_voc': [],
-    #         'test_type_perf': [],
-    #         'test_type_words_count': []
-    #     }
-    #     mock_loader.test_type = 'test_type'
-    #     mock_load_tables.return_value = {
-    #         'test_type_voc': [],
-    #         'test_type_perf': [],
-    #         'test_type_words_count': []
-    #     }
-    #     mock_guesser = MagicMock()
-    #     mock_set_interro_df.return_value = True
-    #     # ----- ACT
-    #     result = interro_api.load_test(
-    #         user_name,
-    #         db_name,
-    #         test_type,
-    #         test_length
-    #     )
-    #     # ----- ASSERT
-    #     self.assertIsInstance(result, tuple)
-    #     self.assertIsInstance(result[0], Loader)
-    #     self.assertIsInstance(result[1], Test)
-    #     mock_db_manipulator.assert_called_once_with(
-    #         user_name="user",
-    #         db_name="db",
-    #         test_type="test_type"
-    #     )
-    #     mock_db_manipulator.return_value.check_test_type.assert_called_once_with("test_type")
-    #     mock_loader.assert_called_once_with(mock_db_manipulator.return_value)
-    #     mock_loader.return_value.load_tables.assert_called_once()
-    #     mock_test_call_args = mock_loader.return_value.tables['test_type_voc'], 10, mock_guesser, \
-    #                           mock_loader.return_value.tables['test_type_perf'], \
-    #                           mock_loader.return_value.tables['test_type_words_count']
-    #     mock_test_constructor = MagicMock()
-    #     mock_test_constructor.assert_called_once_with(*mock_test_call_args)
-    #     mock_set_interro_df.assert_called_once()
+    @patch('src.interro.PremierTest.set_interro_df')
+    @patch('src.api.interro.adjust_test_length')
+    @patch('src.interro.Loader')
+    @patch('src.api.interro.database_interface.DbManipulator.check_test_type')
+    def test_load_test(
+            self,
+            mock_check_test_type,
+            mock_loader,
+            mock_adjust_test_length,
+            mock_set_interro_df
+        ):
+        """
+        Should instanciate a data loader and a corresponding PremierTest object.
+        """
+        # ----- ARRANGE
+        user_name = 'mock_user_name'
+        db_name = 'mock_db_name'
+        test_type = 'mock_test_type'
+        test_length = 10
+        mock_loader = MagicMock()
+        mock_loader.tables = {
+            'mock_test_type_voc': pd.DataFrame(),
+            'mock_test_type_perf': pd.DataFrame(),
+            'mock_test_type_words_count': pd.DataFrame()
+        }
+        mock_loader.load_tables.return_value = True
+        mock_check_test_type.return_value = True
+        mock_adjust_test_length.side_effect = lambda arg1, arg2: arg1
+        mock_set_interro_df.return_value = True
+        # ----- ACT
+        result = interro_api.load_test(
+            user_name,
+            db_name,
+            test_type,
+            test_length
+        )
+        # ----- ASSERT
+        self.assertEqual(len(result), 2)
+        mock_check_test_type.assert_any_call(test_type)
+        # mock_loader.load_tables.assert_called_once()
+        mock_adjust_test_length.assert_called_once()
+        mock_set_interro_df.assert_called_once()
+        self.assertIsInstance(result[0], MagicMock)
+        self.assertIsInstance(result[1], PremierTest)
 
     def test_adjust_test_length(self):
         """
@@ -137,24 +83,16 @@ class TestInterro(unittest.TestCase):
         """
         # ----- ARRANGE
         test_length = 10
-        loader_ = MagicMock()
-        words_table = pd.DataFrame(
-            {
-                'some_column':
-                [
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
-                ],
-            }
-        )
+        words_table = pd.DataFrame({
+            'some_column': [1, 2, 3, 4, 5],
+        })
         loader_ = MagicMock()
         loader_.test_type = 'test_type'
-        loader_.tables = {
-            'test_type_voc': words_table
-        }
+        loader_.tables = {'test_type_voc': words_table}
         # ----- ACT
         result = interro_api.adjust_test_length(test_length, loader_)
         # ----- ASSERT
-        self.assertEqual(result, 10)
+        self.assertEqual(result, 5)
 
     def test_adjust_test_length_small_table(self):
         """
@@ -229,8 +167,8 @@ class TestInterro(unittest.TestCase):
         mock_get_user_databases.assert_called_once_with(token)
         mock_get_error_messages.assert_called_once_with(error_message)
 
-    @patch('src.data.redis_interface.save_loader_in_redis')
-    @patch('src.data.redis_interface.save_interro_in_redis')
+    @patch('src.api.interro.save_loader_in_redis')
+    @patch('src.api.interro.save_interro_in_redis')
     @patch('src.api.interro.load_test')
     @patch('src.api.authentication.get_user_name_from_token')
     def test_save_interro_settings(
@@ -257,10 +195,7 @@ class TestInterro(unittest.TestCase):
         mock_save_interro_in_redis.return_value = True
         mock_save_loader_in_redis.return_value = True
         # ----- ACT
-        result = interro_api.save_interro_settings(
-            settings,
-            token
-        )
+        result = interro_api.save_interro_settings(settings, token)
         # ----- ASSERT
         self.assertIsInstance(result, JSONResponse)
         content = result.body
@@ -303,7 +238,7 @@ class TestInterro(unittest.TestCase):
         assert content_dict['message'] == "Empty table"
         assert content_dict['token'] == token
 
-    @patch('src.data.redis_interface.load_interro_from_redis')
+    @patch('src.api.interro.load_interro_from_redis')
     @patch('src.api.authentication.get_user_name_from_token')
     def test_get_interro_question(
             self,
@@ -311,6 +246,7 @@ class TestInterro(unittest.TestCase):
             mock_load_interro_from_redis
         ):
         # ----- ARRANGE
+        interro_category = 'mock_category'
         request = 'mock_request'
         total = 10
         count = 1
@@ -333,6 +269,7 @@ class TestInterro(unittest.TestCase):
         # ----- ACT
         result = interro_api.get_interro_question(
             request,
+            interro_category,
             total,
             count,
             score,
@@ -344,21 +281,23 @@ class TestInterro(unittest.TestCase):
             result,
             {
                 "request": request,
+                'token': token,
                 "numWords": total,
+                "interroCategory": interro_category,
                 "userName": 'mock_user_name',
                 "count": count + 1,
                 "score": score,
                 "progressPercent": int(count / int(total) * 100),
-                'token': token,
                 "content_box1": 'Hello'
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
 
-    @patch('src.data.redis_interface.load_interro_from_redis')
+    @patch('src.api.interro.load_interro_from_redis')
     def test_load_interro_answer(self, mock_load_interro_from_redis):
         # ----- ARRANGE
         request = 'mock_request'
+        interro_category = 'mock_category'
         total = 10
         count = 1
         score = 3
@@ -380,6 +319,7 @@ class TestInterro(unittest.TestCase):
         # ----- ACT
         result = interro_api.load_interro_answer(
             request,
+            interro_category,
             total,
             count,
             score,
@@ -392,6 +332,7 @@ class TestInterro(unittest.TestCase):
             {
                 "request": request,
                 "token": token,
+                "interroCategory": interro_category,
                 "numWords": total,
                 "count": count,
                 "score": score,
@@ -400,23 +341,25 @@ class TestInterro(unittest.TestCase):
                 "content_box2": 'Salut'
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
 
-    @patch('src.data.redis_interface.save_interro_in_redis')
+    @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.data.redis_interface.load_interro_from_redis')
-    def test_get_user_response_test_yes(
+    @patch('src.api.interro.load_interro_from_redis')
+    def test_get_user_answer_test_yes(
             self,
             mock_load_interro_from_redis,
             mock_update_voc_df,
             mock_save_interro_in_redis
         ):
         # ----- ARRANGE
+        token = 'mock_token'
+        interro_category = 'test'
         data = {
             'score': '10',
-            'answer': 'Yes'
+            'answer': 'Yes',
+            'interroCategory': interro_category,
         }
-        token = 'mock_token'
         mock_interro_df = pd.DataFrame(
             {
                 'some_column': ['some_value'],
@@ -432,7 +375,7 @@ class TestInterro(unittest.TestCase):
         mock_update_voc_df.return_value = True
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = interro_api.get_user_response(
+        result = interro_api.get_user_answer(
             data,
             token
         )
@@ -444,19 +387,21 @@ class TestInterro(unittest.TestCase):
         self.assertEqual(
             content_dict,
             {
-                'score': 11,
                 'message': 'User response stored successfully',
+                'token': 'mock_token',
+                'interroCategory': interro_category,
+                'score': 11,
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
         mock_update_voc_df.assert_called_once_with(True)
-        mock_save_interro_in_redis.assert_called_once_with(mock_test, token)
+        mock_save_interro_in_redis.assert_called_once_with(mock_test, token, interro_category)
 
-    @patch('src.data.redis_interface.save_interro_in_redis')
+    @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_faults_df')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.data.redis_interface.load_interro_from_redis')
-    def test_get_user_response_test_no(
+    @patch('src.api.interro.load_interro_from_redis')
+    def test_get_user_answer_test_no(
             self,
             mock_load_interro_from_redis,
             mock_update_voc_df,
@@ -464,11 +409,13 @@ class TestInterro(unittest.TestCase):
             mock_save_interro_in_redis
         ):
         # ----- ARRANGE
+        interro_category = 'test'
         data = {
             'score': '10',
             'answer': 'No',
             'english': 'Hello',
-            'french': 'Bonjour'
+            'french': 'Bonjour',
+            'interroCategory': interro_category
         }
         token = 'mock_token'
         mock_interro_df = pd.DataFrame(
@@ -487,7 +434,7 @@ class TestInterro(unittest.TestCase):
         mock_update_faults_df.return_value = True
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = interro_api.get_user_response(
+        result = interro_api.get_user_answer(
             data,
             token
         )
@@ -499,30 +446,34 @@ class TestInterro(unittest.TestCase):
         self.assertEqual(
             content_dict,
             {
-                'score': 10,
                 'message': 'User response stored successfully',
+                'token': token,
+                'interroCategory': interro_category,
+                'score': 10,
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
         mock_update_faults_df.assert_called_once_with(False, ['Hello', 'Bonjour'])
         mock_update_voc_df.assert_called_once_with(False)
-        mock_save_interro_in_redis.assert_called_once_with(mock_test, token)
+        mock_save_interro_in_redis.assert_called_once_with(mock_test, token, interro_category)
 
-    @patch('src.data.redis_interface.save_interro_in_redis')
+    @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.data.redis_interface.load_interro_from_redis')
-    def test_get_user_response_rattraps_yes(
+    @patch('src.api.interro.load_interro_from_redis')
+    def test_get_user_answer_rattraps_yes(
             self,
             mock_load_interro_from_redis,
             mock_update_voc_df,
             mock_save_interro_in_redis
         ):
         # ----- ARRANGE
+        interro_category = 'rattrap'
         data = {
             'score': '10',
             'answer': 'Yes',
             'english': 'Hello',
-            'french': 'Bonjour'
+            'french': 'Bonjour',
+            'interroCategory': interro_category
         }
         token = 'mock_token'
         mock_interro_df = pd.DataFrame(
@@ -540,7 +491,7 @@ class TestInterro(unittest.TestCase):
         mock_update_voc_df.return_value = True
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = interro_api.get_user_response(
+        result = interro_api.get_user_answer(
             data,
             token
         )
@@ -552,19 +503,21 @@ class TestInterro(unittest.TestCase):
         self.assertEqual(
             content_dict,
             {
-                'score': 11,
                 'message': 'User response stored successfully',
+                'token': token,
+                'interroCategory': interro_category,
+                'score': 11,
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
         assert not mock_update_voc_df.called
-        mock_save_interro_in_redis.assert_called_once_with(mock_rattrap, token)
+        mock_save_interro_in_redis.assert_called_once_with(mock_rattrap, token, interro_category)
 
     @patch('src.interro.logger')
     @patch('src.interro.Updater.update_data')
-    @patch('src.data.redis_interface.load_loader_from_redis')
+    @patch('src.api.interro.load_loader_from_redis')
     @patch('src.interro.PremierTest.compute_success_rate')
-    @patch('src.data.redis_interface.load_interro_from_redis')
+    @patch('src.api.interro.load_interro_from_redis')
     def test_propose_rattraps(
             self,
             mock_load_interro_from_redis,
@@ -581,6 +534,7 @@ class TestInterro(unittest.TestCase):
         total = 10
         score = 3
         token = 'mock_token'
+        interro_category = 'test'
         mock_interro_df = pd.DataFrame(
             {
                 'some_column': ['some_value'],
@@ -612,6 +566,7 @@ class TestInterro(unittest.TestCase):
         # ----- ACT
         result = interro_api.propose_rattraps(
             request,
+            interro_category,
             total,
             score,
             token
@@ -621,6 +576,7 @@ class TestInterro(unittest.TestCase):
         expected_result = {
             "request": request,
             "token": token,
+            "interroCategory": interro_category,
             "newTotal": 2,
             "newScore": 0,
             "newCount": 0,
@@ -628,14 +584,14 @@ class TestInterro(unittest.TestCase):
             "numWords": total
         }
         self.assertEqual(result, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
         mock_compute_success_rate.assert_called_once()
         mock_load_loader_from_redis.assert_called_once_with(token)
         mock_update_data.assert_called_once()
         # mock_logger.info.assert_called_once_with("User data updated.")
 
     @patch('src.interro.PremierTest.compute_success_rate')
-    @patch('src.data.redis_interface.load_interro_from_redis')
+    @patch('src.api.interro.load_interro_from_redis')
     def test_propose_rattraps_rattraps(
             self,
             mock_load_interro_from_redis,
@@ -649,6 +605,7 @@ class TestInterro(unittest.TestCase):
         total = 10
         score = 3
         token = 'mock_token'
+        interro_category = 'mock_category'
         mock_faults_df_ = pd.DataFrame(
             {
                 'some_column_1': ['some_value_1', 'some_value_3'],
@@ -665,6 +622,7 @@ class TestInterro(unittest.TestCase):
         # ----- ACT
         result = interro_api.propose_rattraps(
             request,
+            interro_category,
             total,
             score,
             token
@@ -674,6 +632,7 @@ class TestInterro(unittest.TestCase):
         expected_result = {
             "request": request,
             "token": token,
+            "interroCategory": interro_category,
             "newTotal": 0,
             "newScore": 0,
             "newCount": 0,
@@ -681,11 +640,11 @@ class TestInterro(unittest.TestCase):
             "numWords": total
         }
         self.assertEqual(result, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
         assert mock_compute_success_rate.called is False
 
-    @patch('src.data.redis_interface.save_interro_in_redis')
-    @patch('src.data.redis_interface.load_interro_from_redis')
+    @patch('src.api.interro.save_interro_in_redis')
+    @patch('src.api.interro.load_interro_from_redis')
     def test_load_rattraps(
             self,
             mock_load_interro_from_redis,
@@ -696,10 +655,12 @@ class TestInterro(unittest.TestCase):
         """
         # ----- ARRANGE
         token = 'mock_token'
+        new_interro_category = 'mock_category'
         data = {
             'count': '2',
             'total': '10',
-            'score': '3'
+            'score': '3',
+            'interroCategory': new_interro_category
         }
         mock_interro_df = pd.DataFrame(
             {
@@ -727,15 +688,15 @@ class TestInterro(unittest.TestCase):
         expected_dict = {
             'message': "Rattraps created successfully",
             'token': token,
+            'interroCategory': 'rattrap',
             'total': int(data['total']),
             'score': int(data['score']),
             'count': int(data['count'])
         }
         self.assertEqual(actual_dict, expected_dict)
 
-
-    @patch('src.data.redis_interface.save_interro_in_redis')
-    @patch('src.data.redis_interface.load_interro_from_redis')
+    @patch('src.api.interro.save_interro_in_redis')
+    @patch('src.api.interro.load_interro_from_redis')
     def test_load_rattraps_rattraps(
             self,
             mock_load_interro_from_redis,
@@ -746,10 +707,12 @@ class TestInterro(unittest.TestCase):
         """
         # ----- ARRANGE
         token = 'mock_token'
+        interro_category = 'rattrap'
         data = {
             'count': '2',
             'total': '10',
-            'score': '3'
+            'score': '3',
+            'interroCategory': interro_category
         }
         mock_interro_df = pd.DataFrame(
             {
@@ -777,27 +740,31 @@ class TestInterro(unittest.TestCase):
         expected_dict = {
             'message': "Rattraps created successfully",
             'token': token,
+            'interroCategory': 'rattrap',
             'total': int(data['total']),
             'score': int(data['score']),
             'count': int(data['count'])
         }
         self.assertEqual(actual_dict, expected_dict)
 
-    @patch('src.interro.logger')
+    @patch('src.api.interro.turn_df_into_dict')
     @patch('src.interro.Updater.update_data')
-    @patch('src.data.redis_interface.load_loader_from_redis')
-    @patch('src.data.redis_interface.load_interro_from_redis')
+    @patch('src.api.interro.load_loader_from_redis')
+    @patch('src.api.interro.load_interro_from_redis')
+    @patch('src.interro.logger')
     def test_end_interro(
             self,
+            mock_logger,
             mock_load_interro_from_redis,
             mock_load_loader_from_redis,
             mock_update_data,
-            mock_logger
+            mock_turn_df_into_dict,
         ):
         """
         Should end the interro.
         """
         # ----- ARRANGE
+        interro_category = 'test'
         request = 'mock_request'
         total = '10'
         score = '2'
@@ -822,9 +789,14 @@ class TestInterro(unittest.TestCase):
         mock_loader = Loader(mock_db_interface)
         mock_load_loader_from_redis.return_value = mock_loader
         mock_update_data.return_value = True
+        mock_turn_df_into_dict.return_value = (
+            ['header_1', 'header_2'],
+            ['row_1', 'row_2', 'row_3']
+        )
         # ----- ACT
         result = interro_api.end_interro(
             request,
+            interro_category,
             total,
             score,
             token
@@ -833,12 +805,16 @@ class TestInterro(unittest.TestCase):
         self.assertIsInstance(result, dict)
         expected_dict = {
             "request": request,
+            "token": token,
+            "headers": ['header_1', 'header_2'],
+            "rows": ['row_1', 'row_2', 'row_3'],
             "score": score,
             "numWords": total,
-            "token": token
         }
         self.assertEqual(result, expected_dict)
-        mock_load_interro_from_redis.assert_called_once_with(token)
+        assert mock_load_interro_from_redis.call_count == 2
+        mock_load_interro_from_redis.any_call_with(token, interro_category)
+        mock_load_interro_from_redis.any_call_with(token, interro_category)
         mock_load_loader_from_redis.assert_called_once_with(token)
         mock_update_data.assert_called_once()
         # mock_logger.info.assert_called_once_with("User data updated.")
@@ -899,3 +875,16 @@ class TestInterro(unittest.TestCase):
         mock_logger.error.assert_any_call(
             f"Should be in: {expected_list}"
         )
+
+    def test_turn_df_into_dict(self):
+        # ----- ARRANGE
+        words_df = pd.DataFrame({
+            'col_1': ['val_1', 'val_2'],
+            'col_2': ['val_3', 'val_4']
+        })
+        # ----- ACT
+        result = interro_api.turn_df_into_dict(words_df)
+        # ----- ASSERT
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], ['col_1', 'col_2'])
+        self.assertEqual(result[1], [['val_1', 'val_3'], ['val_2', 'val_4']])

@@ -45,15 +45,17 @@ class TestRedisInterface(unittest.TestCase):
         """
         # ----- ARRANGE
         token = 'test_token'
+        interro_category = 'mock_category'
         # ----- ACT
         redis_interface.save_interro_in_redis(
-            self.test_object,
-            token,
+            interro=self.test_object,
+            token=token,
+            interro_category=interro_category,
             redis_db=self.mock_redis_db
         )
         # ----- ASSERT
         self.mock_redis_db.set.assert_called_once_with(
-            token + '_test',
+            'test_token_mock_category',
             pickle.dumps(self.test_object)
         )
 
@@ -63,15 +65,18 @@ class TestRedisInterface(unittest.TestCase):
         """
         # ----- ARRANGE
         token = 'test_token'
+        interro_category = 'mock_category'
         pickled_test_object = pickle.dumps(self.test_object)
         self.mock_redis_db.get.return_value = pickled_test_object
         # ----- ACT
         result = redis_interface.load_interro_from_redis(
-            token,
+            token=token,
+            interro_category=interro_category,
             redis_db=self.mock_redis_db
         )
         # ----- ASSERT
         self.assertEqual(result, self.test_object)
+        self.mock_redis_db.get.assert_called_once_with('test_token_mock_category')
 
     def test_save_loader_in_redis(self):
         """

@@ -91,10 +91,7 @@ def get_interro_settings(
     return settings_dict
 
 
-def save_interro_settings(
-        settings,
-        token
-    ):
+def save_interro_settings(settings, token):
     """
     API function to save the interro settings.
     """

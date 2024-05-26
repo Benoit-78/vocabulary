@@ -40,7 +40,6 @@ def create_account(
                 'token': token
             }
         )
-        logger.debug(f"json_response: {json_response}")
         return json_response
     user_account = users.UserAccount(creds['input_name'])
     result = user_account.create_account(creds['input_password'])
@@ -74,10 +73,10 @@ def authenticate_user(
     """
     Authenticate the user.
     """
-    if form_data.client_id is not None:
+    if 'client_id' in form_data.keys():
         json_response = authenticate_user_with_oauth(token, form_data)
         return json_response
-    if '' in [form_data.username, form_data.password]:
+    if '' in [form_data['username'], form_data['password']]:
         json_response = JSONResponse(
             content=
             {
@@ -85,7 +84,6 @@ def authenticate_user(
                 'token': token
             }
         )
-        logger.debug(f"json_response: {json_response}")
         return json_response
     logger.info('')
     users_list = auth_api.get_users_list()
@@ -128,6 +126,7 @@ def authenticate_user_with_oauth(
         form_data
     ):
     user = auth_api.authenticate_with_oauth(form_data)
+    logger.debug(f'user: {user}')
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
