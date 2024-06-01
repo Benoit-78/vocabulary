@@ -13,24 +13,18 @@ RUN apt-get install -y mariadb-client
 
 # Switch to a non-root user
 WORKDIR /app
-RUN useradd --uid 1000 benito && chown -R benito /app
-RUN useradd --uid 1001 guess && chown -R guess /app
+RUN useradd --uid 1000 developer && chown -R developer /app
 
 
 # Create working folder and install dependencies
-RUN pip install --upgrade pip
 COPY requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN rm requirements.txt
 
 
 # Copy the application contents
-COPY conf/cred.json ./conf/cred.json
-COPY conf/columns.json ./conf/columns.json
-COPY data/zhongwen.sql /docker-entrypoint-initdb.d/zhongwen.sql
 COPY src/ ./src/
 
 
 # Run the service
-WORKDIR /app
 CMD uvicorn src.web:app --reload --host 0.0.0.0 --port 80

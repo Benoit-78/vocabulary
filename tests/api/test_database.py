@@ -207,6 +207,43 @@ class TestDatabase(unittest.TestCase):
 
     @patch('src.data.users.UserAccount.create_database')
     @patch('src.api.authentication.get_user_name_from_token')
+    def test_create_database_no_name(
+            self,
+            mock_get_user_name_from_token,
+            mock_create_database
+        ):
+        """
+        Test the function choose_database
+        """
+        # ----- ARRANGE
+        data = {
+            'db_name': 'mock_db_name'
+        }
+        token = 'mock_token'
+        mock_get_user_name_from_token.return_value = 'mock_user'
+        mock_create_database.return_value = True
+        # ----- ACT
+        result = db_api.create_database(
+            data,
+            token
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, JSONResponse)
+        expected_result = {
+            'message': "Database created successfully",
+            'token': token,
+            'databaseName': data['db_name']
+        }
+        content = result.body
+        content_dict = content.decode('utf-8')
+        content_dict = json.loads(content_dict)
+        self.assertEqual(content_dict, expected_result)
+        mock_get_user_name_from_token.assert_called_once_with(token)
+        mock_create_database.assert_called_once_with(data['db_name'])
+
+
+    @patch('src.data.users.UserAccount.create_database')
+    @patch('src.api.authentication.get_user_name_from_token')
     def test_create_database_not_available(
             self,
             mock_get_user_name_from_token,
@@ -240,6 +277,67 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(content_dict, expected_result)
         mock_get_user_name_from_token.assert_called_once_with(token)
         mock_create_database.assert_called_once_with(data['db_name'])
+
+    @patch('src.api.database.DbQuerier.get_tables')
+    @patch('src.api.database.auth_api.get_user_name_from_token')
+    def test_retrieve_database(
+            self,
+            mock_mock_get_user_name_from_token,
+            mock_get_tables
+        ):
+        # ----- ARRANGE
+        data = {
+            'db_name': 'mock_db_name',
+            'some_key': 'some_value'
+        }
+        token = 'mock_token'
+        mock_mock_get_user_name_from_token.return_value = 'mock_user_name'
+        mock_get_tables.return_value = {
+            'version_voc': 'mock_version_table',
+            'theme_voc': 'mock_theme_table'
+        }
+        # ----- ACT
+        result = db_api.retrieve_database(
+            data,
+            token
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, JSONResponse)
+        expected_result = {
+            "message": "Retrieved database words successfully",
+            "token": token,
+            'versionTable': 'mock_version_table',
+            'themeTable': 'mock_theme_table'
+        }
+        content = result.body
+        content_dict = content.decode('utf-8')
+        content_dict = json.loads(content_dict)
+        self.assertEqual(content_dict, expected_result)
+
+    def test_see_database(self):
+        # ----- ARRANGE
+        request = 'mock_request'
+        token = 'mock_token'
+        db_name = 'mock_db_name'
+        version_table = 'mock_version_table'
+        theme_table = 'mock_theme_table'
+        # ----- ACT
+        result = db_api.see_database(
+            request=request,
+            token=token,
+            db_name=db_name,
+            version_table=version_table,
+            theme_table=theme_table
+        )
+        # ----- ASSERT
+        expected_result = {
+            'request': 'mock_request',
+            'token': 'mock_token',
+            'databaseName': 'mock_db_name',
+            'versionTable': 'mock_version_table',
+            'themeTable': 'mock_theme_table',
+        }
+        self.assertEqual(result, expected_result)
 
     def test_get_error_messages_fail(self):
         """

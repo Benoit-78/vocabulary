@@ -19,7 +19,8 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.data import users, database_interface
+from src.data import users
+from src.data.database_interface import DbQuerier
 from src.api import authentication as auth_api
 
 
@@ -57,30 +58,26 @@ def create_database(data: dict, token: str):
     user_account = users.UserAccount(user_name)
     logger.debug(f"Creating database: {data}")
     if data['db_name'] == '':
-        db_name = None
-        result = False
-    else:
-        db_name = data['db_name']
-        result = user_account.create_database(db_name)
-    if result is False:
-        if db_name is None:
-            json_response = JSONResponse(
+        json_response = JSONResponse(
                 content=
                 {
                     'message': "No database name given",
                     'token': token,
-                    'databaseName': db_name
+                    'databaseName': ''
                 }
             )
-        else:
-            json_response = JSONResponse(
-                content=
-                {
-                    'message': "Database name not available",
-                    'token': token,
-                    'databaseName': db_name
-                }
-            )
+        return json_response
+    db_name = data['db_name']
+    result = user_account.create_database(db_name)
+    if result is False:
+        json_response = JSONResponse(
+            content=
+            {
+                'message': "Database name not available",
+                'token': token,
+                'databaseName': db_name
+            }
+        )
     if result is True:
         json_response = JSONResponse(
             content=
@@ -100,12 +97,12 @@ def retrieve_database(data: dict, token: str):
     logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     db_name = data['db_name']
-    db_manipulator = database_interface.DbManipulator(
+    db_querier = DbQuerier(
         user_name,
         db_name,
         'version'
     )
-    tables = db_manipulator.get_tables()
+    tables = db_querier.get_tables()
     version_table = tables['version_voc']
     theme_table = tables['theme_voc']
     json_response = JSONResponse(

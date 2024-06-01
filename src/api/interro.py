@@ -39,13 +39,12 @@ def load_test(
     """
     Load the interroooo!
     """
-    db_handler = database_interface.DbManipulator(
+    db_querier = database_interface.DbQuerier(
         user_name=user_name,
         db_name=db_name,
         test_type=test_type,
     )
-    db_handler.check_test_type(test_type)
-    loader = core_interro.Loader(db_handler)
+    loader = core_interro.Loader(db_querier)
     loader.load_tables()
     test_length = adjust_test_length(test_length, loader)
     guesser = api_view.FastapiGuesser()

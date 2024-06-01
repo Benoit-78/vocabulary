@@ -153,14 +153,16 @@ class TestLoader(unittest.TestCase):
     The Loader class should interact with database interfaces,
     such as csv handler or MariaDB handler.
     """
-    def setUp(self):
+    @patch('src.data.database_interface.check_test_type')
+    def setUp(self, mock_check_test_type):
+        mock_check_test_type.side_effect = lambda arg1: arg1
         self.test_type = 'mock_test_type'
-        self.data_manipulator = database_interface.DbManipulator(
+        self.data_querier = database_interface.DbQuerier(
             user_name='mock_user_name',
             db_name='mock_db_name',
             test_type=self.test_type
         )
-        self.loader = interro.Loader(self.data_manipulator)
+        self.loader = interro.Loader(self.data_querier)
 
     def test_init(self):
         """
@@ -170,15 +172,15 @@ class TestLoader(unittest.TestCase):
         # ----- ACT
         # ----- ASSERT
         self.assertEqual(hasattr(self.loader, 'test_type'), True)
-        self.assertEqual(hasattr(self.loader, 'data_handler'), True)
+        self.assertEqual(hasattr(self.loader, 'data_querier'), True)
         self.assertEqual(hasattr(self.loader, 'tables'), True)
         self.assertEqual(hasattr(self.loader, 'output_table'), True)
         self.assertEqual(self.loader.test_type, self.test_type)
-        self.assertEqual(self.loader.data_handler, self.data_manipulator)
+        self.assertEqual(self.loader.data_querier, self.data_querier)
         self.assertEqual(self.loader.tables, {})
         self.assertEqual(self.loader.output_table, '')
 
-    @patch('src.data.database_interface.DbManipulator.get_tables')
+    @patch('src.data.database_interface.DbQuerier.get_tables')
     def test_load_tables(self, mock_get_tables):
         """
         Input should be a dataframe, and it should be added a query column.
@@ -201,7 +203,7 @@ class TestLoader(unittest.TestCase):
             self.assertEqual(table['taux'].dtype, np.float64)
             self.assertGreater(table.shape[0], 1)
 
-    @patch('src.data.database_interface.DbManipulator.get_tables')
+    @patch('src.data.database_interface.DbQuerier.get_tables')
     def test_load_tables_no_bad_word_column(self, mock_get_tables):
         """
         Input should be a dataframe, and it should be added a query column.
@@ -228,16 +230,20 @@ class TestPremierTest(unittest.TestCase):
     It should then be abstract.
     """
     @classmethod
-    def setUpClass(cls):
-        """Run once before all tests."""
+    @patch('src.data.database_interface.check_test_type')
+    def setUpClass(cls, mock_check_test_type):
+        """
+        Run once before all tests
+        """
+        mock_check_test_type.side_effect = lambda arg1: arg1
         cls.user_1 = interro.CliUser()
         cls.user_1.parse_arguments(['-t', 'version'])
-        cls.data_handler_1 = database_interface.DbManipulator(
+        cls.data_querier_1 = database_interface.DbQuerier(
             user_name='test_user',
             db_name='test_db',
             test_type='test_type'
         )
-        cls.loader_1 = interro.Loader(cls.data_handler_1)
+        cls.loader_1 = interro.Loader(cls.data_querier_1)
 
     def setUp(self):
         df = pd.DataFrame(columns=['english', 'français'])
@@ -603,12 +609,12 @@ class TestUpdater(unittest.TestCase):
     def setUp(self):
         self.user_1 = interro.CliUser()
         self.user_1.parse_arguments(['-t', 'version'])
-        self.data_handler_1 = database_interface.DbManipulator(
+        self.data_querier_1 = database_interface.DbQuerier(
             user_name='test_user',
             db_name='test_db',
             test_type=self.user_1.settings.type
         )
-        self.loader_1 = interro.Loader(self.data_handler_1)
+        self.loader_1 = interro.Loader(self.data_querier_1)
         self.loader_1.tables = {
             'version_voc': pd.DataFrame(
                 columns=[
@@ -724,28 +730,38 @@ class TestUpdater(unittest.TestCase):
         self.assertEqual(new_shape[1], old_shape[1] - 1)
         self.assertNotIn('img_good', self.interro_1.words_df.columns)
 
-    def test_move_good_words(self):
+    @patch('src.interro.Updater.delete_good_words')
+    @patch('src.interro.DbManipulator.save_table')
+    @patch('src.interro.Updater.copy_good_words')
+    @patch('src.interro.Updater.set_good_words')
+    def test_move_good_words(
+            self,
+            mock_set_good_words,
+            mock_copy_good_words,
+            mock_save_table,
+            mock_delete_good_words,
+        ):
         """
         Should move the words that have been guessed sufficiently enough
         from one table to its output.
         """
         # Arrange
-        self.updater_1.set_good_words = MagicMock()
-        self.updater_1.copy_good_words = MagicMock()
+        mock_set_good_words.return_value = True
+        mock_copy_good_words.return_value = True
         self.updater_1.loader.tables['output'] = MagicMock()
-        self.updater_1.loader.data_handler.save_table = MagicMock()
-        self.updater_1.delete_good_words = MagicMock()
+        mock_save_table.retuirn_value = True
+        mock_delete_good_words.return_value = True
         # Act
         self.updater_1.move_good_words()
         # Assert
-        self.updater_1.set_good_words.assert_called_once()
-        self.updater_1.copy_good_words.assert_called_once()
+        mock_set_good_words.assert_called_once()
+        mock_copy_good_words.assert_called_once()
         self.updater_1.loader.tables['output'].reset_index.assert_called_once()
-        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+        mock_save_table.assert_called_once_with(
             'output',
             self.updater_1.loader.tables['output']
         )
-        self.updater_1.delete_good_words.assert_called_once()
+        mock_delete_good_words.assert_called_once()
 
     def test_flag_bad_words(self):
         """Should flag bad words, i.e. words rarely guessed by the user."""
@@ -766,25 +782,30 @@ class TestUpdater(unittest.TestCase):
         elif first_word['bad_word'] == 0:
             self.assertGreaterEqual(first_word['taux'], img_bad) # greater or equal
 
-    def test_save_words(self):
-        """Prepare the words table for saving, and save it."""
-        # Arrange
-        self.updater_1.loader.data_handler.save_table = MagicMock()
+    @patch('src.data.database_interface.DbManipulator.save_table')
+    def test_save_words(self, mock_save_table):
+        """
+        Prepare the words table for saving, and save it.
+        """
+        # ----- ARRANGE
         old_width = self.updater_1.interro.words_df.shape[1]
-        # Act
+        mock_save_table.return_value = True
+        # ----- ACT
         self.updater_1.save_words()
+        # ----- ASSERT
         new_width = self.updater_1.interro.words_df.shape[1]
-        # Assert
-        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+        mock_save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_voc',
             self.updater_1.interro.words_df
         )
         self.assertEqual(new_width, old_width + 1)
 
-    def test_save_performances(self):
-        """Save performances for further analysis."""
+    @patch('src.data.database_interface.DbManipulator.save_table')
+    def test_save_performances(self, mock_save_table):
+        """
+        Save performances for further analysis.
+        """
         # Arrange
-        self.updater_1.loader.data_handler.save_table = MagicMock()
         perf_df = pd.DataFrame(columns=['test_date', 'test'])
         perf_df.loc[perf_df.shape[0]] = ["2022-01-01", 65]
         perf_df.loc[perf_df.shape[0]] = ["2022-02-01", 75]
@@ -792,6 +813,7 @@ class TestUpdater(unittest.TestCase):
         perf_df.loc[perf_df.shape[0]] = ["2022-04-01", 0]
         self.updater_1.interro.perf_df = perf_df
         old_shape = self.updater_1.interro.perf_df.shape
+        mock_save_table.return_value = True
         # Act
         self.updater_1.save_performances()
         new_shape = self.updater_1.interro.perf_df.shape
@@ -799,7 +821,7 @@ class TestUpdater(unittest.TestCase):
         self.assertEqual(new_shape[0], old_shape[0] + 1)
         logger.debug(f"Columns: {self.updater_1.interro.perf_df.columns}")
         self.assertEqual(new_shape[1], old_shape[1] + 1)
-        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+        mock_save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_perf',
             self.updater_1.interro.perf_df
         )
@@ -827,7 +849,7 @@ class TestUpdater(unittest.TestCase):
         new_shape = self.updater_1.interro.word_cnt_df.shape
         self.assertEqual(new_shape[0], old_shape[0] + 1)
         self.assertEqual(new_shape[1], old_shape[1])
-        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+        mock_save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_words_count',
             self.updater_1.interro.word_cnt_df
         )
@@ -857,7 +879,7 @@ class TestUpdater(unittest.TestCase):
         new_shape = self.updater_1.interro.word_cnt_df.shape
         self.assertEqual(new_shape[0], old_shape[0] + 1)
         self.assertEqual(new_shape[1], old_shape[1] + 1)
-        self.updater_1.loader.data_handler.save_table.assert_called_once_with(
+        mock_save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_words_count',
             self.updater_1.interro.word_cnt_df
         )

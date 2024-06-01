@@ -25,10 +25,11 @@ class TestDbInterface(unittest.TestCase):
     """
     Abstract class, embodied by divers daughter classes that serve as 
     interfaces for different data operations.
-    As of today (2024-03-30), the daughter classes are:
+    As of today (2024-06-01), the daughter classes are:
     - DbController, for Data Control Language operations,
     - DbDefiner, for Data Definition Language operations,
-    - DbManipulator, for Data Manipulation Language operations.
+    - DbManipulator, for Data Manipulation Language operations,
+    - DbQuerier, for Data Querying Language operations.
     """
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.database_interface.logger')
@@ -58,37 +59,6 @@ class TestDbInterface(unittest.TestCase):
         self.assertEqual(result[0], mock_connection)
         self.assertEqual(result[1], mock_cursor)
         mock_logger.assert_not_called()
-
-    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.database_interface.logger')
-    @patch('src.data.database_interface.mariadb.connect')
-    def test_get_db_cursor_host_nok(self, mock_connect, mock_logger):
-        # ----- ARRANGE
-        mock_connection = MagicMock(spec=mariadb.connection.MySQLConnection)
-        mock_cursor = MagicMock(spec=mariadb.connection.MySQLCursor)
-        mock_connect.return_value = mock_connection
-        mock_connection.cursor.return_value = mock_cursor
-        db_interface = database_interface.DbInterface()
-        db_interface.host = 'nimportequoi'
-        # ----- ACT
-        result = db_interface.get_db_cursor()
-        # ----- ASSERT
-        # mock_connect.assert_called_once_with(
-        #     user=user_name,
-        #     password=password,
-        #     database=db_name,
-        #     port=database_interface.PARAMS['MariaDB']['port'],
-        #     host=host
-        # )
-        mock_connection.cursor.assert_called_once()
-        self.assertIsInstance(result, tuple)
-        self.assertEqual(len(result), 2)
-        self.assertIsInstance(result[0], mariadb.connection.MySQLConnection)
-        self.assertIsInstance(result[1], mariadb.connection.MySQLCursor)
-        self.assertEqual(result[0], mock_connection)
-        self.assertEqual(result[1], mock_cursor)
-        mock_logger.warning.assert_called_once_with("host: nimportequoi")
-        mock_logger.error.assert_called_once_with(f"host should be in {database_interface.HOSTS}")
 
 
 
@@ -820,101 +790,7 @@ class TestDbManipulator(unittest.TestCase):
         self.assertEqual(self.db_manipulator.db_name, self.db_name)
         self.assertEqual(self.db_manipulator.test_type, self.test_type)
 
-    def test_check_test_type(self):
-        """"""
-        # Arrange
-        # Act
-        self.db_manipulator.check_test_type(('version'))
-        # Assert
-        self.assertIsInstance(self.db_manipulator.test_type, str)
-        self.assertIn(self.db_manipulator.test_type, ['version', 'theme'])
-        self.assertEqual(self.db_manipulator.test_type, 'version')
-
-    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.database_interface.DbDefiner.get_database_cols')
-    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
-    def test_get_tables(self, mock_get_db_cursor, mock_get_database_cols):
-        """"""
-        # Arrange
-        mock_connection = MagicMock()
-        mock_cursor = MagicMock()
-        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-        mock_get_database_cols.return_value = {
-            'version_voc':
-            [
-                'col_1', 'col_2'
-            ],
-            'version_perf':
-            [
-                'col_3', 'col_4'
-            ],
-            'version_words_count':
-            [
-                'col_5', 'col_6'
-            ],
-            'theme_voc':
-            [
-                'col_7', 'col_8'
-            ],
-            'theme_perf':
-            [
-                'col_9', 'col_10'
-            ],
-            'theme_words_count':
-            [
-                'col_11', 'col_12'
-            ],
-            'archives':
-            [
-                'col_13', 'col_14'
-            ]
-        }
-        # Act
-        result = self.db_manipulator.get_tables()
-        # Assert
-        self.assertIsInstance(result, dict)
-        self.assertEqual(len(result), 7)
-        self.assertIn('output', list(result.keys()))
-        mock_get_db_cursor.assert_called_once_with()
-
-    def test_get_output_table(self):
-        """
-        Should go from version to theme
-        """
-        # ----- ARRANGE
-        self.db_manipulator.test_type = 'version'
-        # ----- ACT
-        result = self.db_manipulator.get_output_table()
-        # ----- ASSERT
-        self.assertEqual(result, 'theme_voc')
-
-    def test_get_output_table_theme(self):
-        """
-        Should go from theme to theme archives
-        """
-        # ----- ARRANGE
-        self.db_manipulator.test_type = 'theme'
-        # ----- ACT
-        result = self.db_manipulator.get_output_table()
-        # ----- ASSERT
-        self.assertEqual(result, 'archives')
-
-    @patch('src.data.database_interface.logger')
-    def test_get_output_table_error(self, mock_logger):
-        """
-        Should raise error if test_type is not 'version' or 'theme'.
-        """
-        # ----- ARRANGE
-        self.db_manipulator.test_type = 'vladivostok'
-        # ----- ACT
-        with self.assertRaises(SystemExit):
-            self.db_manipulator.get_output_table()
-        # ----- ASSERT
-        mock_logger.error.assert_called_once_with(
-            f"Wrong test_type argument: {self.db_manipulator.test_type}"
-        )
-
-    @patch('src.data.database_interface.DbManipulator.read_word')
+    @patch('src.data.database_interface.DbQuerier.read_word')
     @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_insert_word(self, mock_get_db_cursor, mock_read_word):
         """
@@ -943,7 +819,7 @@ class TestDbManipulator(unittest.TestCase):
         mock_connection.close.assert_called_once()
 
     @patch('src.data.database_interface.logger')
-    @patch('src.data.database_interface.DbManipulator.read_word')
+    @patch('src.data.database_interface.DbQuerier.read_word')
     @patch('src.data.database_interface.DbDefiner.get_tables_names')
     @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_insert_word_already_exists(
@@ -974,7 +850,7 @@ class TestDbManipulator(unittest.TestCase):
         )
 
     @patch('src.data.database_interface.logger')
-    @patch('src.data.database_interface.DbManipulator.read_word')
+    @patch('src.data.database_interface.DbQuerier.read_word')
     @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     def test_insert_word_error(
             self,
@@ -1005,49 +881,6 @@ class TestDbManipulator(unittest.TestCase):
         sql_request = " ".join([request_1, request_2, request_3])
         mock_cursor.execute.assert_called_with(sql_request)
         mock_logger.error.assert_called_once()
-        self.assertFalse(result)
-        mock_cursor.close.assert_called_once()
-        mock_connection.close.assert_called_once()
-
-    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
-    def test_read_word(self, mock_get_db_cursor):
-        # Arrange
-        mock_connection = MagicMock()
-        mock_cursor = MagicMock()
-        mock_cursor.execute.return_value = [('test_english', 'test_french', 42)]
-        mock_cursor.fetchall.return_value = [('test_english', 'test_french', 42)]
-        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-        english = self.words_df['english'][0]
-        # Act
-        result = self.db_manipulator.read_word(english)
-        # Assert
-        mock_get_db_cursor.assert_called_once()
-        request_1 = f"SELECT english, français, score FROM {self.table_name}"
-        request_2 = f"WHERE english = '{english}';"
-        sql_request = " ".join([request_1, request_2])
-        mock_cursor.execute.assert_called_once_with(sql_request)
-        mock_cursor.fetchall.assert_called_once()
-        mock_cursor.close.assert_called_once()
-        mock_connection.close.assert_called_once()
-        self.assertEqual(result, ('test_english', 'test_french', 42))
-
-    @patch('src.data.database_interface.logger')
-    @patch('src.data.database_interface.DbManipulator.get_db_cursor')
-    def test_read_word_error(self, mock_get_db_cursor, mock_logger):
-        # Arrange
-        mock_connection = MagicMock()
-        mock_cursor = MagicMock()
-        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
-        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-        english = self.words_df['english'][0]
-        # Act
-        result = self.db_manipulator.read_word(english)
-        # Assert
-        mock_get_db_cursor.assert_called_once()
-        request_1 = f"SELECT english, français, score FROM {self.table_name}"
-        request_2 = f"WHERE english = '{english}';"
-        sql_request = " ".join([request_1, request_2])
-        mock_cursor.execute.assert_called_once_with(sql_request)
         self.assertFalse(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
@@ -1188,7 +1021,7 @@ class TestDbManipulator(unittest.TestCase):
         mock_connection.close.assert_called_once()
 
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
-    @patch('src.data.database_interface.DbManipulator.get_output_table')
+    @patch('src.data.database_interface.DbQuerier.get_output_table')
     @patch('src.data.database_interface.DbManipulator.get_db_cursor')
     @patch('src.data.database_interface.DbDefiner.get_database_cols')
     @patch('src.data.database_interface.create_engine')
@@ -1274,3 +1107,184 @@ class TestDbManipulator(unittest.TestCase):
         mock_logger.error.assert_called_once()
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
+
+
+
+class TestDbQuerier(unittest.TestCase):
+    def setUp(self):
+        # Data definition
+        self.user_name = 'benoit'
+        self.db_definer = database_interface.DbDefiner(self.user_name)
+        # Data manipulation
+        self.db_name = 'English'
+        self.table_name = self.user_name + '_' + self.db_name + '.' + 'version_voc'
+        self.test_type = 'version'
+        self.password = 'test_password'
+        self.db_querier = database_interface.DbQuerier(
+            self.user_name,
+            self.db_name,
+            self.test_type
+        )
+        self.words_df = pd.DataFrame({
+            'english': ['test_english'],
+            'french': ['test_french'],
+            'score': [42]
+        })
+
+    @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
+    @patch('src.data.database_interface.DbDefiner.get_database_cols')
+    @patch('src.data.database_interface.DbQuerier.get_db_cursor')
+    def test_get_tables(self, mock_get_db_cursor, mock_get_database_cols):
+        """"""
+        # Arrange
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        mock_get_database_cols.return_value = {
+            'version_voc':
+            [
+                'col_1', 'col_2'
+            ],
+            'version_perf':
+            [
+                'col_3', 'col_4'
+            ],
+            'version_words_count':
+            [
+                'col_5', 'col_6'
+            ],
+            'theme_voc':
+            [
+                'col_7', 'col_8'
+            ],
+            'theme_perf':
+            [
+                'col_9', 'col_10'
+            ],
+            'theme_words_count':
+            [
+                'col_11', 'col_12'
+            ],
+            'archives':
+            [
+                'col_13', 'col_14'
+            ]
+        }
+        # Act
+        result = self.db_querier.get_tables()
+        # Assert
+        self.assertIsInstance(result, dict)
+        self.assertEqual(len(result), 7)
+        self.assertIn('output', list(result.keys()))
+        mock_get_db_cursor.assert_called_once_with()
+
+    def test_get_output_table(self):
+        """
+        Should go from version to theme
+        """
+        # ----- ARRANGE
+        self.db_querier.test_type = 'version'
+        # ----- ACT
+        result = self.db_querier.get_output_table()
+        # ----- ASSERT
+        self.assertEqual(result, 'theme_voc')
+
+    def test_get_output_table_theme(self):
+        """
+        Should go from theme to theme archives
+        """
+        # ----- ARRANGE
+        self.db_querier.test_type = 'theme'
+        # ----- ACT
+        result = self.db_querier.get_output_table()
+        # ----- ASSERT
+        self.assertEqual(result, 'archives')
+
+    @patch('src.data.database_interface.logger')
+    def test_get_output_table_error(self, mock_logger):
+        """
+        Should raise error if test_type is not 'version' or 'theme'.
+        """
+        # ----- ARRANGE
+        self.db_querier.test_type = 'vladivostok'
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.db_querier.get_output_table()
+        # ----- ASSERT
+        mock_logger.error.assert_called_once_with(
+            f"Wrong test_type argument: {self.db_querier.test_type}"
+        )
+
+    @patch('src.data.database_interface.DbQuerier.get_db_cursor')
+    def test_read_word(self, mock_get_db_cursor):
+        # Arrange
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.return_value = [('test_english', 'test_french', 42)]
+        mock_cursor.fetchall.return_value = [('test_english', 'test_french', 42)]
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        english = self.words_df['english'][0]
+        # Act
+        result = self.db_querier.read_word(english)
+        # Assert
+        mock_get_db_cursor.assert_called_once()
+        request_1 = f"SELECT english, français, score FROM {self.table_name}"
+        request_2 = f"WHERE english = '{english}';"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        mock_cursor.fetchall.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+        self.assertEqual(result, ('test_english', 'test_french', 42))
+
+    @patch('src.data.database_interface.DbQuerier.get_db_cursor')
+    def test_read_word_error(self, mock_get_db_cursor):
+        # Arrange
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
+        english = self.words_df['english'][0]
+        # Act
+        result = self.db_querier.read_word(english)
+        # Assert
+        mock_get_db_cursor.assert_called_once()
+        request_1 = f"SELECT english, français, score FROM {self.table_name}"
+        request_2 = f"WHERE english = '{english}';"
+        sql_request = " ".join([request_1, request_2])
+        mock_cursor.execute.assert_called_once_with(sql_request)
+        self.assertFalse(result)
+        mock_cursor.close.assert_called_once()
+        mock_connection.close.assert_called_once()
+
+
+
+class TestDbInterfaceFunctions(unittest.TestCase):
+    """
+    Should provide all necessary methods to query the database
+    """
+    def test_check_test_type(self):
+        """
+        Should return the test type if valid
+        """
+        # ----- ARRANGE
+        test_type = 'version'
+        # ----- ACT
+        result = database_interface.check_test_type(test_type)
+        # ----- ASSERT
+        self.assertEqual(result, 'version')
+
+    @patch('src.data.database_interface.logger')
+    def test_check_test_type_error(self, mock_logger):
+        """
+        Should raise an error if test type is invalid
+        """
+        # ----- ARRANGE
+        test_type = 'mock_test_type'
+        # ----- ACT
+        with self.assertRaises(ValueError):
+            database_interface.check_test_type(test_type)
+        # ----- ASSERT
+        mock_logger.error.assert_called_once_with(
+            f"Test type {test_type} incorrect, should be either version or theme."
+        )

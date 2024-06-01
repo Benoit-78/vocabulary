@@ -25,6 +25,8 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
+from src.data.database_interface import DbManipulator
+
 
 
 class CliUser():
@@ -86,12 +88,12 @@ class Loader():
     """
     Data loader.
     """
-    def __init__(self, data_handler_):
+    def __init__(self, data_querier):
         """
         Must be done in the same session than the interroooo is launched.
         """
-        self.test_type = data_handler_.test_type
-        self.data_handler = data_handler_
+        self.test_type = data_querier.test_type
+        self.data_querier = data_querier
         self.tables = {}
         self.output_table = ''
 
@@ -99,7 +101,7 @@ class Loader():
         """
         Return the tables necessary for the interro to run.
         """
-        self.tables = self.data_handler.get_tables()
+        self.tables = self.data_querier.get_tables()
         voc = self.test_type + '_voc'
         # self.tables[voc] = self.tables[voc].reset_index()
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]
@@ -344,13 +346,18 @@ class Updater():
         self.good_words_df = pd.DataFrame()
         self.criteria = {}
         self.set_criteria()
+        self.db_manipulator = DbManipulator(
+            loader.data_querier.user_name,
+            loader.data_querier.db_name,
+            loader.data_querier.test_type,
+        )
 
     def set_criteria(self):
         """
         Upload the dictionnary of criteria.
         By the way, can you say 'criteria' three times in a row?
         """
-        with open(REPO_DIR + '/conf/interro.json', 'r') as file:
+        with open(REPO_DIR + '/conf/interro.json', 'r', encoding='utf-8') as file:
             self.criteria = json.load(file)
         self.criteria = self.criteria['interro']
 
@@ -386,11 +393,13 @@ class Updater():
         self.interro.words_df = self.interro.words_df.drop('img_good', axis=1)
 
     def move_good_words(self):
-        """Transfer the well-good words in an ouput table, and save this."""
+        """
+        Transfer the well-good words in an ouput table, and save this.
+        """
         self.set_good_words()
         self.copy_good_words()
         self.loader.tables['output'].reset_index(inplace=True)
-        self.loader.data_handler.save_table(
+        self.db_manipulator.save_table(
             'output',
             self.loader.tables['output']
         )
@@ -415,10 +424,10 @@ class Updater():
     def save_words(self):
         """
         1) Reset the index of words dataframe.
-        2) Use data_handler instance to save the table in the database.
+        2) Use data handler instance to save the table in the database.
         """
         self.interro.words_df.reset_index(inplace=True)
-        self.loader.data_handler.save_table(
+        self.db_manipulator.save_table(
             self.loader.test_type + '_voc',
             self.interro.words_df
         )
@@ -427,7 +436,7 @@ class Updater():
         """
         1) Save the user performance & today date.
         2) Save the former in the performance table.
-        3) Save the updated performance table through the data_handler instance.
+        3) Save the updated performance table through the data handler instance.
         """
         new_row = pd.DataFrame(
             data={
@@ -438,7 +447,7 @@ class Updater():
         )
         self.interro.perf_df = pd.concat([self.interro.perf_df, new_row])
         self.interro.perf_df.reset_index(inplace=True, names=['id_test'])
-        self.loader.data_handler.save_table(
+        self.db_manipulator.save_table(
             self.loader.test_type + '_perf',
             self.interro.perf_df
         )
@@ -470,7 +479,7 @@ class Updater():
             new_row
         ])
         self.interro.word_cnt_df.sort_index(inplace=True)
-        self.loader.data_handler.save_table(
+        self.db_manipulator.save_table(
             self.loader.test_type + '_words_count',
             self.interro.word_cnt_df
         )
@@ -484,7 +493,6 @@ class Updater():
         self.save_words()
         self.save_performances()
         self.save_words_count()
-
 
 
 

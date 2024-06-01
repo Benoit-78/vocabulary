@@ -35,7 +35,7 @@ class TestInterro(unittest.TestCase):
     @patch('src.interro.PremierTest.set_interro_df')
     @patch('src.api.interro.adjust_test_length')
     @patch('src.interro.Loader')
-    @patch('src.api.interro.database_interface.DbManipulator.check_test_type')
+    @patch('src.api.interro.database_interface.check_test_type')
     def test_load_test(
             self,
             mock_check_test_type,

@@ -24,9 +24,14 @@ REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
-with open(REPO_DIR + '/conf/data.json', 'r', encoding='utf-8') as param_file:
-    PARAMS = json.load(param_file)
-HOSTS = PARAMS['host'].keys()
+HOSTS = {
+    "localhost": "localhost",
+    "%": "%",
+    "web_local": "0.0.0.0",
+    "container": "db",
+    "fedora": "localhost",
+    "ip-172-32-0-78": "localhost"
+}
 
 
 
@@ -36,28 +41,27 @@ class DbInterface(ABC):
     All methods invoked by the user should provide with a host name.
     """
     def __init__(self):
-        self.host = PARAMS['host'][socket.gethostname()]
+        self.host = HOSTS[socket.gethostname()]
+        hosts = HOSTS.keys()
+        if self.host not in hosts:
+            logger.warning(f"host: {self.host}")
+            logger.error(f"host should be in {hosts}")
+            raise ValueError
 
     def get_db_cursor(self):
         """
         Connect to vocabulary database if credentials are correct.
         # """
-        user_name = 'root'
+        user_name = os.getenv('VOC_DB_ROOT_USR')
         password = os.getenv('VOC_DB_ROOT_PWD')
         db_name = 'mysql'
-        # logger.debug(f"port: {PARAMS['port']}")
         connection_config = {
             'user': user_name,
             'password': password,
             'database': db_name,
-            'port': PARAMS['port']
+            'port': os.getenv('VOC_DB_PORT')
         }
-        if self.host not in HOSTS:
-            logger.warning(f"host: {self.host}")
-            logger.error(f"host should be in {HOSTS}")
-        else:
-            connection_config['host'] = PARAMS['host'][self.host]
-        # logger.debug(f"host: {PARAMS['host'][self.host]}")
+        connection_config['host'] = HOSTS[self.host]
         connection = mariadb.connect(**connection_config)
         cursor = connection.cursor()
         return connection, cursor
@@ -402,7 +406,7 @@ class DbDefiner(DbInterface):
 
 class DbManipulator(DbInterface):
     """
-    Working with data.
+    Modifying the data
     """
     def __init__(self, user_name, db_name, test_type):
         super().__init__()
@@ -412,57 +416,8 @@ class DbManipulator(DbInterface):
         else:
             self.db_name = db_name
         self.db_definer = DbDefiner(self.user_name)
-        self.test_type = ''
-        self.check_test_type(test_type)
-
-    def check_test_type(self, test_type):
-        """
-        Check the test type attribute.
-        """
-        if test_type not in ['version', 'theme']:
-            logger.error(
-                f"Test type {test_type} incorrect, should be either version or theme."
-            )
-        self.test_type = test_type
-
-    def get_tables(self):
-        """
-        Load the different tables necessary to the app.
-        """
-        connection, cursor = self.get_db_cursor()
-        cursor.execute(f"USE {self.db_name};")
-        cols = self.db_definer.get_database_cols(self.db_name)
-        tables_names = list(cols.keys())
-        tables = {}
-        for table_name in tables_names:
-            sql_request = f"SELECT * FROM {table_name}"
-            cursor.execute(sql_request)
-            tables[table_name] = pd.DataFrame(
-                columns=cols[table_name],
-                data=cursor.fetchall()
-            )
-            index_col = tables[table_name].columns[0]
-            tables[table_name] = tables[table_name].set_index(index_col)
-        # Special case of output table
-        output_table = self.get_output_table()
-        tables['output'] = tables[output_table]
-        tables.pop(output_table)
-        cursor.close()
-        connection.close()
-        return tables
-
-    def get_output_table(self):
-        """
-        Rename the output name according to the test type.
-        """
-        if self.test_type == 'version':
-            output_table = 'theme_voc'
-        elif self.test_type == 'theme':
-            output_table = 'archives'
-        else:
-            logger.error(f"Wrong test_type argument: {self.test_type}")
-            raise SystemExit
-        return output_table
+        self.db_querier = DbQuerier(self.user_name, db_name, test_type)
+        self.test_type = check_test_type(test_type)
 
     def insert_word(self, row: list):
         """
@@ -472,7 +427,7 @@ class DbManipulator(DbInterface):
         today_str = str(datetime.today().date())
         words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
         english = row[0]
-        if self.read_word(english) is not None:
+        if self.db_querier.read_word(english) is not None:
             result = 'Word already exists'
             logger.error(result)
             return result
@@ -492,34 +447,6 @@ class DbManipulator(DbInterface):
         finally:
             cursor.close()
             connection.close()
-        return result
-
-    def read_word(self, english: str):
-        """
-        Read the given word
-        """
-        connection, cursor = self.get_db_cursor()
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = "SELECT english, français, score"
-        request_2 = f"FROM {self.db_name}.{words_table_name}"
-        request_3 = f"WHERE english = '{english}';"
-        sql_request = " ".join([request_1, request_2, request_3])
-        request_result = None
-        try:
-            request_result = cursor.execute(sql_request)
-            request_result = cursor.fetchall()
-        except Exception as err:
-            if err.errno == -1:
-                logger.error(err)
-                result = None
-        finally:
-            cursor.close()
-            connection.close()
-        if request_result:
-            english, native, score = request_result[0]
-            result = (english, native, score)
-        else:
-            result = None
         return result
 
     def update_word(self, english: str, new_nb, new_score):
@@ -574,13 +501,13 @@ class DbManipulator(DbInterface):
         connection, cursor = self.get_db_cursor()
         cols = self.db_definer.get_database_cols(self.db_name)
         if table_name == 'output':
-            table_name = self.get_output_table()
+            table_name = self.db_querier.get_output_table()
         table = table[cols[table_name]]
         try:
             engine = create_engine(
                 ''.join([
                     "mysql+pymysql",
-                    "://", 'root',
+                    "://", os.getenv('VOC_DB_ROOT_USR'),
                     ':', os.getenv('VOC_DB_ROOT_PWD'),
                     '@', self.host,
                     '/', self.db_name
@@ -602,3 +529,99 @@ class DbManipulator(DbInterface):
             cursor.close()
             connection.close()
         return result
+
+
+
+class DbQuerier(DbInterface):
+    """
+    Querying the data
+    """
+    def __init__(self, user_name, db_name, test_type):
+        super().__init__()
+        self.user_name = user_name
+        if self.user_name not in db_name:
+            self.db_name = f"{user_name}_{db_name}"
+        else:
+            self.db_name = db_name
+        self.db_definer = DbDefiner(self.user_name)
+        self.test_type = check_test_type(test_type)
+
+    def get_tables(self):
+        """
+        Load the different tables necessary to the app.
+        """
+        connection, cursor = self.get_db_cursor()
+        cursor.execute(f"USE {self.db_name};")
+        cols = self.db_definer.get_database_cols(self.db_name)
+        tables_names = list(cols.keys())
+        tables = {}
+        for table_name in tables_names:
+            sql_request = f"SELECT * FROM {table_name}"
+            cursor.execute(sql_request)
+            tables[table_name] = pd.DataFrame(
+                columns=cols[table_name],
+                data=cursor.fetchall()
+            )
+            index_col = tables[table_name].columns[0]
+            tables[table_name] = tables[table_name].set_index(index_col)
+        # Special case of output table
+        output_table = self.get_output_table()
+        tables['output'] = tables[output_table]
+        tables.pop(output_table)
+        cursor.close()
+        connection.close()
+        return tables
+
+    def get_output_table(self):
+        """
+        Rename the output name according to the test type.
+        """
+        if self.test_type == 'version':
+            output_table = 'theme_voc'
+        elif self.test_type == 'theme':
+            output_table = 'archives'
+        else:
+            logger.error(f"Wrong test_type argument: {self.test_type}")
+            raise SystemExit
+        return output_table
+
+    def read_word(self, english: str):
+        """
+        Read the given word
+        """
+        connection, cursor = self.get_db_cursor()
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        request_1 = "SELECT english, français, score"
+        request_2 = f"FROM {self.db_name}.{words_table_name}"
+        request_3 = f"WHERE english = '{english}';"
+        sql_request = " ".join([request_1, request_2, request_3])
+        request_result = None
+        try:
+            request_result = cursor.execute(sql_request)
+            request_result = cursor.fetchall()
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = None
+        finally:
+            cursor.close()
+            connection.close()
+        if request_result:
+            english, native, score = request_result[0]
+            result = (english, native, score)
+        else:
+            result = None
+        return result
+
+
+
+def check_test_type(test_type):
+    """
+    Check the test type attribute.
+    """
+    if test_type not in ['version', 'theme']:
+        logger.error(
+            f"Test type {test_type} incorrect, should be either version or theme."
+        )
+        raise ValueError
+    return test_type
