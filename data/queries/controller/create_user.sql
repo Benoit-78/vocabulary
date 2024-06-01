@@ -1,0 +1,1 @@
+CREATE USER '{user_name}'@'{host}' IDENTIFIED BY '{user_password}';

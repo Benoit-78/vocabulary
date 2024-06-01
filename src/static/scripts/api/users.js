@@ -47,11 +47,11 @@ async function authenticateUser(token, formData) {
         if (data && data.message === "User successfully authenticated") {
             window.location.href = `/v1/user/user-space?token=${data.token}`;
         } else if (data && data.message === "Unknown user") {
-            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
+            window.location.href = `/v1/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else if (data && data.message === "Password incorrect") {
-            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
+            window.location.href = `/v1/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else if (data && data.message === "User name or password not provided") {
-            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
+            window.location.href = `/v1/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else {
             console.error("Error in sign-in");
         }

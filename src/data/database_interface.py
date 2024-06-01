@@ -86,7 +86,13 @@ class DbController(DbInterface):
     @staticmethod
     def load_sql_queries():
         queries = [
-            
+            'create_user',
+            'grant_select',
+            'grant_all',
+            'get_users_mysql',
+            'add_user',
+            'get_users',
+            'revoke_all'
         ]
         sql_queries = {}
         for query in queries:
@@ -102,9 +108,12 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor()
         result = None
         try:
-            cursor.execute(
-                f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';"
+            sql_query = self.sql_queries['create_user'].format(
+                user_name=user_name,
+                host=self.host,
+                user_password=user_password
             )
+            cursor.execute(sql_query)
             connection.commit()
             result = True
         except Exception as err:
@@ -123,7 +132,11 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor()
         result = None
         try:
-            cursor.execute(f"GRANT SELECT ON common.* TO '{user_name}'@'{self.host}';")
+            sql_query = self.sql_queries['grant_select'].format(
+                user_name=user_name,
+                host=self.host
+            )
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(f"User '{user_name}' created on {self.host}.")
             result = True
@@ -140,12 +153,16 @@ class DbController(DbInterface):
         """
         Grant privileges to the user on the given database.
         """
+        sql_db_name = f"{user_name}_{db_name}"
         connection, cursor = self.get_db_cursor()
         result = None
         try:
-            request_1 = "GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON "
-            request_2 = f"{user_name}_{db_name}.* TO '{user_name}'@'{self.host}';"
-            cursor.execute(request_1 + request_2)
+            sql_query = self.sql_queries['grant_all'].format(
+                sql_db_name=sql_db_name,
+                user_name=user_name,
+                host=self.host
+            )
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(
                 f"User '{user_name}' granted access to '{user_name}_{db_name}'."
@@ -169,7 +186,8 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor()
         users_list = []
         try:
-            cursor.execute("SELECT User, Host FROM mysql.user;")
+            sql_query = self.sql_queries['get_users_mysql']
+            cursor.execute(sql_query)
             result = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
             df = pd.DataFrame(result, columns=columns)
@@ -195,11 +213,12 @@ class DbController(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         try:
-            request_1 = "INSERT INTO `users`.`voc_users`"
-            request_2 = "(`username`, `password_hash`, `email`, `disabled`)"
-            request_3 = f"VALUES('{user_name}', '{hash_password}', '{user_email}', FALSE);"
-            sql_request = " ".join([request_1, request_2, request_3])
-            cursor.execute(sql_request)
+            sql_query = self.sql_queries['add_user'].format(
+                user_name=user_name,
+                hash_password=hash_password,
+                user_email=user_email
+            )
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(f"User '{user_name}' added to users table.")
             result = True
@@ -219,10 +238,8 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor()
         users_list = []
         try:
-            request_1 = "SELECT username, password_hash, email, disabled"
-            request_2 = "FROM users.voc_users;"
-            sql_request = " ".join([request_1, request_2])
-            cursor.execute(sql_request)
+            sql_query = self.sql_queries['get_users']
+            cursor.execute(sql_query)
             result = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
             users_df = pd.DataFrame(result, columns=columns)
@@ -244,10 +261,12 @@ class DbController(DbInterface):
         connection, cursor = self.get_db_cursor()
         result = None
         try:
-            request_1 = "REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON"
-            request_2 = f"{db_name}.* FROM '{user_name}'@'{self.host}';"
-            sql_request = " ".join([request_1, request_2])
-            cursor.execute(sql_request)
+            sql_query = self.sql_queries['revoke_all'].format(
+                db_name=db_name,
+                user_name=user_name,
+                host=self.host
+            )
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(
                 f"User '{user_name}' removed from '{user_name}_{db_name}'."
@@ -484,6 +503,22 @@ class DbManipulator(DbInterface):
         self.db_definer = DbDefiner(self.user_name)
         self.db_querier = DbQuerier(self.user_name, db_name, test_type)
         self.test_type = check_test_type(test_type)
+        self.sql_queries = self.load_sql_queries()
+
+    @staticmethod
+    def load_sql_queries():
+        queries = [
+            # 'insert_word',
+            # 'update_word',
+            # 'delete_word',
+            # 'save_table'
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/manipulator/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
 
     def insert_word(self, row: list):
         """
@@ -611,6 +646,21 @@ class DbQuerier(DbInterface):
             self.db_name = db_name
         self.db_definer = DbDefiner(self.user_name)
         self.test_type = check_test_type(test_type)
+        self.sql_queries = self.load_sql_queries()
+
+    @staticmethod
+    def load_sql_queries():
+        queries = [
+            # 'get_tables',
+            # 'get_output_table',
+            # 'read_word'
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/querier/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
 
     def get_tables(self):
         """
@@ -678,6 +728,7 @@ class DbQuerier(DbInterface):
         else:
             result = None
         return result
+
 
 
 

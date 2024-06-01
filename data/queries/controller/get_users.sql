@@ -1,0 +1,1 @@
+SELECT username, password_hash, email, disabled FROM users.voc_users;
