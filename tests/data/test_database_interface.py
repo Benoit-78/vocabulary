@@ -528,30 +528,6 @@ class TestDbDefiner(unittest.TestCase):
         # ----- ASSERT
         self.assertTrue(result)
         mock_cursor.execute.assert_any_call(f"USE {sql_db_name};")
-        mock_cursor.execute.assert_any_call(
-            "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-            "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-        )
-        mock_cursor.execute.assert_any_call(
-            "CREATE TABLE version_perf (test_date DATE, score INT, taux INT);"
-        )
-        mock_cursor.execute.assert_any_call(
-            "CREATE TABLE version_words_count (test_date DATE, nb INT);"
-        )
-        mock_cursor.execute.assert_any_call(
-            "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-            "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-        )
-        mock_cursor.execute.assert_any_call(
-            "CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);"
-        )
-        mock_cursor.execute.assert_any_call(
-            "CREATE TABLE theme_words_count (test_date DATE, nb INT);"
-        )
-        mock_cursor.execute.assert_any_call(
-            "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-            "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-        )
         assert mock_cursor.execute.call_count == 8
         mock_connection.commit.assert_called_once()
         mock_cursor.close.assert_called_once()

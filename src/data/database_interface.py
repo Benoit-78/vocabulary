@@ -43,6 +43,12 @@ class DbInterface(ABC):
     """
     def __init__(self):
         self.host = HOSTS[socket.gethostname()]
+        self.check_host()
+
+    def check_host(self):
+        """
+        Check if the host is in the list of expected hosts.
+        """
         hosts = HOSTS.keys()
         if self.host not in hosts:
             logger.warning(f"host: {self.host}")
@@ -73,6 +79,22 @@ class DbController(DbInterface):
     """
     Manage access.
     """
+    def __init__(self):
+        super().__init__()
+        self.sql_queries = self.load_sql_queries()
+
+    @staticmethod
+    def load_sql_queries():
+        queries = [
+            
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/controller/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
+
     def create_user_in_mysql(self, user_name, user_password):
         """
         Create a user in the mysql.user table.
@@ -316,10 +338,11 @@ class DbDefiner(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         try:
-            cursor.execute(
-                self.sql_queries['show_db'],
-                (f'{self.user_name}_%',)
-            )
+            sql_query = self.user_name.join([
+                self.sql_queries['show_db'] + " '",
+                "_%';"
+            ])
+            cursor.execute(sql_query)
             databases = [db[0] for db in cursor.fetchall()]
             result = databases
         except Exception as err:
@@ -345,16 +368,17 @@ class DbDefiner(DbInterface):
                 sql_query = sql_db_name.join([self.sql_queries['use_db'] + ' ', ";"])
                 cursor.execute(sql_query)
                 create_tables = [
-                    'create_version_voc'
-                    'create_version_perf'
-                    'create_version_count'
-                    'create_theme_voc'
-                    'create_theme_perf'
-                    'create_theme_count'
+                    'create_version_voc',
+                    'create_version_perf',
+                    'create_version_count',
+                    'create_theme_voc',
+                    'create_theme_perf',
+                    'create_theme_count',
                     'create_archives'
                 ]
                 for create_table in create_tables:
                     sql_query = self.sql_queries[create_table]
+                    logger.debug("\n" + sql_query)
                     cursor.execute(sql_query)
                 connection.commit()
                 result = True
