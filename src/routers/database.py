@@ -8,9 +8,9 @@
 import os
 import sys
 
-from loguru import logger
-from fastapi import Query, Request, Depends, File, UploadFile, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+# from loguru import logger
+from fastapi import Query, Request, Depends, File, UploadFile
+from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
 
@@ -18,11 +18,10 @@ REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
-from src.data import users
 from src.api import database as db_api
 from src.api import authentication as auth_api
 
-database_router = APIRouter(prefix='/database')
+database_router = APIRouter(prefix='/v1/database')
 templates = Jinja2Templates(directory="src/templates")
 
 
@@ -42,18 +41,6 @@ def user_databases(
     )
 
 
-@database_router.post("/choose-database")
-async def choose_database(
-        data: dict,
-        token: str = Depends(auth_api.check_token),
-    ):
-    """
-    Choose a database.
-    """
-    json_response = db_api.choose_database(data, token)
-    return json_response
-
-
 @database_router.post("/create-database")
 async def create_database(
         data: dict,
@@ -63,6 +50,54 @@ async def create_database(
     Create a database.
     """
     json_response = db_api.create_database(data, token)
+    return json_response
+
+
+@database_router.post("/retrieve-database")
+async def retrieve_database(
+        data: dict,
+        token: str = Depends(auth_api.check_token),
+    ):
+    """
+    Choose a database.
+    """
+    json_response = db_api.retrieve_database(data, token)
+    return json_response
+
+
+@database_router.get("/see-database", response_class=HTMLResponse)
+def see_database(
+        request: Request,
+        token: str = Depends(auth_api.check_token),
+        db_name: str = Query(None, alias="databaseName"),
+        version_table: str = Query(None, alias="versionTable"),
+        theme_table: str = Query(None, alias="themeTable"),
+    ):
+    """
+    Base page for data input by the user.
+    """
+    request_dict = db_api.see_database(
+        request,
+        token,
+        db_name,
+        version_table,
+        theme_table
+    )
+    return templates.TemplateResponse(
+        "database/see.html",
+        request_dict
+    )
+
+
+@database_router.post("/choose-database")
+async def choose_database(
+        data: dict,
+        token: str = Depends(auth_api.check_token),
+    ):
+    """
+    Choose a database.
+    """
+    json_response = db_api.choose_database(data, token)
     return json_response
 
 

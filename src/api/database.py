@@ -19,7 +19,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.data import users
+from src.data import users, database_interface
 from src.api import authentication as auth_api
 
 
@@ -46,32 +46,6 @@ def load_user_databases(request, token, error_message):
         'createDatabaseErrorMessage': db_message
     }
     return response_dict
-
-
-def choose_database(data, token: str):
-    """
-    Choose the given database.
-    """
-    logger.info('')
-    user_name = auth_api.get_user_name_from_token(token)
-    user_account = users.UserAccount(user_name)
-    db_name = data['db_name']
-    db_exists = user_account.check_if_database_exists(db_name)
-    if not db_exists:
-        json_response = JSONResponse(
-            content=
-            {
-                "message": f"Database name {db_name} not available",
-            }
-        )
-    if db_exists:
-        json_response = JSONResponse(
-            content=
-            {
-                "message": "Database chosen successfully",
-            }
-        )
-    return json_response
 
 
 def create_database(data: dict, token: str):
@@ -114,6 +88,79 @@ def create_database(data: dict, token: str):
                 'message': "Database created successfully",
                 'token': token,
                 'databaseName': db_name
+            }
+        )
+    return json_response
+
+
+def retrieve_database(data: dict, token: str):
+    """
+    See the given database.
+    """
+    logger.info('')
+    user_name = auth_api.get_user_name_from_token(token)
+    db_name = data['db_name']
+    db_manipulator = database_interface.DbManipulator(
+        user_name,
+        db_name,
+        'version'
+    )
+    tables = db_manipulator.get_tables()
+    version_table = tables['version_voc']
+    theme_table = tables['theme_voc']
+    json_response = JSONResponse(
+        content=
+        {
+            "message": "Retrieved database words successfully",
+            "token": token,
+            'versionTable': version_table,
+            'themeTable': theme_table,
+        }
+    )
+    return json_response
+
+
+def see_database(
+        request,
+        token: str,
+        db_name: str,
+        version_table: str,
+        theme_table: str
+    ):
+    """
+    Base page for data input by the user.
+    """
+    request_dict = {
+        'request': request,
+        'token': token,
+        'databaseName': db_name,
+        'versionTable': version_table,
+        'themeTable': theme_table,
+    }
+    return request_dict
+
+
+def choose_database(data, token: str):
+    """
+    Choose the given database.
+    """
+    logger.info('')
+    user_name = auth_api.get_user_name_from_token(token)
+    user_account = users.UserAccount(user_name)
+    db_name = data['db_name']
+    db_exists = user_account.check_if_database_exists(db_name)
+    if not db_exists:
+        json_response = JSONResponse(
+            content=
+            {
+                "message": f"Database name {db_name} not available",
+            }
+        )
+    if db_exists:
+        json_response = JSONResponse(
+            content=
+            {
+                "message": "Database chosen successfully",
             }
         )
     return json_response

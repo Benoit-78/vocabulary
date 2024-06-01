@@ -17,6 +17,7 @@ if REPO_DIR not in sys.path:
 
 from fastapi import FastAPI, Depends, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.routing import APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
@@ -30,7 +31,7 @@ from src.api import authentication as auth_api
 
 app = FastAPI(
     title="vocabulary",
-    docs_url="/docs"
+    docs_url="/doc"
 )
 
 
@@ -56,12 +57,14 @@ app.add_middleware(
     CacheControlMiddleware
 )
 # Routers
+v1_router = APIRouter(prefix="/v1")
 app.include_router(common_router)
 app.include_router(dashboard_router)
 app.include_router(database_router)
 app.include_router(guest_router)
 app.include_router(interro_router)
 app.include_router(user_router)
+
 # CSS
 app.mount(
     "/static",
@@ -80,10 +83,10 @@ async def root_page(
     """
     Redirects to the welcome page.
     """
-    return RedirectResponse(url="/welcome")
+    return RedirectResponse(url="/v1/welcome")
 
 
-@app.get("/welcome", response_class=HTMLResponse)
+@v1_router.get("/welcome", response_class=HTMLResponse)
 async def welcome_page(
         request: Request,
         token: str = Depends(auth_api.create_token)
@@ -98,7 +101,7 @@ async def welcome_page(
     )
 
 
-@app.get("/sign-in", response_class=HTMLResponse)
+@v1_router.get("/sign-in", response_class=HTMLResponse)
 def sign_in(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -114,7 +117,7 @@ def sign_in(
     )
 
 
-@app.get("/sign-up", response_class=HTMLResponse)
+@v1_router.get("/sign-up", response_class=HTMLResponse)
 def sign_up(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -130,7 +133,7 @@ def sign_up(
     )
 
 
-@app.get("/about-the-app", response_class=HTMLResponse)
+@v1_router.get("/about-the-app", response_class=HTMLResponse)
 def about_the_app(
         request: Request,
         token: str = Depends(auth_api.check_token)
@@ -145,7 +148,7 @@ def about_the_app(
     )
 
 
-@app.get("/help", response_class=HTMLResponse)
+@v1_router.get("/help", response_class=HTMLResponse)
 def get_help(
         request: Request,
         token: str = Depends(auth_api.check_token)
@@ -158,3 +161,6 @@ def get_help(
         "help.html",
         response_dict
     )
+
+
+app.include_router(v1_router)

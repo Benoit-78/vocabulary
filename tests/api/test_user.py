@@ -154,7 +154,8 @@ class TestUserApi(unittest.TestCase):
         ):
         # ----- ARRANGE
         token = 'mock_token'
-        form_data = {'client_id': 'yes'}
+        form_data = MagicMock()
+        form_data.client_id = 'yes'
         mock_authenticate_user_with_oauth.return_value = 'return_value'
         # ----- ACT
         result = user_api.authenticate_user(token, form_data)
@@ -238,10 +239,10 @@ class TestUserApi(unittest.TestCase):
     def test_authenticate_user_empty(self):
         # ----- ARRANGE
         token = 'mock_token'
-        form_data = {
-            'username': 'qscd',
-            'password': ''
-        }
+        form_data = MagicMock()
+        form_data.username = 'qscd'
+        form_data.password = ''
+        form_data.client_id = None
         # ----- ACT
         result = user_api.authenticate_user(token, form_data)
         # ----- ASSERT
@@ -259,7 +260,8 @@ class TestUserApi(unittest.TestCase):
     def test_authenticate_user_with_oauth(self, mock_authenticate_with_oauth):
         # ----- ARRANGE
         token = 'mock_token'
-        form_data = {'client_id': 'test_client_id'}
+        form_data = MagicMock()
+        form_data.client_id = 'test_client_id'
         mock_authenticate_with_oauth.return_value = "some_random_user_I_dont_care_about"
         # ----- ACT
         result = user_api.authenticate_user_with_oauth(token, form_data)
@@ -279,7 +281,8 @@ class TestUserApi(unittest.TestCase):
     def test_authenticate_user_with_oauth_error(self, mock_authenticate_with_oauth):
         # ----- ARRANGE
         token = 'mock_token'
-        form_data = {'client_id': 'test_client_id'}
+        form_data = MagicMock()
+        form_data.client_id = 'test_client_id'
         mock_authenticate_with_oauth.return_value = None
         # ----- ASSERT
         with self.assertRaises(HTTPException):

@@ -73,10 +73,10 @@ def authenticate_user(
     """
     Authenticate the user.
     """
-    if 'client_id' in form_data.keys():
+    if form_data.client_id is not None:
         json_response = authenticate_user_with_oauth(token, form_data)
         return json_response
-    if '' in [form_data['username'], form_data['password']]:
+    if '' in [form_data.username, form_data.password]:
         json_response = JSONResponse(
             content=
             {

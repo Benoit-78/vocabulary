@@ -14,28 +14,28 @@
 }
 
 .data-table {
-    border-radius: 10px;
-    border-collapse: collapse;
-    width: 100%;
     background-color: rgba(183, 98, 6, 0.6);
+    border-collapse: collapse;
+    border-radius: 10px;
+    width: 100%;
 }
 
-.data-table tr {
+/* .data-table tr {
     border-radius: 10px;
     margin-bottom: 5px;
     margin-top: 5px;
     width: 100%;
     text-align: center;
-}
+} */
 
  /* Inner lines */
 .data-table td {
     border: 1px solid orange;
     color: white;
     padding: 8px;
-    text-align: center;
-    width: 50%;
-    box-sizing: border-box;
+    /* text-align: center; */
+    /* width: 50%; */
+    /* box-sizing: border-box; */
 }
 
 .data-table tr:first-child td {
@@ -57,20 +57,34 @@
 }
 
 /* ------------------------- */
-.data-table tbody tr {
+/* .data-table tbody tr {
     display: block;
     justify-content: center;
-    margin-bottom: 5px; /* Adjust as needed for spacing */
-}
+    margin-bottom: 5px;
+} */
 
-.data-table tbody tr:last-child {
-    margin-bottom: 0; /* Remove margin from the last row */
-}
+/* Remove margin from the last row */
+/* .data-table tbody tr:last-child {
+    margin-bottom: 0;
+} */
 
-.data-table tbody {
-    display: block; /* Makes sure the margins between rows apply correctly */
-}
+/* Makes sure the margins between rows apply correctly */
+/* .data-table tbody {
+    display: block;
+} */
 
-.data-table tbody tr td {
-    flex: 1; /* Make each cell take up equal space */
+/* Make each cell take up equal space */
+/* .data-table tbody tr td {
+    flex: 1;
+} */
+
+
+.display-table {
+    border: 1px solid orange;
+    color: white;
+    padding: 8px;
+    justify-content: center;
+    text-align: center;
+    /* width: 50%; */
+    /* box-sizing: border-box; */
 }

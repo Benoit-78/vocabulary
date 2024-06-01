@@ -19,7 +19,7 @@ sys.path.append(REPO_DIR)
 
 from src.api import dashboard as dashboard_api
 
-dashboard_router = APIRouter(prefix='/dashboard')
+dashboard_router = APIRouter(prefix='/v1/dashboard')
 templates = Jinja2Templates(directory="src/templates")
 
 

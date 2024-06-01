@@ -20,7 +20,7 @@ sys.path.append(REPO_DIR)
 from src.api import authentication as auth_api
 from src.api import common as api_common
 
-common_router = APIRouter(prefix="/common")
+common_router = APIRouter(prefix="/v1/common")
 
 
 @common_router.post("/change-language", response_class=HTMLResponse)

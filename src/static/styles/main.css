@@ -14,19 +14,17 @@ body {
     background-size: cover;
 }
 
-
 p {
     position: relative;
-    z-index: 1; /* Ensure the text is above the rectangle */
+    /* Ensure the text is above the rectangle */
+    z-index: 1;
 }
-
 
 label {
     display: block;
     margin-bottom: 5px;
 }
 
-/* styles/main.css */
 .container {
     text-align: center;
     max-width: 600px;
@@ -71,28 +69,13 @@ input {
     width: 100%;
 }
 
-
 .white-text {
     color: #ffffff;
 }
 
 .rounded-input {
-    border-radius: 20px; /* Adjust the value to control the roundness of the corners */
-    padding: 8px; /* Adjust the padding as needed */
-    border: 1px solid #ccc; /* Optional: Add border for better appearance */
-    width: 200px; /* Adjust the width as needed */
+    border-radius: 20px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    width: 200px;
 }
-
-/* @keyframes slideIn {
-    from {
-        transform: translateY(-100%);
-    }
-    to {
-        transform: translateY(0);
-    }
-} */
-
-/* Slide in effect */
-/* #table-container {
-    animation: slideIn 1s ease-out;
-} */

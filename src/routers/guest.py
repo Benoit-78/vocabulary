@@ -25,7 +25,7 @@ if REPO_DIR not in sys.path:
 from src.api import authentication as auth_api
 from src.api import guest as guest_api
 
-guest_router = APIRouter(prefix='/guest')
+guest_router = APIRouter(prefix='/v1/guest')
 templates = Jinja2Templates(directory="src/templates")
 
 
@@ -138,12 +138,12 @@ def propose_rattraps_guest(
     Load a page that proposes the user to take a rattraps, or leave the test.
     """
     response_dict = guest_api.propose_rattraps_guest(
-        request,
-        interro_category,
-        total,
-        score,
-        token,
-        language
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        score=score,
+        token=token,
+        language=language
     )
     return templates.TemplateResponse(
         "guest/rattraps.html",

@@ -12,7 +12,7 @@ describe('nextGuess', () => {
     nextGuess('sampleToken', 20, 5, 100);
 
     // Expect window.location.href to be updated with the correct URL
-    expect(hrefSetter).toHaveBeenCalledWith('/interro/interro-question?token=sampleToken&total=20&count=5&score=100');
+    expect(hrefSetter).toHaveBeenCalledWith('/v1/interro/interro-question?token=sampleToken&total=20&count=5&score=100');
 
     // Restore window.location.href to its original value
     window.location.href = oldLocation;

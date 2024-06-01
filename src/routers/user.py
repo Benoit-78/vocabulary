@@ -21,9 +21,8 @@ sys.path.append(REPO_DIR)
 
 from src.api import authentication as auth_api
 from src.api import user as user_api
-from src.data import users
 
-user_router = APIRouter(prefix="/user")
+user_router = APIRouter(prefix="/v1/user")
 templates = Jinja2Templates(directory="src/templates")
 
 

@@ -3,7 +3,7 @@ export { sendGuestSettings, showTranslation, sendUserAnswer, nextGuess, launchRa
 
 function sendGuestSettings(token, language) {
     fetch(
-        `/guest/save-interro-settings?token=${token}`,
+        `/v1/guest/save-interro-settings?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -32,7 +32,7 @@ function startTest(token, language, interroCategory) {
     var total = 10;
     var count = 0;
     var score = 0;
-    window.location.href = `/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
+    window.location.href = `/v1/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
 }
 
 
@@ -41,7 +41,7 @@ function showTranslation(token, interroCategory, numWords, count, score, languag
     var count = parseInt(count, 10);
     var score = parseInt(score, 10);
     if (!isNaN(total)) {
-        window.location.href = `/guest/interro-answer?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
+        window.location.href = `/v1/guest/interro-answer?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
     } else {
         console.error("Invalid numWords:", total);
     }
@@ -54,7 +54,7 @@ function sendUserAnswer(token, interroCategory, answer, count, numWords, score, 
     var score = parseInt(score, 10);
     var language = String(language);
     fetch(
-        `/guest/user-answer?token=${token}`,
+        `/v1/guest/user-answer?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -90,7 +90,7 @@ function nextGuess(token, interroCategory, numWords, count, score, language) {
     var total = parseInt(numWords, 10);
     var count = parseInt(count, 10);
     var score = parseInt(score, 10);
-    window.location.href = `/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
+    window.location.href = `/v1/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language.toLowerCase()}`;
 }
 
 
@@ -100,7 +100,7 @@ function launchRattraps(token, interroCategory, newWords, newCount, newScore, la
     var score = parseInt(newScore, 10);
     console.log("Total:", total, "Count:", count, "Score:", score);
     fetch(
-        `/guest/launch-guest-rattraps?token=${token}`,
+        `/v1/guest/launch-guest-rattraps?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -120,7 +120,7 @@ function launchRattraps(token, interroCategory, newWords, newCount, newScore, la
             const count = data.count;
             const score = data.score;
             // console.log("Total:", total, "Count:", count, "Score:", score);
-            window.location.href = `/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language}`;
+            window.location.href = `/v1/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language}`;
         } else {
             console.error("Error with guest rattraps creation.");
         }
@@ -135,8 +135,8 @@ function endInterro(token, interroCategory, numWords, score, language) {
     var total = parseInt(numWords, 10);
     var score = parseInt(score, 10);
     if (score === total) {
-        window.location.href = `/guest/interro-end?token=${token}&total=${total}&score=${score}`;
+        window.location.href = `/v1/guest/interro-end?token=${token}&total=${total}&score=${score}`;
     } else {
-        window.location.href = `/guest/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}&language=${language.toLowerCase()}`;
+        window.location.href = `/v1/guest/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}&language=${language.toLowerCase()}`;
     }
 }

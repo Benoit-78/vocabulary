@@ -25,6 +25,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 document.addEventListener("DOMContentLoaded", function() {
+    const seeDatabaseButton = document.getElementById("seeDatabaseButton");
+    const token = document.body.dataset.token;
+
+    seeDatabaseButton.addEventListener("click", function() {
+        var databaseName = document.getElementById("databaseName").value;
+        seeDatabase(token, databaseName);
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
     const chooseDatabaseButton = document.getElementById("chooseDatabaseButton");
     const token = document.body.dataset.token;
 

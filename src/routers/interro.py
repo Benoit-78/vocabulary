@@ -22,7 +22,7 @@ if REPO_DIR not in sys.path:
 from src.api import authentication as auth_api
 from src.api import interro as interro_api
 
-interro_router = APIRouter(prefix='/interro')
+interro_router = APIRouter(prefix='/v1/interro')
 templates = Jinja2Templates(directory="src/templates")
 
 
