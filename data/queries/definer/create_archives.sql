@@ -1,0 +1,1 @@
+CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50), français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);

@@ -126,7 +126,6 @@ def authenticate_user_with_oauth(
         form_data
     ):
     user = auth_api.authenticate_with_oauth(form_data)
-    logger.debug(f'user: {user}')
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -6,6 +6,7 @@
 
 import json
 import os
+import re
 import socket
 import sys
 from abc import ABC
@@ -51,7 +52,7 @@ class DbInterface(ABC):
     def get_db_cursor(self):
         """
         Connect to vocabulary database if credentials are correct.
-        # """
+        """
         user_name = os.getenv('VOC_DB_ROOT_USR')
         password = os.getenv('VOC_DB_ROOT_PWD')
         db_name = 'mysql'
@@ -249,17 +250,57 @@ class DbDefiner(DbInterface):
         super().__init__()
         self.user_name = user_name
         self.db_name = None
+        self.sql_queries = self.load_sql_queries()
+
+    @staticmethod
+    def load_sql_queries():
+        queries = [
+            'show_db',
+            'use_db',
+            'create_db',
+            'create_version_voc',
+            'create_version_perf',
+            'create_version_count',
+            'create_theme_voc',
+            'create_theme_perf',
+            'create_theme_count',
+            'create_archives',
+            'show_tables',
+            'drop_db'
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/definer/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
+
+    def validate_db_name(self, db_name):
+        """
+        Regular expression to match a valid database name (alphanumeric and underscores)
+        """
+        result = re.match(r'^[A-Za-z0-9_]+$', db_name)
+        return bool(result)
 
     def create_database(self, db_name):
         """
         Create a database with the given database name
         """
+        sql_db_name = f"{self.user_name}_{db_name}"
         connection, cursor = self.get_db_cursor()
         result = None
         try:
-            cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
-            connection.commit()
-            result = True
+            if not self.validate_db_name(sql_db_name):
+                logger.error(f"Invalid database name: {sql_db_name}")
+                result = False
+            else:
+                sql_query = sql_db_name.join([
+                    self.sql_queries['create_db'] + ' ',
+                    ";"
+                ])
+                cursor.execute(sql_query)
+                connection.commit()
+                result = True
         except Exception as err:
             if err.errno == -1:
                 logger.error(err)
@@ -275,7 +316,10 @@ class DbDefiner(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         try:
-            cursor.execute(f"SHOW DATABASES LIKE '{self.user_name}_%';")
+            cursor.execute(
+                self.sql_queries['show_db'],
+                (f'{self.user_name}_%',)
+            )
             databases = [db[0] for db in cursor.fetchall()]
             result = databases
         except Exception as err:
@@ -294,35 +338,31 @@ class DbDefiner(DbInterface):
         sql_db_name = f"{self.user_name}_{db_name}"
         connection, cursor = self.get_db_cursor()
         try:
-            cursor.execute(f"USE {sql_db_name};")
-            cursor.execute(
-                "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE version_perf (test_date DATE, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE version_words_count (test_date DATE, nb INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE theme_words_count (test_date DATE, nb INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-            )
-            connection.commit()
-            result = True
+            if not self.validate_db_name(sql_db_name):
+                logger.error(f"Invalid database name: {sql_db_name}")
+                result = False
+            else:
+                sql_query = sql_db_name.join([self.sql_queries['use_db'] + ' ', ";"])
+                cursor.execute(sql_query)
+                create_tables = [
+                    'create_version_voc'
+                    'create_version_perf'
+                    'create_version_count'
+                    'create_theme_voc'
+                    'create_theme_perf'
+                    'create_theme_count'
+                    'create_archives'
+                ]
+                for create_table in create_tables:
+                    sql_query = self.sql_queries[create_table]
+                    cursor.execute(sql_query)
+                connection.commit()
+                result = True
         except Exception as err:
             if err.errno == -1:
+                logger.error(err)
+                result = False
+            else:
                 logger.error(err)
                 result = False
         finally:
@@ -336,8 +376,9 @@ class DbDefiner(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         try:
-            cursor.execute(f"USE {db_name};")
-            cursor.execute("SHOW TABLES;")
+            sql_query = db_name.join([self.sql_queries['use_db'] + ' ', ";"])
+            cursor.execute(sql_query)
+            cursor.execute(self.sql_queries['show_tables'])
             tables = list(cursor.fetchall())
             tables = self.rectify_this_strange_result(tables)
             cols_dict = {}
@@ -390,7 +431,8 @@ class DbDefiner(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         try:
-            cursor.execute(f"DROP DATABASE {db_name};")
+            sql_query = db_name.join([self.sql_queries['drop_db'] + ' ', ";"])
+            cursor.execute(sql_query)
             connection.commit()
             result = True
         except Exception as err:

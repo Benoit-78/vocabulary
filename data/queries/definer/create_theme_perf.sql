@@ -1,0 +1,1 @@
+CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);

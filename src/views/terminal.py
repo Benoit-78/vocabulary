@@ -30,7 +30,6 @@ class CliGuesser():
         mot_natal = row[1]
         text_2 = f"Voici la traduction correcte : \'{mot_natal}\'. \nAviez-vous la bonne réponse ?"
         word_guessed = messagebox.askyesnocancel(title=title, message=text_2)
-        logger.debug(f"word_guessed: {word_guessed}")
         if word_guessed is None:
             logger.error("Interruption by user")
             raise SystemExit

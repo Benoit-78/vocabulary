@@ -56,7 +56,6 @@ def create_database(data: dict, token: str):
     logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
     user_account = users.UserAccount(user_name)
-    logger.debug(f"Creating database: {data}")
     if data['db_name'] == '':
         json_response = JSONResponse(
                 content=

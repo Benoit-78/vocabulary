@@ -819,7 +819,6 @@ class TestUpdater(unittest.TestCase):
         new_shape = self.updater_1.interro.perf_df.shape
         # Assert
         self.assertEqual(new_shape[0], old_shape[0] + 1)
-        logger.debug(f"Columns: {self.updater_1.interro.perf_df.columns}")
         self.assertEqual(new_shape[1], old_shape[1] + 1)
         mock_save_table.assert_called_once_with(
             self.updater_1.loader.test_type + '_perf',
@@ -853,7 +852,6 @@ class TestUpdater(unittest.TestCase):
             self.updater_1.loader.test_type + '_words_count',
             self.updater_1.interro.word_cnt_df
         )
-        logger.debug(f"A very strange table: \n{self.updater_1.interro.word_cnt_df}")
         last_count = self.updater_1.interro.word_cnt_df.loc[
             self.updater_1.interro.word_cnt_df.shape[0] - 1
         ]
@@ -883,7 +881,6 @@ class TestUpdater(unittest.TestCase):
             self.updater_1.loader.test_type + '_words_count',
             self.updater_1.interro.word_cnt_df
         )
-        logger.debug(f"A very strange table: \n{self.updater_1.interro.word_cnt_df}")
         last_count = self.updater_1.interro.word_cnt_df.loc[
             self.updater_1.interro.word_cnt_df.shape[0] - 1
         ]

@@ -34,9 +34,7 @@ async def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
-    logger.debug("Router before")
     json_response = user_api.create_account(creds, token)
-    logger.debug("Router after")
     return json_response
 
 

@@ -192,7 +192,6 @@ def propose_rattraps_guest(
     """
     Propose the rattraps.
     """
-    logger.debug(f"Interro categorie: {interro_category}")
     interro = load_interro_from_redis(token, interro_category)
     new_total = interro.faults_df.shape[0]
     response_dict = {

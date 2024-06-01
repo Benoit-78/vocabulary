@@ -162,8 +162,6 @@ class TestWordsGraph1(unittest.TestCase):
             },
             index=[1, 2]
         )
-        logger.debug(f"graph.data : \n{self.graph.data}")
-        logger.debug(f"mock_df_after : \n{mock_df_after}")
         pd.testing.assert_frame_equal(self.graph.data, mock_df_after)
 
 
@@ -217,8 +215,6 @@ class TestWordsGraph2(unittest.TestCase):
             },
             index=[1, 2]
         )
-        logger.debug(f"graph.data : \n{self.graph.data}")
-        logger.debug(f"mock_df_after : \n{mock_df_after}")
         pd.testing.assert_frame_equal(self.graph.data, mock_df_after)
 
 

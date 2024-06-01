@@ -150,16 +150,12 @@ def load_word_vectors(model):
 
 def calculate_concept_embedding(tokenizer, notion_sequences, word_vectors):
     concept_embeddings = []
-    logger.debug(f"Number of notion sequences: {len(notion_sequences)}")
-    logger.debug(f"Word vectors shape: {word_vectors.shape}")
     for notion_seq in notion_sequences:
         related_words = [
             tokenizer.index_word[idx]
             for idx in notion_seq
             if idx in tokenizer.index_word
         ]
-        logger.debug(f"notion: {notion_seq}")
-        logger.debug(f"Related words: {related_words}")
         concept_embedding = np.mean(
             [
                 word_vectors.get(word, np.zeros(word_vectors.vector_size))

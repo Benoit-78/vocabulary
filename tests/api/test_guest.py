@@ -381,7 +381,6 @@ class TestGuest(unittest.TestCase):
             'numWords': words,
             'language': language
         }
-        logger.debug(f"Result: {result}")
         self.assertEqual(result, expected_result)
         mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
 

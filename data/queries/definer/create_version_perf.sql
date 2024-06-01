@@ -1,0 +1,1 @@
+CREATE TABLE version_perf (test_date DATE, score INT, taux INT);
