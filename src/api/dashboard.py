@@ -342,7 +342,7 @@ def get_user_dashboards(request, user_name, user_password, db_name):
     """
     Get the user dashboards.
     """
-    logger.info('')
+    logger.info(f"User: {user_name}")
     graphs = load_graphs(user_name, user_password, db_name)
     request_dict = {
         "request": request,

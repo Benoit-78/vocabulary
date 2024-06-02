@@ -21,6 +21,7 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src import interro as core_interro
+from src.api.authentication import get_user_name_from_token
 from src.api.interro import load_test, get_interro_category, turn_df_into_dict
 from src.data.redis_interface import save_interro_in_redis, load_interro_from_redis
 from src.views import api as api_view
@@ -253,7 +254,8 @@ def end_interro_guest(
         score,
         token
     ):
-    logger.info('')
+    user_name = get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     premier_test = load_interro_from_redis(token, 'test')
     headers, rows = turn_df_into_dict(premier_test.interro_df)
     response_dict = {

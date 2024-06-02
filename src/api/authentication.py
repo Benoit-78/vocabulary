@@ -73,9 +73,9 @@ def create_token(
     """
     Function to generate a token for a guest or an existing user.
     """
-    logger.info('')
     if data is None:
         data = create_guest_user_name()
+    logger.info(f"User: {data['sub']}")
     to_encode = data.copy()
     if not expires_delta:
         expires_delta = 15

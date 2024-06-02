@@ -94,8 +94,8 @@ def save_interro_settings(settings, token):
     """
     API function to save the interro settings.
     """
-    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     db_name = settings.get('databaseName')
     test_type = settings.get('testType').lower()
     test_length = int(settings.get('numWords'))
@@ -318,7 +318,8 @@ def end_interro(
     """
     End the interro.
     """
-    logger.info('')
+    user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     # Enregistrer les résultats
     if interro_category == 'test':
         interro = load_interro_from_redis(token, interro_category)

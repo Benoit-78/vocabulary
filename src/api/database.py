@@ -53,8 +53,8 @@ def create_database(data: dict, token: str):
     """
     Create the given database.
     """
-    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     user_account = users.UserAccount(user_name)
     if data['db_name'] == '':
         json_response = JSONResponse(
@@ -93,8 +93,8 @@ def retrieve_database(data: dict, token: str):
     """
     See the given database.
     """
-    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     db_name = data['db_name']
     db_querier = DbQuerier(
         user_name,
@@ -140,8 +140,8 @@ def choose_database(data, token: str):
     """
     Choose the given database.
     """
-    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     user_account = users.UserAccount(user_name)
     db_name = data['db_name']
     db_exists = user_account.check_if_database_exists(db_name)
@@ -244,9 +244,9 @@ def delete_database(data: dict, token: str):
     """
     Remove the given database.
     """
-    logger.info('')
     db_name = data['db_name']
     user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     user_account = users.UserAccount(user_name)
     result = user_account.remove_database(db_name)
     if result is False:

@@ -31,7 +31,8 @@ def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
-    logger.info('')
+    user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     if creds['input_name'] == '' or creds['input_password'] == '':
         json_response = JSONResponse(
             content=
@@ -85,7 +86,7 @@ def authenticate_user(
             }
         )
         return json_response
-    logger.info('')
+    logger.info(f"User: {form_data.username}")
     users_list = auth_api.get_users_list()
     user = auth_api.authenticate_user(
         users_list,
@@ -149,8 +150,8 @@ def load_user_space(
     """
     Call the base page of user space.
     """
-    logger.info('')
     user_name = auth_api.get_user_name_from_token(token)
+    logger.info(f"User: {user_name}")
     json_response = {
         'request': request,
         'token': token,
