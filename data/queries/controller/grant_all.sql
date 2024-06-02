@@ -1,1 +1,1 @@
-GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON '{sql_db_name}'.* TO '{user_name}'@'{host}';
+GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON {sql_db_name}.* TO '{user_name}'@'{host}';
