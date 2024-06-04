@@ -114,9 +114,9 @@ class TestGuest(unittest.TestCase):
             test_length=10
         )
         mock_save_interro_in_redis.assert_called_once_with(
-            'mock_test',
-            token,
-            'mock_category'
+            interro='mock_test',
+            token=token,
+            interro_category='mock_category'
         )
 
     @patch('src.api.guest.get_flags_dict')
@@ -180,7 +180,8 @@ class TestGuest(unittest.TestCase):
         self.assertEqual(result, expected_result)
         mock_get_flags_dict.assert_called_once()
         mock_load_interro_from_redis.assert_called_once_with(
-            token, interro_category
+            token=token,
+            interro_category=interro_category
         )
 
     @patch('src.api.guest.get_flags_dict')
@@ -238,7 +239,10 @@ class TestGuest(unittest.TestCase):
             'flag': 'flag_id'
         }
         self.assertEqual(result, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         mock_get_flags_dict.assert_called_once()
 
     @patch('src.api.guest.save_interro_in_redis')
@@ -279,11 +283,14 @@ class TestGuest(unittest.TestCase):
             'total': 10
         }
         self.assertEqual(content_dict, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         mock_save_interro_in_redis.assert_called_once_with(
-            mock_load_interro_from_redis.return_value,
-            token,
-            interro_category
+            interro=mock_load_interro_from_redis.return_value,
+            token=token,
+            interro_category=interro_category
         )
 
     @patch('src.api.guest.save_interro_in_redis')
@@ -323,15 +330,18 @@ class TestGuest(unittest.TestCase):
             'total': 10
         }
         self.assertEqual(content_dict, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         mock_test.update_faults_df.assert_called_once_with(
             False,
             ['Hi', 'Salut']
         )
         mock_save_interro_in_redis.assert_called_once_with(
-            mock_load_interro_from_redis.return_value,
-            token,
-            interro_category
+            interro=mock_load_interro_from_redis.return_value,
+            token=token,
+            interro_category=interro_category
         )
 
     @patch('src.api.guest.save_interro_in_redis')
@@ -382,7 +392,10 @@ class TestGuest(unittest.TestCase):
             'language': language
         }
         self.assertEqual(result, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
 
     @patch('src.api.guest.save_interro_in_redis')
     @patch('src.api.guest.load_interro_from_redis')
@@ -471,5 +484,8 @@ class TestGuest(unittest.TestCase):
             'numWords': words,
         }
         self.assertEqual(result, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token, 'test')
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category='test'
+        )
         mock_turn_df_into_dict.assert_called_once_with(premier_test.interro_df)

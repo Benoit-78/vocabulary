@@ -86,8 +86,8 @@ class TestRedisInterface(unittest.TestCase):
         token = 'test_token'
         # ----- ACT
         redis_interface.save_loader_in_redis(
-            self.loader_object,
-            token,
+            loader=self.loader_object,
+            token=token,
             redis_db=self.mock_redis_db
         )
         # ----- ASSERT
@@ -106,7 +106,7 @@ class TestRedisInterface(unittest.TestCase):
         self.mock_redis_db.get.return_value = pickled_loader_object
         # ----- ACT
         result = redis_interface.load_loader_from_redis(
-            token,
+            token=token,
             redis_db=self.mock_redis_db
         )
         # ----- ASSERT

@@ -44,16 +44,19 @@ def load_test(
         db_name=db_name,
         test_type=test_type,
     )
-    loader = core_interro.Loader(db_querier)
+    loader = core_interro.Loader(data_querier=db_querier)
     loader.load_tables()
-    test_length = adjust_test_length(test_length, loader)
+    test_length = adjust_test_length(
+        test_length=test_length,
+        loader=loader
+    )
     guesser = api_view.FastapiGuesser()
     premier_test = core_interro.PremierTest(
-        loader.tables[loader.test_type + '_voc'],
-        test_length,
-        guesser,
-        loader.tables[loader.test_type + '_perf'],
-        loader.tables[loader.test_type + '_words_count']
+        words_df_=loader.tables[loader.test_type + '_voc'],
+        words=test_length,
+        guesser=guesser,
+        perf_df_=loader.tables[loader.test_type + '_perf'],
+        words_cnt_df=loader.tables[loader.test_type + '_words_count']
     )
     premier_test.set_interro_df()
     return loader, premier_test
@@ -79,8 +82,8 @@ def get_interro_settings(
     """
     API function to load the interro settings.
     """
-    databases = db_api.get_user_databases(token)
-    db_message = get_error_messages(error_message)
+    databases = db_api.get_user_databases(token=token)
+    db_message = get_error_messages(error_message=error_message)
     settings_dict = {
         'request': request,
         'token': token,
@@ -94,7 +97,7 @@ def save_interro_settings(settings, token):
     """
     API function to save the interro settings.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     logger.info(f"User: {user_name}")
     db_name = settings.get('databaseName')
     test_type = settings.get('testType').lower()
@@ -115,9 +118,16 @@ def save_interro_settings(settings, token):
                 'test_length': test_length
             }
         )
-    interro_category = get_interro_category(premier_test)
-    save_interro_in_redis(premier_test, token, interro_category)
-    save_loader_in_redis(loader, token)
+    interro_category = get_interro_category(interro=premier_test)
+    save_interro_in_redis(
+        interro=premier_test,
+        token=token,
+        interro_category=interro_category
+    )
+    save_loader_in_redis(
+        loader=loader,
+        token=token
+    )
     json_response = JSONResponse(
         content=
         {
@@ -141,10 +151,13 @@ def get_interro_question(
     """
     API function to load the interro question.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     count = int(count)
     score = int(score)
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     progress_percent = int(count / int(total) * 100)
     index = interro.interro_df.index[count]
     english = interro.interro_df.loc[index][0]
@@ -179,7 +192,10 @@ def load_interro_answer(
     count = int(count)
     score = int(score)
     progress_percent = int(count / total * 100)
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     index = interro.interro_df.index[count - 1]
     english = interro.interro_df.loc[index][0]
     english = english.replace("'", "\'")
@@ -207,7 +223,10 @@ def get_user_answer(
     Get the user response.
     """
     interro_category = data.get('interroCategory')
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     score = data.get('score')
     score = int(score)
     if data["answer"] == 'Yes':
@@ -216,15 +235,19 @@ def get_user_answer(
     elif data["answer"] == 'No':
         update = False
         interro.update_faults_df(
-            False,
-            [
+            word_guessed=False,
+            row=[
                 data.get('english'),
                 data.get('french')
             ]
         )
     if interro_category == 'test':
-        interro.update_voc_df(update)
-    save_interro_in_redis(interro, token, interro_category)
+        interro.update_voc_df(word_guessed=update)
+    save_interro_in_redis(
+        interro=interro,
+        token=token,
+        interro_category=interro_category
+    )
     json_response = JSONResponse(
         content=
         {
@@ -247,13 +270,19 @@ def propose_rattraps(
     """
     Propose the rattraps.
     """
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     new_total = interro.faults_df.shape[0]
     # Enregistrer les résultats
     if interro_category == 'test':
         interro.compute_success_rate()
-        loader = load_loader_from_redis(token)
-        updater = Updater(loader, interro)
+        loader = load_loader_from_redis(token=token)
+        updater = Updater(
+            loader=loader,
+            interro=interro
+        )
         updater.update_data()
     # Réinitialisation
     response_dict = {
@@ -277,7 +306,10 @@ def load_rattraps(
     Load the rattraps!
     """
     interro_category = data.get('interroCategory')
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     if interro_category == 'rattrap':
         rattraps_cnt = interro.rattraps + 1
     else:
@@ -286,12 +318,16 @@ def load_rattraps(
     interro.faults_df = interro.faults_df.sample(frac=1)
     interro.faults_df = interro.faults_df.reset_index(drop=True)
     rattrap = core_interro.Rattrap(
-        interro.faults_df,
-        rattraps_cnt,
-        guesser
+        faults_df_=interro.faults_df,
+        rattraps=rattraps_cnt,
+        guesser=guesser
     )
-    new_interro_category = get_interro_category(rattrap)
-    save_interro_in_redis(rattrap, token, new_interro_category)
+    new_interro_category = get_interro_category(interro=rattrap)
+    save_interro_in_redis(
+        interro=rattrap,
+        token=token,
+        interro_category=new_interro_category
+    )
     count = int(data.get('count'))
     total = int(data.get('total'))
     score = int(data.get('score'))
@@ -318,17 +354,28 @@ def end_interro(
     """
     End the interro.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     logger.info(f"User: {user_name}")
     # Enregistrer les résultats
     if interro_category == 'test':
-        interro = load_interro_from_redis(token, interro_category)
+        interro = load_interro_from_redis(
+            token=token,
+            interro_category=interro_category
+        )
         interro.compute_success_rate()
-        loader = load_loader_from_redis(token)
-        updater = Updater(loader, interro)
+        loader = load_loader_from_redis(token=token)
+        updater = Updater(
+            loader=loader,
+            interro=interro
+        )
         updater.update_data()
-    premier_test = load_interro_from_redis(token, 'test')
-    headers, rows = turn_df_into_dict(premier_test.interro_df)
+    premier_test = load_interro_from_redis(
+        token=token,
+        interro_category='test'
+    )
+    headers, rows = turn_df_into_dict(
+        words_df=premier_test.interro_df
+    )
     response_dict = {
         "request": request,
         "token": token,

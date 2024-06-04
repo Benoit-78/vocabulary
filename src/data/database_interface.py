@@ -325,7 +325,10 @@ class DbDefiner(DbInterface):
         """
         Regular expression to match a valid database name (alphanumeric and underscores)
         """
-        result = re.match(r'^[A-Za-z0-9_]+$', db_name)
+        result = re.match(
+            pattern=r'^[A-Za-z0-9_]+$',
+            string=db_name
+        )
         return bool(result)
 
     def create_database(self, db_name):
@@ -427,16 +430,16 @@ class DbDefiner(DbInterface):
             cursor.execute(sql_query)
             cursor.execute(self.sql_queries['show_tables'])
             tables = list(cursor.fetchall())
-            tables = self.rectify_this_strange_result(tables)
+            tables = self.rectify_this_strange_result(columns=tables)
             cols_dict = {}
             for table_name in tables:
                 sql_query = table_name.join([
                     self.sql_queries['show_columns'] + ' ',
                     ';'
                 ])
-                cursor.execute(sql_query) 
+                cursor.execute(sql_query)
                 columns = list(cursor.fetchall())
-                columns = self.rectify_this_strange_result(columns)
+                columns = self.rectify_this_strange_result(columns=columns)
                 cols_dict[table_name] = columns
             result = cols_dict
         except Exception as err:
@@ -508,9 +511,13 @@ class DbManipulator(DbInterface):
             self.db_name = f"{user_name}_{db_name}"
         else:
             self.db_name = db_name
-        self.db_definer = DbDefiner(self.user_name)
-        self.db_querier = DbQuerier(self.user_name, db_name, test_type)
-        self.test_type = check_test_type(test_type)
+        self.db_definer = DbDefiner(user_name=self.user_name)
+        self.db_querier = DbQuerier(
+            user_name=self.user_name,
+            db_name=db_name,
+            test_type=test_type
+        )
+        self.test_type = check_test_type(test_type=test_type)
         self.sql_queries = self.load_sql_queries()
 
     @staticmethod
@@ -533,7 +540,9 @@ class DbManipulator(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         today_str = str(datetime.today().date())
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
         english = row[0]
         if self.db_querier.read_word(english) is not None:
             result = 'Word already exists'
@@ -566,7 +575,9 @@ class DbManipulator(DbInterface):
         Update statistics on the given word
         """
         connection, cursor = self.get_db_cursor()
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
         sql_query = self.sql_queries['update_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
@@ -592,7 +603,9 @@ class DbManipulator(DbInterface):
         Delete a word from the words table of the instance database.
         """
         connection, cursor = self.get_db_cursor()
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
         sql_query = self.sql_queries['delete_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
@@ -616,13 +629,13 @@ class DbManipulator(DbInterface):
         Save given table.
         """
         connection, cursor = self.get_db_cursor()
-        cols = self.db_definer.get_database_cols(self.db_name)
+        cols = self.db_definer.get_database_cols(db_name=self.db_name)
         if table_name == 'output':
             table_name = self.db_querier.get_output_table()
         table = table[cols[table_name]]
         try:
             engine = create_engine(
-                ''.join([
+                url=''.join([
                     "mysql+pymysql",
                     "://", os.getenv('VOC_DB_ROOT_USR'),
                     ':', os.getenv('VOC_DB_ROOT_PWD'),
@@ -660,8 +673,8 @@ class DbQuerier(DbInterface):
             self.db_name = f"{user_name}_{db_name}"
         else:
             self.db_name = db_name
-        self.db_definer = DbDefiner(self.user_name)
-        self.test_type = check_test_type(test_type)
+        self.db_definer = DbDefiner(user_name=self.user_name)
+        self.test_type = check_test_type(test_type=test_type)
         self.sql_queries = self.load_sql_queries()
 
     @staticmethod
@@ -683,7 +696,7 @@ class DbQuerier(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         cursor.execute(f"USE {self.db_name};")
-        cols = self.db_definer.get_database_cols(self.db_name)
+        cols = self.db_definer.get_database_cols(db_name=self.db_name)
         tables_names = list(cols.keys())
         tables = {}
         for table_name in tables_names:
@@ -723,7 +736,9 @@ class DbQuerier(DbInterface):
         Read the given word
         """
         connection, cursor = self.get_db_cursor()
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
         sql_query = self.sql_queries['read_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,

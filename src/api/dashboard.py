@@ -338,12 +338,21 @@ class WordsGraph5(WordsGraph):
 
 
 
-def get_user_dashboards(request, user_name, user_password, db_name):
+def get_user_dashboards(
+        request,
+        user_name,
+        user_password,
+        db_name
+    ):
     """
     Get the user dashboards.
     """
     logger.info(f"User: {user_name}")
-    graphs = load_graphs(user_name, user_password, db_name)
+    graphs = load_graphs(
+        user_name=user_name,
+        user_password=user_password,
+        db_name=db_name
+    )
     request_dict = {
         "request": request,
         "graph_1": graphs[0],
@@ -369,17 +378,17 @@ def load_graphs(user_name, user_password, db_name):
         test_type='version'
     )
     # Instanciate
-    graph_1 = WordsGraph1(data_querier)
-    graph_2 = WordsGraph2(data_querier)
-    graph_3 = WordsGraph3(data_querier)
-    graph_4 = WordsGraph4(data_querier)
-    graph_5 = WordsGraph5(data_querier)
+    graph_1 = WordsGraph1(db_querier=data_querier)
+    graph_2 = WordsGraph2(db_querier=data_querier)
+    graph_3 = WordsGraph3(db_querier=data_querier)
+    graph_4 = WordsGraph4(db_querier=data_querier)
+    graph_5 = WordsGraph5(db_querier=data_querier)
     # Create graphs
-    graph_1_html = graph_1.create(user_password)
-    graph_2_html = graph_2.create(user_password)
-    graph_3_html = graph_3.create(user_password)
-    graph_4_html = graph_4.create(user_password)
-    graph_5_html = graph_5.create(user_password)
+    graph_1_html = graph_1.create(user_password=user_password)
+    graph_2_html = graph_2.create(user_password=user_password)
+    graph_3_html = graph_3.create(user_password=user_password)
+    graph_4_html = graph_4.create(user_password=user_password)
+    graph_5_html = graph_5.create(user_password=user_password)
     # Save graphs
     html_graphs.append(graph_1_html)
     html_graphs.append(graph_2_html)

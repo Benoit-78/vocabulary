@@ -30,8 +30,8 @@ class TestDataHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests."""
-        cls.csv_handler_1 = csv_interface.DataHandler('version')
-        cls.csv_handler_2 = csv_interface.DataHandler('theme')
+        cls.csv_handler_1 = csv_interface.DataHandler(test_type='version')
+        cls.csv_handler_2 = csv_interface.DataHandler(test_type='theme')
         cls.error_data_handler = None
 
     def test_set_paths(self):
@@ -50,7 +50,7 @@ class TestDataHandler(unittest.TestCase):
         """Error should be raised in case of unknown OS."""
         # Arrange
         invalid_test_type = "blablabla"
-        self.error_data_handler = csv_interface.DataHandler(invalid_test_type)
+        self.error_data_handler = csv_interface.DataHandler(test_type=invalid_test_type)
         mock_logger = MagicMock()
         logging.basicConfig(level=logging.INFO)
         with self.assertRaises(SystemExit):
@@ -132,7 +132,7 @@ class TestDataHandler(unittest.TestCase):
         Should save the table as a csv file.
         """
         # Arrange
-        csv_handler = csv_interface.DataHandler('version')
+        csv_handler = csv_interface.DataHandler(test_type='version')
         csv_handler.set_paths()
         old_df = pd.DataFrame(columns=['words', 'integers', 'floats', 'booleans'])
         old_df.loc[old_df.shape[0]] = ['a', 0, 0.0, True]
@@ -164,7 +164,7 @@ class TestMenusReader(unittest.TestCase):
     """
     def setUp(self):
         """Run once before all tests."""
-        self.menu_reader = csv_interface.MenuReader('user/user_space')
+        self.menu_reader = csv_interface.MenuReader(current_page='user/user_space')
 
     def test_init(self):
         """

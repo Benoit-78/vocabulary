@@ -77,11 +77,19 @@ class UserAccount(Account):
         account_exists = self.check_if_account_exists()
         if account_exists:
             return False
-        hash_password = auth_api.get_password_hash(password)
+        hash_password = auth_api.get_password_hash(password=password)
         db_controller = DbController()
-        db_controller.create_user_in_mysql(self.user_name, hash_password)
-        db_controller.grant_privileges_on_common_database(self.user_name)
-        db_controller.add_user_to_users_table(self.user_name, hash_password)
+        db_controller.create_user_in_mysql(
+            user_name=self.user_name,
+            user_password=hash_password
+        )
+        db_controller.grant_privileges_on_common_database(
+            user_name=self.user_name
+        )
+        db_controller.add_user_to_users_table(
+            user_name=self.user_name,
+            hash_password=hash_password
+        )
         return True
 
     def check_if_account_exists(self):
@@ -130,17 +138,22 @@ class UserAccount(Account):
         Add a database to the user's space.
         """
         # Check
-        database_already_exists = self.check_if_database_exists(db_name)
+        database_already_exists = self.check_if_database_exists(
+            db_name=db_name
+        )
         if database_already_exists:
             return False
         # Create database
-        db_definer = DbDefiner(self.user_name)
-        db_created = db_definer.create_database(db_name)
+        db_definer = DbDefiner(user_name=self.user_name)
+        db_created = db_definer.create_database(db_name=db_name)
         if not db_created:
             return False
         db_controller = DbController()
-        db_controller.grant_privileges(self.user_name, db_name)
-        tables_created = db_definer.create_seven_tables(db_name)
+        db_controller.grant_privileges(
+            user_name=self.user_name,
+            db_name=db_name
+        )
+        tables_created = db_definer.create_seven_tables(db_name=db_name)
         if not tables_created:
             logger.error(f"Error with the creation of tables for {db_name}.")
             return False
@@ -150,7 +163,7 @@ class UserAccount(Account):
         """
         Check if the user's database already exists.
         """
-        db_definer = DbDefiner(self.user_name)
+        db_definer = DbDefiner(user_name=self.user_name)
         db_names = db_definer.get_user_databases()
         sql_db_name = self.user_name + '_' + db_name
         if sql_db_name in db_names:
@@ -163,7 +176,7 @@ class UserAccount(Account):
         """
         List the databases of the user.
         """
-        db_definer = DbDefiner(self.user_name)
+        db_definer = DbDefiner(user_name=self.user_name)
         databases = db_definer.get_user_databases()
         databases = [
             '_'.join(db.split('_')[1:])
@@ -177,10 +190,14 @@ class UserAccount(Account):
         """
         # Remove database
         db_definer = DbDefiner(self.user_name)
-        db_dropped = db_definer.drop_database(db_name)
-        # Remove privileges of the user on the database, as they're not removed automatically
+        db_dropped = db_definer.drop_database(db_name=db_name)
+        # Remove privileges of the user on the database,
+        # as they're not removed automatically
         db_controller = DbController()
-        privileges_dropped = db_controller.revoke_privileges(self.user_name, db_name)
+        privileges_dropped = db_controller.revoke_privileges(
+            user_name=self.user_name,
+            db_name=db_name
+        )
         return bool(db_dropped and privileges_dropped)
 
     def insert_word(self, db_name, foreign, native):
@@ -188,11 +205,11 @@ class UserAccount(Account):
         Add a couple of words to the user's database.
         """
         db_manipulator = DbManipulator(
-            self.user_name,
-            db_name,
-            'version',
+            user_name=self.user_name,
+            db_name=db_name,
+            test_type='version',
         )
-        result = db_manipulator.insert_word([foreign, native])
+        result = db_manipulator.insert_word(row=[foreign, native])
         return result
 
     def remove_word(self):

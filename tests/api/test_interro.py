@@ -291,7 +291,10 @@ class TestInterro(unittest.TestCase):
                 "content_box1": 'Hello'
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
 
     @patch('src.api.interro.load_interro_from_redis')
     def test_load_interro_answer(self, mock_load_interro_from_redis):
@@ -341,7 +344,10 @@ class TestInterro(unittest.TestCase):
                 "content_box2": 'Salut'
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
 
     @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_voc_df')
@@ -393,9 +399,16 @@ class TestInterro(unittest.TestCase):
                 'score': 11,
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         mock_update_voc_df.assert_called_once_with(True)
-        mock_save_interro_in_redis.assert_called_once_with(mock_test, token, interro_category)
+        mock_save_interro_in_redis.assert_called_once_with(
+            interro=mock_test,
+            token=token,
+            interro_category=interro_category
+        )
 
     @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_faults_df')
@@ -452,10 +465,17 @@ class TestInterro(unittest.TestCase):
                 'score': 10,
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         mock_update_faults_df.assert_called_once_with(False, ['Hello', 'Bonjour'])
         mock_update_voc_df.assert_called_once_with(False)
-        mock_save_interro_in_redis.assert_called_once_with(mock_test, token, interro_category)
+        mock_save_interro_in_redis.assert_called_once_with(
+            interro=mock_test,
+            token=token,
+            interro_category=interro_category
+        )
 
     @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_voc_df')
@@ -509,9 +529,16 @@ class TestInterro(unittest.TestCase):
                 'score': 11,
             }
         )
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         assert not mock_update_voc_df.called
-        mock_save_interro_in_redis.assert_called_once_with(mock_rattrap, token, interro_category)
+        mock_save_interro_in_redis.assert_called_once_with(
+            interro=mock_rattrap,
+            token=token,
+            interro_category=interro_category
+        )
 
     @patch('src.interro.logger')
     @patch('src.interro.Updater.update_data')
@@ -584,9 +611,12 @@ class TestInterro(unittest.TestCase):
             "numWords": total
         }
         self.assertEqual(result, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         mock_compute_success_rate.assert_called_once()
-        mock_load_loader_from_redis.assert_called_once_with(token)
+        mock_load_loader_from_redis.assert_called_once_with(token=token)
         mock_update_data.assert_called_once()
         # mock_logger.info.assert_called_once_with("User data updated.")
 
@@ -640,7 +670,10 @@ class TestInterro(unittest.TestCase):
             "numWords": total
         }
         self.assertEqual(result, expected_result)
-        mock_load_interro_from_redis.assert_called_once_with(token, interro_category)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         assert mock_compute_success_rate.called is False
 
     @patch('src.api.interro.save_interro_in_redis')
@@ -813,9 +846,15 @@ class TestInterro(unittest.TestCase):
         }
         self.assertEqual(result, expected_dict)
         assert mock_load_interro_from_redis.call_count == 2
-        mock_load_interro_from_redis.any_call_with(token, interro_category)
-        mock_load_interro_from_redis.any_call_with(token, interro_category)
-        mock_load_loader_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.any_call_with(
+            token=token,
+            interro_category=interro_category
+        )
+        mock_load_interro_from_redis.any_call_with(
+            token=token,
+            interro_category=interro_category
+        )
+        mock_load_loader_from_redis.assert_called_once_with(token=token)
         mock_update_data.assert_called_once()
         # mock_logger.info.assert_called_once_with("User data updated.")
 

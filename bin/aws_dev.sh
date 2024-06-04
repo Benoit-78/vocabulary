@@ -83,8 +83,8 @@ scp -r -i \
 
 scp -r -i \
     conf/voc_ssh_key_1.pem \
-    /home/benoit/projects/vocabulary/conf/languages.json \
-    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/conf/ && cl
+    /home/benoit/projects/vocabulary/data/queries \
+    ubuntu@ec2-51-44-1-83.eu-west-3.compute.amazonaws.com:/home/ubuntu/vocabulary/data/queries && cl
 
 scp -r -i \
     conf/voc_ssh_key_1.pem \

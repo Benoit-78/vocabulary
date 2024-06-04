@@ -214,13 +214,16 @@ def authenticate_user(
         )
         return result
 
-    user_in_db_model = get_user(users_list, username)
+    user_in_db_model = get_user(
+        users_list=users_list,
+        username=username
+    )
     if user_in_db_model is None:
         user = 'Unknown user'
     else:
         password_correct = verify_password(
-            password,
-            user_in_db_model.password_hash
+            plain_password=password,
+            password_hash=user_in_db_model.password_hash
         )
         if password_correct:
             user = user_in_db_model
@@ -237,9 +240,9 @@ def authenticate_with_oauth(
     Authenticate the user using OAuth2.
     """
     user = authenticate_user(
-        users_dict,
-        form_data.username,
-        form_data.password
+        users_list=users_dict,
+        username=form_data.username,
+        password=form_data.password
     )
     return user
 

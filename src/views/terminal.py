@@ -41,5 +41,8 @@ class CliGuesser():
         """
         title = f"Word {i}/{words}"
         self.ask_word(row, title)
-        word_guessed = self.get_user_answer(row, title)
+        word_guessed = self.get_user_answer(
+            row=row,
+            title=title
+        )
         return word_guessed

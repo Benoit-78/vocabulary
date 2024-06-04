@@ -28,8 +28,8 @@ def get_user_databases(token):
     """
     Call the base page of user databases.
     """
-    user_name = auth_api.get_user_name_from_token(token)
-    user_account = users.UserAccount(user_name)
+    user_name = auth_api.get_user_name_from_token(token=token)
+    user_account = users.UserAccount(user_name=user_name)
     databases = user_account.get_databases_list()
     return databases
 
@@ -38,8 +38,8 @@ def load_user_databases(request, token, error_message):
     """
     Load the user databases.
     """
-    databases = get_user_databases(token)
-    db_message = get_error_messages(error_message)
+    databases = get_user_databases(token=token)
+    db_message = get_error_messages(error_message=error_message)
     response_dict = {
         'request': request,
         'token': token,
@@ -53,9 +53,9 @@ def create_database(data: dict, token: str):
     """
     Create the given database.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     logger.info(f"User: {user_name}")
-    user_account = users.UserAccount(user_name)
+    user_account = users.UserAccount(user_name=user_name)
     if data['db_name'] == '':
         json_response = JSONResponse(
                 content=
@@ -67,7 +67,7 @@ def create_database(data: dict, token: str):
             )
         return json_response
     db_name = data['db_name']
-    result = user_account.create_database(db_name)
+    result = user_account.create_database(db_name=db_name)
     if result is False:
         json_response = JSONResponse(
             content=
@@ -93,13 +93,13 @@ def retrieve_database(data: dict, token: str):
     """
     See the given database.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     logger.info(f"User: {user_name}")
     db_name = data['db_name']
     db_querier = DbQuerier(
-        user_name,
-        db_name,
-        'version'
+        user_name=user_name,
+        db_name=db_name,
+        test_type='version'
     )
     tables = db_querier.get_tables()
     version_table = tables['version_voc']
@@ -140,11 +140,11 @@ def choose_database(data, token: str):
     """
     Choose the given database.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     logger.info(f"User: {user_name}")
-    user_account = users.UserAccount(user_name)
+    user_account = users.UserAccount(user_name=user_name)
     db_name = data['db_name']
-    db_exists = user_account.check_if_database_exists(db_name)
+    db_exists = user_account.check_if_database_exists(db_name=db_name)
     if not db_exists:
         json_response = JSONResponse(
             content=
@@ -194,7 +194,7 @@ def fill_database(
         token
     ):
     """
-    
+    Back-end function to prepare json response for a new word insertion.
     """
     if not db_name:
         logger.error("No database name given")
@@ -202,7 +202,7 @@ def fill_database(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No database name given"
         )
-    _ = auth_api.get_user_name_from_token(token)
+    _ = auth_api.get_user_name_from_token(token=token)
     request_dict = {
         'request': request,
         'title': "Here you can add words to your database",
@@ -217,13 +217,13 @@ def create_word(data: dict, token:str):
     """
     Save the word in the database.
     """
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     db_name = data['db_name']
-    user_account = users.UserAccount(user_name)
+    user_account = users.UserAccount(user_name=user_name)
     result = user_account.insert_word(
-        db_name,
-        data['foreign'],
-        data['native']
+        db_name=db_name,
+        foreign=data['foreign'],
+        native=data['native']
     )
     if result == 'Word already exists':
         json_response = JSONResponse(
@@ -245,10 +245,10 @@ def delete_database(data: dict, token: str):
     Remove the given database.
     """
     db_name = data['db_name']
-    user_name = auth_api.get_user_name_from_token(token)
+    user_name = auth_api.get_user_name_from_token(token=token)
     logger.info(f"User: {user_name}")
-    user_account = users.UserAccount(user_name)
-    result = user_account.remove_database(db_name)
+    user_account = users.UserAccount(user_name=user_name)
+    result = user_account.remove_database(db_name=db_name)
     if result is False:
         json_response = JSONResponse(
             content={"message": "Error with the database removal"}

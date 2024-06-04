@@ -37,7 +37,10 @@ def interro_settings_guest(
     """
     Call the page that gets the user settings for one interro.
     """
-    response_dict = guest_api.load_guest_settings(request, token)
+    response_dict = guest_api.load_guest_settings(
+        request=request,
+        token=token
+    )
     return templates.TemplateResponse(
         "guest/settings.html",
         response_dict
@@ -52,7 +55,10 @@ async def save_interro_settings_guest(
     """
     Acquire the user settings for one interro.
     """
-    json_response = guest_api.save_interro_settings_guest(language, token)
+    json_response = guest_api.save_interro_settings_guest(
+        language=language,
+        token=token
+    )
     return json_response
 
 
@@ -70,13 +76,13 @@ def load_interro_question_guest(
     Call the page that asks the user the meaning of a word
     """
     response_dict = guest_api.load_interro_question_guest(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        language,
-        token
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        count=count,
+        score=score,
+        language=language,
+        token=token
     )
     return templates.TemplateResponse(
         "guest/question.html",
@@ -99,13 +105,13 @@ def load_interro_answer_guest(
     Asks the user to tell if his guess was right or wrong.
     """
     response_dict = guest_api.load_interro_answer_guest(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        token,
-        language
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        count=count,
+        score=score,
+        token=token,
+        language=language
     )
     return templates.TemplateResponse(
         "guest/answer.html",
@@ -121,7 +127,10 @@ async def get_user_response_guest(
     """
     Acquire the user decision: was his answer right or wrong.
     """
-    json_response = guest_api.get_user_response_guest(data, token)
+    json_response = guest_api.get_user_response_guest(
+        data=data,
+        token=token
+    )
     return json_response
 
 
@@ -159,7 +168,10 @@ async def launch_rattraps(
     """
     Load the rattraps page.
     """
-    json_response = guest_api.load_rattraps(token, data)
+    json_response = guest_api.load_rattraps(
+        data,
+        token
+    )
     return json_response
 
 
@@ -175,10 +187,10 @@ def end_interro_guest(
     or a blaming message depending on the performance.
     """
     response_dict = guest_api.end_interro_guest(
-        request,
-        total,
-        score,
-        token
+        request=request,
+        total=total,
+        score=score,
+        token=token
     )
     return templates.TemplateResponse(
         "guest/end.html",

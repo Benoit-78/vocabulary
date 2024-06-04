@@ -110,7 +110,11 @@ def sign_in(
     """
     Call the sign-in page.
     """
-    response_dict = auth_api.sign_in(request, token, error_message)
+    response_dict = auth_api.sign_in(
+        request=request,
+        token=token,
+        error_message=error_message
+    )
     return templates.TemplateResponse(
         "user/sign_in.html",
         response_dict

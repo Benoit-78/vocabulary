@@ -34,7 +34,11 @@ def user_databases(
     """
     Call the base page of user databases.
     """
-    response_dict = db_api.load_user_databases(request, token, error_message)
+    response_dict = db_api.load_user_databases(
+        request=request,
+        token=token,
+        error_message=error_message
+    )
     return templates.TemplateResponse(
         "database/choose.html",
         response_dict
@@ -49,7 +53,10 @@ async def create_database(
     """
     Create a database.
     """
-    json_response = db_api.create_database(data, token)
+    json_response = db_api.create_database(
+        data=data,
+        token=token
+    )
     return json_response
 
 
@@ -61,7 +68,10 @@ async def retrieve_database(
     """
     Choose a database.
     """
-    json_response = db_api.retrieve_database(data, token)
+    json_response = db_api.retrieve_database(
+        data=data,
+        token=token
+    )
     return json_response
 
 
@@ -77,11 +87,11 @@ def see_database(
     Base page for data input by the user.
     """
     request_dict = db_api.see_database(
-        request,
-        token,
-        db_name,
-        version_table,
-        theme_table
+        request=request,
+        token=token,
+        db_name=db_name,
+        version_table=version_table,
+        theme_table=theme_table
     )
     return templates.TemplateResponse(
         "database/see.html",
@@ -97,7 +107,10 @@ async def choose_database(
     """
     Choose a database.
     """
-    json_response = db_api.choose_database(data, token)
+    json_response = db_api.choose_database(
+        data=data,
+        token=token
+    )
     return json_response
 
 
@@ -111,7 +124,12 @@ def data_page(
     """
     Base page for data input by the user.
     """
-    request_dict = db_api.fill_database(request, db_name, error_message, token)
+    request_dict = db_api.fill_database(
+        request=request,
+        db_name=db_name,
+        error_message=error_message,
+        token=token
+    )
     return templates.TemplateResponse(
         "database/fill.html",
         request_dict
@@ -126,7 +144,10 @@ async def create_word(
     """
     Save the word in the database.
     """
-    json_response = db_api.create_word(data, token)
+    json_response = db_api.create_word(
+        data=data,
+        token=token
+    )
     return json_response
 
 
@@ -138,17 +159,23 @@ async def delete_database(
     """
     Delete the database.
     """
-    json_response = db_api.delete_database(data, token)
+    json_response = db_api.delete_database(
+        data=data,
+        token=token
+    )
     return json_response
 
 
-@database_router.post("/upload-csv", response_class=HTMLResponse)
-async def upload_csv(
-        csv_file: UploadFile = File(...),
-        token: str = Depends(auth_api.check_token)
-    ):
-    """
-    Upload the given CSV file.
-    """
-    json_response = db_api.upload_csv(csv_file, token)
-    return json_response
+# @database_router.post("/upload-csv", response_class=HTMLResponse)
+# async def upload_csv(
+#         csv_file: UploadFile = File(...),
+#         token: str = Depends(auth_api.check_token)
+#     ):
+#     """
+#     Upload the given CSV file.
+#     """
+#     json_response = db_api.load_csv(
+#         csv_file,
+#         token
+#     )
+#     return json_response

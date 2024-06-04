@@ -63,7 +63,11 @@ def save_interro_settings_guest(language, token):
         test_length=10
     )
     interro_category = get_interro_category(test)
-    save_interro_in_redis(test, token, interro_category)
+    save_interro_in_redis(
+        interro=test,
+        token=token,
+        interro_category=interro_category
+    )
     json_response = JSONResponse(
         content=
         {
@@ -91,7 +95,10 @@ def load_interro_question_guest(
     count = int(count)
     score = int(score)
     progress_percent = int(count / int(total) * 100)
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     index = interro.interro_df.index[count]
     english = interro.interro_df.loc[index][0]
     english = english.replace("'", "\'")
@@ -125,7 +132,10 @@ def load_interro_answer_guest(
     count = int(count)
     score = int(score)
     progress_percent = int(count / total * 100)
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     index = interro.interro_df.index[count - 1]
     english = interro.interro_df.loc[index][0]
     english = english.replace("'", "\'")
@@ -153,7 +163,10 @@ def get_user_response_guest(
         token
     ):
     interro_category = data.get('interroCategory')
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     score = data.get('score')
     score = int(score)
     total = data.get('total')
@@ -168,7 +181,11 @@ def get_user_response_guest(
                 data.get('french')
             ]
         )
-    save_interro_in_redis(interro, token, interro_category)
+    save_interro_in_redis(
+        interro=interro,
+        token=token,
+        interro_category=interro_category
+    )
     json_response = JSONResponse(
         content=
         {
@@ -193,7 +210,10 @@ def propose_rattraps_guest(
     """
     Propose the rattraps.
     """
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     new_total = interro.faults_df.shape[0]
     response_dict = {
         'request': request,
@@ -210,14 +230,17 @@ def propose_rattraps_guest(
 
 
 def load_rattraps(
-        token,
-        data
+        data,
+        token
     ):
     """
     Load the rattraps!
     """
     interro_category = data.get('interroCategory')
-    interro = load_interro_from_redis(token, interro_category)
+    interro = load_interro_from_redis(
+        token=token,
+        interro_category=interro_category
+    )
     if interro_category == 'rattrap':
         rattraps_cnt = interro.rattraps + 1
     else:
@@ -226,12 +249,16 @@ def load_rattraps(
     interro.faults_df = interro.faults_df.sample(frac=1)
     interro.faults_df = interro.faults_df.reset_index(drop=True)
     rattrap = core_interro.Rattrap(
-        interro.faults_df,
-        rattraps_cnt,
-        guesser
+        faults_df_=interro.faults_df,
+        rattraps=rattraps_cnt,
+        guesser=guesser
     )
-    new_interro_category = get_interro_category(rattrap)
-    save_interro_in_redis(rattrap, token, new_interro_category)
+    new_interro_category = get_interro_category(interro=rattrap)
+    save_interro_in_redis(
+        interro=rattrap,
+        token=token,
+        interro_category=new_interro_category
+    )
     count = int(data.get('count'))
     total = int(data.get('total'))
     score = int(data.get('score'))
@@ -254,10 +281,15 @@ def end_interro_guest(
         score,
         token
     ):
-    user_name = get_user_name_from_token(token)
+    user_name = get_user_name_from_token(token=token)
     logger.info(f"User: {user_name}")
-    premier_test = load_interro_from_redis(token, 'test')
-    headers, rows = turn_df_into_dict(premier_test.interro_df)
+    premier_test = load_interro_from_redis(
+        token=token,
+        interro_category='test'
+    )
+    headers, rows = turn_df_into_dict(
+        words_df=premier_test.interro_df
+    )
     response_dict = {
         'request': request,
         'token': token,

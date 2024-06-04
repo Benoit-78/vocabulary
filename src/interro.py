@@ -139,7 +139,9 @@ class Interro(ABC):
 
     @abstractmethod
     def run(self):
-        """Launch the interroooo !!!!"""
+        """
+        Launch the interroooo !!!!
+        """
 
     def set_row(self) -> pd.DataFrame:
         """
@@ -170,7 +172,11 @@ class PremierTest(Interro):
             perf_df_=None,
             words_cnt_df=None
         ):
-        super().__init__(words_df_, int(words), guesser)
+        super().__init__(
+            words_df_=words_df_,
+            words=int(words),
+            guesser=guesser
+        )
         self.perf_df = perf_df_
         self.word_cnt_df = words_cnt_df
         self.perf = 0
@@ -252,11 +258,17 @@ class PremierTest(Interro):
         3) Update the words table with the user input
         4) Update the faults table with the user input
         """
-        for i, index in enumerate(self.interro_df.index):
+        for index in self.interro_df.index:
             row = list(self.interro_df.loc[index])
-            word_guessed = self.guesser.guess_word(row, i + 1, self.words)
+            word_guessed = self.guesser.guess_word(
+                row=row,
+                words=self.words
+            )
             self.update_voc_df(word_guessed)
-            self.update_faults_df(word_guessed, row)
+            self.update_faults_df(
+                word_guessed=word_guessed,
+                row=row
+            )
 
     def compute_success_rate(self):
         """
@@ -289,9 +301,9 @@ class Rattrap(Interro):
             guesser
         ):
         super().__init__(
-            faults_df_,
-            faults_df_.shape[0],
-            guesser
+            words_df_=faults_df_,
+            words=faults_df_.shape[0],
+            guesser=guesser
         )
         self.words_df = faults_df_.copy()
         self.rattraps = int(rattraps)
@@ -314,8 +326,14 @@ class Rattrap(Interro):
         for j in range(0, words_total):
             self.index = j
             self.set_row()
-            word_guessed = self.guesser.guess_word(self.row, j+1, words_total)
-            self.update_faults_df(word_guessed, self.row)
+            word_guessed = self.guesser.guess_word(
+                row=self.row,
+                words=words_total
+            )
+            self.update_faults_df(
+                word_guessed=word_guessed,
+                row=self.row
+            )
         self.words_df = self.faults_df.copy()
         self.faults_df.drop(self.faults_df.index, inplace=True)
 
@@ -337,7 +355,11 @@ class Updater():
     """
     Update tables.
     """
-    def __init__(self, loader: Loader, interro: Interro):
+    def __init__(
+            self,
+            loader: Loader,
+            interro: Interro
+        ):
         self.loader = loader
         self.interro = interro
         self.good_words_df = pd.DataFrame()
@@ -359,7 +381,9 @@ class Updater():
         self.criteria = self.criteria['interro']
 
     def set_good_words(self):
-        """Identify the words that have been sufficiently guessed."""
+        """
+        Identify the words that have been sufficiently guessed.
+        """
         ord_good = self.criteria['ORD_GOOD']
         steep_good = self.criteria['STEEP_GOOD']
         self.interro.words_df['img_good'] = ord_good + steep_good * self.interro.words_df['nb']
@@ -368,10 +392,12 @@ class Updater():
         ]
 
     def copy_good_words(self):
-        """Copy the well-good words in the next step table."""
+        """
+        Copy the well-good words in the next step table.
+        """
         self.good_words_df = complete_columns(
-            self.loader.tables['output'],
-            self.good_words_df
+            df_1=self.loader.tables['output'],
+            df_2=self.good_words_df
         )
         self.loader.tables['output'] = pd.concat(
             [
@@ -381,9 +407,11 @@ class Updater():
         )
 
     def delete_good_words(self) -> pd.DataFrame:
-        """Remove words that have been guessed sufficiently enough.
+        """
+        Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
-        only under the author's dictatorial will."""
+        only under the author's dictatorial will.
+        """
         self.interro.words_df = self.interro.words_df[
             self.interro.words_df['taux'] < self.interro.words_df['img_good']
         ]
@@ -397,8 +425,8 @@ class Updater():
         self.copy_good_words()
         self.loader.tables['output'].reset_index(inplace=True)
         self.db_manipulator.save_table(
-            'output',
-            self.loader.tables['output']
+            table_name='output',
+            table=self.loader.tables['output']
         )
         self.delete_good_words()
 
@@ -425,8 +453,8 @@ class Updater():
         """
         self.interro.words_df.reset_index(inplace=True)
         self.db_manipulator.save_table(
-            self.loader.test_type + '_voc',
-            self.interro.words_df
+            table_name=self.loader.test_type + '_voc',
+            table=self.interro.words_df
         )
 
     def save_performances(self):
@@ -445,13 +473,13 @@ class Updater():
         self.interro.perf_df = pd.concat([self.interro.perf_df, new_row])
         self.interro.perf_df.reset_index(inplace=True, names=['id_test'])
         self.db_manipulator.save_table(
-            self.loader.test_type + '_perf',
-            self.interro.perf_df
+            table_name=self.loader.test_type + '_perf',
+            table=self.interro.perf_df
         )
 
     def save_words_count(self):
         """
-        1) 
+        1)
         """
         def correct_words_cnt_df():
             """
@@ -477,8 +505,8 @@ class Updater():
         ])
         self.interro.word_cnt_df.sort_index(inplace=True)
         self.db_manipulator.save_table(
-            self.loader.test_type + '_words_count',
-            self.interro.word_cnt_df
+            table_name=self.loader.test_type + '_words_count',
+            table=self.interro.word_cnt_df
         )
 
     def update_data(self):

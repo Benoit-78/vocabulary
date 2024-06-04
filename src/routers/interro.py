@@ -35,7 +35,11 @@ def interro_settings(
     """
     Call the page that gets the user settings for one interro.
     """
-    response_dict = interro_api.get_interro_settings(request, token, error_message)
+    response_dict = interro_api.get_interro_settings(
+        request=request,
+        token=token,
+        error_message=error_message
+    )
     return templates.TemplateResponse(
         "interro/settings.html",
         response_dict
@@ -50,7 +54,10 @@ async def save_interro_settings(
     """
     Save the user settings for the interro.
     """
-    json_response = interro_api.save_interro_settings(settings, token)
+    json_response = interro_api.save_interro_settings(
+        settings=settings,
+        token=token
+    )
     return json_response
 
 
@@ -67,12 +74,12 @@ def load_interro_question(
     Call the page that asks the user the meaning of a word.
     """
     response_dict = interro_api.get_interro_question(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        token
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        count=count,
+        score=score,
+        token=token
     )
     return templates.TemplateResponse(
         "interro/question.html",
@@ -94,12 +101,12 @@ def load_interro_answer(
     Asks the user to tell if his guess was right or wrong.
     """
     request_dict = interro_api.load_interro_answer(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        token
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        count=count,
+        score=score,
+        token=token
     )
     return templates.TemplateResponse(
         "interro/answer.html",
@@ -115,7 +122,10 @@ async def get_user_answer(
     """
     Acquire the user decision: was his answer right or wrong.
     """
-    json_response = interro_api.get_user_answer(data, token)
+    json_response = interro_api.get_user_answer(
+        data=data,
+        token=token
+    )
     return json_response
 
 
@@ -131,11 +141,11 @@ def propose_rattraps(
     Load a page that proposes the user to take a rattraps, or leave the test.
     """
     response_dict = interro_api.propose_rattraps(
-        request,
-        interro_category,
-        total,
-        score,
-        token
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        score=score,
+        token=token
     )
     return templates.TemplateResponse(
         "interro/rattraps.html",
@@ -151,7 +161,10 @@ async def launch_rattraps(
     """
     Load the rattraps page.
     """
-    json_response = interro_api.load_rattraps(token, data)
+    json_response = interro_api.load_rattraps(
+        token=token,
+        data=data
+    )
     return json_response
 
 
@@ -168,11 +181,11 @@ def end_interro(
     or a blaming message depending on the performances.
     """
     response_dict = interro_api.end_interro(
-        request,
-        interro_category,
-        total,
-        score,
-        token
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        score=score,
+        token=token
     )
     return templates.TemplateResponse(
         "interro/end.html",

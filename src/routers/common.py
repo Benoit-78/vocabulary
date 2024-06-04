@@ -31,5 +31,5 @@ async def change_language(
     """
     Change the language of the user interface.
     """
-    json_response = api_common.change_language(data)
+    json_response = api_common.change_language(data=data)
     return json_response
