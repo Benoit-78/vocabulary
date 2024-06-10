@@ -392,7 +392,7 @@ class TestPremierTest(unittest.TestCase):
         mock_get_next_index.assert_called_once()
         mock_set_row.assert_called_once()
 
-    def test_update_voc_df_success(self):
+    def test_update_interro_df_success(self):
         """
         After the guess (or the non-guess, if the user is not very very smart),
         the word should be updated on number of queries, number of guesses, ...
@@ -401,7 +401,7 @@ class TestPremierTest(unittest.TestCase):
         old_row = self.interro_1.words_df.loc[self.interro_1.index]
         word_guessed = True
         # Act
-        self.interro_1.update_voc_df(word_guessed)
+        self.interro_1.update_interro_df(word_guessed)
         new_row = self.interro_1.words_df.loc[self.interro_1.index]
         # Assert
         self.assertEqual(new_row['nb'], old_row['nb'] + 1)
@@ -409,7 +409,7 @@ class TestPremierTest(unittest.TestCase):
         self.assertGreater(new_row['taux'], old_row['taux'])
         self.assertEqual(new_row['query'], old_row['query'] + 1)
 
-    def test_update_voc_df_failure(self):
+    def test_update_interro_df_failure(self):
         """
         After the guess (or the non-guess, if the user is not very very smart),
         the word should be updated on number of queries, number of guesses, ...
@@ -418,7 +418,7 @@ class TestPremierTest(unittest.TestCase):
         old_row = self.interro_1.words_df.loc[self.interro_1.index]
         word_guessed = False
         # Act
-        self.interro_1.update_voc_df(word_guessed)
+        self.interro_1.update_interro_df(word_guessed)
         new_row = self.interro_1.words_df.loc[self.interro_1.index]
         # Assert
         self.assertEqual(new_row['nb'], old_row['nb'] + 1)
@@ -428,8 +428,8 @@ class TestPremierTest(unittest.TestCase):
 
     @patch('src.views.terminal.CliGuesser.guess_word')
     @patch('src.interro.PremierTest.update_faults_df')
-    @patch('src.interro.PremierTest.update_voc_df')
-    def test_ask_series_of_guesses(self, mock_update_voc_df, mock_update_faults_df, mock_guess_word):
+    @patch('src.interro.PremierTest.update_interro_df')
+    def test_ask_series_of_guesses(self, mock_update_interro_df, mock_update_faults_df, mock_guess_word):
         # ----- ARRANGE
         self.interro_1.interro_df = pd.DataFrame(
             {
@@ -438,7 +438,7 @@ class TestPremierTest(unittest.TestCase):
             },
             index=[1]
         )
-        mock_update_voc_df.return_value = True
+        mock_update_interro_df.return_value = True
         mock_update_faults_df.return_value = True
         mock_guess_word.return_value = 'Bonjour'
         # ----- ACT
@@ -449,7 +449,7 @@ class TestPremierTest(unittest.TestCase):
             1,
             self.interro_1.words
         )
-        mock_update_voc_df.assert_called_once_with(
+        mock_update_interro_df.assert_called_once_with(
             'Bonjour'
         )
         mock_update_faults_df.assert_called_once_with(

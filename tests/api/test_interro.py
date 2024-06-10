@@ -350,12 +350,12 @@ class TestInterro(unittest.TestCase):
         )
 
     @patch('src.api.interro.save_interro_in_redis')
-    @patch('src.interro.PremierTest.update_voc_df')
+    @patch('src.interro.PremierTest.update_interro_df')
     @patch('src.api.interro.load_interro_from_redis')
     def test_get_user_answer_test_yes(
             self,
             mock_load_interro_from_redis,
-            mock_update_voc_df,
+            mock_update_interro_df,
             mock_save_interro_in_redis
         ):
         # ----- ARRANGE
@@ -378,7 +378,7 @@ class TestInterro(unittest.TestCase):
         )
         mock_test.interro_df = mock_interro_df
         mock_load_interro_from_redis.return_value = mock_test
-        mock_update_voc_df.return_value = True
+        mock_update_interro_df.return_value = True
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = interro_api.get_user_answer(
@@ -403,7 +403,7 @@ class TestInterro(unittest.TestCase):
             token=token,
             interro_category=interro_category
         )
-        mock_update_voc_df.assert_called_once_with(True)
+        mock_update_interro_df.assert_called_once_with(True)
         mock_save_interro_in_redis.assert_called_once_with(
             interro=mock_test,
             token=token,
@@ -412,12 +412,12 @@ class TestInterro(unittest.TestCase):
 
     @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_faults_df')
-    @patch('src.interro.PremierTest.update_voc_df')
+    @patch('src.interro.PremierTest.update_interro_df')
     @patch('src.api.interro.load_interro_from_redis')
     def test_get_user_answer_test_no(
             self,
             mock_load_interro_from_redis,
-            mock_update_voc_df,
+            mock_update_interro_df,
             mock_update_faults_df,
             mock_save_interro_in_redis
         ):
@@ -443,7 +443,7 @@ class TestInterro(unittest.TestCase):
         )
         mock_test.interro_df = mock_interro_df
         mock_load_interro_from_redis.return_value = mock_test
-        mock_update_voc_df.return_value = True
+        mock_update_interro_df.return_value = True
         mock_update_faults_df.return_value = True
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
@@ -470,7 +470,7 @@ class TestInterro(unittest.TestCase):
             interro_category=interro_category
         )
         mock_update_faults_df.assert_called_once_with(False, ['Hello', 'Bonjour'])
-        mock_update_voc_df.assert_called_once_with(False)
+        mock_update_interro_df.assert_called_once_with(False)
         mock_save_interro_in_redis.assert_called_once_with(
             interro=mock_test,
             token=token,
@@ -478,12 +478,12 @@ class TestInterro(unittest.TestCase):
         )
 
     @patch('src.api.interro.save_interro_in_redis')
-    @patch('src.interro.PremierTest.update_voc_df')
+    @patch('src.interro.PremierTest.update_interro_df')
     @patch('src.api.interro.load_interro_from_redis')
     def test_get_user_answer_rattraps_yes(
             self,
             mock_load_interro_from_redis,
-            mock_update_voc_df,
+            mock_update_interro_df,
             mock_save_interro_in_redis
         ):
         # ----- ARRANGE
@@ -508,7 +508,7 @@ class TestInterro(unittest.TestCase):
         )
         mock_rattrap.interro_df = mock_interro_df
         mock_load_interro_from_redis.return_value = mock_rattrap
-        mock_update_voc_df.return_value = True
+        mock_update_interro_df.return_value = True
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = interro_api.get_user_answer(
@@ -533,7 +533,7 @@ class TestInterro(unittest.TestCase):
             token=token,
             interro_category=interro_category
         )
-        assert not mock_update_voc_df.called
+        assert not mock_update_interro_df.called
         mock_save_interro_in_redis.assert_called_once_with(
             interro=mock_rattrap,
             token=token,

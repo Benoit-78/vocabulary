@@ -73,7 +73,6 @@ function sendUserAnswer(token, interroCategory, answer, count, numWords, score, 
     .then(data => {
         const score = data.score;
         const total = data.total;
-        // console.log("Score:", score, "Total:", total, "Count:", count);
         if (count < total) {
             nextGuess(token, interroCategory, total, count, score, language.toLowerCase());
         } else {
@@ -119,7 +118,6 @@ function launchRattraps(token, interroCategory, newWords, newCount, newScore, la
             const total = data.total;
             const count = data.count;
             const score = data.score;
-            // console.log("Total:", total, "Count:", count, "Score:", score);
             window.location.href = `/v1/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language}`;
         } else {
             console.error("Error with guest rattraps creation.");

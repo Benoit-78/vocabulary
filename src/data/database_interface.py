@@ -556,7 +556,6 @@ class DbManipulator(DbInterface):
             french=native,
             today_str=today_str
         )
-        logger.debug(sql_query)
         try:
             cursor.execute(sql_query)
             connection.commit()

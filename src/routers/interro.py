@@ -8,7 +8,7 @@
 import os
 import sys
 
-# from loguru import logger
+from loguru import logger
 from fastapi import Body, Depends, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
@@ -64,22 +64,32 @@ async def save_interro_settings(
 @interro_router.get("/interro-question", response_class=HTMLResponse)
 def load_interro_question(
         request: Request,
+        token: str=Depends(auth_api.check_token),
+        message: str=Query(None, alias="message"),
         interro_category: str=Query(None, alias="interroCategory"),
-        total: str=Query(None, alias="total"),
+        interro_dict: str=Query(None, alias="interroDict"),
+        test_length: str=Query(None, alias="testLength"),
+        index: str=Query(None, alias="index"),
+        faults_dict: str=Query(None, alias="faults_dict"),
+        perf: str=Query(None, alias="perf"),
         count: str=Query(None, alias="count"),
         score: str=Query(None, alias="score"),
-        token: str=Depends(auth_api.check_token)
     ):
     """
     Call the page that asks the user the meaning of a word.
     """
     response_dict = interro_api.get_interro_question(
         request=request,
+        token=token,
+        message=message,
         interro_category=interro_category,
-        total=total,
+        interro_dict=interro_dict,
+        test_length=test_length,
+        index=index,
+        faults_dict=faults_dict,
+        perf=perf,
         count=count,
         score=score,
-        token=token
     )
     return templates.TemplateResponse(
         "interro/question.html",
@@ -90,11 +100,15 @@ def load_interro_question(
 @interro_router.get("/interro-answer", response_class=HTMLResponse)
 def load_interro_answer(
         request: Request,
+        token: str=Depends(auth_api.check_token),
         interro_category: str=Query(None, alias="interroCategory"),
-        total: str=Query(None, alias="total"),
+        interro_dict: str=Query(None, alias="interroDict"),
+        test_length: str=Query(None, alias="testLength"),
+        index: str=Query(None, alias="index"),
+        faults_dict: str=Query(None, alias="faults_dict"),
+        perf: str=Query(None, alias="perf"),
         count: str=Query(None, alias="count"),
         score: str=Query(None, alias="score"),
-        token: str=Depends(auth_api.check_token)
     ):
     """
     Call the page that displays the right answer
@@ -102,11 +116,15 @@ def load_interro_answer(
     """
     request_dict = interro_api.load_interro_answer(
         request=request,
+        token=token,
         interro_category=interro_category,
-        total=total,
+        interro_dict=interro_dict,
+        test_length=test_length,
+        index=index,
+        faults_dict=faults_dict,
+        perf=perf,
         count=count,
-        score=score,
-        token=token
+        score=score
     )
     return templates.TemplateResponse(
         "interro/answer.html",
@@ -127,6 +145,31 @@ async def get_user_answer(
         token=token
     )
     return json_response
+
+
+@interro_router.get("/interro-end", response_class=HTMLResponse)
+def end_interro(
+        request: Request,
+        interro_category: str=Query(None, alias="interroCategory"),
+        total: str=Query(None, alias="total"),
+        score: str=Query(None, alias="score"),
+        token: str=Depends(auth_api.check_token)
+    ):
+    """
+    Page that ends the interro with a congratulation message,
+    or a blaming message depending on the performances.
+    """
+    response_dict = interro_api.end_interro(
+        request=request,
+        interro_category=interro_category,
+        total=total,
+        score=score,
+        token=token
+    )
+    return templates.TemplateResponse(
+        "interro/end.html",
+        response_dict
+    )
 
 
 @interro_router.get("/propose-rattraps", response_class=HTMLResponse)
@@ -166,28 +209,3 @@ async def launch_rattraps(
         data=data
     )
     return json_response
-
-
-@interro_router.get("/interro-end", response_class=HTMLResponse)
-def end_interro(
-        request: Request,
-        interro_category: str=Query(None, alias="interroCategory"),
-        total: str=Query(None, alias="total"),
-        score: str=Query(None, alias="score"),
-        token: str=Depends(auth_api.check_token)
-    ):
-    """
-    Page that ends the interro with a congratulation message,
-    or a blaming message depending on the performances.
-    """
-    response_dict = interro_api.end_interro(
-        request=request,
-        interro_category=interro_category,
-        total=total,
-        score=score,
-        token=token
-    )
-    return templates.TemplateResponse(
-        "interro/end.html",
-        response_dict
-    )

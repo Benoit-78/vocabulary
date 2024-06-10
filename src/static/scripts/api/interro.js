@@ -2,7 +2,8 @@ export { goToInterroSettings, sendUserSettings, showTranslation, sendUserAnswer,
 
 
 function goToInterroSettings(token) {
-    window.location.href = `/v1/interro/interro-settings?token=${token}`;
+    var errorMessage = ''
+    window.location.href = `/v1/interro/interro-settings?token=${token}&errorMessage=${errorMessage}`;
 }
 
 
@@ -22,8 +23,16 @@ function sendUserSettings(token, databaseName, testType, numWords) {
     .then(response => response.json())
     .then(data => {
         if (data && data.message === "Settings saved successfully") {
-            numWords = data.test_length;
-            startTest(token, numWords, data.interro_category)
+            startTest(
+                data.token,
+                data.message,
+                data.interro_category,
+                data.interro_dict,
+                data.test_length,
+                data.index,
+                data.faults_dict,
+                data.perf
+            )
         } else if (data && data.message === "Empty table") {
             window.location.href = `/v1/interro/interro-settings?token=${token}&errorMessage=${data.message}`;
         } else {
@@ -36,35 +45,56 @@ function sendUserSettings(token, databaseName, testType, numWords) {
 }
 
 
-function startTest(token, numWords, interroCategory) {
-    var total = parseInt(numWords, 10);
+function startTest(token, message, interroCategory, interroDict, numWords, index, faultsDict, perf) {
+    var testLength = parseInt(numWords, 10);
     var count = 0;
     var score = 0;
-    // Check if the conversion was successful
-    if (!isNaN(numWords)) {
-        window.location.href = `/v1/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
+    if (!isNaN(testLength)) {
+        const params = new URLSearchParams({
+            token: token,
+            message: message,
+            interroCategory: interroCategory,
+            interroDict: interroDict,
+            testLength: testLength,
+            index: index,
+            faultsDict: faultsDict,
+            perf: perf,
+            count: count,
+            score: score
+        });
+        window.location.href = `/v1/interro/interro-question?${params.toString()}`;
     } else {
-        console.error("Invalid numWords:", numWords);
+        console.error('Error:', error);
     }
 }
 
 
-function showTranslation(token, interroCategory, numWords, count, score) {
-    var total = parseInt(numWords, 10);
+function showTranslation(token, interroCategory, interroDict, testLength, index, faultsDict, perf, count, score) {
+    var testLength = parseInt(testLength, 10);
     var count = parseInt(count, 10);
     var score = parseInt(score, 10);
-    if (!isNaN(numWords)) {
-        window.location.href = `/v1/interro/interro-answer?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
+    console.log(interroDict)
+    if (!isNaN(testLength)) {
+        const params = new URLSearchParams({
+            token: token,
+            interroCategory: interroCategory,
+            interroDict: interroDict,
+            testLength: testLength,
+            index: index,
+            faultsDict: faultsDict,
+            perf: perf,
+            count: count,
+            score: score
+        });
+        window.location.href = `/v1/interro/interro-answer?${params.toString()}`;
     } else {
-        console.error("Invalid numWords:", numWords);
+        console.error("Invalid testLength:", testLength);
     }
 }
 
 
-function sendUserAnswer(token, interroCategory, answer, count, numWords, score, content_box1, content_box2) {
-    var total = parseInt(numWords, 10);
-    var count = parseInt(count, 10);
-    // console.log("Total:", total, "Count:", count);
+function sendUserAnswer(token, answer, interroCategory, interroDict, testLength, index,  faultsDict, perf, count, score) {
+    console.log(interroDict)
     fetch(
         `/v1/interro/user-answer?token=${token}`,
         {
@@ -73,24 +103,24 @@ function sendUserAnswer(token, interroCategory, answer, count, numWords, score, 
             body: JSON.stringify({
                 interroCategory,
                 answer: answer,
+                interroDict: interroDict,
+                testLength: testLength,
+                index: index,
+                faultsDict: faultsDict,
+                perf: perf,
                 count: count,
-                number_of_questions: numWords,
                 score: score,
-                english: content_box1,
-                french: content_box2
             }),
         }
     )
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "User response stored successfully") {
-            // console.log("Total:", total, "Count:", count);
-            // console.log(count < total)
             var score = parseInt(data.score, 10);
             if (count < total) {
-                nextGuess(token, interroCategory, total, count, score);
+                nextGuess(token, interroCategory, data.interroDict, testLength, index, data.faultsDict, perf, count, score);
             } else {
-                endInterro(token, interroCategory, total, score);
+                endInterro(token, interroCategory, interroDict, testLength, faultsDict, perf, count, score);
             }
         } else {
             console.error("Error with user answer acquisition");
@@ -102,12 +132,43 @@ function sendUserAnswer(token, interroCategory, answer, count, numWords, score, 
 }
 
 
-function nextGuess(token, interroCategory, numWords, count, score) {
-    var total = parseInt(numWords, 10);
-    var count = parseInt(count, 10);
+function nextGuess(token, interroCategory, interroDict, testLength, index,  faultsDict, perf, count, score) {
+    const params = new URLSearchParams({
+        token: token,
+        interroCategory: interroCategory,
+        interroDict: interroDict,
+        testLength: testLength,
+        index: index,
+        faultsDict: faultsDict,
+        perf: perf,
+        count: count,
+        score: score
+    });
+    window.location.href = `/v1/interro/interro-question?${params.toString()}`;
+    // window.location.href = `/v1/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
+}
+
+
+function endInterro(token, interroCategory, interroDict, testLength, faultsDict, perf, count, score) {
+    var testLength = parseInt(testLength, 10);
     var score = parseInt(score, 10);
-    // console.log("Total:", total, "Count:", count);
-    window.location.href = `/v1/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
+    if (score === testLength) {
+        const params = new URLSearchParams({
+            token: token,
+            interroCategory: interroCategory,
+            interroDict: interroDict,
+            testLength: testLength,
+            faultsDict: faultsDict,
+            perf: perf,
+            count: count,
+            score: score
+        });
+        window.location.href = `/v1/interro/interro-end?${params.toString()}`;
+        // window.location.href = `/v1/interro/interro-end?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
+    } else {
+
+        window.location.href = `/v1/interro/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
+    }
 }
 
 
@@ -142,13 +203,3 @@ function launchRattraps(token, interroCategory, newTotal, newCount, newScore) {
     })
 }
 
-
-function endInterro(token, interroCategory, numWords, score) {
-    var total = parseInt(numWords, 10);
-    var score = parseInt(score, 10);
-    if (score === total) {
-        window.location.href = `/v1/interro/interro-end?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
-    } else {
-        window.location.href = `/v1/interro/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
-    }
-}

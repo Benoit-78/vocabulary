@@ -26,61 +26,7 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src.data.database_interface import DbManipulator
-
-
-
-class CliUser():
-    """
-    User who launchs the app through the CLI.
-    """
-    def __init__(self):
-        self.settings = None
-
-    def parse_arguments(self, arg: List[str]) -> argparse.Namespace:
-        """
-        Parse command line argument.
-        """
-        another_parser = argparse.ArgumentParser()
-        another_parser.add_argument("-t", "--type", type=str)
-        another_parser.add_argument("-w", "--words", type=int)
-        another_parser.add_argument("-r", "--rattraps", type=int)
-        if '-t' not in arg:
-            arg.append('-t')
-            arg.append('version')
-        if '-w' not in arg:
-            arg.append('-w')
-            arg.append('10')
-        if '-r' not in arg:
-            arg.append('-r')
-            arg.append('2')
-        self.settings = another_parser.parse_args(arg)
-
-    def get_settings(self):
-        """
-        Check the kind of interro, version or theme.
-        """
-        self.parse_arguments(sys.argv[1:])
-        cond_1 = not self.settings.type
-        cond_2 = not self.settings.words
-        cond_3 = not self.settings.rattraps
-        if cond_1 or cond_2 or cond_3:
-            message = ' '.join([
-                "Please give",
-                "-t <test type>, ",
-                "-w <number of words> and ",
-                "-r <number of rattraps>"
-            ])
-            logger.error(message)
-            raise SystemExit
-        if self.settings.type not in ['version', 'theme']:
-            logger.error("Test type must be either version or theme")
-            raise SystemExit
-        if self.settings.rattraps < -1:
-            logger.error("Number of rattraps must be greater than -1.")
-            raise SystemExit
-        if self.settings.words < 1:
-            logger.error("Number of words must be greater than 0.")
-            raise SystemExit
+from src.views.api import FastapiGuesser
 
 
 
@@ -88,14 +34,18 @@ class Loader():
     """
     Data loader.
     """
-    def __init__(self, data_querier):
+    def __init__(self, words, data_querier):
         """
         Must be done in the same session than the interroooo is launched.
         """
-        self.test_type = data_querier.test_type
         self.data_querier = data_querier
+        self.test_type = data_querier.test_type
+        self.words = words
         self.tables = {}
         self.output_table = ''
+        self.words_df = pd.DataFrame()
+        self.interro_df = pd.DataFrame(columns=['foreign', 'native'])
+        self.index = 0
 
     def load_tables(self):
         """
@@ -103,7 +53,6 @@ class Loader():
         """
         self.tables = self.data_querier.get_tables()
         voc = self.test_type + '_voc'
-        # self.tables[voc] = self.tables[voc].reset_index()
         self.tables[voc]['query'] = [0] * self.tables[voc].shape[0]
         self.tables[voc] = self.tables[voc].sort_values(
             by='creation_date',
@@ -117,88 +66,35 @@ class Loader():
         self.tables[voc]['taux'] = self.tables[voc]['taux'].astype(float)
         if 'bad_word' not in self.tables[voc].columns:
             self.tables[voc]['bad_word'] = [0] * self.tables[voc].shape[0]
+        self.words_df = self.tables[voc]
 
-
-
-class Interro(ABC):
-    """
-    Abstract class for interrooooo!!!! !!! !
-    """
-    def __init__(
-            self,
-            words_df_: pd.DataFrame,
-            words: int,
-            guesser
-        ):
-        self.words_df = words_df_
-        self.words = words
-        self.guesser = guesser
-        self.faults_df = pd.DataFrame(columns=[['foreign', 'native']])
-        self.index = 1
-        self.row = []
-
-    @abstractmethod
-    def run(self):
+    def adjust_test_length(self):
         """
-        Launch the interroooo !!!!
+        Check the test length.
         """
+        words_table = self.tables[self.test_type + '_voc']
+        words_total = words_table.shape[0]
+        self.words = min(words_total, self.words)
+        if self.words == 0:
+            raise ValueError
 
-    def set_row(self) -> pd.DataFrame:
-        """
-        Get the row of the word to be asked
-        """
-        mot_etranger = self.words_df.loc[self.index, self.words_df.columns[0]]
-        mot_natal = self.words_df.loc[self.index, self.words_df.columns[1]]
-        self.row = [self.index, mot_etranger, mot_natal]
-
-    def update_faults_df(self, word_guessed: bool, row: List[str]):
-        """
-        Save the faulty answers for the second test.
-        """
-        if word_guessed is False:
-            self.faults_df.loc[self.faults_df.shape[0]] = [row[-2], row[-1]]
-
-
-
-class PremierTest(Interro):
-    """
-    First round!
-    """
-    def __init__(
-            self,
-            words_df_,
-            words: int,
-            guesser,
-            perf_df_=None,
-            words_cnt_df=None
-        ):
-        super().__init__(
-            words_df_=words_df_,
-            words=int(words),
-            guesser=guesser
-        )
-        self.perf_df = perf_df_
-        self.word_cnt_df = words_cnt_df
-        self.perf = 0
-        self.step = 0
-        self.interro_df = pd.DataFrame(columns=['english', 'français'])
-
-    def create_random_step(self):
+    def get_random_step(self):
         """
         Get random step, the jump from one word to another
         """
-        self.step = random.randint(1, self.words_df.shape[0])
+        step = random.randint(1, self.words_df.shape[0])
+        return step
 
     def get_another_index(self) -> int:
         """
         The word must not have been already asked.
         """
-        next_index = random.randint(0, self.words_df.shape[0])
+        next_index = random.randint(0, self.words_df.shape[0] - 1)
         next_index = max(next_index, 1)
         already_asked = self.words_df.loc[next_index, 'query'] == 1
         i = 0
         while already_asked and i < (self.words_df.shape[0]):
-            next_index = random.randint(0, self.words_df.shape[0])
+            next_index = random.randint(0, self.words_df.shape[0] - 1)
             next_index = max(next_index, 1)
             already_asked = self.words_df.loc[next_index, 'query'] == 1
             i += 1
@@ -221,54 +117,108 @@ class PremierTest(Interro):
             next_index = self.get_another_index()
         return next_index
 
+    def get_row(self) -> pd.DataFrame:
+        """
+        Get the row of the word to be asked
+        """
+        mot_etranger = self.words_df.loc[self.index, self.words_df.columns[0]]
+        mot_natal = self.words_df.loc[self.index, self.words_df.columns[1]]
+        row = [self.index, mot_etranger, mot_natal]
+        return row
+
     def set_interro_df(self):
         """
         Extract the words that will be asked.
         """
-        self.create_random_step()
-        self.index = self.step
+        self.adjust_test_length()
+        self.index = self.get_random_step()
         for _ in range(1, self.words + 1):
             self.index = self.get_next_index()
-            self.set_row()
-            self.interro_df.loc[self.row[0]] = self.row[1:]
+            row = self.get_row()
+            self.interro_df.loc[row[0]] = row[1:]
 
-    def update_voc_df(self, word_guessed: bool):
+    def to_dict(self):
+        pass
+
+    @classmethod
+    def from_dict(cls):
+        pass
+
+
+
+class Interro(ABC):
+    """
+    Abstract class for interrooooo!!!! !!! !
+    """
+    def __init__(
+            self,
+            interro_df: pd.DataFrame,
+            words: int,
+            guesser
+        ):
+        self.interro_df = interro_df
+        self.words = words
+        self.guesser = guesser
+        self.faults_df = pd.DataFrame(columns=[['foreign', 'native']])
+        self.index = 1
+        self.row = []
+
+    @abstractmethod
+    def to_dict(self):
+        """
+        Serialize the instance by turning its attributes into a dict.
+        """
+
+    @abstractmethod
+    def from_dict(self):
+        """
+        Instantiate the instance from a dict of its attributes.
+        """
+
+    def update_faults_df(self, word_guessed: bool, row: List[str]):
+        """
+        Save the faulty answers for the second test.
+        """
+        if word_guessed is False:
+            self.faults_df.loc[self.faults_df.shape[0]] = [row[-2], row[-1]]
+
+
+
+class PremierTest(Interro):
+    """
+    First round!
+    """
+    def __init__(
+            self,
+            interro_df: pd.DataFrame,
+            words: int,
+            guesser,
+        ):
+        super().__init__(
+            interro_df=interro_df,
+            words=int(words),
+            guesser=guesser
+        )
+        self.perf = 0
+
+    def update_interro_df(self, word_guessed: bool):
         """
         Update the vocabulary dataframe
         """
         # Nb
-        self.words_df.loc[self.index, 'nb'] += 1
+        self.interro_df.loc[self.index, 'nb'] += 1
         # Score
         if word_guessed:
-            self.words_df.loc[self.index, 'score'] += 1
+            self.interro_df.loc[self.index, 'score'] += 1
         else:
-            self.words_df.loc[self.index, 'score'] -= 1
+            self.interro_df.loc[self.index, 'score'] -= 1
         # Taux
-        nombre = self.words_df.loc[self.index, 'nb']
-        score = self.words_df.loc[self.index, 'score']
+        nombre = self.interro_df.loc[self.index, 'nb']
+        score = self.interro_df.loc[self.index, 'score']
         taux = int(score / nombre * 100)
-        self.words_df.loc[self.index, 'taux'] = taux
+        self.interro_df.loc[self.index, 'taux'] = taux
         # Query
-        self.words_df.loc[self.index, 'query'] += 1
-
-    def ask_series_of_guesses(self):
-        """
-        1) Extract one sample
-        2) Ask a guess to the user
-        3) Update the words table with the user input
-        4) Update the faults table with the user input
-        """
-        for index in self.interro_df.index:
-            row = list(self.interro_df.loc[index])
-            word_guessed = self.guesser.guess_word(
-                row=row,
-                words=self.words
-            )
-            self.update_voc_df(word_guessed)
-            self.update_faults_df(
-                word_guessed=word_guessed,
-                row=row
-            )
+        self.interro_df.loc[self.index, 'query'] += 1
 
     def compute_success_rate(self):
         """
@@ -278,15 +228,38 @@ class PremierTest(Interro):
         success_rate = int(100 * (1 - (faults_total / self.words)))
         self.perf = success_rate
 
-    def run(self):
+    def to_dict(self):
         """
-        1) Set the interro table,
-        2) Ask guesses to the user,
-        3) Compute the performances.
+        Create a dict out of the instance attributes
         """
-        self.set_interro_df()
-        self.ask_series_of_guesses()
-        self.compute_success_rate()
+        attributes_dict = {
+            'interro_dict': self.interro_df.to_json(orient='records'),
+            'test_length': self.words,
+            'index': self.index,
+            'faults_dict': self.faults_df.to_json(orient='records'),
+            'perf': self.perf,
+        }
+        return attributes_dict
+
+    @classmethod
+    def from_dict(cls, data):
+        """
+        Instanciate a PremierTest out of a dictionnary of arguments &
+        class attributes.
+        """
+        words = data['test_length']
+        interro_df = data['interro_df']
+        guesser = FastapiGuesser()
+        instance = cls(
+            interro_df=interro_df,
+            words=words,
+            guesser=guesser,
+        )
+        instance.faults_df = data['faults_df']
+        instance.index = data['index']
+        instance.row = data['row']
+        instance.perf = data['perf']
+        return instance
 
 
 
@@ -296,58 +269,50 @@ class Rattrap(Interro):
     """
     def __init__(
             self,
-            faults_df_: pd.DataFrame,
+            interro_df: pd.DataFrame,
             rattraps: int,
             guesser
         ):
         super().__init__(
-            words_df_=faults_df_,
-            words=faults_df_.shape[0],
+            interro_df=interro_df,
+            words=interro_df.shape[0],
             guesser=guesser
         )
-        self.words_df = faults_df_.copy()
         self.rattraps = int(rattraps)
-        self.interro_df = faults_df_.copy()
 
     def reshuffle_words_table(self):
         """
         Shuffle the words table, so that the words are asked
         in a different order than the precedent test.
         """
-        self.words_df = self.words_df.sample(frac=1)
-        self.words_df = self.words_df.reset_index(drop=True)
+        self.interro_df = self.interro_df.sample(frac=1)
+        self.interro_df = self.interro_df.reset_index(drop=True)
 
-    def run(self):
-        """
-        Launch a rattraps.
-        """
-        self.reshuffle_words_table()
-        words_total = self.words_df.shape[0]
-        for j in range(0, words_total):
-            self.index = j
-            self.set_row()
-            word_guessed = self.guesser.guess_word(
-                row=self.row,
-                words=words_total
-            )
-            self.update_faults_df(
-                word_guessed=word_guessed,
-                row=self.row
-            )
-        self.words_df = self.faults_df.copy()
-        self.faults_df.drop(self.faults_df.index, inplace=True)
+    def to_dict(self):
+        attributes_dict = {
+            'interro_dict': self.interro_df.to_dict(),
+            'words': self.words,
+            'faults_dict': self.faults_df.to_dict(),
+            'index': self.index,
+            'rattraps': self.rattraps,
+        }
+        return attributes_dict
 
-    def start_loop(self):
-        """
-        Start rattraps loop.
-        """
-        if self.rattraps == -1:
-            while self.words_df.shape[0] > 0:
-                self.run()
-        else:
-            for _ in range(self.rattraps):
-                if self.words_df.shape[0] > 0:
-                    self.run()
+    @classmethod
+    def from_dict(cls, data):
+        interro_df = pd.DataFrame(data['interro_dict'])
+        rattraps = data['rattraps']
+        guesser = FastapiGuesser()
+        instance = cls(
+            interro_df=interro_df,
+            rattraps=rattraps,
+            guesser=guesser,
+        )
+        instance.words = data['words']
+        instance.faults_df = pd.DataFrame(data['faults_dict'])
+        instance.index = data['index']
+        instance.row = data['row']
+        return instance
 
 
 

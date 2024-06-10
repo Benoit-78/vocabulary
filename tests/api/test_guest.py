@@ -246,12 +246,12 @@ class TestGuest(unittest.TestCase):
         mock_get_flags_dict.assert_called_once()
 
     @patch('src.api.guest.save_interro_in_redis')
-    @patch('src.interro.PremierTest.update_voc_df')
+    @patch('src.interro.PremierTest.update_interro_df')
     @patch('src.api.guest.load_interro_from_redis')
     def test_get_user_response_guest_yes(
             self,
             mock_load_interro_from_redis,
-            mock_update_voc_df,
+            mock_update_interro_df,
             mock_save_interro_in_redis
         ):
         # ----- ARRANGE
@@ -266,7 +266,7 @@ class TestGuest(unittest.TestCase):
         }
         token = 'mock_token'
         mock_load_interro_from_redis.return_value = MagicMock()
-        mock_update_voc_df.return_value = True
+        mock_update_interro_df.return_value = True
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.get_user_response_guest(data, token)
