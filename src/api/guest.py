@@ -199,7 +199,7 @@ def get_user_response_guest(
     return json_response
 
 
-def propose_rattraps_guest(
+def propose_rattrap_guest(
         request,
         interro_category,
         total,
@@ -208,7 +208,7 @@ def propose_rattraps_guest(
         token,
     ):
     """
-    Propose the rattraps.
+    Propose the rattrap.
     """
     interro = load_interro_from_redis(
         token=token,
@@ -229,12 +229,12 @@ def propose_rattraps_guest(
     return response_dict
 
 
-def load_rattraps(
+def load_rattrap(
         data,
         token
     ):
     """
-    Load the rattraps!
+    Load the rattrap!
     """
     interro_category = data.get('interroCategory')
     interro = load_interro_from_redis(
@@ -242,15 +242,15 @@ def load_rattraps(
         interro_category=interro_category
     )
     if interro_category == 'rattrap':
-        rattraps_cnt = interro.rattraps + 1
+        rattrap_cnt = interro.rattrap + 1
     else:
-        rattraps_cnt = 0
+        rattrap_cnt = 0
     guesser = api_view.FastapiGuesser()
     interro.faults_df = interro.faults_df.sample(frac=1)
     interro.faults_df = interro.faults_df.reset_index(drop=True)
     rattrap = core_interro.Rattrap(
         faults_df_=interro.faults_df,
-        rattraps=rattraps_cnt,
+        rattrap=rattrap_cnt,
         guesser=guesser
     )
     new_interro_category = get_interro_category(interro=rattrap)
@@ -265,7 +265,7 @@ def load_rattraps(
     return JSONResponse(
         content=
         {
-            'message': "Guest rattraps created successfully",
+            'message': "Guest rattrap created successfully",
             'token': token,
             'interroCategory': new_interro_category,
             'total': total,

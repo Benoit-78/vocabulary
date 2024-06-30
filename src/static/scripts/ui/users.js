@@ -1,4 +1,4 @@
-import { authenticateUser, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace } from "../api/users.js";
+import { authenticateUser, goToInterroSettings, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace } from "../api/users.js";
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -28,6 +28,16 @@ document.addEventListener("DOMContentLoaded", function() {
         const inputName = document.getElementById("inputName").value;
         const inputPassword = document.getElementById("inputPassword").value;
         createAccount(token, inputName, inputPassword);
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    const interroButton = document.getElementById("interroButton");
+    const token = document.body.dataset.token;
+
+    interroButton.addEventListener("click", function() {
+        goToInterroSettings(token);
     });
 });
 

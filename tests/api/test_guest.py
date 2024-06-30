@@ -346,7 +346,7 @@ class TestGuest(unittest.TestCase):
 
     @patch('src.api.guest.save_interro_in_redis')
     @patch('src.api.guest.load_interro_from_redis')
-    def test_propose_rattraps_guest(
+    def test_propose_rattrap_guest(
             self,
             mock_load_interro_from_redis,
             mock_save_interro_in_redis
@@ -370,7 +370,7 @@ class TestGuest(unittest.TestCase):
         mock_load_interro_from_redis.return_value = mock_test
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = guest_api.propose_rattraps_guest(
+        result = guest_api.propose_rattrap_guest(
             request=request,
             token=token,
             interro_category=interro_category,
@@ -399,13 +399,13 @@ class TestGuest(unittest.TestCase):
 
     @patch('src.api.guest.save_interro_in_redis')
     @patch('src.api.guest.load_interro_from_redis')
-    def test_load_rattraps(
+    def test_load_rattrap(
             self,
             mock_load_interro_from_redis,
             mock_save_interro_in_redis,
         ):
         """
-        Should load the rattraps.
+        Should load the rattrap.
         """
         # ----- ARRANGE
         token = 'mock_token'
@@ -430,7 +430,7 @@ class TestGuest(unittest.TestCase):
         mock_load_interro_from_redis.return_value = mock_test
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = guest_api.load_rattraps(
+        result = guest_api.load_rattrap(
             token,
             data
         )
@@ -440,7 +440,7 @@ class TestGuest(unittest.TestCase):
         actual_dict = content.decode('utf-8')
         actual_dict = json.loads(actual_dict)
         expected_dict = {
-            'message': "Guest rattraps created successfully",
+            'message': "Guest rattrap created successfully",
             'token': token,
             'interroCategory': 'rattrap',
             'total': int(data['total']),

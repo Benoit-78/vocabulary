@@ -62,7 +62,7 @@ class TestCliUser(unittest.TestCase):
         args = [
             '--type', 'version',
             '--words', '100',
-            '--rattraps', '1'
+            '--rattrap', '1'
         ]
         # ----- ACT
         self.user.parse_arguments(args)
@@ -71,7 +71,7 @@ class TestCliUser(unittest.TestCase):
             [
                 '--type', 'version',
                 '--words', '100',
-                '--rattraps', '1',
+                '--rattrap', '1',
                 '-t', 'version',
                 '-w', '10',
                 '-r', '2'
@@ -108,7 +108,7 @@ class TestCliUser(unittest.TestCase):
             "Please give",
             "-t <test type>, ",
             "-w <number of words> and ",
-            "-r <number of rattraps>"
+            "-r <number of rattrap>"
         ])
         mock_logger.error.assert_called_with(message)
 
@@ -124,14 +124,14 @@ class TestCliUser(unittest.TestCase):
 
     @patch('src.interro.sys.argv', ['interro.py', '-t', 'version', '-w', '100', '-r', '-2'])
     @patch('src.interro.logger')
-    def test_get_settings_rattraps_negative(self, mock_logger):
+    def test_get_settings_rattrap_negative(self, mock_logger):
         # ----- ARRANGE
         # ----- ACT
         with self.assertRaises(SystemExit):
             self.user.get_settings()
         # ----- ASSERT
         mock_logger.error.assert_called_with(
-            "Number of rattraps must be greater than -1."
+            "Number of rattrap must be greater than -1."
         )
 
     @patch('src.interro.sys.argv', ['interro.py', '-t', 'version', '-w', '-100', '-r', '1'])
@@ -499,11 +499,11 @@ class TestRattrap(unittest.TestCase):
             'english': [1, 2, 3],
             'français': [4, 5, 6]
         })
-        self.rattraps = 10
+        self.rattrap = 10
         self.guesser = MagicMock()
         self.rattrap = interro.Rattrap(
             self.faults_df,
-            self.rattraps,
+            self.rattrap,
             self.guesser
         )
 
@@ -520,7 +520,7 @@ class TestRattrap(unittest.TestCase):
         self.assertEqual(self.rattrap.guesser, self.guesser)
         # Verify attribute initialization
         pd.testing.assert_frame_equal(self.rattrap.words_df, self.faults_df)
-        self.assertEqual(self.rattrap.rattraps, self.rattraps)
+        self.assertEqual(self.rattrap.attraps, self.rattrap)
         pd.testing.assert_frame_equal(self.rattrap.interro_df, self.faults_df)
 
     def test_run_2(self):
@@ -563,7 +563,7 @@ class TestRattrap(unittest.TestCase):
         to go through all the words.
         """
         # ----- ARRANGE
-        self.rattrap.rattraps = -1
+        self.rattrap.rattrap = -1
         self.rattrap.words_df = pd.DataFrame({
             'mock_column': [1, 2, 3]
         })
@@ -577,19 +577,19 @@ class TestRattrap(unittest.TestCase):
         # ----- ASSERT
         assert self.rattrap.run.call_count == old_length
 
-    def test_start_loop_with_positive_rattraps(self):
+    def test_start_loop_with_positive_rattrap(self):
         """
-        Should run the test as many times as the number of rattraps.
+        Should run the test as many times as the number of rattrap.
         """
         # ----- ARRANGE
-        self.rattrap.rattraps = 2
+        self.rattrap.rattrap = 2
         self.rattrap.words_df = pd.DataFrame({'col1': [1, 2, 3], 'col2': [4, 5, 6]})
         self.rattrap.run = MagicMock()
         # ----- ACT
         self.rattrap.start_loop()
         # ----- ASSERT
         expected_calls = min(
-            self.rattrap.rattraps,
+            self.rattrap.rattrap,
             len(self.rattrap.words_df)
         )
         self.assertEqual(

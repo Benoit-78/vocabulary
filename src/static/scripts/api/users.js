@@ -1,4 +1,4 @@
-export { authenticateUser, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace };
+export { authenticateUser, goToInterroSettings, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace };
 
 
 async function createAccount(token, inputName, inputPassword) {
@@ -58,6 +58,12 @@ async function authenticateUser(token, formData) {
     } catch (error) {
         console.error("Error:", error);
     }
+}
+
+
+function goToInterroSettings(token) {
+    var errorMessage = ''
+    window.location.href = `/v1/interro/interro-settings?token=${token}&errorMessage=${errorMessage}`;
 }
 
 

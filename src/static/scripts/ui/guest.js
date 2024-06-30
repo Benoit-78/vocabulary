@@ -1,4 +1,4 @@
-import { sendGuestSettings, showTranslation, sendUserAnswer, launchRattraps } from "../api/guest.js";
+import { sendGuestSettings, showTranslation, sendUserAnswer, launchRattrap } from "../api/guest.js";
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -143,10 +143,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    const rattrapsButton = document.getElementById("rattrapsButton");
+    const rattrapButton = document.getElementById("rattrapButton");
     const token = document.body.dataset.token;
-    rattrapsButton.addEventListener("click", function() {
-        launchRattraps(token, interroCategory, newWords, newCount, newScore, language);
+    rattrapButton.addEventListener("click", function() {
+        launchRattrap(token, interroCategory, newWords, newCount, newScore, language);
     });
 });
 

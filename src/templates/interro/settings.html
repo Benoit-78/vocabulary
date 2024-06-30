@@ -18,13 +18,8 @@
 </head>
 
 <body data-token="{{ token }}">
-    <script>
-        const testType = "version";
-    </script>
-
     <div class="container">
         <form>
-
             <div class="row">
                 <label class="white-text" for="testType">Choisir un dictionnaire</label>
             </div>
@@ -38,23 +33,11 @@
                     <p class="error-message">{{ emptyTableErrorMessage }}</p>
                 {% endif %}
             </div>
-
-            <!-- <div class="row">
-                <label class="white-text" for="testType">Type d'interro:</label>
+            <div class="row">
+                <label class="white-text" for="testLength">Nombre de questions</label>
             </div>
             <div class="row">
-                <select id="testType" name="testType" class="dropdown-container rounded-input" required>
-                    <option value="version">Normale</option>
-                    <option value="theme">Inversée</option>
-                </select>
-                Attention à la balise <script> au début du body !!!
-            </div> -->
-
-            <div class="row">
-                <label class="white-text" for="numWords">Nombre de questions</label>
-            </div>
-            <div class="row">
-                <select id="numWords" name="numWords" class="dropdown-container rounded-input" required>
+                <select id="testLength" name="testLength" class="dropdown-container rounded-input" required>
                     <option value="100">100</option>
                     <option value="50">50</option>
                     <option value="20">20</option>
@@ -63,15 +46,16 @@
                 </select>
             </div>
         </form>
-
         <div class="row">
             <button id="sendUserSettingsButton" class="button">Interro !</button>
         </div>
-
         <div class="row">
             <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
+    <script>
+        const testType = "version";
+    </script>
 </body>
 
 </html>

@@ -480,7 +480,7 @@ class TestInterro(unittest.TestCase):
     @patch('src.api.interro.save_interro_in_redis')
     @patch('src.interro.PremierTest.update_interro_df')
     @patch('src.api.interro.load_interro_from_redis')
-    def test_get_user_answer_rattraps_yes(
+    def test_get_user_answer_rattrap_yes(
             self,
             mock_load_interro_from_redis,
             mock_update_interro_df,
@@ -503,7 +503,7 @@ class TestInterro(unittest.TestCase):
         )
         mock_rattrap = Rattrap(
             faults_df_=pd.DataFrame(),
-            rattraps=10,
+            rattrap=10,
             guesser=api_view.FastapiGuesser(),
         )
         mock_rattrap.interro_df = mock_interro_df
@@ -545,7 +545,7 @@ class TestInterro(unittest.TestCase):
     @patch('src.api.interro.load_loader_from_redis')
     @patch('src.interro.PremierTest.compute_success_rate')
     @patch('src.api.interro.load_interro_from_redis')
-    def test_propose_rattraps(
+    def test_propose_rattrap(
             self,
             mock_load_interro_from_redis,
             mock_compute_success_rate,
@@ -554,7 +554,7 @@ class TestInterro(unittest.TestCase):
             mock_logger
         ):
         """
-        Should propose a new rattraps test to the user.
+        Should propose a new rattrap test to the user.
         """
         # ----- ARRANGE
         request = 'mock_request'
@@ -591,7 +591,7 @@ class TestInterro(unittest.TestCase):
         mock_load_loader_from_redis.return_value = mock_loader
         mock_update_data.return_value = True
         # ----- ACT
-        result = interro_api.propose_rattraps(
+        result = interro_api.propose_rattrap(
             request,
             interro_category,
             total,
@@ -622,13 +622,13 @@ class TestInterro(unittest.TestCase):
 
     @patch('src.interro.PremierTest.compute_success_rate')
     @patch('src.api.interro.load_interro_from_redis')
-    def test_propose_rattraps_rattraps(
+    def test_propose_rattrap_rattrap(
             self,
             mock_load_interro_from_redis,
             mock_compute_success_rate
         ):
         """
-        Should propose a new rattraps test to the user.
+        Should propose a new rattrap test to the user.
         """
         # ----- ARRANGE
         request = 'mock_request'
@@ -644,13 +644,13 @@ class TestInterro(unittest.TestCase):
         )
         mock_rattrap = Rattrap(
             faults_df_=mock_faults_df_,
-            rattraps=2,
+            rattrap=2,
             guesser=api_view.FastapiGuesser(),
         )
         mock_load_interro_from_redis.return_value = mock_rattrap
         mock_compute_success_rate.return_value = True
         # ----- ACT
-        result = interro_api.propose_rattraps(
+        result = interro_api.propose_rattrap(
             request,
             interro_category,
             total,
@@ -678,13 +678,13 @@ class TestInterro(unittest.TestCase):
 
     @patch('src.api.interro.save_interro_in_redis')
     @patch('src.api.interro.load_interro_from_redis')
-    def test_load_rattraps(
+    def test_load_rattrap(
             self,
             mock_load_interro_from_redis,
             mock_save_interro_in_redis,
         ):
         """
-        Should load the rattraps.
+        Should load the rattrap.
         """
         # ----- ARRANGE
         token = 'mock_token'
@@ -709,7 +709,7 @@ class TestInterro(unittest.TestCase):
         mock_load_interro_from_redis.return_value = mock_test
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = interro_api.load_rattraps(
+        result = interro_api.load_rattrap(
             token,
             data
         )
@@ -719,7 +719,7 @@ class TestInterro(unittest.TestCase):
         actual_dict = content.decode('utf-8')
         actual_dict = json.loads(actual_dict)
         expected_dict = {
-            'message': "Rattraps created successfully",
+            'message': "Rattrap created successfully",
             'token': token,
             'interroCategory': 'rattrap',
             'total': int(data['total']),
@@ -730,13 +730,13 @@ class TestInterro(unittest.TestCase):
 
     @patch('src.api.interro.save_interro_in_redis')
     @patch('src.api.interro.load_interro_from_redis')
-    def test_load_rattraps_rattraps(
+    def test_load_rattrap_rattrap(
             self,
             mock_load_interro_from_redis,
             mock_save_interro_in_redis,
         ):
         """
-        Should load the rattraps.
+        Should load the rattrap.
         """
         # ----- ARRANGE
         token = 'mock_token'
@@ -754,14 +754,14 @@ class TestInterro(unittest.TestCase):
         )
         mock_test = Rattrap(
             faults_df_=pd.DataFrame(),
-            rattraps=2,
+            rattrap=2,
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.faults_df_ = mock_interro_df
         mock_load_interro_from_redis.return_value = mock_test
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = interro_api.load_rattraps(
+        result = interro_api.load_rattrap(
             token,
             data
         )
@@ -771,7 +771,7 @@ class TestInterro(unittest.TestCase):
         actual_dict = content.decode('utf-8')
         actual_dict = json.loads(actual_dict)
         expected_dict = {
-            'message': "Rattraps created successfully",
+            'message': "Rattrap created successfully",
             'token': token,
             'interroCategory': 'rattrap',
             'total': int(data['total']),

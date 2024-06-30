@@ -1,42 +1,26 @@
-export { goToInterroSettings, sendUserSettings, showTranslation, sendUserAnswer, launchRattraps };
+export { sendUserSettings, showTranslation, sendUserAnswer, launchRattrap };
 
 
-function goToInterroSettings(token) {
-    var errorMessage = ''
-    window.location.href = `/v1/interro/interro-settings?token=${token}&errorMessage=${errorMessage}`;
-}
-
-
-function sendUserSettings(token, databaseName, testType, numWords) {
+function sendUserSettings(token, inputParams) {
+    // console.log("InputParams:", inputParams);
     fetch(
         `/v1/interro/save-interro-settings?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                databaseName: databaseName,
-                testType: testType,
-                numWords: numWords
-            })
+            body: JSON.stringify(inputParams)
         }
     )
     .then(response => response.json())
     .then(data => {
+        // console.log("data.message: ", data.message)
         if (data && data.message === "Settings saved successfully") {
-            startTest(
-                data.token,
-                data.message,
-                data.interro_category,
-                data.interro_dict,
-                data.test_length,
-                data.index,
-                data.faults_dict,
-                data.perf
-            )
+            console.log("Params:", data)
+            startTest(token, data)
         } else if (data && data.message === "Empty table") {
             window.location.href = `/v1/interro/interro-settings?token=${token}&errorMessage=${data.message}`;
         } else {
-            console.error("Unknown message at interro creation:", data.message);
+            console.error("Unknown message at interro creation, data:", data);
         }
     })
     .catch(error => {
@@ -45,82 +29,49 @@ function sendUserSettings(token, databaseName, testType, numWords) {
 }
 
 
-function startTest(token, message, interroCategory, interroDict, numWords, index, faultsDict, perf) {
-    var testLength = parseInt(numWords, 10);
-    var count = 0;
-    var score = 0;
-    if (!isNaN(testLength)) {
-        const params = new URLSearchParams({
-            token: token,
-            message: message,
-            interroCategory: interroCategory,
-            interroDict: interroDict,
-            testLength: testLength,
-            index: index,
-            faultsDict: faultsDict,
-            perf: perf,
-            count: count,
-            score: score
-        });
-        window.location.href = `/v1/interro/interro-question?${params.toString()}`;
+function startTest(token, inputParams) {
+    console.log("InputParams:", inputParams);
+    if (!isNaN(inputParams.testLength)) {
+        const urlParams = new URLSearchParams(inputParams);
+        urlParams.append("token", token);
+        urlParams.append("count", 0);
+        urlParams.append("score", 0);
+        window.location.href = `/v1/interro/interro-question?${urlParams.toString()}`;
     } else {
-        console.error('Error:', error);
+        console.error("Error: testLength is not a number:", inputParams.testLength);
     }
 }
 
 
-function showTranslation(token, interroCategory, interroDict, testLength, index, faultsDict, perf, count, score) {
-    var testLength = parseInt(testLength, 10);
-    var count = parseInt(count, 10);
-    var score = parseInt(score, 10);
-    console.log(interroDict)
-    if (!isNaN(testLength)) {
-        const params = new URLSearchParams({
-            token: token,
-            interroCategory: interroCategory,
-            interroDict: interroDict,
-            testLength: testLength,
-            index: index,
-            faultsDict: faultsDict,
-            perf: perf,
-            count: count,
-            score: score
-        });
-        window.location.href = `/v1/interro/interro-answer?${params.toString()}`;
+function showTranslation(token, inputParams) {
+    console.log("InputParams:", inputParams);
+    if (!isNaN(inputParams.testLength)) {
+        const urlParams = new URLSearchParams(inputParams);
+        urlParams.append("token", token);
+        window.location.href = `/v1/interro/interro-answer?${urlParams.toString()}`;
     } else {
-        console.error("Invalid testLength:", testLength);
+        console.error("Invalid testLength:", inputParams.testLength);
     }
 }
 
 
-function sendUserAnswer(token, answer, interroCategory, interroDict, testLength, index,  faultsDict, perf, count, score) {
-    console.log(interroDict)
+function sendUserAnswer(token, inputParams) {
+    console.log("InputParams:", inputParams);
     fetch(
         `/v1/interro/user-answer?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                interroCategory,
-                answer: answer,
-                interroDict: interroDict,
-                testLength: testLength,
-                index: index,
-                faultsDict: faultsDict,
-                perf: perf,
-                count: count,
-                score: score,
-            }),
+            body: JSON.stringify(inputParams),
         }
     )
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "User response stored successfully") {
-            var score = parseInt(data.score, 10);
-            if (count < total) {
-                nextGuess(token, interroCategory, data.interroDict, testLength, index, data.faultsDict, perf, count, score);
+            if (data.count < data.testLength) {
+                nextGuess(token, data);
             } else {
-                endInterro(token, interroCategory, interroDict, testLength, faultsDict, perf, count, score);
+                endInterro(token, data);
             }
         } else {
             console.error("Error with user answer acquisition");
@@ -132,70 +83,46 @@ function sendUserAnswer(token, answer, interroCategory, interroDict, testLength,
 }
 
 
-function nextGuess(token, interroCategory, interroDict, testLength, index,  faultsDict, perf, count, score) {
-    const params = new URLSearchParams({
-        token: token,
-        interroCategory: interroCategory,
-        interroDict: interroDict,
-        testLength: testLength,
-        index: index,
-        faultsDict: faultsDict,
-        perf: perf,
-        count: count,
-        score: score
-    });
-    window.location.href = `/v1/interro/interro-question?${params.toString()}`;
-    // window.location.href = `/v1/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
+function nextGuess(token, inputParams) {
+    // console.log("InputParams:", inputParams);
+    const urlParams = new URLSearchParams(inputParams);
+    urlParams.append("token", token);
+    window.location.href = `/v1/interro/interro-question?${urlParams.toString()}`;
 }
 
 
-function endInterro(token, interroCategory, interroDict, testLength, faultsDict, perf, count, score) {
-    var testLength = parseInt(testLength, 10);
-    var score = parseInt(score, 10);
-    if (score === testLength) {
-        const params = new URLSearchParams({
-            token: token,
-            interroCategory: interroCategory,
-            interroDict: interroDict,
-            testLength: testLength,
-            faultsDict: faultsDict,
-            perf: perf,
-            count: count,
-            score: score
-        });
-        window.location.href = `/v1/interro/interro-end?${params.toString()}`;
-        // window.location.href = `/v1/interro/interro-end?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
+function endInterro(token, inputParams) {
+    console.log("InputParams:", inputParams);
+    if (inputParams.score === inputParams.testLength) {
+        const urlParams = new URLSearchParams(inputParams);
+        urlParams.append("token", token);
+        window.location.href = `/v1/interro/interro-end?${urlParams.toString()}`;
     } else {
-
-        window.location.href = `/v1/interro/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}`;
+        const urlParams = new URLSearchParams(inputParams);
+        urlParams.append("token", token);
+        window.location.href = `/v1/interro/propose-rattrap?${urlParams.toString()}`;
     }
 }
 
 
-function launchRattraps(token, interroCategory, newTotal, newCount, newScore) {
+function launchRattrap(token, inputParams) {
     fetch(
-        `/v1/interro/launch-rattraps?token=${token}`,
+        `/v1/interro/launch-rattrap?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                interroCategory: interroCategory,
-                count: newCount,
-                total: newTotal,
-                score: newScore,
-            }),
+            body: JSON.stringify(inputParams),
         }
     )
     .then(answer => answer.json())
     .then(data => {
-        if (data && data.message === "Rattraps created successfully") {
-            const interroCategory = data.interroCategory;
-            const total = data.total;
-            const count = data.count;
-            const score = data.score;
-            window.location.href = `/v1/interro/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}`;
+        if (data && data.message === "Rattrap created successfully") {
+            const urlParams = new URLSearchParams(data);
+            urlParams.append("token", token);
+            urlParams.append("perf", 0);
+            window.location.href = `/v1/interro/interro-question?${urlParams.toString()}`;
         } else {
-            console.error("Error with rattraps creation.");
+            console.error("Error with rattrap creation.");
         }
     })
     .catch(error => {

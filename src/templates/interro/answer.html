@@ -18,34 +18,16 @@
 </head>
 
 <body data-token="{{ token }}">
-    <script>
-        // Declare HTML page variables to the JS file that will call them
-        const interroCategory = `{{ interroCategory }}`;
-        const testLength = `{{ testLength }}`;
-        const interroDict = `{{ interroDict }}`;
-        const index = `{{ index }}`;
-        const faultsDict = `{{ faultsDict }}`;
-        const perf = `{{ perf }}`;
-        const count = `{{ count }}`;
-        const score = `{{ score }}`;
-        const content_box1 = `{{ content_box1|safe }}`;
-        const content_box2 = `{{ content_box2|safe }}`;
-        const language = `{{ language|safe }}`;
-    </script>
-    
     <div class="container">
         <div class="white-text">
             <p>{{ count }} / {{ testLength }}</p>
         </div>
-
         <div class="progress-container">
             <div class="progress-bar" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
-
         <div class="row">
             <p class="white-text">Quelle traduction donnez-vous pour :</p>
         </div>
-
         <div class="row">
             <div class="flag-box">
                 <div class="box rounded-input">
@@ -69,6 +51,22 @@
             <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const content_box1 = `{{ content_box1|safe }}`;
+        const content_box2 = `{{ content_box2|safe }}`;
+        const count = `{{ count }}`;
+        const databaseName = `{{ databaseName }}`;
+        const faultsDict = `{{ faultsDict }}`;
+        const index = `{{ index }}`;
+        const interroCategory = `{{ interroCategory }}`;
+        const interroDict = `{{ interroDict }}`;
+        const oldInterroDict = `{{ oldInterroDict }}`;
+        const perf = `{{ perf }}`;
+        const score = `{{ score }}`;
+        const testLength = `{{ testLength }}`;
+        const testType = `{{ testType }}`;
+    </script>
 </body>
 
 </html>

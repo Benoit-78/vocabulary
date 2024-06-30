@@ -134,8 +134,8 @@ async def get_user_response_guest(
     return json_response
 
 
-@guest_router.get("/propose-rattraps", response_class=HTMLResponse)
-def propose_rattraps_guest(
+@guest_router.get("/propose-rattrap", response_class=HTMLResponse)
+def propose_rattrap_guest(
         request: Request,
         interro_category: str=Query(None, alias="interroCategory"),
         total: str = Query(None, alias="total"),
@@ -144,9 +144,9 @@ def propose_rattraps_guest(
         language: str = Query('', alias='language')
     ):
     """
-    Load a page that proposes the user to take a rattraps, or leave the test.
+    Load a page that proposes the user to take a rattrap, or leave the test.
     """
-    response_dict = guest_api.propose_rattraps_guest(
+    response_dict = guest_api.propose_rattrap_guest(
         request=request,
         interro_category=interro_category,
         total=total,
@@ -155,20 +155,20 @@ def propose_rattraps_guest(
         language=language
     )
     return templates.TemplateResponse(
-        "guest/rattraps.html",
+        "guest/rattrap.html",
         response_dict
     )
 
 
-@guest_router.post("/launch-guest-rattraps", response_class=HTMLResponse)
-async def launch_rattraps(
+@guest_router.post("/launch-guest-rattrap", response_class=HTMLResponse)
+async def launch_rattrap(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
     ):
     """
-    Load the rattraps page.
+    Load the rattrap page.
     """
-    json_response = guest_api.load_rattraps(
+    json_response = guest_api.load_rattrap(
         data,
         token
     )

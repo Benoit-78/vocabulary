@@ -1,1 +1,1 @@
-DELETE FROM {db_name}.{table_name} WHERE english = {english};
+DELETE FROM {db_name}.{table_name} WHERE `foreign` = {english};

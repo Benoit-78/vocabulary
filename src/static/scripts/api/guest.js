@@ -1,4 +1,4 @@
-export { sendGuestSettings, showTranslation, sendUserAnswer, nextGuess, launchRattraps };
+export { sendGuestSettings, showTranslation, sendUserAnswer, nextGuess, launchRattrap };
 
 
 function sendGuestSettings(token, language) {
@@ -93,13 +93,13 @@ function nextGuess(token, interroCategory, numWords, count, score, language) {
 }
 
 
-function launchRattraps(token, interroCategory, newWords, newCount, newScore, language) {
+function launchRattrap(token, interroCategory, newWords, newCount, newScore, language) {
     var total = parseInt(newWords, 10);
     var count = parseInt(newCount, 10);
     var score = parseInt(newScore, 10);
     console.log("Total:", total, "Count:", count, "Score:", score);
     fetch(
-        `/v1/guest/launch-guest-rattraps?token=${token}`,
+        `/v1/guest/launch-guest-rattrap?token=${token}`,
         {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -113,14 +113,14 @@ function launchRattraps(token, interroCategory, newWords, newCount, newScore, la
     )
     .then(answer => answer.json())
     .then(data => {
-        if (data && data.message === "Guest rattraps created successfully") {
+        if (data && data.message === "Guest rattrap created successfully") {
             const interroCategory = data.interroCategory;
             const total = data.total;
             const count = data.count;
             const score = data.score;
             window.location.href = `/v1/guest/interro-question?token=${token}&interroCategory=${interroCategory}&total=${total}&count=${count}&score=${score}&language=${language}`;
         } else {
-            console.error("Error with guest rattraps creation.");
+            console.error("Error with guest rattrap creation.");
         }
     })
     .catch(error => {
@@ -135,6 +135,6 @@ function endInterro(token, interroCategory, numWords, score, language) {
     if (score === total) {
         window.location.href = `/v1/guest/interro-end?token=${token}&total=${total}&score=${score}`;
     } else {
-        window.location.href = `/v1/guest/propose-rattraps?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}&language=${language.toLowerCase()}`;
+        window.location.href = `/v1/guest/propose-rattrap?token=${token}&interroCategory=${interroCategory}&total=${total}&score=${score}&language=${language.toLowerCase()}`;
     }
 }

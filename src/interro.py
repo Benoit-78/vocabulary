@@ -44,8 +44,10 @@ class Loader():
         self.tables = {}
         self.output_table = ''
         self.words_df = pd.DataFrame()
-        self.interro_df = pd.DataFrame(columns=['foreign', 'native'])
+        self.interro_df = pd.DataFrame()
         self.index = 0
+        self.perf_df = pd.DataFrame()
+        self.words_count_df = pd.DataFrame()
 
     def load_tables(self):
         """
@@ -67,6 +69,8 @@ class Loader():
         if 'bad_word' not in self.tables[voc].columns:
             self.tables[voc]['bad_word'] = [0] * self.tables[voc].shape[0]
         self.words_df = self.tables[voc]
+        self.perf_df = self.tables[self.test_type + '_perf']
+        self.words_count_df = self.tables[self.test_type + '_words_count']
 
     def adjust_test_length(self):
         """
@@ -98,7 +102,6 @@ class Loader():
             next_index = max(next_index, 1)
             already_asked = self.words_df.loc[next_index, 'query'] == 1
             i += 1
-        self.words_df.loc[next_index, 'query'] = 1
         return next_index
 
     def get_next_index(self) -> int:
@@ -121,28 +124,34 @@ class Loader():
         """
         Get the row of the word to be asked
         """
-        mot_etranger = self.words_df.loc[self.index, self.words_df.columns[0]]
-        mot_natal = self.words_df.loc[self.index, self.words_df.columns[1]]
-        row = [self.index, mot_etranger, mot_natal]
+        row = [
+            self.index,
+            list(self.words_df.loc[self.index])
+        ]
         return row
 
     def set_interro_df(self):
         """
         Extract the words that will be asked.
         """
+        self.interro_df = pd.DataFrame(
+            columns=[
+                'foreign',
+                'native',
+                'creation_date',
+                'nb',
+                'score',
+                'taux',
+                'query',
+                'bad_word'
+            ]
+        )
         self.adjust_test_length()
         self.index = self.get_random_step()
         for _ in range(1, self.words + 1):
             self.index = self.get_next_index()
             row = self.get_row()
-            self.interro_df.loc[row[0]] = row[1:]
-
-    def to_dict(self):
-        pass
-
-    @classmethod
-    def from_dict(cls):
-        pass
+            self.interro_df.loc[row[0]] = row[1]
 
 
 
@@ -160,8 +169,7 @@ class Interro(ABC):
         self.words = words
         self.guesser = guesser
         self.faults_df = pd.DataFrame(columns=[['foreign', 'native']])
-        self.index = 1
-        self.row = []
+        self.index = 0
 
     @abstractmethod
     def to_dict(self):
@@ -200,6 +208,7 @@ class PremierTest(Interro):
             guesser=guesser
         )
         self.perf = 0
+        self.index = int(self.interro_df.index[0])
 
     def update_interro_df(self, word_guessed: bool):
         """
@@ -220,6 +229,16 @@ class PremierTest(Interro):
         # Query
         self.interro_df.loc[self.index, 'query'] += 1
 
+    def update_index(self):
+        """
+        Update the vocabulary dataframe
+        """
+        indices = list(self.interro_df.index)
+        for idx_nb, idx in enumerate(indices):
+            if idx == self.index:
+                self.index = indices[idx_nb + 1]
+            break
+
     def compute_success_rate(self):
         """
         Compute success rate.
@@ -231,12 +250,14 @@ class PremierTest(Interro):
     def to_dict(self):
         """
         Create a dict out of the instance attributes
+        Keys of the dictionnary have the JavaScript case.
         """
+        self.interro_df = self.interro_df.reset_index(names='index')
         attributes_dict = {
-            'interro_dict': self.interro_df.to_json(orient='records'),
-            'test_length': self.words,
+            'interroDict': self.interro_df.to_json(orient='records'),
+            'testLength': self.words,
             'index': self.index,
-            'faults_dict': self.faults_df.to_json(orient='records'),
+            'faultsDict': self.faults_df.to_json(orient='records'),
             'perf': self.perf,
         }
         return attributes_dict
@@ -246,18 +267,18 @@ class PremierTest(Interro):
         """
         Instanciate a PremierTest out of a dictionnary of arguments &
         class attributes.
+        Keys of the input dictionnary have the JavaScript case.
         """
-        words = data['test_length']
-        interro_df = data['interro_df']
+        words = data['testLength']
+        interro_df = data['interroTable']
         guesser = FastapiGuesser()
         instance = cls(
             interro_df=interro_df,
             words=words,
             guesser=guesser,
         )
-        instance.faults_df = data['faults_df']
+        instance.faults_df = data['faultsTable']
         instance.index = data['index']
-        instance.row = data['row']
         instance.perf = data['perf']
         return instance
 
@@ -270,15 +291,16 @@ class Rattrap(Interro):
     def __init__(
             self,
             interro_df: pd.DataFrame,
-            rattraps: int,
-            guesser
+            guesser,
+            old_interro_df: pd.DataFrame
         ):
         super().__init__(
             interro_df=interro_df,
             words=interro_df.shape[0],
             guesser=guesser
         )
-        self.rattraps = int(rattraps)
+        self.rattrap = True
+        self.old_interro_df = old_interro_df
 
     def reshuffle_words_table(self):
         """
@@ -290,28 +312,27 @@ class Rattrap(Interro):
 
     def to_dict(self):
         attributes_dict = {
-            'interro_dict': self.interro_df.to_dict(),
-            'words': self.words,
-            'faults_dict': self.faults_df.to_dict(),
+            'faultsDict': self.faults_df.to_json(orient='records'),
             'index': self.index,
-            'rattraps': self.rattraps,
+            'interroDict': self.interro_df.to_json(orient='records'),
+            'oldInterroDict': self.old_interro_df.to_json(orient='records'),
+            'testLength': self.words,
         }
         return attributes_dict
 
     @classmethod
     def from_dict(cls, data):
-        interro_df = pd.DataFrame(data['interro_dict'])
-        rattraps = data['rattraps']
+        interro_df = pd.DataFrame(data['interroDict'])
+        old_interro_df = pd.DataFrame(data['oldInterroDict'])
         guesser = FastapiGuesser()
         instance = cls(
             interro_df=interro_df,
-            rattraps=rattraps,
             guesser=guesser,
+            old_interro_df=old_interro_df
         )
-        instance.words = data['words']
-        instance.faults_df = pd.DataFrame(data['faults_dict'])
+        instance.words = data['testLength']
+        instance.faults_df = pd.DataFrame(data['faultsDict'])
         instance.index = data['index']
-        instance.row = data['row']
         return instance
 
 
@@ -336,6 +357,15 @@ class Updater():
             loader.data_querier.test_type,
         )
 
+    def update_words(self):
+        """
+        Update words table with the interro results.
+        """
+        for idx in self.interro.interro_df.index:
+            row = list(self.interro.interro_df.loc[idx])
+            self.loader.words_df.loc[idx] = row
+        logger.info(f"Table {self.loader.data_querier.db_name} updated!")
+
     def set_criteria(self):
         """
         Upload the dictionnary of criteria.
@@ -351,9 +381,9 @@ class Updater():
         """
         ord_good = self.criteria['ORD_GOOD']
         steep_good = self.criteria['STEEP_GOOD']
-        self.interro.words_df['img_good'] = ord_good + steep_good * self.interro.words_df['nb']
-        self.good_words_df = self.interro.words_df[
-            self.interro.words_df['taux'] >= self.interro.words_df['img_good']
+        self.loader.words_df['img_good'] = ord_good + steep_good * self.loader.words_df['nb']
+        self.good_words_df = self.loader.words_df[
+            self.loader.words_df['taux'] >= self.loader.words_df['img_good']
         ]
 
     def copy_good_words(self):
@@ -377,10 +407,10 @@ class Updater():
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
         only under the author's dictatorial will.
         """
-        self.interro.words_df = self.interro.words_df[
-            self.interro.words_df['taux'] < self.interro.words_df['img_good']
+        self.loader.words_df = self.loader.words_df[
+            self.loader.words_df['taux'] < self.loader.words_df['img_good']
         ]
-        self.interro.words_df = self.interro.words_df.drop('img_good', axis=1)
+        self.loader.words_df = self.loader.words_df.drop('img_good', axis=1)
 
     def move_good_words(self):
         """
@@ -405,21 +435,21 @@ class Updater():
         """
         ord_bad = self.criteria['ORD_BAD']
         steep_bad = self.criteria['STEEP_BAD']
-        self.interro.words_df['img_bad'] = ord_bad + steep_bad * self.interro.words_df['nb']
-        self.interro.words_df['bad_word'] = np.where(
-            self.interro.words_df['taux'] < self.interro.words_df['img_bad'], 1, 0
+        self.loader.words_df['img_bad'] = ord_bad + steep_bad * self.loader.words_df['nb']
+        self.loader.words_df['bad_word'] = np.where(
+            self.loader.words_df['taux'] < self.loader.words_df['img_bad'], 1, 0
         )
-        self.interro.words_df.drop('img_bad', axis=1, inplace=True)
+        self.loader.words_df.drop('img_bad', axis=1, inplace=True)
 
     def save_words(self):
         """
         1) Reset the index of words dataframe.
         2) Use data handler instance to save the table in the database.
         """
-        self.interro.words_df.reset_index(inplace=True)
+        self.loader.words_df.reset_index(inplace=True)
         self.db_manipulator.save_table(
             table_name=self.loader.test_type + '_voc',
-            table=self.interro.words_df
+            table=self.loader.words_df
         )
 
     def save_performances(self):
@@ -433,51 +463,52 @@ class Updater():
                 'test_date': datetime.today().date().strftime('%Y-%m-%d'),
                 'test': self.interro.perf
             },
-            index=[self.interro.perf_df.shape[0] + 1]
+            index=[self.loader.perf_df.shape[0] + 1]
         )
-        self.interro.perf_df = pd.concat([self.interro.perf_df, new_row])
-        self.interro.perf_df.reset_index(inplace=True, names=['id_test'])
+        self.loader.perf_df = pd.concat([self.loader.perf_df, new_row])
+        self.loader.perf_df.reset_index(inplace=True, names=['id_test'])
         self.db_manipulator.save_table(
             table_name=self.loader.test_type + '_perf',
-            table=self.interro.perf_df
+            table=self.loader.perf_df
         )
 
     def save_words_count(self):
         """
         1)
         """
-        def correct_words_cnt_df():
+        def correct_words_count_df():
             """
             Correct the words count dataframe.
             """
-            real_columns = set(self.interro.word_cnt_df.columns)
+            real_columns = set(self.loader.words_count_df.columns)
             expected_columns = {'test_date', 'nb'}
             if real_columns != expected_columns:
-                self.interro.word_cnt_df.reset_index(inplace=True)
+                self.loader.words_count_df.reset_index(inplace=True)
 
-        count_before = self.interro.word_cnt_df.shape[0]
+        count_before = self.loader.words_count_df.shape[0]
         new_row = pd.DataFrame(
             data={
                 'test_date': datetime.today().date().strftime('%Y-%m-%d'),
-                'nb': self.interro.words_df.shape[0]
+                'nb': self.loader.words_df.shape[0]
             },
             index=[count_before]
         )
-        correct_words_cnt_df()
-        self.interro.word_cnt_df = pd.concat([
-            self.interro.word_cnt_df,
+        correct_words_count_df()
+        self.loader.words_count_df = pd.concat([
+            self.loader.words_count_df,
             new_row
         ])
-        self.interro.word_cnt_df.sort_index(inplace=True)
+        self.loader.words_count_df.sort_index(inplace=True)
         self.db_manipulator.save_table(
             table_name=self.loader.test_type + '_words_count',
-            table=self.interro.word_cnt_df
+            table=self.loader.words_count_df
         )
 
     def update_data(self):
         """
         Main method of Updater class
         """
+        self.update_words()
         self.move_good_words()
         self.flag_bad_words()
         self.save_words()

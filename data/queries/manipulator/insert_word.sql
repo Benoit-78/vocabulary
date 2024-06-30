@@ -1,1 +1,1 @@
-INSERT INTO {db_name}.{table_name} (english, français, creation_date, nb, score, taux) VALUES ('{english}', '{french}', '{today_str}', 0, 0, 0);
+INSERT INTO {db_name}.{table_name} (`foreign`, `native`, creation_date, nb, score, taux) VALUES ('{english}', '{french}', '{today_str}', 0, 0, 0);

@@ -41,10 +41,10 @@ guest/end.html	Guest interro	Guest interro	Interro invité
 guest/question.html	What is the translation for:	What is the translation for:	Quelle traduction donnez-vous pour :
 guest/question.html	Translation	Translation	Traduction
 guest/question.html	Quit	Quit	Quitter
-guest/rattraps.html	Guest interro	Guest interro	Interro invité
-guest/rattraps.html	Your score is: 	Your score is: 	Votre score :
-guest/rattraps.html	Take a catch-up test	Take the catch-up quiz	Passer le rattrapage
-guest/rattraps.html	Quit	Quit	Quitter
+guest/rattrap.html	Guest interro	Guest interro	Interro invité
+guest/rattrap.html	Your score is: 	Your score is: 	Votre score :
+guest/rattrap.html	Take a catch-up test	Take the catch-up quiz	Passer le rattrapage
+guest/rattrap.html	Quit	Quit	Quitter
 guest/settings.html	Guest interro	Guest interro	Interro invité
 guest/settings.html	Select a language	Select a language	Choisissez une langue
 guest/settings.html	Quit	Quit	Quitter
@@ -61,10 +61,10 @@ interro/end.html	Guest interro	Guest interro	Interro invité
 interro/question.html	What is the translation for:	What is the translation for:	Quelle traduction donnez-vous pour :
 interro/question.html	Show translation	Show translation	Traduction
 interro/question.html	Quit	Quit	Quitter
-interro/rattraps.html	Guest interro	Guest interro	Interro invité
-interro/rattraps.html	Your score is: 	Your score is: 	Votre score :
-interro/rattraps.html	Take a catch-up test	Take the catch-up quiz	Passer le rattrapage
-interro/rattraps.html	Quit	Quit	Quitter
+interro/rattrap.html	Guest interro	Guest interro	Interro invité
+interro/rattrap.html	Your score is: 	Your score is: 	Votre score :
+interro/rattrap.html	Take a catch-up test	Take the catch-up quiz	Passer le rattrapage
+interro/rattrap.html	Quit	Quit	Quitter
 interro/settings.html	Interro !	Quiz	Interro !
 interro/settings.html	Select a language	Select a language	Choisir une base de données:
 interro/settings.html	Nombre de questions	Number of words:	Nombre de questions

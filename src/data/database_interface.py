@@ -564,6 +564,9 @@ class DbManipulator(DbInterface):
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                logger.error(err)
+                result = False
         finally:
             cursor.close()
             connection.close()
