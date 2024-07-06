@@ -14,6 +14,126 @@ from src.views import terminal as terminal_view
 
 
 
+class TestCliUser(unittest.TestCase):
+    """
+    Tests on arguments parser.
+    """
+    def setUp(self):
+        self.user = terminal_view.CliUser()
+
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_parse_arguments_default(self, mock_parse_args):
+        """
+        The method should store three arguments.
+        """
+        # ----- ARRANGE
+        args = []
+        # ----- ACT
+        self.user.parse_arguments(args)
+        # ----- ASSERT
+        mock_parse_args.assert_called_with(
+            [
+                '-t', 'version',
+                '-w', '10',
+                '-r', '2'
+            ]
+        )
+
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_arguments_all(self, mock_parse_args):
+        """
+        Test case 1: Valid arguments provided
+        """
+        # ----- ARRANGE
+        args = [
+            '--type', 'version',
+            '--words', '100',
+            '--rattrap', '1'
+        ]
+        # ----- ACT
+        self.user.parse_arguments(args)
+        # ----- ASSERT
+        mock_parse_args.assert_called_with(
+            [
+                '--type', 'version',
+                '--words', '100',
+                '--rattrap', '1',
+                '-t', 'version',
+                '-w', '10',
+                '-r', '2'
+            ]
+        )
+
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_arguments_required_only(self, mock_parse_args):
+        """
+        Test case 2: Only required argument provided
+        """
+        # ----- ARRANGE
+        args = ['-t', 'theme']
+        # ----- ACT
+        self.user.parse_arguments(args)
+        # ----- ASSERT
+        mock_parse_args.assert_called_with(
+            [
+                '-t', 'theme',
+                '-w', '10',
+                '-r', '2'
+            ]
+        )
+
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', '', '-w', '100', '-r', '1'])
+    @patch('src.views.terminal.logger')
+    def test_get_settings_error_1(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        message = ' '.join([
+            "Please give",
+            "-t <test type>, ",
+            "-w <number of words> and ",
+            "-r <number of rattrap>"
+        ])
+        mock_logger.error.assert_called_with(message)
+
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'mock_type', '-w', '100', '-r', '1'])
+    @patch('src.views.terminal.logger')
+    def test_get_settings_error_2(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        mock_logger.error.assert_called_with("Test type must be either version or theme")
+
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'version', '-w', '100', '-r', '-2'])
+    @patch('src.views.terminal.logger')
+    def test_get_settings_rattrap_negative(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        mock_logger.error.assert_called_with(
+            "Number of rattrap must be greater than -1."
+        )
+
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'version', '-w', '-100', '-r', '1'])
+    @patch('src.views.terminal.logger')
+    def test_get_settings_words_negative(self, mock_logger):
+        # ----- ARRANGE
+        # ----- ACT
+        with self.assertRaises(SystemExit):
+            self.user.get_settings()
+        # ----- ASSERT
+        mock_logger.error.assert_called_with(
+            "Number of words must be greater than 0."
+        )
+
+
+
 class TestCliGuesser(unittest.TestCase):
     """
     Either on Windows or on Linux, this command line interface should enable the user
@@ -104,8 +224,8 @@ class TestCliGuesser(unittest.TestCase):
         self.assertEqual(result, True)
         mock_ask_word.assert_called_once()
         mock_get_user_answer.assert_called_once_with(
-            self.row,
-            f"Word {i}/{words}"
+            row=self.row,
+            title=f"Word {i}/{words}"
         )
 
     @patch('src.views.terminal.CliGuesser.get_user_answer')
@@ -122,7 +242,6 @@ class TestCliGuesser(unittest.TestCase):
         self.assertEqual(result, False)
         mock_ask_word.assert_called_once()
         mock_get_user_answer.assert_called_once_with(
-            self.row,
-            f"Word {i}/{words}"
+            row=self.row,
+            title=f"Word {i}/{words}"
         )
-

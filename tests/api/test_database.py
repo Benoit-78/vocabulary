@@ -65,7 +65,7 @@ class TestDatabase(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, list)
         self.assertEqual(result, ['db1', 'db2'])
-        mock_get_user_name_from_token.assert_called_once_with(token)
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
         mock_get_databases_list.assert_called_once()
 
     @patch('src.api.database.get_error_messages')
@@ -99,7 +99,7 @@ class TestDatabase(unittest.TestCase):
             'createDatabaseErrorMessage': 'mock_db_message'
         }
         self.assertEqual(result, expected_result)
-        mock_get_user_databases.assert_called_once_with(token)
+        mock_get_user_databases.assert_called_once_with(token=token)
 
     @patch('src.data.users.UserAccount.check_if_database_exists')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -132,8 +132,8 @@ class TestDatabase(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
-        mock_check_if_database_exists.assert_called_once_with(data['db_name'])
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_check_if_database_exists.assert_called_once_with(db_name=data['db_name'])
 
     @patch('src.data.users.UserAccount.check_if_database_exists')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -166,8 +166,8 @@ class TestDatabase(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
-        mock_check_if_database_exists.assert_called_once_with(data['db_name'])
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_check_if_database_exists.assert_called_once_with(db_name=data['db_name'])
 
     @patch('src.data.users.UserAccount.create_database')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -202,8 +202,8 @@ class TestDatabase(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
-        mock_create_database.assert_called_once_with(data['db_name'])
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_create_database.assert_called_once_with(db_name=data['db_name'])
 
     @patch('src.data.users.UserAccount.create_database')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -238,8 +238,8 @@ class TestDatabase(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
-        mock_create_database.assert_called_once_with(data['db_name'])
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_create_database.assert_called_once_with(db_name=data['db_name'])
 
 
     @patch('src.data.users.UserAccount.create_database')
@@ -275,8 +275,8 @@ class TestDatabase(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
-        mock_create_database.assert_called_once_with(data['db_name'])
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_create_database.assert_called_once_with(db_name=data['db_name'])
 
     @patch('src.api.database.DbQuerier.get_tables')
     @patch('src.api.database.auth_api.get_user_name_from_token')
@@ -425,7 +425,7 @@ class TestDatabase(unittest.TestCase):
             'wordAlreadyPresentErrorMessage': error_message,
         }
         self.assertEqual(result, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
 
     @patch('src.api.database.logger')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -481,11 +481,11 @@ class TestDatabase(unittest.TestCase):
             'message': "Word added successfully"
         }
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
         mock_insert_word.assert_called_once_with(
-            data['db_name'],
-            data['foreign'],
-            data['native']
+            db_name=data['db_name'],
+            foreign=data['foreign'],
+            native=data['native']
         )
 
     @patch('src.data.users.UserAccount.insert_word')
@@ -518,11 +518,11 @@ class TestDatabase(unittest.TestCase):
             'message': "Word already exists"
         }
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
         mock_insert_word.assert_called_once_with(
-            data['db_name'],
-            data['foreign'],
-            data['native']
+            db_name=data['db_name'],
+            foreign=data['foreign'],
+            native=data['native']
         )
 
     @patch('src.data.users.UserAccount.insert_word')
@@ -555,11 +555,11 @@ class TestDatabase(unittest.TestCase):
             'message': "Error with the word creation"
         }
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
         mock_insert_word.assert_called_once_with(
-            data['db_name'],
-            data['foreign'],
-            data['native']
+            db_name=data['db_name'],
+            foreign=data['foreign'],
+            native=data['native']
         )
 
     @patch('src.data.users.UserAccount.remove_database')
@@ -590,8 +590,8 @@ class TestDatabase(unittest.TestCase):
             'message': "Database deleted successfully"
         }
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
-        mock_remove_database.assert_called_once_with(data['db_name'])
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_remove_database.assert_called_once_with(db_name=data['db_name'])
 
     @patch('src.data.users.UserAccount.remove_database')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -621,80 +621,8 @@ class TestDatabase(unittest.TestCase):
             'message': "Error with the database removal"
         }
         self.assertEqual(content_dict, expected_result)
-        mock_get_user_name_from_token.assert_called_once_with(token)
-        mock_remove_database.assert_called_once_with(data['db_name'])
-
-    # @pytest.mark.asyncio
-    # @patch('src.api.database.add_csv_to_database')
-    # @patch('src.api.database.is_malicious')
-    # async def test_upload_csv(
-    #         self,
-    #         mock_is_malicious,
-    #         mock_add_csv_to_database
-    #     ):
-    #     """
-    #     Test the function upload_csv
-    #     """
-    #     # ----- ARRANGE
-    #     # csv_file = AsyncMock()
-    #     # csv_file.filename = "test.csv"
-    #     # csv_file.read.return_value = b"csv_content"
-    #     token = 'mock_token'
-    #     mock_is_malicious.return_value = False
-    #     mock_add_csv_to_database.return_value = True
-    #     # ----- ACT
-    #     result = await db_api.load_csv(
-    #         csv_file,
-    #         token
-    #     )
-    #     # ----- ASSERT
-    #     self.assertIsInstance(result, dict)
-    #     expected_result = {
-    #         'message': "CSV file uploaded successfully",
-    #         'token': token
-    #     }
-    #     self.assertEqual(result, expected_result)
-    #     mock_is_malicious.assert_called_once()
-    #     mock_add_csv_to_database.assert_called_once()
-
-    # @pytest.mark.asyncio
-    # async def test_upload_csv_not_a_csv(self):
-    #     """
-    #     Test the function upload_csv
-    #     """
-    #     # ----- ARRANGE
-    #     # csv_file = AsyncMock()
-    #     # csv_file.filename = "test.pdf"
-    #     token = 'mock_token'
-    #     # ----- ACT
-    #     # ----- ASSERT
-    #     with self.assertRaises(HTTPException):
-    #         db_api.load_csv(
-    #             csv_file,
-    #             token
-    #         )
-
-    # @pytest.mark.asyncio
-    # @patch('src.api.database.is_malicious')
-    # async def test_upload_csv_malicious(
-    #         self,
-    #         mock_is_malicious
-    #     ):
-    #     """
-    #     Test the function upload_csv
-    #     """
-    #     # ----- ARRANGE
-    #     # csv_file = AsyncMock()
-    #     # csv_file.filename = "test.pdf"
-    #     token = 'mock_token'
-    #     mock_is_malicious.return_value = True
-    #     # ----- ACT
-    #     # ----- ASSERT
-    #     with self.assertRaises(HTTPException):
-    #         await db_api.load_csv(
-    #             csv_file,
-    #             token
-    #         )
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_remove_database.assert_called_once_with(db_name=data['db_name'])
 
     def test_is_malicious_1(self):
         """

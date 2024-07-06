@@ -141,8 +141,8 @@ class TestGuest(unittest.TestCase):
             index=[0, 1, 2]
         )
         mock_test = PremierTest(
-            words_df_=pd.DataFrame(),
-            words=10,
+            interro_df=mock_interro_df,
+            words=mock_interro_df.shape[0],
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
@@ -422,8 +422,8 @@ class TestGuest(unittest.TestCase):
             }
         )
         mock_test = PremierTest(
-            words_df_=pd.DataFrame(),
-            words=10,
+            interro_df=mock_interro_df,
+            words=mock_interro_df.shape[0],
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
@@ -431,8 +431,8 @@ class TestGuest(unittest.TestCase):
         mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.load_rattrap(
-            token,
-            data
+            data=data,
+            token=token,
         )
         # ----- ASSERT
         self.assertIsInstance(result, JSONResponse)
@@ -449,15 +449,17 @@ class TestGuest(unittest.TestCase):
         }
         self.assertEqual(actual_dict, expected_dict)
 
-
     @patch('src.api.guest.turn_df_into_dict')
     @patch('src.api.guest.load_interro_from_redis')
+    @patch('src.api.guest.get_user_name_from_token')
     def test_end_interro_guest(
             self,
+            mock_get_user_name_from_token,
             mock_load_interro_from_redis,
             mock_turn_df_into_dict
         ):
         # ----- ARRANGE
+        mock_get_user_name_from_token.return_value = 'mock_user_name'
         request = 'mock_request'
         score = 1
         words = 10
@@ -488,4 +490,6 @@ class TestGuest(unittest.TestCase):
             token=token,
             interro_category='test'
         )
-        mock_turn_df_into_dict.assert_called_once_with(premier_test.interro_df)
+        mock_turn_df_into_dict.assert_called_once_with(
+            words_df=premier_test.interro_df
+        )

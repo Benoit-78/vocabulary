@@ -249,9 +249,9 @@ def load_rattrap(
     interro.faults_df = interro.faults_df.sample(frac=1)
     interro.faults_df = interro.faults_df.reset_index(drop=True)
     rattrap = core_interro.Rattrap(
-        faults_df_=interro.faults_df,
-        rattrap=rattrap_cnt,
-        guesser=guesser
+        interro_df=interro.faults_df,
+        guesser=guesser,
+        old_interro_df=rattrap_cnt,
     )
     new_interro_category = get_interro_category(interro=rattrap)
     save_interro_in_redis(
@@ -291,11 +291,11 @@ def end_interro_guest(
         words_df=premier_test.interro_df
     )
     response_dict = {
+        'headers': headers,
+        'numWords': total,
         'request': request,
-        'token': token,
-        "headers": headers,
-        "rows": rows,
+        'rows': rows,
         'score': score,
-        'numWords': total
+        'token': token,
     }
     return response_dict

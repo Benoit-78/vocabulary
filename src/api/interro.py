@@ -30,6 +30,7 @@ from src.interro import Updater
 from src.views.api import FastapiGuesser
 
 
+# ------------------ API functions ------------------ #
 def load_test(
         user_name,
         db_name,
@@ -117,6 +118,7 @@ def save_interro_settings(
     response_dict['count'] = 0
     response_dict['databaseName'] = db_name
     response_dict['testType'] = test_type
+    logger.debug(f"Response dict: {response_dict}")
     json_response = JSONResponse(
         content=response_dict
     )
@@ -170,14 +172,14 @@ def load_interro_answer(
     progress_percent = int(count / test_length * 100)
     interro_df = decode_dict(params.interroDict)
     index = int(params.index)
-    english = interro_df.loc[index][0]
-    english = english.replace("'", "\'")
-    french = interro_df.loc[index][1]
-    french = french.replace("'", "\'")
+    foreign = interro_df.loc[index][0]
+    foreign = foreign.replace("'", "\'")
+    native = interro_df.loc[index][1]
+    native = native.replace("'", "\'")
     response_dict = {
         'token': token,
-        'content_box1': english,
-        'content_box2': french,
+        'content_box1': foreign,
+        'content_box2': native,
         'count': params.count,
         'databaseName': params.databaseName,
         'faultsDict': params.faultsDict,
@@ -201,74 +203,9 @@ def get_user_answer(
     """
     Get the user response.
     """
-    def get_interro(params):
-        interro_df = decode_dict(params.interroDict)
-        faults_dict = params.faultsDict
-        faults_df = get_faults_df(faults_dict)
-        index = int(params.index)
-        interro_category = params.interroCategory
-        if interro_category == 'test':
-            interro = PremierTest.from_dict({
-                'testLength': params.testLength,
-                'interroTable': interro_df,
-                'faultsTable': faults_df,
-                'index': index,
-                'perf': params.perf
-            })
-        elif interro_category == 'rattrap':
-            guesser = FastapiGuesser()
-            old_interro_df = decode_dict(params.oldInterroDict)
-            rattrap = Rattrap(
-                interro_df=interro_df,
-                guesser=guesser,
-                old_interro_df=old_interro_df
-            )
-            rattrap.reshuffle_words_table()
-            interro = rattrap
-        else:
-            logger.error(f"Unknown interro category: {interro_category}")
-            raise ValueError
-        return interro
-
-    def update_interro(interro, params):
-        index = int(params.index)
-        interro_df = decode_dict(params.interroDict)
-        score = int(params.score)
-        if params.answer == 'Yes':
-            score += 1
-            update = True
-        elif params.answer == 'No':
-            update = False
-            english = interro_df.loc[index][0]
-            english = english.replace("'", "\'")
-            french = interro_df.loc[index][1]
-            french = french.replace("'", "\'")
-            interro.update_faults_df(
-                word_guessed=False,
-                row=[english, french]
-            )
-        if params.interroCategory == 'test':
-            interro.update_interro_df(word_guessed=update)
-            interro.update_index()
-        return interro, score
-
-    def get_attributes_dict(interro, params, score):
-        attributes_dict = interro.to_dict()
-        if params.interroCategory != 'test':
-            attributes_dict['index'] = 0
-        attributes_dict['message'] = "User response stored successfully"
-        attributes_dict['token'] = token
-        attributes_dict['count'] = params.count
-        attributes_dict['databaseName'] = params.databaseName
-        attributes_dict['interroCategory'] = params.interroCategory
-        attributes_dict['oldInterroDict'] = str(params.oldInterroDict)
-        attributes_dict['score'] = score
-        attributes_dict['testType'] = params.testType
-        return attributes_dict
-
     interro = get_interro(params)
     interro, score = update_interro(interro, params)
-    attributes_dict = get_attributes_dict(interro, params, score)
+    attributes_dict = get_attributes_dict(token, interro, params, score)
     json_response = JSONResponse(
         content=attributes_dict
     )
@@ -282,51 +219,20 @@ def end_interro(
     """
     End the interro.
     """
-    def update_test(params):
-        test_length = params.testLength
-        faults_df = get_faults_df(params.faultsDict)
-        premier_test = PremierTest.from_dict({
-            'faultsTable': faults_df,
-            'index': params.index,
-            'interroTable': interro_df,
-            'perf': params.perf,
-            'testLength': test_length,
-        })
-        premier_test.compute_success_rate()
-        user_name = get_user_name_from_token(token=token)
-        db_querier = DbQuerier(
-            user_name=user_name,
-            db_name=params.databaseName,
-            test_type=params.testType,
-        )
-        loader = Loader(
-            words=test_length,
-            data_querier=db_querier
-        )
-        loader.load_tables()
-        updater = Updater(
-            loader=loader,
-            interro=premier_test
-        )
-        updater.update_data()
-
     # If the user guesses all words, and there is no rattrap
     if params.interroCategory == 'test':
-        update_test(params)
         interro_df = decode_dict(params.interroDict)
+        update_test(params, interro_df, token)
     # If the user does not guesses all words, and there is a rattrap
     elif params.interroCategory == 'rattrap':
         interro_df = decode_dict(params.oldInterroDict)
-    headers, rows = turn_df_into_dict(
-        words_df=interro_df
-    )
-    test_length = params.testLength
+    headers, rows = turn_df_into_dict(words_df=interro_df)
     response_dict = {
         "token": token,
         "headers": headers,
         "rows": rows,
         "score": params.score,
-        "testLength": test_length
+        "testLength": params.testLength
     }
     return response_dict
 
@@ -338,36 +244,8 @@ def propose_rattrap(
     """
     Propose the rattrap.
     """
-    def save_result(params):
-        interro_df = decode_dict(params.interroDict)
-        faults_df = get_faults_df(params.faultsDict)
-        premier_test = PremierTest.from_dict({
-            'testLength': params.testLength,
-            'interroTable': interro_df,
-            'faultsTable': faults_df,
-            'index': params.index,
-            'perf': params.perf
-        })
-        premier_test.compute_success_rate()
-        user_name = get_user_name_from_token(token=token)
-        db_querier = DbQuerier(
-            user_name=user_name,
-            db_name=params.databaseName,
-            test_type=params.testType,
-        )
-        loader = Loader(
-            words=params.testLength,
-            data_querier=db_querier
-        )
-        loader.load_tables()
-        updater = Updater(
-            loader=loader,
-            interro=premier_test
-        )
-        updater.update_data()
-
     if params.interroCategory == 'test':
-        save_result(params)
+        save_result(token, params)
     response_dict = {
         "token": token,
         "databaseName": params.databaseName,
@@ -414,6 +292,7 @@ def launch_rattrap(
     )
 
 
+# ------------------ Helper functions ------------------ #
 def get_old_interro_dict(interro_dict):
     """
     Get the old interro dict out of the original interro dict.
@@ -499,3 +378,132 @@ def get_faults_df(faults_dict):
     else:
         faults_df = decode_dict(faults_dict)
     return faults_df
+
+
+def get_interro(params):
+    interro_df = decode_dict(params.interroDict)
+    faults_dict = params.faultsDict
+    faults_df = get_faults_df(faults_dict)
+    index = int(params.index)
+    interro_category = params.interroCategory
+    if interro_category == 'test':
+        interro = PremierTest.from_dict({
+            'testLength': params.testLength,
+            'interroTable': interro_df,
+            'faultsTable': faults_df,
+            'index': index,
+            'perf': params.perf
+        })
+    elif interro_category == 'rattrap':
+        guesser = FastapiGuesser()
+        old_interro_df = decode_dict(params.oldInterroDict)
+        rattrap = Rattrap(
+            interro_df=interro_df,
+            guesser=guesser,
+            old_interro_df=old_interro_df
+        )
+        rattrap.reshuffle_words_table()
+        interro = rattrap
+    else:
+        logger.error(f"Unknown interro category: {interro_category}")
+        raise ValueError
+    return interro
+
+
+def update_interro(interro, params):
+    index = int(params.index)
+    interro_df = decode_dict(params.interroDict)
+    score = int(params.score)
+    if params.answer == 'Yes':
+        score += 1
+        update = True
+    elif params.answer == 'No':
+        update = False
+        english = interro_df.loc[index][0]
+        english = english.replace("'", "\'")
+        french = interro_df.loc[index][1]
+        french = french.replace("'", "\'")
+        interro.update_faults_df(
+            word_guessed=False,
+            row=[english, french]
+        )
+    if params.interroCategory == 'test':
+        interro.update_interro_df(word_guessed=update)
+        interro.update_index()
+    return interro, score
+
+
+def get_attributes_dict(token, interro, params, score):
+    attributes_dict = interro.to_dict()
+    if params.interroCategory != 'test':
+        attributes_dict['index'] = 0
+    attributes_dict['message'] = "User response stored successfully"
+    attributes_dict['token'] = token
+    attributes_dict['count'] = params.count
+    attributes_dict['databaseName'] = params.databaseName
+    attributes_dict['interroCategory'] = params.interroCategory
+    attributes_dict['oldInterroDict'] = str(params.oldInterroDict)
+    attributes_dict['score'] = score
+    attributes_dict['testType'] = params.testType
+    return attributes_dict
+
+
+def save_result(token, params):
+    """
+    Save the result of the interro.
+    """
+    interro_df = decode_dict(params.interroDict)
+    faults_df = get_faults_df(params.faultsDict)
+    premier_test = PremierTest.from_dict({
+        'testLength': params.testLength,
+        'interroTable': interro_df,
+        'faultsTable': faults_df,
+        'index': params.index,
+        'perf': params.perf
+    })
+    premier_test.compute_success_rate()
+    user_name = get_user_name_from_token(token=token)
+    db_querier = DbQuerier(
+        user_name=user_name,
+        db_name=params.databaseName,
+        test_type=params.testType,
+    )
+    loader = Loader(
+        words=params.testLength,
+        data_querier=db_querier
+    )
+    loader.load_tables()
+    updater = Updater(
+        loader=loader,
+        interro=premier_test
+    )
+    updater.update_data()
+
+
+def update_test(params, interro_df, token):
+    test_length = params.testLength
+    faults_df = get_faults_df(params.faultsDict)
+    premier_test = PremierTest.from_dict({
+        'faultsTable': faults_df,
+        'index': params.index,
+        'interroTable': interro_df,
+        'perf': params.perf,
+        'testLength': test_length,
+    })
+    premier_test.compute_success_rate()
+    user_name = get_user_name_from_token(token=token)
+    db_querier = DbQuerier(
+        user_name=user_name,
+        db_name=params.databaseName,
+        test_type=params.testType,
+    )
+    loader = Loader(
+        words=test_length,
+        data_querier=db_querier
+    )
+    loader.load_tables()
+    updater = Updater(
+        loader=loader,
+        interro=premier_test
+    )
+    updater.update_data()

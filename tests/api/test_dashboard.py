@@ -24,6 +24,7 @@ from src.api import dashboard as dashboard_api
 from src.data.database_interface import DbQuerier
 
 
+
 class TestDashboard(unittest.TestCase):
     """
     Test class for the dashboard module functions
@@ -49,9 +50,9 @@ class TestDashboard(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         mock_load_graphs.assert_called_once_with(
-            user_name,
-            user_password,
-            db_name
+            user_name=user_name,
+            user_password=user_password,
+            db_name=db_name
         )
         expected_dict = {
             "request": 'mock_request',
@@ -107,7 +108,7 @@ class TestWordsGraph1(unittest.TestCase):
     """
     @patch('src.data.database_interface.check_test_type')
     def setUp(self, mock_check_test_type):
-        mock_check_test_type.side_effect = lambda arg1: arg1
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mock_user_name'
         db_name = 'mock_db_name'
         test_type = 'mock_test_type'
@@ -169,7 +170,7 @@ class TestWordsGraph1(unittest.TestCase):
 class TestWordsGraph2(unittest.TestCase):
     @patch('src.data.database_interface.check_test_type')
     def setUp(self, mock_check_test_type):
-        mock_check_test_type.side_effect = lambda arg1: arg1
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
@@ -222,7 +223,7 @@ class TestWordsGraph2(unittest.TestCase):
 class TestWordsGraph3(unittest.TestCase):
     @patch('src.data.database_interface.check_test_type')
     def setUp(self, mock_check_test_type):
-        mock_check_test_type.side_effect = lambda arg1: arg1
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
@@ -274,7 +275,7 @@ class TestWordsGraph3(unittest.TestCase):
 class TestWordsGraph4(unittest.TestCase):
     @patch('src.data.database_interface.check_test_type')
     def setUp(self, mock_check_test_type):
-        mock_check_test_type.side_effect = lambda arg1: arg1
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
@@ -326,7 +327,7 @@ class TestWordsGraph4(unittest.TestCase):
 class TestWordsGraph5(unittest.TestCase):
     @patch('src.data.database_interface.check_test_type')
     def setUp(self, mock_check_test_type):
-        mock_check_test_type.side_effect = lambda arg1: arg1
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'

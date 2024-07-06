@@ -574,7 +574,7 @@ class TestDbDefiner(unittest.TestCase):
             [('col1', 'type1'), ('col2', 'type2')],
             [('col3', 'type3'), ('col4', 'type4')]  # Mock SHOW COLUMNS result
         ]
-        mock_rectify.side_effect = lambda arg1: arg1
+        mock_rectify.side_effect = lambda **kwargs: kwargs['columns']
         # ----- ACT
         result = self.db_definer.get_database_cols(db_name)
         # ----- ASSERT
@@ -594,10 +594,10 @@ class TestDbDefiner(unittest.TestCase):
         assert mock_cursor.fetchall.call_count == 3
         assert mock_rectify.call_count == 3
         mock_rectify.assert_any_call(
-            [('col1', 'type1'), ('col2', 'type2')]
+            columns=[('col1', 'type1'), ('col2', 'type2')]
         )
         mock_rectify.assert_any_call(
-            [('col3', 'type3'), ('col4', 'type4')]
+            columns=[('col3', 'type3'), ('col4', 'type4')]
         )
 
     @patch('src.data.database_interface.logger')
@@ -786,7 +786,7 @@ class TestDbManipulator(unittest.TestCase):
         english = test_row[0]
         native = test_row[1]
         request_1 = f"INSERT INTO {self.table_name}"
-        request_2 = "(english, français, creation_date, nb, score, taux)"
+        request_2 = "(`foreign`, `native`, creation_date, nb, score, taux)"
         request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2, request_3])
         mock_cursor.execute.assert_called_with(sql_request)
@@ -852,7 +852,7 @@ class TestDbManipulator(unittest.TestCase):
         english = test_row[0]
         native = test_row[1]
         request_1 = f"INSERT INTO {self.table_name}"
-        request_2 = "(english, français, creation_date, nb, score, taux)"
+        request_2 = "(`foreign`, `native`, creation_date, nb, score, taux)"
         request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_date}\', 0, 0, 0);"
         sql_request = " ".join([request_1, request_2, request_3])
         mock_cursor.execute.assert_called_with(sql_request)
@@ -878,7 +878,7 @@ class TestDbManipulator(unittest.TestCase):
         # Assert
         request_1 = f"UPDATE {self.table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
-        request_3 = f"WHERE english = {english};"
+        request_3 = f"WHERE `foreign` = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         mock_cursor.execute.assert_called_once_with(sql_request)
         self.assertTrue(result)
@@ -904,7 +904,7 @@ class TestDbManipulator(unittest.TestCase):
         # Assert
         request_1 = f"UPDATE {self.table_name}"
         request_2 = f"SET nb = {new_nb}, score = {new_score}"
-        request_3 = f"WHERE english = {english};"
+        request_3 = f"WHERE `foreign` = {english};"
         sql_request = " ".join([request_1, request_2, request_3])
         mock_cursor.execute.assert_called_once_with(sql_request)
         mock_logger.error.assert_called_once()
@@ -926,7 +926,7 @@ class TestDbManipulator(unittest.TestCase):
         result = self.db_manipulator.delete_word(english)
         # ----- ASSERT
         request_1 = f"DELETE FROM {self.table_name}"
-        request_2 = f"WHERE english = {english};"
+        request_2 = f"WHERE `foreign` = {english};"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
         self.assertTrue(result)
@@ -949,7 +949,7 @@ class TestDbManipulator(unittest.TestCase):
         result = self.db_manipulator.delete_word(english)
         # ----- ASSERT
         request_1 = f"DELETE FROM {self.table_name}"
-        request_2 = f"WHERE english = {english};"
+        request_2 = f"WHERE `foreign` = {english};"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
         mock_logger.error.assert_called_once()
@@ -990,7 +990,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
+            url=f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         self.assertTrue(result)
         mock_cursor.close.assert_called_once()
@@ -1036,7 +1036,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
+            url=f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
@@ -1078,7 +1078,7 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ASSERT
         mock_get_db_cursor.assert_called_once()
         mock_create_engine.assert_called_once_with(
-            f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
+            url=f"mysql+pymysql://root:{password}@{self.db_manipulator.host}/{self.db_manipulator.db_name}"
         )
         mock_logger.error.assert_called_once()
         mock_cursor.close.assert_called_once()
@@ -1204,8 +1204,8 @@ class TestDbQuerier(unittest.TestCase):
         result = self.db_querier.read_word(english)
         # Assert
         mock_get_db_cursor.assert_called_once()
-        request_1 = f"SELECT english, français, score FROM {self.table_name}"
-        request_2 = f"WHERE english = '{english}';"
+        request_1 = f"SELECT `foreign`, `native`, score FROM {self.table_name}"
+        request_2 = f"WHERE `foreign` = '{english}';"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
         mock_cursor.fetchall.assert_called_once()
@@ -1225,8 +1225,8 @@ class TestDbQuerier(unittest.TestCase):
         result = self.db_querier.read_word(english)
         # Assert
         mock_get_db_cursor.assert_called_once()
-        request_1 = f"SELECT english, français, score FROM {self.table_name}"
-        request_2 = f"WHERE english = '{english}';"
+        request_1 = f"SELECT `foreign`, `native`, score FROM {self.table_name}"
+        request_2 = f"WHERE `foreign` = '{english}';"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
         self.assertFalse(result)

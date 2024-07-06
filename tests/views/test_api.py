@@ -73,13 +73,12 @@ class TestFastapiGuesser(unittest.TestCase):
         """
         # ----- ARRANGE
         row = ['1', 'word', 'mot']
-        i = 1
         words = 10
         mock_ask_word.return_value = True
         mock_return_translation.return_value = True
         # mock_get_user_answer.return_value = True
         # ----- ACT
-        self.fastapi_guesser.guess_word(row, i, words)
+        self.fastapi_guesser.guess_word(row, words)
         # ----- ASSERT
         mock_ask_word.assert_called_once_with(row)
         mock_return_translation.assert_called_once_with(row)

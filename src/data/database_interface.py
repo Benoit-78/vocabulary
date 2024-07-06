@@ -766,7 +766,6 @@ class DbQuerier(DbInterface):
 
 
 
-
 def check_test_type(test_type):
     """
     Check the test type attribute.

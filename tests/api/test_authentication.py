@@ -59,7 +59,7 @@ class TestAuthentication(unittest.TestCase):
         Test the creation of a token.
         """
         # ----- ARRANGE
-        data = {"user_id": 123}
+        data = {"sub": 123}
         expires_delta = 15
         # ----- ACT
         token = auth_api.create_token(data, expires_delta)
@@ -67,7 +67,7 @@ class TestAuthentication(unittest.TestCase):
         assert token is not None
         mock_jwt_encode.assert_called_once_with(
             {
-                "user_id": 123,
+                "sub": 123,
                 "exp": datetime.now() + timedelta(minutes=expires_delta)
             },
             "your_secret_key",
@@ -89,14 +89,14 @@ class TestAuthentication(unittest.TestCase):
         # ----- ARRANGE
         data = None
         expires_delta = 15
-        mock_create_guest_user_name.return_value = {"guest": "user"}
+        mock_create_guest_user_name.return_value = {"sub": "user"}
         # ----- ACT
         token = auth_api.create_token(data, expires_delta)
         # ----- ASSERT
         assert token is not None
         mock_jwt_encode.assert_called_once_with(
             {
-                "guest": 'user',
+                "sub": 'user',
                 "exp": datetime.now() + timedelta(minutes=expires_delta)
             },
             "your_secret_key",
@@ -115,14 +115,14 @@ class TestAuthentication(unittest.TestCase):
         Test the creation of a token with the standard expiration delta.
         """
         # ----- ARRANGE
-        data = {"user_id": 123}
+        data = {"sub": 123}
         # ----- ACT
         token = auth_api.create_token(data)
         # ----- ASSERT
         assert token is not None
         mock_jwt_encode.assert_called_once_with(
             {
-                "user_id": 123,
+                "sub": 123,
                 "exp": datetime.now() + timedelta(minutes=15)
             },
             "your_secret_key",
