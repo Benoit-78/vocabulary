@@ -260,28 +260,6 @@ def delete_database(data: dict, token: str):
     return json_response
 
 
-# async def load_csv(csv_file, token: str):
-#     """
-#     """
-#     if not csv_file.filename.endswith('.csv'):
-#         raise HTTPException(
-#             status_code=400,
-#             detail="Invalid file format, only CSV files are allowed"
-#         )
-#     csv_content = await csv_file.read()
-#     if is_malicious(csv_content.decode('utf-8')):
-#         raise HTTPException(
-#             status_code=400,
-#             detail="Malicious code detected in the CSV file"
-#         )
-#     add_csv_to_database(csv_content.decode('utf-8'))
-#     response_dict = {
-#         'message': "CSV file uploaded successfully",
-#         'token': token
-#     }
-#     return response_dict
-
-
 def is_malicious(csv_content):
     """
     Check if the given CSV content is malicious.
@@ -291,10 +269,3 @@ def is_malicious(csv_content):
     if 'DELETE FROM' in csv_content:
         return True
     return False
-
-
-def add_csv_to_database(csv_content):
-    """
-    Add the CSV content to the database.
-    """
-    pass

@@ -27,7 +27,8 @@ from src.interro import PremierTest, Rattrap
 from src.views import api as api_view
 
 
-class TestInterro(unittest.TestCase):
+
+class TestInterroAPI(unittest.TestCase):
     """
     Test class for interro.py
     """
@@ -476,6 +477,70 @@ class TestInterro(unittest.TestCase):
         mock_turn_df_into_dict.assert_called_once()
         mock_update_test.assert_called_once()
 
+    @patch('src.api.interro.turn_df_into_dict')
+    @patch('src.api.interro.decode_dict')
+    def test_end_interro_rattrap(
+            self,
+            mock_decode_dict,
+            mock_turn_df_into_dict,
+        ):
+        """
+        Should end the interro.
+        """
+        # ----- ARRANGE
+        token = 'mock_token'
+        params = MagicMock()
+        params.interroCategory = 'rattrap'
+        params.interroDict = 'mock_interro_dict'
+        params.oldInterroDict = 'mock_old_interro_dict'
+        params.testLength = '10'
+        params.score = '2'
+        mock_decode_dict.return_value = pd.DataFrame()
+        mock_turn_df_into_dict.return_value = [['headers'], ['rows']]
+        # ----- ACT
+        result = interro_api.end_interro(
+            token=token,
+            params=params
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, dict)
+        expected_dict = {
+            'token': token,
+            'headers': ['headers'],
+            'rows': ['rows'],
+            'testLength': '10',
+            'score': '2',
+        }
+        self.assertEqual(result, expected_dict)
+        mock_decode_dict.assert_called_once_with('mock_old_interro_dict')
+        mock_turn_df_into_dict.assert_called_once()
+
+
+
+class TestHelper(unittest.TestCase):
+    """
+    Designed to test all back-end functions of the API use case.
+    """
+    @patch('ast.literal_eval')
+    def test_get_old_interro_dict(self, mock_literal_eval):
+        # ----- ARRANGE
+        interro_dict = {
+            'foreign': ['zero', 'one', 'two'],
+            'native': ['zero', 'un', 'deux']
+        }
+        # ----- ACT
+        result = interro_api.get_old_interro_dict(interro_dict)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        expected_result = ''.join([
+            '[{"foreign":"zero","native":"zero"}',
+            ',',
+            '{"foreign":"one","native":"un"}',
+            ',',
+            '{"foreign":"two","native":"deux"}]'
+        ])
+        self.assertEqual(result, expected_result)
+
     def test_get_error_messages_fail(self):
         """
         Test the function get_error_messages
@@ -533,6 +598,48 @@ class TestInterro(unittest.TestCase):
             f"Should be in: {expected_list}"
         )
 
+    def test_get_interro_category(self):
+        # ----- ARRANGE
+        interro = PremierTest(
+            interro_df=pd.DataFrame({'col_1': ['val_1', 'val_2']}),
+            words=10,
+            guesser=MagicMock()
+        )
+        # ----- ACT
+        result = interro_api.get_interro_category(interro)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, 'test')
+
+    def test_get_interro_category_rattrap(self):
+        # ----- ARRANGE
+        interro = Rattrap(
+            interro_df=pd.DataFrame({'col_1': ['val_1', 'val_2']}),
+            guesser=MagicMock(),
+            old_interro_df=pd.DataFrame({'col_2': ['val_3', 'val_4']}),
+        )
+        # ----- ACT
+        result = interro_api.get_interro_category(interro)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, 'rattrap')
+
+    @patch('src.api.interro.logger')
+    def test_get_interro_category_error(self, mock_logger):
+        # ----- ARRANGE
+        interro = 'mock_interro'
+        # ----- ACT
+        # ----- ASSERT
+        with self.assertRaises(ValueError):
+            interro_api.get_interro_category(interro)
+            self.assertEqual(mock_logger.error.call_count, 2)
+            mock_logger.error.assert_any_call(
+                "Unknown interro object, should have either a perf or a rattrap attribute!"
+            )
+            mock_logger.error.assert_any_call(
+                f"Interro object: {type(interro)}"
+            )
+
     def test_turn_df_into_dict(self):
         # ----- ARRANGE
         words_df = pd.DataFrame({
@@ -545,3 +652,358 @@ class TestInterro(unittest.TestCase):
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], ['col_1', 'col_2'])
         self.assertEqual(result[1], [['val_1', 'val_3'], ['val_2', 'val_4']])
+
+    def test_decode_dict(self):
+        # ----- ARRANGE
+        interro_dict = {
+            'foreign': ['zero', 'one', 'two'],
+            'native': ['zero', 'un', 'deux']
+        }
+        # ----- ACT
+        result = interro_api.decode_dict(interro_dict)
+        # ----- ASSERT
+        self.assertIsInstance(result, pd.DataFrame)
+        self.assertEqual(result.shape, (3, 2))
+        pd.testing.assert_frame_equal(result, pd.DataFrame(interro_dict))
+
+    def test_decode_dict_creation_date(self):
+        # ----- ARRANGE
+        interro_dict = {
+            'foreign': ['zero', 'one', 'two'],
+            'native': ['zero', 'un', 'deux'],
+            'creation_date': [12789033445, 12785033445, 12786033445],
+            'index': [0, 1, 2]
+        }
+        # ----- ACT
+        result = interro_api.decode_dict(interro_dict)
+        # ----- ASSERT
+        self.assertIsInstance(result, pd.DataFrame)
+        self.assertEqual(result.shape, (3, 3))
+        expected_df = pd.DataFrame({
+            'foreign': ['zero', 'one', 'two'],
+            'native': ['zero', 'un', 'deux'],
+            'creation_date': ["1970-05-29", "1970-05-28", "1970-05-28"]
+        })
+        pd.testing.assert_frame_equal(result, expected_df)
+
+    @patch('src.api.interro.pd.to_datetime')
+    def test_decode_dict_error(self, mock_to_datetime):
+        # ----- ARRANGE
+        interro_dict = {
+            'foreign': ['zero', 'one', 'two'],
+            'native': ['zero', 'un', 'deux'],
+            'creation_date': [12789033445, 12785033445, 12786033445],
+        }
+        mock_to_datetime.side_effect = ValueError()
+        # ----- ACT
+        result = interro_api.decode_dict(interro_dict)
+        # ----- ASSERT
+        self.assertIsInstance(result, pd.DataFrame)
+        self.assertEqual(result.shape, (3, 3))
+        expected_df = pd.DataFrame(interro_dict)
+        pd.testing.assert_frame_equal(result, expected_df)
+
+    @patch('src.api.interro.decode_dict')
+    def test_get_faults_df(self, mock_decode_dict):
+        # ----- ARRANGE
+        expected_df = pd.DataFrame({'col_1': ['val_1', 'val_2']})
+        mock_decode_dict.return_value = expected_df
+        # ----- ACT
+        result = interro_api.get_faults_df('mock_faults_dict')
+        # ----- ASSERT
+        pd.testing.assert_frame_equal(result, expected_df)
+
+    def test_get_faults_df_none(self):
+        # ----- ARRANGE
+        # ----- ACT
+        result = interro_api.get_faults_df('None')
+        # ----- ASSERT
+        expected_df = pd.DataFrame(columns=['foreign', 'native'])
+        pd.testing.assert_frame_equal(result, expected_df)
+
+    @patch('src.api.interro.get_faults_df')
+    @patch('src.api.interro.decode_dict')
+    def test_get_interro_test(
+            self,
+            mock_decode_dict,
+            mock_get_faults_df
+        ):
+        # ----- ARRANGE
+        params = MagicMock()
+        params.interroDict = 'mock_interro_dict'
+        params.faultsDict = 'mock_faults_dict'
+        params.index = '3'
+        params.interroCategory = 'test'
+        params.testLength = '10'
+        params.perf = '1'
+        mock_decode_dict.return_value = pd.DataFrame({'col_1': ['val_1', 'val_2']})
+        mock_get_faults_df.return_value = pd.DataFrame({'col_2': ['val_3', 'val_4']})
+        # ----- ACT
+        result = interro_api.get_interro(params)
+        # ----- ASSERT
+        self.assertIsInstance(result, PremierTest)
+
+    @patch('src.api.interro.Rattrap')
+    @patch('src.api.interro.FastapiGuesser')
+    @patch('src.api.interro.decode_dict')
+    def test_get_interro_rattrap(
+            self,
+            mock_decode_dict,
+            mock_guesser,
+            mock_rattrap
+        ):
+        # ----- ARRANGE
+        params = MagicMock()
+        params.interroDict = 'mock_interro_dict'
+        params.faultsDict = 'mock_faults_dict'
+        params.index = '3'
+        params.interroCategory = 'rattrap'
+        params.testLength = '10'
+        params.perf = '1'
+        mock_decode_dict.return_value = pd.DataFrame({'col_1': ['val_1', 'val_2']})
+        mock_guesser.return_value = 'mock_guesser'
+        mock_rattrap_object = MagicMock()
+        mock_rattrap.return_value = mock_rattrap_object
+        # ----- ACT
+        result = interro_api.get_interro(params)
+        # ----- ASSERT
+        self.assertIsInstance(result, MagicMock)
+        mock_rattrap.assert_called_once()
+        mock_rattrap_object.reshuffle_words_table.assert_called_once()
+
+    @patch('src.api.interro.logger')
+    @patch('src.api.interro.decode_dict')
+    def test_get_interro_error(
+            self,
+            mock_decode_dict,
+            mock_logger
+        ):
+        # ----- ARRANGE
+        params = MagicMock()
+        params.interroDict = 'mock_interro_dict'
+        params.interroCategory = 'bizarre_bizarre'
+        mock_decode_dict.return_value = pd.DataFrame({'col_1': ['val_1', 'val_2']})
+        # ----- ACT
+        # ----- ASSERT
+        with self.assertRaises(ValueError):
+            interro_api.get_interro(params)
+            mock_logger.error.assert_called_once_with(
+                "Unknown interro category: bizarre_bizarre"
+            )
+
+    def test_update_interro_guessed(self):
+        # ----- ARRANGE
+        interro = MagicMock()
+        params= MagicMock()
+        params.index = '3'
+        params.interroDict = 'mock_interro_dict'
+        params.score = '1'
+        params.answer = 'Yes'
+        params.interroCategory = 'test'
+        # ----- ACT
+        result = interro_api.update_interro(
+            interro=interro,
+            params=params
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, tuple)
+        self.assertIsInstance(result[0], MagicMock)
+        self.assertEqual(result[1], 2)
+        interro.update_interro_df.assert_called_once_with(
+            word_guessed=True
+        )
+        interro.update_index.assert_called_once()
+
+    @patch('src.api.interro.decode_dict')
+    def test_update_interro_not_guessed(self, mock_decode_dict):
+        # ----- ARRANGE
+        interro = MagicMock()
+        params= MagicMock()
+        params.index = '2'
+        params.interroDict = 'mock_interro_dict'
+        params.score = '1'
+        params.answer = 'No'
+        params.interroCategory = 'test'
+        mock_decode_dict.return_value = pd.DataFrame({
+            'foreign': ['one', 'two', 'three'],
+            'native': ['un', 'deux', 'trois']
+        })
+        # ----- ACT
+        result = interro_api.update_interro(
+            interro=interro,
+            params=params
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, tuple)
+        self.assertIsInstance(result[0], MagicMock)
+        self.assertEqual(result[1], 1)
+        interro.update_faults_df.assert_called_once_with(
+            word_guessed=False,
+            row=['three', 'trois']
+        )
+        interro.update_interro_df.assert_called_once_with(
+            word_guessed=False
+        )
+        interro.update_index.assert_called_once()
+
+    def test_get_attributes_dict(self):
+        # ----- ARRANGE
+        token = 'mock_token'
+        interro = MagicMock()
+        interro.to_dict.return_value = {
+            'mock_key': 'mock_value'
+        }
+        params = MagicMock()
+        params.interroCategory = 'not_a_test'
+        params.count = '2'
+        params.databaseName = 'mock_db_name'
+        params.oldInterroDict = 'mock_old_interro_dict'
+        params.testType = 'mock_test_type'
+        score = 3
+        # ----- ACT
+        result = interro_api.get_attributes_dict(
+            token=token,
+            interro=interro,
+            params=params,
+            score=score
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, dict)
+        expected_dict = {
+            'count': '2',
+            'databaseName': 'mock_db_name',
+            'index': 0,
+            'interroCategory': 'not_a_test',
+            'message': "User response stored successfully",
+            'mock_key': 'mock_value',
+            'oldInterroDict': 'mock_old_interro_dict',
+            'score': 3,
+            'testType': 'mock_test_type',
+            'token': token,
+        }
+        self.assertEqual(result, expected_dict)
+        interro.to_dict.assert_called_once()
+
+    @patch('src.api.interro.Updater')
+    @patch('src.api.interro.Loader')
+    @patch('src.api.interro.DbQuerier')
+    @patch('src.api.interro.get_user_name_from_token')
+    @patch('src.api.interro.PremierTest')
+    @patch('src.api.interro.get_faults_df')
+    @patch('src.api.interro.decode_dict')
+    def test_save_result(
+            self,
+            mock_decode_dict,
+            mock_get_faults_df,
+            mock_premier_test,
+            mock_get_user_name_from_token,
+            mock_db_querier,
+            mock_loader,
+            mock_updater
+        ):
+        # ----- ARRANGE
+        token = 'mock_token'
+        params = MagicMock()
+        params.interroDict = 'mock_interro_dict'
+        params.faultsDict = 'mock_faults_dict'
+        params.index = 'mock_index'
+        params.perf = 'mock_perf'
+        params.databaseName = 'mock_db_name'
+        params.testType = 'mock_test_type'
+        params.testLength = 'mock_test_length'
+        mock_decode_dict.return_value = pd.DataFrame({'col_1': ['val_1', 'val_2']})
+        mock_get_faults_df.return_value = pd.DataFrame({'col_2': ['val_3', 'val_4']})
+        mock_premier_test_object = MagicMock()
+        mock_premier_test.from_dict.return_value = mock_premier_test_object
+        mock_get_user_name_from_token.return_value = 'mock_user_name'
+        mock_db_querier.return_value = 'mock_db_querier'
+        mock_loader_object = MagicMock()
+        mock_loader.return_value = mock_loader_object
+        mock_updater_object = MagicMock()
+        mock_updater.return_value = mock_updater_object
+        # ----- ACT
+        interro_api.save_result(
+            token=token,
+            params=params
+        )
+        # ----- ASSERT
+        mock_decode_dict.assert_called_once_with('mock_interro_dict')
+        mock_get_faults_df.assert_called_once_with('mock_faults_dict')
+        mock_premier_test.from_dict.assert_called_once()
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_db_querier.assert_called_once_with(
+            user_name='mock_user_name',
+            db_name='mock_db_name',
+            test_type='mock_test_type'
+        )
+        mock_loader.assert_called_once_with(
+            words='mock_test_length',
+            data_querier='mock_db_querier'
+        )
+        mock_loader_object.load_tables.assert_called_once()
+        mock_updater.assert_called_once_with(
+            loader=mock_loader_object,
+            interro=mock_premier_test_object,
+        )
+        mock_updater_object.update_data.assert_called_once_with()
+
+    @patch('src.api.interro.Updater')
+    @patch('src.api.interro.Loader')
+    @patch('src.api.interro.DbQuerier')
+    @patch('src.api.interro.get_user_name_from_token')
+    @patch('src.api.interro.PremierTest')
+    @patch('src.api.interro.get_faults_df')
+    def test_update_test(
+            self,
+            mock_get_faults_df,
+            mock_premier_test,
+            mock_get_user_name_from_token,
+            mock_db_querier,
+            mock_loader,
+            mock_updater
+        ):
+        # ----- ARRANGE
+        params = MagicMock()
+        params.databaseName = 'mock_db_name'
+        params.faultsDict = 'mock_faults_dict'
+        params.index = 'mock_index'
+        params.perf = 'mock_perf'
+        params.testLength = 'mock_test_length'
+        params.testType = 'mock_test_type'
+        interro_df = MagicMock()
+        token = 'mock_token'
+        mock_get_faults_df.return_value = pd.DataFrame({'col_2': ['val_3', 'val_4']})
+        mock_premier_test_object = MagicMock()
+        mock_premier_test.from_dict.return_value = mock_premier_test_object
+        mock_get_user_name_from_token.return_value = 'mock_user_name'
+        mock_db_querier.return_value = 'mock_db_querier'
+        mock_loader_object = MagicMock()
+        mock_loader.return_value = mock_loader_object
+        mock_updater_object = MagicMock()
+        mock_updater.return_value = mock_updater_object
+        # ----- ACT
+        interro_api.update_test(
+            token=token,
+            params=params,
+            interro_df=interro_df
+        )
+        # ----- ASSERT
+        mock_get_faults_df.assert_called_once_with(params.faultsDict)
+        mock_premier_test.from_dict.assert_called_once()
+        mock_get_user_name_from_token.assert_called_once_with(token=token)
+        mock_db_querier.assert_called_once_with(
+            user_name='mock_user_name',
+            db_name='mock_db_name',
+            test_type='mock_test_type'
+        )
+        mock_loader.assert_called_once_with(
+            words='mock_test_length',
+            data_querier='mock_db_querier'
+        )
+        mock_loader_object.load_tables.assert_called_once()
+        mock_updater.assert_called_once_with(
+            loader=mock_loader_object,
+            interro=mock_premier_test_object,
+        )
+        mock_updater_object.update_data.assert_called_once_with()
+

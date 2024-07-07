@@ -176,7 +176,7 @@ class TestLoader(unittest.TestCase):
         When the next index points to a bad word, the search should stop.
         So the index search method should be called once.
         """
-        # Arrange
+        # ----- ARRANGE
         self.loader.words_df = pd.DataFrame(
             {
                 'english': ['Hello', 'One', 'Two', 'Three', 'Four', 'Five'],
@@ -186,11 +186,27 @@ class TestLoader(unittest.TestCase):
             }
         )
         mock_get_another_index.return_value = 4
-        # Act
+        # ----- ACT
         next_index = self.loader.get_next_index()
-        # Assert
+        # ----- ASSERT
         self.assertEqual(next_index, 4)
         assert mock_get_another_index.call_count == 1
+
+    def test_get_row(self):
+        # ----- ARRANGE
+        self.loader.index = 2
+        self.loader.words_df = pd.DataFrame({
+            'english': ['Hello', 'One', 'Two', 'Three', 'Four', 'Five'],
+            'français': ['Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq'],
+            'bad_word': [0, 1, 2, 3, 4, 5],
+            'query': [5, 4, 3, 2, 1, 0]
+        })
+        # ----- ACT
+        result = self.loader.get_row()
+        # ----- ASSERT
+        self.assertIsInstance(result, list)
+        self.assertEqual(result[0], 2)
+        self.assertEqual(result[1], ['Two', 'Deux', 2, 3])
 
     @patch('src.interro.Loader.get_row')
     @patch('src.interro.Loader.get_next_index')
@@ -233,7 +249,7 @@ class TestLoader(unittest.TestCase):
             self.loader.test_type + '_voc': pd.DataFrame({
                 'creation_date': ['2022-01-01', '2022-02-01'],
                 'taux': [0.5, 0.34],
-                'bad_word': [0, 1]
+                # 'bad_word': [0, 1]
             }),
             self.loader.test_type + '_perf': pd.DataFrame({
                 'some_col_1': ['some_value_1']
@@ -354,30 +370,81 @@ class TestPremierTest(unittest.TestCase):
         After the guess (or the non-guess, if the user is not very very smart),
         the word should be updated on number of queries, number of guesses, ...
         """
-        # Arrange
+        # ----- ARRANGE
         old_row = self.interro_1.interro_df.loc[self.interro_1.index]
         word_guessed = False
-        # Act
+        # ----- ACT
         self.interro_1.update_interro_df(word_guessed)
         new_row = self.interro_1.interro_df.loc[self.interro_1.index]
-        # Assert
+        # ----- ASSERT
         self.assertEqual(new_row['nb'], old_row['nb'] + 1)
         self.assertEqual(new_row['score'], old_row['score'] - 1)
         self.assertLess(new_row['taux'], old_row['taux'])
         self.assertEqual(new_row['query'], old_row['query'] + 1)
 
+    def test_update_index(self):
+        # ----- ARRANGE
+        self.interro_1.interro_df = pd.DataFrame({
+            'query': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        })
+        self.interro_1.index = 7
+        # ----- ACT
+        self.interro_1.update_index()
+        # ----- ASSERT
+        self.assertEqual(self.interro_1.index, 8)
+
     def test_compute_success_rate(self):
-        """Based on the user's guesses and the umber of words asked, a success rate is computed."""
-        # Arrange
+        """
+        Based on the user's guesses and the umber of words asked,
+        a success rate is computed.
+        """
+        # ----- ARRANGE
         self.interro_1.faults_df.loc[self.interro_1.faults_df.shape[0]] = ['Yes', 'Oui']
         self.interro_1.faults_df.loc[self.interro_1.faults_df.shape[0]] = ['No', 'Non']
         self.interro_1.faults_df.loc[self.interro_1.faults_df.shape[0]] = ['Maybe', 'Peut-être']
-        # Act
+        # ----- ACT
         self.interro_1.compute_success_rate()
-        # Assert
+        # ----- ASSERT
         self.assertIsInstance(self.interro_1.perf, int)
         self.assertLess(self.interro_1.perf, 101)
         self.assertGreater(self.interro_1.perf, -1)
+
+    def test_to_dict(self):
+        # ----- ARRANGE
+        # ----- ACT
+        result = self.interro_1.to_dict()
+        # ----- ASSERT
+        self.assertIsInstance(result, dict)
+        expected_keys = {
+            'interroDict',
+            'testLength',
+            'index',
+            'faultsDict',
+            'perf'
+        }
+        self.assertEqual(set(result.keys()), expected_keys)
+
+    @patch('src.interro.FastapiGuesser')
+    def test_from_dict(self, mock_guesser):
+        # ----- ARRANGE
+        mock_guesser_object = MagicMock()
+        mock_guesser.return_value = mock_guesser_object
+        data = {
+            'testLength': 10,
+            'interroTable': pd.DataFrame({'a': [1, 2, 3]}),
+            'faultsTable': pd.DataFrame({'b': [4, 5, 6]}),
+            'index': 5,
+            'perf': 'some performance data'
+        }
+        # ----- ACT
+        instance = self.interro_1.from_dict(data)
+        # ----- ASSERT
+        self.assertEqual(instance.words, data['testLength'])
+        pd.testing.assert_frame_equal(instance.interro_df, data['interroTable'])
+        pd.testing.assert_frame_equal(instance.faults_df, data['faultsTable'])
+        self.assertEqual(instance.index, data['index'])
+        self.assertEqual(instance.perf, data['perf'])
+        self.assertIs(instance.guesser, mock_guesser_object)
 
 
 
@@ -427,6 +494,59 @@ class TestRattrap(unittest.TestCase):
             self.rattrap.old_interro_df,
             pd.DataFrame()
         )
+
+    def test_reshuffle_words_table(self):
+        """
+        The words table should be reshuffled.
+        """
+        # ----- ARRANGE
+        self.rattrap.interro_df = pd.DataFrame({
+            'foreign': ['one', 'two', 'three', 'four', 'five'],
+            'native': ['un', 'deux', 'trois', 'quatre', 'cinq']
+        })
+        old_df = self.rattrap.interro_df
+        old_words = list(old_df['foreign'])
+        # ----- ACT
+        self.rattrap.reshuffle_words_table()
+        # ----- ASSERT
+        new_words = list(self.rattrap.interro_df['foreign'])
+        self.assertNotEqual(old_words, new_words)
+        old_words = set(old_df['foreign'])
+        new_words = set(self.rattrap.interro_df['foreign'])
+        self.assertEqual(old_words, new_words)
+
+    def test_to_dict(self):
+        # ----- ARRANGE
+        # ----- ACT
+        result = self.rattrap.to_dict()
+        # ----- ASSERT
+        self.assertIsInstance(result, dict)
+        expected_keys = {
+            'interroDict',
+            'testLength',
+            'index',
+            'faultsDict',
+            'oldInterroDict'
+        }
+        self.assertEqual(set(result.keys()), expected_keys)
+
+    def test_from_dict(self):
+        # ----- ARRANGE
+        data = {
+            'faultsDict': pd.DataFrame({'b': [4, 5, 6]}),
+            'index': 5,
+            'interroDict': pd.DataFrame({'a': [1, 2, 3]}),
+            'oldInterroDict': pd.DataFrame({'c': [7, 8, 9]}),
+            'testLength': 10,
+        }
+        # ----- ACT
+        instance = self.rattrap.from_dict(data)
+        # ----- ASSERT
+        self.assertEqual(instance.words, data['testLength'])
+        pd.testing.assert_frame_equal(instance.interro_df, data['interroDict'])
+        pd.testing.assert_frame_equal(instance.faults_df, data['faultsDict'])
+        self.assertEqual(instance.index, data['index'])
+        pd.testing.assert_frame_equal(instance.old_interro_df, data['oldInterroDict'])
 
 
 
@@ -516,18 +636,57 @@ class TestUpdater(unittest.TestCase):
             self.interro_1
         )
 
+    @patch('src.interro.logger')
+    def test_update_words(self, mock_logger):
+        # ----- ARRANGE
+        self.updater_1.loader.words_df = pd.DataFrame(
+            index=[0, 1, 2, 3, 4, 5],
+            data={
+                'foreign': ['Hello', 'One', 'Two', 'Three', 'Four', 'Five'],
+                'native': ['Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq'],
+                'score': [9, 8, 7, 6, 5, 4]
+            }
+        )
+        self.updater_1.interro.interro_df = pd.DataFrame(
+            index=[1, 3],
+            data={
+                'foreign': ['One', 'Three'],
+                'native': ['Un', 'Trois'],
+                'score': [7, 7]
+            }
+        )
+        self.updater_1.loader.data_querier.db_name = 'machin_bidule'
+        # ----- ACT
+        self.updater_1.update_words()
+        # ----- ASSERT
+        mock_logger.info.assert_called_once_with(
+            "Table machin_bidule updated!"
+        )
+        expected_df = pd.DataFrame(
+            index=[0, 1, 2, 3, 4, 5],
+            data={
+                'foreign': ['Hello', 'One', 'Two', 'Three', 'Four', 'Five'],
+                'native': ['Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq'],
+                'score': [9, 7, 7, 7, 5, 4]
+            }
+        )
+        pd.testing.assert_frame_equal(
+            self.updater_1.loader.words_df,
+            expected_df
+        )
+
     def test_set_good_words(self):
         """
         Should flag the words that have been guessed sufficiently enough.
         """
-        # Arrange
+        # ----- ARRANGE
         if 'img_good' in self.updater_1.interro.interro_df.columns:
             self.updater_1.interro.interro_df.drop('img_good', axis=1, inplace=True)
         old_columns = list(self.updater_1.interro.interro_df.columns)
         self.loader_1.words_df = self.loader_1.tables['version_voc']
-        # Act
+        # ----- ACT
         self.updater_1.set_good_words()
-        # Assert
+        # ----- ASSERT
         new_columns = list(self.updater_1.interro.interro_df.columns)
         self.assertIn('img_good', new_columns)
         self.assertEqual(len(new_columns), len(old_columns) + 1)

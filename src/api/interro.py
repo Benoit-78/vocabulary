@@ -382,16 +382,14 @@ def get_faults_df(faults_dict):
 
 def get_interro(params):
     interro_df = decode_dict(params.interroDict)
-    faults_dict = params.faultsDict
-    faults_df = get_faults_df(faults_dict)
-    index = int(params.index)
     interro_category = params.interroCategory
     if interro_category == 'test':
+        faults_df = get_faults_df(params.faultsDict)
         interro = PremierTest.from_dict({
             'testLength': params.testLength,
             'interroTable': interro_df,
             'faultsTable': faults_df,
-            'index': index,
+            'index': int(params.index),
             'perf': params.perf
         })
     elif interro_category == 'rattrap':
@@ -412,20 +410,20 @@ def get_interro(params):
 
 def update_interro(interro, params):
     index = int(params.index)
-    interro_df = decode_dict(params.interroDict)
     score = int(params.score)
     if params.answer == 'Yes':
         score += 1
         update = True
     elif params.answer == 'No':
+        interro_df = decode_dict(params.interroDict)
         update = False
-        english = interro_df.loc[index][0]
-        english = english.replace("'", "\'")
-        french = interro_df.loc[index][1]
-        french = french.replace("'", "\'")
+        foreign = interro_df.loc[index][0]
+        foreign = foreign.replace("'", "\'")
+        native = interro_df.loc[index][1]
+        native = native.replace("'", "\'")
         interro.update_faults_df(
-            word_guessed=False,
-            row=[english, french]
+            word_guessed=update,
+            row=[foreign, native]
         )
     if params.interroCategory == 'test':
         interro.update_interro_df(word_guessed=update)
@@ -462,6 +460,7 @@ def save_result(token, params):
         'perf': params.perf
     })
     premier_test.compute_success_rate()
+    # -----
     user_name = get_user_name_from_token(token=token)
     db_querier = DbQuerier(
         user_name=user_name,

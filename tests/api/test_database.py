@@ -17,7 +17,7 @@ import asyncio
 import pytest
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
-from loguru import logger
+# from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -205,42 +205,35 @@ class TestDatabase(unittest.TestCase):
         mock_get_user_name_from_token.assert_called_once_with(token=token)
         mock_create_database.assert_called_once_with(db_name=data['db_name'])
 
-    @patch('src.data.users.UserAccount.create_database')
     @patch('src.api.authentication.get_user_name_from_token')
     def test_create_database_no_name(
             self,
             mock_get_user_name_from_token,
-            mock_create_database
         ):
         """
         Test the function choose_database
         """
         # ----- ARRANGE
-        data = {
-            'db_name': 'mock_db_name'
-        }
+        data = {'db_name': ''}
         token = 'mock_token'
         mock_get_user_name_from_token.return_value = 'mock_user'
-        mock_create_database.return_value = True
         # ----- ACT
         result = db_api.create_database(
-            data,
-            token
+            data=data,
+            token=token
         )
         # ----- ASSERT
         self.assertIsInstance(result, JSONResponse)
-        expected_result = {
-            'message': "Database created successfully",
-            'token': token,
-            'databaseName': data['db_name']
-        }
         content = result.body
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
+        expected_result = {
+            'message': "No database name given",
+            'token': token,
+            'databaseName': ''
+        }
         self.assertEqual(content_dict, expected_result)
         mock_get_user_name_from_token.assert_called_once_with(token=token)
-        mock_create_database.assert_called_once_with(db_name=data['db_name'])
-
 
     @patch('src.data.users.UserAccount.create_database')
     @patch('src.api.authentication.get_user_name_from_token')
@@ -396,6 +389,18 @@ class TestDatabase(unittest.TestCase):
         mock_logger.error.assert_any_call(
             f"Should be in: {expected_list}"
         )
+
+    def test_get_error_messages_no_name(self):
+        """
+        Test the function get_error_messages
+        """
+        # ----- ARRANGE
+        error_message = "No database name given"
+        # ----- ACT
+        result = db_api.get_error_messages(error_message)
+        # ----- ASSERT
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, error_message)
 
     @patch('src.api.authentication.get_user_name_from_token')
     def test_fill_database(self, mock_get_user_name_from_token):

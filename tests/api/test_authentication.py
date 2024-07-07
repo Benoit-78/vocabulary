@@ -12,9 +12,10 @@ import sys
 from datetime import datetime, timedelta
 
 import unittest
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from freezegun import freeze_time
-from unittest.mock import patch
+from jose import JWTError
+from unittest.mock import patch, MagicMock
 
 # from loguru import logger
 
@@ -238,6 +239,20 @@ class TestAuthentication(unittest.TestCase):
         mock_get_user_name_from_token.assert_called_once_with(token)
         mock_get_users_list.assert_called_once()
 
+    @patch('src.api.authentication.get_user_name_from_token')
+    def test_check_token_error(self, mock_get_user_name_from_token):
+        # ----- ARRANGE
+        mock_get_user_name_from_token.side_effect = JWTError
+        # credentials_exception = HTTPException(
+        #     status_code=status.HTTP_401_UNAUTHORIZED,
+        #     detail="Could not validate credentials",
+        #     headers={"WWW-Authenticate": "Bearer"},
+        # )
+        # ----- ACT
+        # ----- ASSERT
+        with self.assertRaises(HTTPException):
+            auth_api.check_token('mock_token')
+
     @patch('src.api.authentication.CryptContext.hash')
     def test_get_password_hash(self, mock_hash):
         """
@@ -299,6 +314,29 @@ class TestAuthentication(unittest.TestCase):
         token = 'mock_token'
         mock_dict = {"sub": None}
         mock_decode.return_value = mock_dict
+        # ----- ACT
+        with self.assertRaises(HTTPException):
+            auth_api.get_user_name_from_token_oauth(token)
+        # ----- ASSERT
+        mock_decode.assert_called_once_with(
+            token,
+            "your_secret_key",
+            algorithms=[auth_api.ALGORITHM]
+        )
+
+    @patch.dict(os.environ, {"SECRET_KEY": "your_secret_key"})
+    @patch('src.api.authentication.jwt.decode')
+    def test_get_username_from_token_error(
+            self,
+            mock_decode,
+        ):
+        """
+        Test the retrieval of the user name from a token
+        that does not contain any user name.
+        """
+        # ----- ARRANGE
+        token = 'mock_token'
+        mock_decode.side_effect = JWTError
         # ----- ACT
         with self.assertRaises(HTTPException):
             auth_api.get_user_name_from_token_oauth(token)
@@ -397,3 +435,39 @@ class TestAuthentication(unittest.TestCase):
         )
         # ----- ASSERT
         self.assertEqual(unknown_user, 'Unknown user')
+
+    @patch('src.api.authentication.authenticate_user')
+    def test_authenticate_with_oauth(self, mock_authenticate_user):
+        # ----- ARRANGE
+        form_data = MagicMock()
+        form_data.username = 'user1'
+        form_data.password = 'password1'
+        mock_authenticate_user.return_value = 'authenticated_user'
+        # ----- ACT
+        result = auth_api.authenticate_with_oauth(form_data)
+        # ----- ASSERT
+        self.assertEqual(result, 'authenticated_user')
+        mock_authenticate_user.assert_called_once_with(
+            users_list=auth_api.users_dict,
+            username='user1',
+            password='password1'
+        )
+
+    def test_sign_in(self):
+        # ----- ARRANGE
+        request = 'mock_request'
+        token = 'mock_token'
+        error_message = 'mock_error_message'
+        # ----- ACT
+        result = auth_api.sign_in(
+            request=request,
+            token=token,
+            error_message=error_message
+        )
+        # ----- ASSERT
+        expected_dict = {
+            'request': request,
+            'token': token,
+            'errorMessage': error_message,
+        }
+        self.assertEqual(result, expected_dict)

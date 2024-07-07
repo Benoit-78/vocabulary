@@ -336,11 +336,11 @@ class DbDefiner(DbInterface):
         Create a database with the given database name
         """
         sql_db_name = f"{self.user_name}_{db_name}"
-        connection, cursor = self.get_db_cursor()
-        result = None
         if not self.validate_db_name(sql_db_name):
             logger.error(f"Invalid database name: {sql_db_name}")
             return False
+        connection, cursor = self.get_db_cursor()
+        result = None
         sql_query = sql_db_name.join([
             self.sql_queries['create_db'] + ' ',
             ";"
@@ -385,10 +385,10 @@ class DbDefiner(DbInterface):
         Create the seven tables necessary to the app.
         """
         sql_db_name = f"{self.user_name}_{db_name}"
-        connection, cursor = self.get_db_cursor()
         if not self.validate_db_name(sql_db_name):
             logger.error(f"Invalid database name: {sql_db_name}")
             return False
+        connection, cursor = self.get_db_cursor()
         sql_query = sql_db_name.join([self.sql_queries['use_db'] + ' ', ";"])
         create_tables = [
             'create_version_voc',

@@ -31,6 +31,23 @@ class TestDbInterface(unittest.TestCase):
     - DbManipulator, for Data Manipulation Language operations,
     - DbQuerier, for Data Querying Language operations.
     """
+    @patch('src.data.database_interface.logger')
+    def test_check_host(self, mock_logger):
+        # ----- ARRANGE
+        db_interface = database_interface.DbInterface()
+        db_interface.host = 'mock_host'
+        # ----- ACT
+        # ----- ASSERT
+        with self.assertRaises(ValueError):
+            db_interface.check_host()
+            mock_logger.warning.assert_called_once_with(
+                "host: mock_host"
+            )
+            mock_logger.error.assert_called_once_with(
+                f"host should be in {database_interface.HOSTS.keys()}"
+            )
+
+
     @patch.dict('os.environ', {'VOC_DB_ROOT_PWD': 'root_password'})
     @patch('src.data.database_interface.logger')
     @patch('src.data.database_interface.mariadb.connect')
@@ -453,6 +470,24 @@ class TestDbDefiner(unittest.TestCase):
         mock_connection.close.assert_called_once()
 
     @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbDefiner.validate_db_name')
+    def test_create_database_invalid_name(
+            self,
+            mock_validate_db_name,
+            mock_logger
+        ):
+        # ----- ARRANGE
+        db_name = 'testdb'
+        mock_validate_db_name.return_value = False
+        # ----- ACT
+        result = self.db_definer.create_database(db_name)
+        # ----- ASSERT
+        self.assertEqual(result, False)
+        mock_logger.error.assert_called_once_with(
+            f"Invalid database name: username_testdb"
+        )
+
+    @patch('src.data.database_interface.logger')
     @patch('src.data.database_interface.DbDefiner.get_db_cursor')
     def test_create_database_error(self, mock_get_db_cursor, mock_logger):
         # Arrange
@@ -532,6 +567,24 @@ class TestDbDefiner(unittest.TestCase):
         mock_connection.commit.assert_called_once()
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
+
+    @patch('src.data.database_interface.logger')
+    @patch('src.data.database_interface.DbDefiner.validate_db_name')
+    def test_create_seven_tables_invalid_name(
+            self,
+            mock_validate_db_name,
+            mock_logger
+        ):
+        # ----- ARRANGE
+        db_name = 'testdb'
+        mock_validate_db_name.return_value = False
+        # ----- ACT
+        result = self.db_definer.create_seven_tables(db_name)
+        # ----- ASSERT
+        self.assertEqual(result, False)
+        mock_logger.error.assert_called_once_with(
+            f"Invalid database name: username_testdb"
+        )
 
     @patch('src.data.database_interface.logger')
     @patch('src.data.database_interface.DbDefiner.get_db_cursor')

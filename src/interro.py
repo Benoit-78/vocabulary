@@ -7,12 +7,12 @@
         Logic of the vocabulary application, including the interoooooo!!!!!
 """
 
-import argparse
 import json
 import os
 import random
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from datetime import datetime
 from typing import List
 
@@ -120,7 +120,7 @@ class Loader():
             next_index = self.get_another_index()
         return next_index
 
-    def get_row(self) -> pd.DataFrame:
+    def get_row(self) -> Iterable:
         """
         Get the row of the word to be asked
         """
@@ -237,7 +237,7 @@ class PremierTest(Interro):
         for idx_nb, idx in enumerate(indices):
             if idx == self.index:
                 self.index = indices[idx_nb + 1]
-            break
+                break
 
     def compute_success_rate(self):
         """
@@ -307,7 +307,11 @@ class Rattrap(Interro):
         Shuffle the words table, so that the words are asked
         in a different order than the precedent test.
         """
-        self.interro_df = self.interro_df.sample(frac=1)
+        old_index = list(self.interro_df.index)
+        new_index = list(self.interro_df.index)
+        while new_index == old_index:
+            self.interro_df = self.interro_df.sample(frac=1)
+            new_index = list(self.interro_df.index)
         self.interro_df = self.interro_df.reset_index(drop=True)
 
     def to_dict(self):
