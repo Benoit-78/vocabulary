@@ -13,6 +13,7 @@ import sys
 
 from fastapi.responses import JSONResponse
 from loguru import logger
+import pandas as pd
 from typing import Dict
 
 REPO_NAME = 'vocabulary'
@@ -24,24 +25,11 @@ from src import interro as core_interro
 from src.api.authentication import get_user_name_from_token
 from src.api.interro import load_test, get_interro_category, turn_df_into_dict
 from src.data.redis_interface import save_interro_in_redis, load_interro_from_redis
+# from src.utils.debug import print_arguments_and_output
 from src.views import api as api_view
 
 
-def get_flags_dict() -> Dict:
-    """
-    Based on the result of the POST method, returns the corresponding error messages
-    that will feed the sign-in html page.
-    """
-    flags_dict = {}
-    with open('conf/languages.json', encoding='utf-8') as f:
-        flags_dict = json.load(f)
-    flags_dict = {
-        k: v['flag']
-        for k, v in flags_dict.items()
-    }
-    return flags_dict
-
-
+# ------------------ API functions ------------------ #
 def load_guest_settings(request, token):
     flags_dict = get_flags_dict()
     settings_dict = flags_dict.copy()
@@ -241,17 +229,13 @@ def load_rattrap(
         token=token,
         interro_category=interro_category
     )
-    if interro_category == 'rattrap':
-        rattrap_cnt = interro.rattrap + 1
-    else:
-        rattrap_cnt = 0
     guesser = api_view.FastapiGuesser()
     interro.faults_df = interro.faults_df.sample(frac=1)
     interro.faults_df = interro.faults_df.reset_index(drop=True)
     rattrap = core_interro.Rattrap(
         interro_df=interro.faults_df,
         guesser=guesser,
-        old_interro_df=rattrap_cnt,
+        old_interro_df=pd.DataFrame(),
     )
     new_interro_category = get_interro_category(interro=rattrap)
     save_interro_in_redis(
@@ -287,8 +271,9 @@ def end_interro_guest(
         token=token,
         interro_category='test'
     )
+    interro_words = premier_test.interro_df[['foreign', 'native']]
     headers, rows = turn_df_into_dict(
-        words_df=premier_test.interro_df
+        words_df=interro_words
     )
     response_dict = {
         'headers': headers,
@@ -298,4 +283,21 @@ def end_interro_guest(
         'score': score,
         'token': token,
     }
+    logger.debug(f"Response dict: {response_dict}")
     return response_dict
+
+
+# ------------------ Helper functions ------------------ #
+def get_flags_dict() -> Dict:
+    """
+    Based on the result of the POST method, returns the corresponding error messages
+    that will feed the sign-in html page.
+    """
+    flags_dict = {}
+    with open('conf/languages.json', encoding='utf-8') as f:
+        flags_dict = json.load(f)
+    flags_dict = {
+        k: v['flag']
+        for k, v in flags_dict.items()
+    }
+    return flags_dict

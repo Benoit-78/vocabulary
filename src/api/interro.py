@@ -31,35 +31,6 @@ from src.views.api import FastapiGuesser
 
 
 # ------------------ API functions ------------------ #
-def load_test(
-        user_name,
-        db_name,
-        test_type,
-        test_length
-    ):
-    """
-    Load the interroooo!
-    """
-    db_querier = DbQuerier(
-        user_name=user_name,
-        db_name=db_name,
-        test_type=test_type,
-    )
-    loader = Loader(
-        words=test_length,
-        data_querier=db_querier
-    )
-    loader.load_tables()
-    loader.set_interro_df()
-    guesser = FastapiGuesser()
-    premier_test = PremierTest(
-        interro_df=loader.interro_df,
-        words=loader.words,
-        guesser=guesser
-    )
-    return loader, premier_test
-
-
 def get_interro_settings(
         token,
         error_message
@@ -293,6 +264,35 @@ def launch_rattrap(
 
 
 # ------------------ Helper functions ------------------ #
+def load_test(
+        user_name,
+        db_name,
+        test_type,
+        test_length
+    ):
+    """
+    Load the interroooo!
+    """
+    db_querier = DbQuerier(
+        user_name=user_name,
+        db_name=db_name,
+        test_type=test_type,
+    )
+    loader = Loader(
+        words=test_length,
+        data_querier=db_querier
+    )
+    loader.load_tables()
+    loader.set_interro_df()
+    guesser = FastapiGuesser()
+    premier_test = PremierTest(
+        interro_df=loader.interro_df,
+        words=loader.words,
+        guesser=guesser
+    )
+    return loader, premier_test
+
+
 def get_old_interro_dict(interro_dict):
     """
     Get the old interro dict out of the original interro dict.
