@@ -11,26 +11,30 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
+    <link rel="stylesheet" href="/static/styles/text.css">
     <!-- JS -->
     <script type="module" src="/static/scripts/ui/main.js"></script>
 </head>
 
 <body data-token="{{ token }}">
+
     <div class="container">
         <h1 class="white-text">Infos</h1>
 
-        <p class="white-text">Quand vous tombez sur un nouveau mot d'une langue étrangère, enregistrez-le dans l’application, avec sa traduction</p>
-        <p class="white-text">Passez ensuite une interro sur vos propres mots</p>
-        <p class="white-text">Gardez le rythme d'une interro par jour</p>
-        <p class="white-text">Au fur et à mesure des interros, les mots que vous retenez le mieux seront archivés</p>
-        <p class="white-text">Les mots difficiles, eux, vous seront demandés plus souvent</p>
-        <p class="white-text">Et en fin de compte, vous aurez tous ces mots dans la tête</p>
+        <p class="white-text p-background">
+            Quand vous tombez sur un nouveau mot dans une langue étrangère, enregistrez-le dans l’application,ainsi que sa traduction<br>
+            <br>Passez ensuite une interro sur les mots que vous avez enregistrés<br>
+            <br>Gardez le rythme d'une interro par jour<br>
+            <br>Au fur et à mesure, les mots que vous retenez le mieux seront archivés<br>
+            <br>Et les mots récalcitrants vous seront demandés plus souvent<br>
+            <br>En bref, l'appli vous permet de garder tous ces mots en mémoire<br>
+        </p>
 
-        <!-- <button class="button" onclick="goToRoot(`{{ token }}`)">Quit</button> -->
         <button id="quitButton" class="button">Quitter</button>
-        
+
         <p class ="white-text">Ne laisser aucune information confidentielle sur cette application !</p>
     </div>
+
 </body>
 
 </html>

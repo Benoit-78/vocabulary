@@ -26,21 +26,33 @@
 
         <form id="signInForm">
             <div class="row">
-                <label class="white-text" for="inputName">Nom d’utilisateur</label>
-                <input type="text" id="inputName" name="inputName" class="rounded-input" required>
-                {% if nameUnknownErrorMessage %}
-                    <p class="error-message">{{ nameUnknownErrorMessage }}</p>
+                <!-- <label class="white-text" for="inputName">Nom d’utilisateur</label> -->
+                <input
+                    id="inputName"
+                    name="inputName"
+                    class="rounded-input"
+                    type="text"
+                    placeholder="Nom d'utilisateur *"
+                    required
+                >
+            </div>
+            <div class="row">
+                <!-- <label class="white-text" for="input2">Mot de passe</label> -->
+                <input
+                    id="inputPassword"
+                    name="inputPassword"
+                    class="rounded-input"
+                    type="password"
+                    autocomplete="off"
+                    placeholder="Mot de passe *"
+                    required
+                >
+                {% if errorMessage %}
+                    <p class="error-message">{{ errorMessage }}</p>
                 {% endif %}
             </div>
             <div class="row">
-                <label class="white-text" for="input2">Mot de passe</label>
-                <input type="inputPassword" id="inputPassword" name="inputPassword" class="rounded-input" autocomplete="off" required>
-                {% if passwordIncorrectErrorMessage %}
-                    <p class="error-message">{{ passwordIncorrectErrorMessage }}</p>
-                {% endif %}
-            </div>
-            <div class="row">
-                <button id="authenticateButton" class="button">Connexion</button>
+                <button id="signInButton" class="button">Connexion</button>
             </div>
         </form>
 

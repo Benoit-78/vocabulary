@@ -19,7 +19,7 @@ sys.path.append(REPO_DIR)
 
 from src.api import dashboard as dashboard_api
 
-dashboard_router = APIRouter(prefix='/dashboard')
+dashboard_router = APIRouter(prefix='/v1/dashboard')
 templates = Jinja2Templates(directory="src/templates")
 
 
@@ -34,10 +34,10 @@ def graphs_page(
     Load the main page for performances visualization
     """
     request_dict = dashboard_api.get_user_dashboards(
-        request,
-        user_name,
-        user_password,
-        db_name
+        request=request,
+        user_name=user_name,
+        user_password=user_password,
+        db_name=db_name
     )
     return templates.TemplateResponse(
         "user/dashboard.html",

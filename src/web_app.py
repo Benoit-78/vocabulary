@@ -17,32 +17,54 @@ if REPO_DIR not in sys.path:
 
 from fastapi import FastAPI, Depends, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.routing import APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
-from src.routers import common_router, dashboard_router, database_router, guest_router, interro_router, user_router
-from src.api import authentication
+from src.routers import common_router, dashboard_router, database_router
+from src.routers import guest_router, interro_router, user_router
+from src.api import authentication as auth_api
 
 app = FastAPI(
     title="vocabulary",
-    docs_url="/docs",
-    # servers=[{"url": "https://www.vocabulary-app.com"}],
+    docs_url="/doc"
 )
+
+
+
+class CacheControlMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to set the cache control header for static files.
+    """
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "public, max-age=31536000"
+        return response
+
+
+
 # Sessions
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.environ.get("SECRET_KEY")
 )
+app.add_middleware(
+    CacheControlMiddleware
+)
 # Routers
+v1_router = APIRouter(prefix="/v1")
 app.include_router(common_router)
 app.include_router(dashboard_router)
 app.include_router(database_router)
 app.include_router(guest_router)
 app.include_router(interro_router)
 app.include_router(user_router)
+
 # CSS
 app.mount(
     "/static",
@@ -56,18 +78,18 @@ templates = Jinja2Templates(directory="src/templates")
 @app.get("/", response_class=HTMLResponse)
 async def root_page(
         request: Request,
-        token: str = Depends(authentication.create_token)
+        token: str = Depends(auth_api.create_token)
     ):
     """
     Redirects to the welcome page.
     """
-    return RedirectResponse(url="/welcome")
+    return RedirectResponse(url="/v1/welcome")
 
 
-@app.get("/welcome", response_class=HTMLResponse)
+@v1_router.get("/welcome", response_class=HTMLResponse)
 async def welcome_page(
         request: Request,
-        token: str = Depends(authentication.create_token)
+        token: str = Depends(auth_api.create_token)
     ):
     """
     Call the welcome page and assign a token to the guest.
@@ -79,26 +101,30 @@ async def welcome_page(
     )
 
 
-@app.get("/sign-in", response_class=HTMLResponse)
+@v1_router.get("/sign-in", response_class=HTMLResponse)
 def sign_in(
         request: Request,
-        token: str = Depends(authentication.check_token),
+        token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
     ):
     """
     Call the sign-in page.
     """
-    response_dict = authentication.sign_in(request, token, error_message)
+    response_dict = auth_api.sign_in(
+        request=request,
+        token=token,
+        error_message=error_message
+    )
     return templates.TemplateResponse(
         "user/sign_in.html",
         response_dict
     )
 
 
-@app.get("/sign-up", response_class=HTMLResponse)
+@v1_router.get("/sign-up", response_class=HTMLResponse)
 def sign_up(
         request: Request,
-        token: str = Depends(authentication.check_token),
+        token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
     ):
     """
@@ -111,10 +137,10 @@ def sign_up(
     )
 
 
-@app.get("/about-the-app", response_class=HTMLResponse)
+@v1_router.get("/about-the-app", response_class=HTMLResponse)
 def about_the_app(
         request: Request,
-        token: str = Depends(authentication.check_token)
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Call the page that helps the user to get started.
@@ -126,10 +152,10 @@ def about_the_app(
     )
 
 
-@app.get("/help", response_class=HTMLResponse)
+@v1_router.get("/help", response_class=HTMLResponse)
 def get_help(
         request: Request,
-        token: str = Depends(authentication.check_token)
+        token: str = Depends(auth_api.check_token)
     ):
     """
     Help!
@@ -139,3 +165,6 @@ def get_help(
         "help.html",
         response_dict
     )
+
+
+app.include_router(v1_router)

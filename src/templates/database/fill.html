@@ -27,16 +27,28 @@
         <div class="row">
 
             <div class="row">
-                <label class="white-text" for="input1">Langue étrangère</label>
+                <!-- <label class="white-text" for="input1">Langue étrangère</label> -->
                 {% if wordAlreadyPresentErrorMessage %}
                     <p class="error-message">{{ wordAlreadyPresentErrorMessage }}</p>
                 {% endif %}
-                <input class="rounded-input" type="text" id="input1" name="input1">
+                <input
+                    class="rounded-input"
+                    id="input1"
+                    name="input1"
+                    placeholder="Langue étrangère"
+                    type="text"
+                >
             </div>
 
             <div class="row">
-                <input class="rounded-input" type="text" id="input2" name="input2">
-                <label class="white-text" for="input2">Français</label>
+                <input
+                    class="rounded-input"
+                    id="input2"
+                    name="input2"
+                    placeholder="Français"
+                    type="text"
+                >
+                <!-- <label class="white-text" for="input2">Français</label> -->
             </div>
 
         </div>
@@ -46,12 +58,12 @@
             <button id="addWordButton" class="button">Ajouter</button>
         </div>
 
-        <h1>Charger un CSV</h1>
+        <!-- <h1>Charger un CSV</h1>
         <form id="csvForm" enctype="multipart/form-data">
             <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
             <input type="hidden" id="token" value="{{ token }}">
             <button class="button" type="submit">Charger</button>
-        </form>
+        </form> -->
 
         <div class="row">
             <button id="userSpaceButton" class="button quit-button">Quitter</button>

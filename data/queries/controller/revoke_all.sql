@@ -1,0 +1,1 @@
+REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON {db_name}.* FROM '{user_name}'@'{host}';

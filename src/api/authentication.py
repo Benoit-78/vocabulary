@@ -73,9 +73,9 @@ def create_token(
     """
     Function to generate a token for a guest or an existing user.
     """
-    logger.info('')
     if data is None:
         data = create_guest_user_name()
+    logger.info(f"User: {data['sub']}")
     to_encode = data.copy()
     if not expires_delta:
         expires_delta = 15
@@ -214,13 +214,16 @@ def authenticate_user(
         )
         return result
 
-    user_in_db_model = get_user(users_list, username)
+    user_in_db_model = get_user(
+        users_list=users_list,
+        username=username
+    )
     if user_in_db_model is None:
         user = 'Unknown user'
     else:
         password_correct = verify_password(
-            password,
-            user_in_db_model.password_hash
+            plain_password=password,
+            password_hash=user_in_db_model.password_hash
         )
         if password_correct:
             user = user_in_db_model
@@ -237,9 +240,9 @@ def authenticate_with_oauth(
     Authenticate the user using OAuth2.
     """
     user = authenticate_user(
-        users_dict,
-        form_data.username,
-        form_data.password
+        users_list=users_dict,
+        username=form_data.username,
+        password=form_data.password
     )
     return user
 
@@ -252,37 +255,9 @@ def sign_in(
         token,
         error_message
     ):
-    name_message, password_message = get_error_messages(error_message)
     response_dict = {
         'request': request,
         'token': token,
-        'nameUnknownErrorMessage': name_message,
-        'passwordIncorrectErrorMessage': password_message
+        'errorMessage': error_message,
     }
     return response_dict
-
-
-def get_error_messages(error_message: str) -> tuple:
-    """
-    Based on the result of the POST method, returns the corresponding error messages
-    that will feed the sign-in html page.
-    """
-    messages = [
-        "Unknown user",
-        "Password incorrect",
-        "User successfully authenticated",
-        ''
-    ]
-    if error_message == messages[0]:
-        result = ("Unknown user name", "")
-    elif error_message == messages[1]:
-        result = ("", "Password incorrect")
-    elif error_message == messages[2]:
-        result = ("", "")
-    elif error_message == messages[3]:
-        result = ("", "")
-    else:
-        logger.error(f"Error message incorrect: {error_message}")
-        logger.error(f"Should be in: {messages}")
-        raise ValueError
-    return result

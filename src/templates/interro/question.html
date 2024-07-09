@@ -10,56 +10,52 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/icons.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
     <script type="module" src="/static/scripts/ui/interro.js"></script>
     <script type="module" src="/static/scripts/ui/users.js"></script>
-
 </head>
 
 <body data-token="{{ token }}">
-    <script>
-        // Declare HTML page variables to the JS file that will call them
-        const numWords = `{{ numWords }}`;
-        const count = `{{ count }}`;
-        const score = `{{ score }}`;
-    </script>
-
     <div class="container">
-        <div class="progress-container">
-            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
-        </div>
-
         <div class="white-text">
-            <p>{{ count }} / {{ numWords }}</p>
+            <p>{{ count }} / {{ testLength }}</p>
         </div>
-
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
+        </div>
         <div class="row white-text">
             <p>Quelle traduction donnez-vous pour :</p>
         </div>
-
         <div class="row">
             <div class="flag-box">
                 <div class="box rounded-input">
                     {{ content_box1 }}
                 </div>
             </div>
-            <div class="flag-box">
-                <div class="box rounded-input">
-                    ?
-                </div>
-            </div>
         </div>
-
         <div class="row">
             <button id="showTranslationButton" class="button middle_button">Traduction</button>
         </div>
-
         <div class="row">
             <button id="userSpaceButton" class="button">Quitter</button>
         </div>
-
     </div>
+    <script>
+        // Declare HTML page variables to the JS file that will call them
+        const count = `{{ count }}`;
+        const databaseName = `{{ databaseName }}`;
+        const faultsDict = `{{ faultsDict }}`;
+        const index = `{{ index }}`;
+        const interroCategory = `{{ interroCategory }}`;
+        const interroDict = `{{ interroDict }}`;
+        const oldInterroDict = `{{ oldInterroDict }}`;
+        const perf = `{{ perf }}`;
+        const score = `{{ score }}`;
+        const testLength = `{{ testLength }}`;
+        const testType = `{{ testType }}`;
+    </script>
 </body>
 
 </html>

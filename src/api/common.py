@@ -25,7 +25,7 @@ def change_language(data):
     """
     Change the language of the user interface.
     """
-    menu_reader = MenuReader(data.get('path'))
+    menu_reader = MenuReader(current_page=data.get('path'))
     translations_dict = menu_reader.get_translations_dict()
     json_response = JSONResponse(
         content={

@@ -4,7 +4,7 @@ import { updateTextFields } from "../ui/main.js";
 
 function changeLanguage(token, selectedLanguage, textData, currentPath) {
     fetch(
-        `/common/change-language?token=${token}`,
+        `/v1/common/change-language?token=${token}`,
         {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -32,5 +32,5 @@ function changeLanguage(token, selectedLanguage, textData, currentPath) {
 
 
 function goToRoot(token) {
-    window.location.href = `/welcome?token=${token}`;
+    window.location.href = `/v1/welcome?token=${token}`;
 }

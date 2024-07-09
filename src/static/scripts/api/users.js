@@ -1,10 +1,10 @@
-export { authenticateUser, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace };
+export { authenticateUser, goToInterroSettings, goToUserDashboards, goToUserSettings, createAccount, goToUserSpace };
 
 
 async function createAccount(token, inputName, inputPassword) {
     try {
         const response = await fetch(
-            `/user/create-user-account?token=${token}`,
+            `/v1/user/create-user-account?token=${token}`,
             {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -18,8 +18,10 @@ async function createAccount(token, inputName, inputPassword) {
         )
         const data = await response.json();
         if (data && data.message === "User account created successfully") {
-            window.location.href = `/user/user-space?token=${data.token}`;
+            window.location.href = `/v1/user/user-space?token=${data.token}`;
         } else if (data && data.message === "User name not available") {
+            window.location.href = `/sign-up?token=${data.token}&errorMessage=${data.message}`;
+        } else if (data && data.message === "User name or password not provided") {
             window.location.href = `/sign-up?token=${data.token}&errorMessage=${data.message}`;
         } else {
             console.error("Error in sign-up");
@@ -33,7 +35,7 @@ async function createAccount(token, inputName, inputPassword) {
 async function authenticateUser(token, formData) {
     try {
         const response = await fetch(
-            `/user/user-token?token=${token}`,
+            `/v1/user/user-token?token=${token}`,
             {
                 method: "POST",
                 headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -41,13 +43,15 @@ async function authenticateUser(token, formData) {
             }
         );
         const data = await response.json();
+        console.log(data);
         if (data && data.message === "User successfully authenticated") {
-            console.log(data.access_token)
-            window.location.href = `/user/user-space?token=${data.token}`;
+            window.location.href = `/v1/user/user-space?token=${data.token}`;
         } else if (data && data.message === "Unknown user") {
-            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
+            window.location.href = `/v1/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else if (data && data.message === "Password incorrect") {
-            window.location.href = `/sign-in?token=${data.token}&errorMessage=${data.message}`;
+            window.location.href = `/v1/sign-in?token=${data.token}&errorMessage=${data.message}`;
+        } else if (data && data.message === "User name or password not provided") {
+            window.location.href = `/v1/sign-in?token=${data.token}&errorMessage=${data.message}`;
         } else {
             console.error("Error in sign-in");
         }
@@ -57,16 +61,22 @@ async function authenticateUser(token, formData) {
 }
 
 
+function goToInterroSettings(token) {
+    var errorMessage = ''
+    window.location.href = `/v1/interro/interro-settings?token=${token}&errorMessage=${errorMessage}`;
+}
+
+
 function goToUserDashboards(token) {
-    window.location.href = `/user/user-dashboards?token=${token}`;
+    window.location.href = `/v1/user/user-dashboards?token=${token}`;
 }
 
 
 function goToUserSettings(token) {
-    window.location.href = `/user/user-settings?token=${token}`;
+    window.location.href = `/v1/user/user-settings?token=${token}`;
 }
 
 
 function goToUserSpace(token) {
-    window.location.href = `/user/user-space?token=${token}`;
+    window.location.href = `/v1/user/user-space?token=${token}`;
 }

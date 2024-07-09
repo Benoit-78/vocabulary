@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
     <link rel="stylesheet" href="/static/styles/errors.css">
+    <link rel="stylesheet" href="/static/styles/text.css">
     <!-- JS -->
     <script type="module" src="/static/scripts/ui/main.js"></script>
     <script type="module" src="/static/scripts/ui/users.js"></script>
@@ -21,18 +22,33 @@
 
         <form id="signUpForm">
             <div class="row">
-                <label class="white-text" for="inputName">Nom d’utilisateur</label>
-                <input type="text" id="inputName" name="inputName" class="rounded-input" required>
-                {% if errorMessage %}
-                    <p class="error-message">{{ errorMessage }}</p>
-                {% endif %}
+                <!-- <label class="white-text" for="inputName">Nom d’utilisateur</label> -->
+                <input
+                    class="rounded-input"
+                    id="inputName"
+                    name="inputName"
+                    placeholder="Nom d'utilisateur *"
+                    required
+                    type="text"
+                >
             </div>
+
             <div class="row">
-                <label class="white-text" for="input2">Mot de passe</label>
-                <input type="inputPassword" id="inputPassword" name="inputPassword" class="rounded-input" required>
+                <input
+                    class="rounded-input"
+                    id="inputPassword"
+                    name="inputPassword"
+                    placeholder="Mot de passe *"
+                    required
+                    type="password"
+                >
             </div>
+
+            {% if errorMessage %}
+                <p class="error-message p-background">{{ errorMessage }}</p>
+            {% endif %}
+
             <div class="row">
-                <!-- <button type="button" class="button" onclick="createAccount(`{{ token }}`)">Sign-up</button> -->
                 <button id="signUpButton" class="button">Inscription</button>
             </div>
         </form>

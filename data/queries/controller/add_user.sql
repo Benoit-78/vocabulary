@@ -1,0 +1,1 @@
+INSERT INTO `users`.`voc_users` (`username`, `password_hash`, `email`, `disabled`) VALUES('{user_name}', '{hash_password}', '{user_email}', FALSE);

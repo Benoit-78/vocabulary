@@ -17,26 +17,28 @@
 </head>
 
 <body data-token="{{ token }}">
-
-    <script>
-        // Declare HTML page variables to the JS file that will call them
-        const newTotal = `{{ newTotal }}`;
-        const newCount = `{{ newCount }}`;
-        const newScore = `{{ newScore }}`;
-    </script>
-
     <div class="container">
-        <div class="row white-text">
-            <h1>Votre score: {{ score }} / {{ numWords }}</h1>
+        <div class="row">
+            <h1 class="white-text">Votre score: {{ score }} / {{ testLength }}</h1>
         </div>
         <div class="row">
-            <button id="rattrapsButton" class="button rattraps_button">Passer le rattrapage</button>
+            <button id="rattrapButton" class="button rattrap_button">Passer le rattrapage</button>
         </div>
         <div class="row">
             <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
-
+    <script>
+        const databaseName = `{{ databaseName }}`;
+        const faultsDict = `{{ faultsDict }}`;
+        const index = `{{ index }}`;
+        const interroCategory = `{{ interroCategory }}`;
+        const interroDict = `{{ interroDict }}`;
+        const oldInterroDict = `{{ oldInterroDict }}`;
+        const score = `{{ score }}`;
+        const testLength = `{{ testLength }}`;
+        const testType = `{{ testType }}`;
+    </script>
 </body>
 
 </html>

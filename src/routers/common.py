@@ -20,7 +20,7 @@ sys.path.append(REPO_DIR)
 from src.api import authentication as auth_api
 from src.api import common as api_common
 
-common_router = APIRouter(prefix="/common")
+common_router = APIRouter(prefix="/v1/common")
 
 
 @common_router.post("/change-language", response_class=HTMLResponse)
@@ -31,5 +31,5 @@ async def change_language(
     """
     Change the language of the user interface.
     """
-    json_response = api_common.change_language(data)
+    json_response = api_common.change_language(data=data)
     return json_response

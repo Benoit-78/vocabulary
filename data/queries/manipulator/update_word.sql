@@ -1,0 +1,1 @@
+UPDATE {db_name}.{table_name} SET nb = {new_nb}, score = {new_score} WHERE `foreign` = {english};

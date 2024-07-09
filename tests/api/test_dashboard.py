@@ -21,7 +21,8 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src.api import dashboard as dashboard_api
-from src.data import database_interface
+from src.data.database_interface import DbQuerier
+
 
 
 class TestDashboard(unittest.TestCase):
@@ -49,9 +50,9 @@ class TestDashboard(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         mock_load_graphs.assert_called_once_with(
-            user_name,
-            user_password,
-            db_name
+            user_name=user_name,
+            user_password=user_password,
+            db_name=db_name
         )
         expected_dict = {
             "request": 'mock_request',
@@ -70,7 +71,7 @@ class TestDashboard(unittest.TestCase):
         Test the load_graphs function
         """
         # ----- ARRANGE
-        mock_data_manipulator = MagicMock(spec=dashboard_api.DbManipulator)
+        mock_data_querier = MagicMock(spec=dashboard_api.DbQuerier)
         mock_graph_1 = MagicMock(spec=dashboard_api.WordsGraph1)
         mock_graph_1.create.return_value = "<div>Graph 1 HTML</div>"
         mock_graph_2 = MagicMock(spec=dashboard_api.WordsGraph2)
@@ -105,16 +106,18 @@ class TestWordsGraph1(unittest.TestCase):
     """
     Test class for WordsGraph1
     """
-    def setUp(self):
+    @patch('src.data.database_interface.check_test_type')
+    def setUp(self, mock_check_test_type):
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mock_user_name'
         db_name = 'mock_db_name'
         test_type = 'mock_test_type'
-        db_handler = database_interface.DbManipulator(
+        db_querier = DbQuerier(
             user_name,
             db_name,
             test_type
         )
-        self.graph = dashboard_api.WordsGraph1(db_handler)
+        self.graph = dashboard_api.WordsGraph1(db_querier)
 
     def test_init(self):
         """
@@ -123,10 +126,10 @@ class TestWordsGraph1(unittest.TestCase):
         # ----- ARRANGE
         # ----- ACT
         # ----- ASSERT
-        self.assertTrue(hasattr(self.graph, 'db_handler'))
+        self.assertTrue(hasattr(self.graph, 'db_querier'))
         self.assertTrue(hasattr(self.graph, 'data'))
 
-    @patch('src.api.dashboard.DbManipulator.get_tables')
+    @patch('src.api.dashboard.DbQuerier.get_tables')
     def test_set_data(self, mock_get_tables):
         # ----- ARRANGE
         password = 'mock_password'
@@ -160,25 +163,25 @@ class TestWordsGraph1(unittest.TestCase):
             },
             index=[1, 2]
         )
-        logger.debug(f"graph.data : \n{self.graph.data}")
-        logger.debug(f"mock_df_after : \n{mock_df_after}")
         pd.testing.assert_frame_equal(self.graph.data, mock_df_after)
 
 
 
 class TestWordsGraph2(unittest.TestCase):
-    def setUp(self):
+    @patch('src.data.database_interface.check_test_type')
+    def setUp(self, mock_check_test_type):
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = database_interface.DbManipulator(
+        db_querier = DbQuerier(
             user_name,
             db_name,
             test_type
         )
-        self.graph = dashboard_api.WordsGraph2(db_handler)
+        self.graph = dashboard_api.WordsGraph2(db_querier)
 
-    @patch('src.api.dashboard.DbManipulator.get_tables')
+    @patch('src.api.dashboard.DbQuerier.get_tables')
     def test_set_data(self, mock_get_tables):
         # ----- ARRANGE
         password = 'mock_password'
@@ -213,25 +216,25 @@ class TestWordsGraph2(unittest.TestCase):
             },
             index=[1, 2]
         )
-        logger.debug(f"graph.data : \n{self.graph.data}")
-        logger.debug(f"mock_df_after : \n{mock_df_after}")
         pd.testing.assert_frame_equal(self.graph.data, mock_df_after)
 
 
 
 class TestWordsGraph3(unittest.TestCase):
-    def setUp(self):
+    @patch('src.data.database_interface.check_test_type')
+    def setUp(self, mock_check_test_type):
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = database_interface.DbManipulator(
+        db_querier = DbQuerier(
             user_name,
             db_name,
             test_type
         )
-        self.graph = dashboard_api.WordsGraph3(db_handler)
+        self.graph = dashboard_api.WordsGraph3(db_querier)
 
-    @patch('src.api.dashboard.DbManipulator.get_tables')
+    @patch('src.api.dashboard.DbQuerier.get_tables')
     def test_set_data(self, mock_get_tables):
         # ----- ARRANGE
         password = 'mock_password'
@@ -270,18 +273,20 @@ class TestWordsGraph3(unittest.TestCase):
 
 
 class TestWordsGraph4(unittest.TestCase):
-    def setUp(self):
+    @patch('src.data.database_interface.check_test_type')
+    def setUp(self, mock_check_test_type):
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = database_interface.DbManipulator(
+        db_querier = DbQuerier(
             user_name,
             db_name,
             test_type
         )
-        self.graph = dashboard_api.WordsGraph4(db_handler)
+        self.graph = dashboard_api.WordsGraph4(db_querier)
 
-    @patch('src.api.dashboard.DbManipulator.get_tables')
+    @patch('src.api.dashboard.DbQuerier.get_tables')
     def test_set_data(self, mock_get_tables):
         # ----- ARRANGE
         password = 'mock_password'
@@ -320,18 +325,20 @@ class TestWordsGraph4(unittest.TestCase):
 
 
 class TestWordsGraph5(unittest.TestCase):
-    def setUp(self):
+    @patch('src.data.database_interface.check_test_type')
+    def setUp(self, mock_check_test_type):
+        mock_check_test_type.side_effect = lambda **kwargs: kwargs['test_type']
         user_name = 'mockusername'
         db_name = 'mockdbname'
         test_type = 'mocktesttype'
-        db_handler = database_interface.DbManipulator(
+        db_querier = DbQuerier(
             user_name,
             db_name,
             test_type
         )
-        self.graph = dashboard_api.WordsGraph5(db_handler)
+        self.graph = dashboard_api.WordsGraph5(db_querier)
 
-    @patch('src.api.dashboard.DbManipulator.get_tables')
+    @patch('src.api.dashboard.DbQuerier.get_tables')
     def test_set_data(self, mock_get_tables):
         # ----- ARRANGE
         password = 'mock_password'

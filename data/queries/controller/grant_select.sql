@@ -1,0 +1,1 @@
+GRANT SELECT ON common.* TO '{user_name}'@'{host}';

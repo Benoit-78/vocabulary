@@ -1,0 +1,1 @@
+CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, `foreign` VARCHAR(50), `native` VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);

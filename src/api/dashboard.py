@@ -22,7 +22,7 @@ REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
-from src.data.database_interface import DbManipulator
+from src.data.database_interface import DbQuerier
 
 
 
@@ -30,11 +30,11 @@ class WordsGraph(ABC):
     """
     Abstract class for creating and saving user-specific graphs.
     """
-    def __init__(self, db_handler):
+    def __init__(self, db_querier):
         """
         Constructor should get a database handler.
         """
-        self.db_handler = db_handler
+        self.db_querier = db_querier
         self.data = pd.DataFrame()
 
     @abstractmethod
@@ -60,8 +60,8 @@ class WordsGraph1(WordsGraph):
         """
         See abstract method description
         """
-        tables = self.db_handler.get_tables(user_password)
-        voc_table_name = self.db_handler.test_type + '_perf'
+        tables = self.db_querier.get_tables(user_password)
+        voc_table_name = self.db_querier.test_type + '_perf'
         self.data = tables[voc_table_name]
 
     def correct_data(self):
@@ -115,10 +115,10 @@ class WordsGraph2(WordsGraph):
         """
         See abstract method description.
         """
-        tables = self.db_handler.get_tables(user_password)
-        voc_table_name = self.db_handler.test_type + '_voc'
+        tables = self.db_querier.get_tables(user_password)
+        voc_table_name = self.db_querier.test_type + '_voc'
         voc_table = tables[voc_table_name]
-        db_name_short = self.db_handler.db_name.split('_')[1]
+        db_name_short = self.db_querier.db_name.split('_')[1]
         self.data = voc_table[[
             db_name_short,
             'nb',
@@ -182,10 +182,10 @@ class WordsGraph3(WordsGraph):
         """
         See abstract method description
         """
-        tables = self.db_handler.get_tables(user_password)
-        voc_table_name = self.db_handler.test_type + '_voc'
+        tables = self.db_querier.get_tables(user_password)
+        voc_table_name = self.db_querier.test_type + '_voc'
         voc_table = tables[voc_table_name]
-        db_name_short = self.db_handler.db_name.split('_')[1]
+        db_name_short = self.db_querier.db_name.split('_')[1]
         self.data = voc_table[[
             db_name_short,
             'taux'
@@ -238,10 +238,10 @@ class WordsGraph4(WordsGraph):
         """
         See abstract method description
         """
-        tables = self.db_handler.get_tables(user_password)
-        voc_table_name = self.db_handler.test_type + '_voc'
+        tables = self.db_querier.get_tables(user_password)
+        voc_table_name = self.db_querier.test_type + '_voc'
         voc_table = tables[voc_table_name]
-        db_name_short = self.db_handler.db_name.split('_')[1]
+        db_name_short = self.db_querier.db_name.split('_')[1]
         self.data = voc_table[[
             db_name_short,
             'nb'
@@ -295,8 +295,8 @@ class WordsGraph5(WordsGraph):
         """
         See abstract method description
         """
-        tables = self.db_handler.get_tables(user_password)
-        voc_table_name = self.db_handler.test_type + '_words_count'
+        tables = self.db_querier.get_tables(user_password)
+        voc_table_name = self.db_querier.test_type + '_words_count'
         self.data = tables[voc_table_name]
 
     def correct_data(self):
@@ -338,12 +338,21 @@ class WordsGraph5(WordsGraph):
 
 
 
-def get_user_dashboards(request, user_name, user_password, db_name):
+def get_user_dashboards(
+        request,
+        user_name,
+        user_password,
+        db_name
+    ):
     """
     Get the user dashboards.
     """
-    logger.info('')
-    graphs = load_graphs(user_name, user_password, db_name)
+    logger.info(f"User: {user_name}")
+    graphs = load_graphs(
+        user_name=user_name,
+        user_password=user_password,
+        db_name=db_name
+    )
     request_dict = {
         "request": request,
         "graph_1": graphs[0],
@@ -363,23 +372,23 @@ def load_graphs(user_name, user_password, db_name):
     """
     html_graphs = []
     # Version
-    data_manipulator = DbManipulator(
+    data_querier = DbQuerier(
         user_name=user_name,
         db_name=db_name,
         test_type='version'
     )
     # Instanciate
-    graph_1 = WordsGraph1(data_manipulator)
-    graph_2 = WordsGraph2(data_manipulator)
-    graph_3 = WordsGraph3(data_manipulator)
-    graph_4 = WordsGraph4(data_manipulator)
-    graph_5 = WordsGraph5(data_manipulator)
+    graph_1 = WordsGraph1(db_querier=data_querier)
+    graph_2 = WordsGraph2(db_querier=data_querier)
+    graph_3 = WordsGraph3(db_querier=data_querier)
+    graph_4 = WordsGraph4(db_querier=data_querier)
+    graph_5 = WordsGraph5(db_querier=data_querier)
     # Create graphs
-    graph_1_html = graph_1.create(user_password)
-    graph_2_html = graph_2.create(user_password)
-    graph_3_html = graph_3.create(user_password)
-    graph_4_html = graph_4.create(user_password)
-    graph_5_html = graph_5.create(user_password)
+    graph_1_html = graph_1.create(user_password=user_password)
+    graph_2_html = graph_2.create(user_password=user_password)
+    graph_3_html = graph_3.create(user_password=user_password)
+    graph_4_html = graph_4.create(user_password=user_password)
+    graph_5_html = graph_5.create(user_password=user_password)
     # Save graphs
     html_graphs.append(graph_1_html)
     html_graphs.append(graph_2_html)

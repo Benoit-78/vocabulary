@@ -10,6 +10,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/icons.css">
     <link rel="stylesheet" href="/static/styles/interro.css">
     <!-- JS -->
     <script type="module" src="/static/scripts/ui/main.js"></script>
@@ -19,6 +20,7 @@
 <body data-token="{{ token }}">
     <script>
         // Declare HTML page variables to the JS file that will call them
+        const interroCategory = `{{ interroCategory }}`;
         const numWords = `{{ numWords }}`;
         const count = `{{ count }}`;
         const score = `{{ score }}`;
@@ -28,13 +30,14 @@
     </script>
 
     <div class="container">
-        <div class="progress-container">
-            <div class="progress-bar full" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
-        </div>
-
         <div>
             <p class="white-text">{{ count }} / {{ numWords }}</p>
         </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
+        </div>
+
         <div class="row">
             <p class="white-text">Quelle traduction donnez-vous pour :</p>
         </div>

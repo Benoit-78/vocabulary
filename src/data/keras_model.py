@@ -4,7 +4,7 @@ import json
 import numpy as np
 
 
-with open('./conf/ml_models/ml.json', 'r') as json_file:
+with open('./conf/ml_models/ml.json', 'r', encoding='utf-8') as json_file:
     ML_JSON = json.load(json_file)
 
 notions = ML_JSON['notions']

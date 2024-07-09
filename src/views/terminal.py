@@ -2,10 +2,69 @@
     Main purpose: user local interface, for CLI.
 """
 
+import argparse
+import sys
+
 from tkinter import messagebox
 from typing import List
 
 from loguru import logger
+
+
+
+class CliUser():
+    """
+    User who launchs the app through the CLI.
+    """
+    def __init__(self):
+        self.settings = None
+
+    def parse_arguments(self, arg: List[str]) -> argparse.Namespace:
+        """
+        Parse command line argument.
+        """
+        another_parser = argparse.ArgumentParser()
+        another_parser.add_argument("-t", "--type", type=str)
+        another_parser.add_argument("-w", "--words", type=int)
+        another_parser.add_argument("-r", "--rattrap", type=int)
+        if '-t' not in arg:
+            arg.append('-t')
+            arg.append('version')
+        if '-w' not in arg:
+            arg.append('-w')
+            arg.append('10')
+        if '-r' not in arg:
+            arg.append('-r')
+            arg.append('2')
+        self.settings = another_parser.parse_args(arg)
+
+    def get_settings(self):
+        """
+        Check the kind of interro, version or theme.
+        """
+        self.parse_arguments(sys.argv[1:])
+        cond_1 = not self.settings.type
+        cond_2 = not self.settings.words
+        cond_3 = not self.settings.rattrap
+        if cond_1 or cond_2 or cond_3:
+            message = ' '.join([
+                "Please give",
+                "-t <test type>, ",
+                "-w <number of words> and ",
+                "-r <number of rattrap>"
+            ])
+            logger.error(message)
+            raise SystemExit
+        if self.settings.type not in ['version', 'theme']:
+            logger.error("Test type must be either version or theme")
+            raise SystemExit
+        if self.settings.rattrap < -1:
+            logger.error("Number of rattrap must be greater than -1.")
+            raise SystemExit
+        if self.settings.words < 1:
+            logger.error("Number of words must be greater than 0.")
+            raise SystemExit
+
 
 
 class CliGuesser():
@@ -30,7 +89,6 @@ class CliGuesser():
         mot_natal = row[1]
         text_2 = f"Voici la traduction correcte : \'{mot_natal}\'. \nAviez-vous la bonne réponse ?"
         word_guessed = messagebox.askyesnocancel(title=title, message=text_2)
-        logger.debug(f"word_guessed: {word_guessed}")
         if word_guessed is None:
             logger.error("Interruption by user")
             raise SystemExit
@@ -42,5 +100,8 @@ class CliGuesser():
         """
         title = f"Word {i}/{words}"
         self.ask_word(row, title)
-        word_guessed = self.get_user_answer(row, title)
+        word_guessed = self.get_user_answer(
+            row=row,
+            title=title
+        )
         return word_guessed

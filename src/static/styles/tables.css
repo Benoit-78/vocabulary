@@ -1,0 +1,90 @@
+@keyframes reveal {
+    from {
+        clip-path: inset(0 0 100% 0);
+    }
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+#table-container {
+    animation: reveal 0.5s ease-out;
+    overflow: hidden; /* Ensure content is hidden until revealed */
+    position: relative;
+}
+
+.data-table {
+    background-color: rgba(183, 98, 6, 0.6);
+    border-collapse: collapse;
+    border-radius: 10px;
+    width: 100%;
+}
+
+/* .data-table tr {
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    width: 100%;
+    text-align: center;
+} */
+
+ /* Inner lines */
+.data-table td {
+    border: 1px solid orange;
+    color: white;
+    padding: 8px;
+    /* text-align: center; */
+    /* width: 50%; */
+    /* box-sizing: border-box; */
+}
+
+.data-table tr:first-child td {
+    border-bottom: none;
+    border-top: none;
+}
+
+.data-table tr td:first-child {
+    border-left: none;
+}
+
+.data-table tr td:last-child {
+    border-right: none;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+    border-top: none;
+}
+
+/* ------------------------- */
+/* .data-table tbody tr {
+    display: block;
+    justify-content: center;
+    margin-bottom: 5px;
+} */
+
+/* Remove margin from the last row */
+/* .data-table tbody tr:last-child {
+    margin-bottom: 0;
+} */
+
+/* Makes sure the margins between rows apply correctly */
+/* .data-table tbody {
+    display: block;
+} */
+
+/* Make each cell take up equal space */
+/* .data-table tbody tr td {
+    flex: 1;
+} */
+
+
+.display-table {
+    border: 1px solid orange;
+    color: white;
+    padding: 8px;
+    justify-content: center;
+    text-align: center;
+    /* width: 50%; */
+    /* box-sizing: border-box; */
+}

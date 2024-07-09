@@ -6,6 +6,7 @@
 
 import json
 import os
+import re
 import socket
 import sys
 from abc import ABC
@@ -24,9 +25,14 @@ REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
-with open(REPO_DIR + '/conf/data.json', 'r', encoding='utf-8') as param_file:
-    PARAMS = json.load(param_file)
-HOSTS = PARAMS['host'].keys()
+HOSTS = {
+    "localhost": "localhost",
+    "%": "%",
+    "web_local": "0.0.0.0",
+    "container": "db",
+    "fedora": "localhost",
+    "ip-172-32-0-78": "localhost"
+}
 
 
 
@@ -36,28 +42,33 @@ class DbInterface(ABC):
     All methods invoked by the user should provide with a host name.
     """
     def __init__(self):
-        self.host = PARAMS['host'][socket.gethostname()]
+        self.host = HOSTS[socket.gethostname()]
+        self.check_host()
+
+    def check_host(self):
+        """
+        Check if the host is in the list of expected hosts.
+        """
+        hosts = HOSTS.keys()
+        if self.host not in hosts:
+            logger.warning(f"host: {self.host}")
+            logger.error(f"host should be in {hosts}")
+            raise ValueError
 
     def get_db_cursor(self):
         """
         Connect to vocabulary database if credentials are correct.
-        # """
-        user_name = 'root'
+        """
+        user_name = os.getenv('VOC_DB_ROOT_USR')
         password = os.getenv('VOC_DB_ROOT_PWD')
         db_name = 'mysql'
-        # logger.debug(f"port: {PARAMS['port']}")
         connection_config = {
             'user': user_name,
             'password': password,
             'database': db_name,
-            'port': PARAMS['port']
+            'port': os.getenv('VOC_DB_PORT')
         }
-        if self.host not in HOSTS:
-            logger.warning(f"host: {self.host}")
-            logger.error(f"host should be in {HOSTS}")
-        else:
-            connection_config['host'] = PARAMS['host'][self.host]
-        # logger.debug(f"host: {PARAMS['host'][self.host]}")
+        connection_config['host'] = HOSTS[self.host]
         connection = mariadb.connect(**connection_config)
         cursor = connection.cursor()
         return connection, cursor
@@ -68,16 +79,41 @@ class DbController(DbInterface):
     """
     Manage access.
     """
+    def __init__(self):
+        super().__init__()
+        self.sql_queries = self.load_sql_queries()
+
+    @staticmethod
+    def load_sql_queries():
+        queries = [
+            'create_user',
+            'grant_select',
+            'grant_all',
+            'get_users_mysql',
+            'add_user',
+            'get_users',
+            'revoke_all'
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/controller/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
+
     def create_user_in_mysql(self, user_name, user_password):
         """
         Create a user in the mysql.user table.
         """
         connection, cursor = self.get_db_cursor()
         result = None
+        sql_query = self.sql_queries['create_user'].format(
+            user_name=user_name,
+            host=self.host,
+            user_password=user_password
+        )
         try:
-            cursor.execute(
-                f"CREATE USER '{user_name}'@'{self.host}' IDENTIFIED BY '{user_password}';"
-            )
+            cursor.execute(sql_query)
             connection.commit()
             result = True
         except Exception as err:
@@ -95,8 +131,12 @@ class DbController(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         result = None
+        sql_query = self.sql_queries['grant_select'].format(
+            user_name=user_name,
+            host=self.host
+        )
         try:
-            cursor.execute(f"GRANT SELECT ON common.* TO '{user_name}'@'{self.host}';")
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(f"User '{user_name}' created on {self.host}.")
             result = True
@@ -113,12 +153,16 @@ class DbController(DbInterface):
         """
         Grant privileges to the user on the given database.
         """
+        sql_db_name = f"{user_name}_{db_name}"
         connection, cursor = self.get_db_cursor()
         result = None
+        sql_query = self.sql_queries['grant_all'].format(
+            sql_db_name=sql_db_name,
+            user_name=user_name,
+            host=self.host
+        )
         try:
-            request_1 = "GRANT SELECT, INSERT, UPDATE, CREATE, DROP ON "
-            request_2 = f"{user_name}_{db_name}.* TO '{user_name}'@'{self.host}';"
-            cursor.execute(request_1 + request_2)
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(
                 f"User '{user_name}' granted access to '{user_name}_{db_name}'."
@@ -141,13 +185,14 @@ class DbController(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         users_list = []
+        sql_query = self.sql_queries['get_users_mysql']
         try:
-            cursor.execute("SELECT User, Host FROM mysql.user;")
+            cursor.execute(sql_query)
             result = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
-            df = pd.DataFrame(result, columns=columns)
-            df = df[df['Host'] == self.host]
-            users_list = df['User'].tolist()
+            users_df = pd.DataFrame(result, columns=columns)
+            users_df = users_df[users_df['Host'] == self.host]
+            users_list = users_df['User'].tolist()
         except Exception as err:
             if err.errno == -1:
                 logger.error(err)
@@ -167,12 +212,13 @@ class DbController(DbInterface):
         Add a user to the users MariaDB table in users Database.
         """
         connection, cursor = self.get_db_cursor()
+        sql_query = self.sql_queries['add_user'].format(
+            user_name=user_name,
+            hash_password=hash_password,
+            user_email=user_email
+        )
         try:
-            request_1 = "INSERT INTO `users`.`voc_users`"
-            request_2 = "(`username`, `password_hash`, `email`, `disabled`)"
-            request_3 = f"VALUES('{user_name}', '{hash_password}', '{user_email}', FALSE);"
-            sql_request = " ".join([request_1, request_2, request_3])
-            cursor.execute(sql_request)
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(f"User '{user_name}' added to users table.")
             result = True
@@ -191,11 +237,9 @@ class DbController(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         users_list = []
+        sql_query = self.sql_queries['get_users']
         try:
-            request_1 = "SELECT username, password_hash, email, disabled"
-            request_2 = "FROM users.voc_users;"
-            sql_request = " ".join([request_1, request_2])
-            cursor.execute(sql_request)
+            cursor.execute(sql_query)
             result = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
             users_df = pd.DataFrame(result, columns=columns)
@@ -216,11 +260,13 @@ class DbController(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         result = None
+        sql_query = self.sql_queries['revoke_all'].format(
+            db_name=db_name,
+            user_name=user_name,
+            host=self.host
+        )
         try:
-            request_1 = "REVOKE SELECT, INSERT, UPDATE, CREATE, DROP ON"
-            request_2 = f"{db_name}.* FROM '{user_name}'@'{self.host}';"
-            sql_request = " ".join([request_1, request_2])
-            cursor.execute(sql_request)
+            cursor.execute(sql_query)
             connection.commit()
             logger.success(
                 f"User '{user_name}' removed from '{user_name}_{db_name}'."
@@ -245,15 +291,62 @@ class DbDefiner(DbInterface):
         super().__init__()
         self.user_name = user_name
         self.db_name = None
+        self.sql_queries = self.load_sql_queries()
+
+    @staticmethod
+    def load_sql_queries():
+        """
+        Load the SQL queries so that they stay in memory,
+        and do not have to be read from disk.
+        """
+        queries = [
+            'show_db',
+            'use_db',
+            'create_db',
+            'create_version_voc',
+            'create_version_perf',
+            'create_version_count',
+            'create_theme_voc',
+            'create_theme_perf',
+            'create_theme_count',
+            'create_archives',
+            'show_tables',
+            'show_columns',
+            'drop_db'
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/definer/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
+
+    def validate_db_name(self, db_name):
+        """
+        Regular expression to match a valid database name (alphanumeric and underscores)
+        """
+        result = re.match(
+            pattern=r'^[A-Za-z0-9_]+$',
+            string=db_name
+        )
+        return bool(result)
 
     def create_database(self, db_name):
         """
         Create a database with the given database name
         """
+        sql_db_name = f"{self.user_name}_{db_name}"
+        if not self.validate_db_name(sql_db_name):
+            logger.error(f"Invalid database name: {sql_db_name}")
+            return False
         connection, cursor = self.get_db_cursor()
         result = None
+        sql_query = sql_db_name.join([
+            self.sql_queries['create_db'] + ' ',
+            ";"
+        ])
         try:
-            cursor.execute(f"CREATE DATABASE {self.user_name}_{db_name};")
+            cursor.execute(sql_query)
             connection.commit()
             result = True
         except Exception as err:
@@ -270,8 +363,12 @@ class DbDefiner(DbInterface):
         Get the list of databases for the user.
         """
         connection, cursor = self.get_db_cursor()
+        sql_query = self.user_name.join([
+            self.sql_queries['show_db'] + " '",
+            "_%';"
+        ])
         try:
-            cursor.execute(f"SHOW DATABASES LIKE '{self.user_name}_%';")
+            cursor.execute(sql_query)
             databases = [db[0] for db in cursor.fetchall()]
             result = databases
         except Exception as err:
@@ -288,37 +385,34 @@ class DbDefiner(DbInterface):
         Create the seven tables necessary to the app.
         """
         sql_db_name = f"{self.user_name}_{db_name}"
+        if not self.validate_db_name(sql_db_name):
+            logger.error(f"Invalid database name: {sql_db_name}")
+            return False
         connection, cursor = self.get_db_cursor()
+        sql_query = sql_db_name.join([self.sql_queries['use_db'] + ' ', ";"])
+        create_tables = [
+            'create_version_voc',
+            'create_version_perf',
+            'create_version_count',
+            'create_theme_voc',
+            'create_theme_perf',
+            'create_theme_count',
+            'create_archives'
+        ]
+        create_queries = [
+            self.sql_queries[create_table]
+            for create_table in create_tables]
         try:
-            cursor.execute(f"USE {sql_db_name};")
-            cursor.execute(
-                "CREATE TABLE version_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE version_perf (test_date DATE, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE version_words_count (test_date DATE, nb INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE theme_voc (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE theme_perf (test_date DATE, score INT, taux INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE theme_words_count (test_date DATE, nb INT);"
-            )
-            cursor.execute(
-                "CREATE TABLE archives (id INT AUTO_INCREMENT PRIMARY KEY, english VARCHAR(50),"
-                "français VARCHAR(50), creation_date DATE, nb INT, score INT, taux INT);"
-            )
+            cursor.execute(sql_query)
+            for sql_query in create_queries:
+                cursor.execute(sql_query)
             connection.commit()
             result = True
         except Exception as err:
             if err.errno == -1:
+                logger.error(err)
+                result = False
+            else:
                 logger.error(err)
                 result = False
         finally:
@@ -331,16 +425,21 @@ class DbDefiner(DbInterface):
         Get table columns.
         """
         connection, cursor = self.get_db_cursor()
+        sql_query = db_name.join([self.sql_queries['use_db'] + ' ', ";"])
         try:
-            cursor.execute(f"USE {db_name};")
-            cursor.execute("SHOW TABLES;")
+            cursor.execute(sql_query)
+            cursor.execute(self.sql_queries['show_tables'])
             tables = list(cursor.fetchall())
-            tables = self.rectify_this_strange_result(tables)
+            tables = self.rectify_this_strange_result(columns=tables)
             cols_dict = {}
             for table_name in tables:
-                cursor.execute(f"SHOW COLUMNS FROM {table_name};")
+                sql_query = table_name.join([
+                    self.sql_queries['show_columns'] + ' ',
+                    ';'
+                ])
+                cursor.execute(sql_query)
                 columns = list(cursor.fetchall())
-                columns = self.rectify_this_strange_result(columns)
+                columns = self.rectify_this_strange_result(columns=columns)
                 cols_dict[table_name] = columns
             result = cols_dict
         except Exception as err:
@@ -385,8 +484,9 @@ class DbDefiner(DbInterface):
         Drop the given database.
         """
         connection, cursor = self.get_db_cursor()
+        sql_query = db_name.join([self.sql_queries['drop_db'] + ' ', ";"])
         try:
-            cursor.execute(f"DROP DATABASE {db_name};")
+            cursor.execute(sql_query)
             connection.commit()
             result = True
         except Exception as err:
@@ -402,7 +502,7 @@ class DbDefiner(DbInterface):
 
 class DbManipulator(DbInterface):
     """
-    Working with data.
+    Modifying the data
     """
     def __init__(self, user_name, db_name, test_type):
         super().__init__()
@@ -411,19 +511,186 @@ class DbManipulator(DbInterface):
             self.db_name = f"{user_name}_{db_name}"
         else:
             self.db_name = db_name
-        self.db_definer = DbDefiner(self.user_name)
-        self.test_type = ''
-        self.check_test_type(test_type)
+        self.db_definer = DbDefiner(user_name=self.user_name)
+        self.db_querier = DbQuerier(
+            user_name=self.user_name,
+            db_name=db_name,
+            test_type=test_type
+        )
+        self.test_type = check_test_type(test_type=test_type)
+        self.sql_queries = self.load_sql_queries()
 
-    def check_test_type(self, test_type):
+    @staticmethod
+    def load_sql_queries():
+        queries = [
+            'insert_word',
+            'update_word',
+            'delete_word'
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/manipulator/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
+
+    def insert_word(self, row: list):
         """
-        Check the test type attribute.
+        Add a word to the table.
         """
-        if test_type not in ['version', 'theme']:
-            logger.error(
-                f"Test type {test_type} incorrect, should be either version or theme."
+        connection, cursor = self.get_db_cursor()
+        today_str = str(datetime.today().date())
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
+        english = row[0]
+        if self.db_querier.read_word(english) is not None:
+            result = 'Word already exists'
+            logger.error(result)
+            return result
+        native = row[1]
+        sql_query = self.sql_queries['insert_word'].format(
+            db_name=self.db_name,
+            table_name=words_table_name,
+            english=english,
+            french=native,
+            today_str=today_str
+        )
+        try:
+            cursor.execute(sql_query)
+            connection.commit()
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+            else:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+    def update_word(self, english: str, new_nb, new_score):
+        """
+        Update statistics on the given word
+        """
+        connection, cursor = self.get_db_cursor()
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
+        sql_query = self.sql_queries['update_word'].format(
+            db_name=self.db_name,
+            table_name=words_table_name,
+            new_nb=new_nb,
+            new_score=new_score,
+            english=english
+        )
+        try:
+            cursor.execute(sql_query)
+            connection.commit()
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+    def delete_word(self, english):
+        """
+        Delete a word from the words table of the instance database.
+        """
+        connection, cursor = self.get_db_cursor()
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
+        sql_query = self.sql_queries['delete_word'].format(
+            db_name=self.db_name,
+            table_name=words_table_name,
+            english=english
+        )
+        try:
+            cursor.execute(sql_query)
+            connection.commit()
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+    def save_table(self, table_name: str, table: pd.DataFrame):
+        """
+        Save given table.
+        """
+        connection, cursor = self.get_db_cursor()
+        cols = self.db_definer.get_database_cols(db_name=self.db_name)
+        if table_name == 'output':
+            table_name = self.db_querier.get_output_table()
+        table = table[cols[table_name]]
+        try:
+            engine = create_engine(
+                url=''.join([
+                    "mysql+pymysql",
+                    "://", os.getenv('VOC_DB_ROOT_USR'),
+                    ':', os.getenv('VOC_DB_ROOT_PWD'),
+                    '@', self.host,
+                    '/', self.db_name
+                ])
             )
-        self.test_type = test_type
+            table.to_sql(
+                name=table_name,
+                con=engine,
+                if_exists='replace',
+                method='multi',
+                index=False
+            )
+            result = True
+        except Exception as err:
+            if err.errno == -1:
+                logger.error(err)
+                result = False
+        finally:
+            cursor.close()
+            connection.close()
+        return result
+
+
+
+class DbQuerier(DbInterface):
+    """
+    Querying the data
+    """
+    def __init__(self, user_name, db_name, test_type):
+        super().__init__()
+        self.user_name = user_name
+        if self.user_name not in db_name:
+            self.db_name = f"{user_name}_{db_name}"
+        else:
+            self.db_name = db_name
+        self.db_definer = DbDefiner(user_name=self.user_name)
+        self.test_type = check_test_type(test_type=test_type)
+        self.sql_queries = self.load_sql_queries()
+
+    @staticmethod
+    def load_sql_queries():
+        queries = [
+            'get_tables',
+            'read_word'
+        ]
+        sql_queries = {}
+        for query in queries:
+            file_path = query.join(["data/queries/querier/", '.sql'])
+            with open(file_path, 'r', encoding='utf-8') as file:
+                sql_queries[query] = file.read().strip()
+        return sql_queries
 
     def get_tables(self):
         """
@@ -431,12 +698,14 @@ class DbManipulator(DbInterface):
         """
         connection, cursor = self.get_db_cursor()
         cursor.execute(f"USE {self.db_name};")
-        cols = self.db_definer.get_database_cols(self.db_name)
+        cols = self.db_definer.get_database_cols(db_name=self.db_name)
         tables_names = list(cols.keys())
         tables = {}
         for table_name in tables_names:
-            sql_request = f"SELECT * FROM {table_name}"
-            cursor.execute(sql_request)
+            sql_query = self.sql_queries['get_tables'].format(
+                table_name=table_name
+            )
+            cursor.execute(sql_query)
             tables[table_name] = pd.DataFrame(
                 columns=cols[table_name],
                 data=cursor.fetchall()
@@ -464,49 +733,22 @@ class DbManipulator(DbInterface):
             raise SystemExit
         return output_table
 
-    def insert_word(self, row: list):
-        """
-        Add a word to the table.
-        """
-        connection, cursor = self.get_db_cursor()
-        today_str = str(datetime.today().date())
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        english = row[0]
-        if self.read_word(english) is not None:
-            result = 'Word already exists'
-            logger.error(result)
-            return result
-        native = row[1]
-        request_1 = f"INSERT INTO {self.db_name}.{words_table_name}"
-        request_2 = "(english, français, creation_date, nb, score, taux)"
-        request_3 = f"VALUES (\'{english}\', \'{native}\', \'{today_str}\', 0, 0, 0);"
-        sql_request = ' '.join([request_1, request_2, request_3])
-        try:
-            cursor.execute(sql_request)
-            connection.commit()
-            result = True
-        except Exception as err:
-            if err.errno == -1:
-                logger.error(err)
-                result = False
-        finally:
-            cursor.close()
-            connection.close()
-        return result
-
     def read_word(self, english: str):
         """
         Read the given word
         """
         connection, cursor = self.get_db_cursor()
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = "SELECT english, français, score"
-        request_2 = f"FROM {self.db_name}.{words_table_name}"
-        request_3 = f"WHERE english = '{english}';"
-        sql_request = " ".join([request_1, request_2, request_3])
+        words_table_name, _, _, _ = self.db_definer.get_tables_names(
+            test_type=self.test_type
+        )
+        sql_query = self.sql_queries['read_word'].format(
+            db_name=self.db_name,
+            table_name=words_table_name,
+            english=english
+        )
         request_result = None
         try:
-            request_result = cursor.execute(sql_request)
+            request_result = cursor.execute(sql_query)
             request_result = cursor.fetchall()
         except Exception as err:
             if err.errno == -1:
@@ -522,83 +764,15 @@ class DbManipulator(DbInterface):
             result = None
         return result
 
-    def update_word(self, english: str, new_nb, new_score):
-        """
-        Update statistics on the given word
-        """
-        connection, cursor = self.get_db_cursor()
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = f"UPDATE {self.db_name }.{words_table_name}"
-        request_2 = f"SET nb = {new_nb}, score = {new_score}"
-        request_3 = f"WHERE english = {english};"
-        sql_request = " ".join([request_1, request_2, request_3])
-        try:
-            cursor.execute(sql_request)
-            connection.commit()
-            result = True
-        except Exception as err:
-            if err.errno == -1:
-                logger.error(err)
-                result = False
-        finally:
-            cursor.close()
-            connection.close()
-        return result
 
-    def delete_word(self, english):
-        """
-        Delete a word from the words table of the instance database.
-        """
-        connection, cursor = self.get_db_cursor()
-        words_table_name, _, _, _ = self.db_definer.get_tables_names(self.test_type)
-        request_1 = f"DELETE FROM {self.db_name}.{words_table_name}"
-        request_2 = f"WHERE english = {english};"
-        sql_request = " ".join([request_1, request_2])
-        try:
-            cursor.execute(sql_request)
-            connection.commit()
-            result = True
-        except Exception as err:
-            if err.errno == -1:
-                logger.error(err)
-                result = False
-        finally:
-            cursor.close()
-            connection.close()
-        return result
 
-    def save_table(self, table_name: str, table: pd.DataFrame):
-        """
-        Save given table.
-        """
-        connection, cursor = self.get_db_cursor()
-        cols = self.db_definer.get_database_cols(self.db_name)
-        if table_name == 'output':
-            table_name = self.get_output_table()
-        table = table[cols[table_name]]
-        try:
-            engine = create_engine(
-                ''.join([
-                    "mysql+pymysql",
-                    "://", 'root',
-                    ':', os.getenv('VOC_DB_ROOT_PWD'),
-                    '@', self.host,
-                    '/', self.db_name
-                ])
-            )
-            table.to_sql(
-                name=table_name,
-                con=engine,
-                if_exists='replace',
-                method='multi',
-                index=False
-            )
-            result = True
-        except Exception as err:
-            if err.errno == -1:
-                logger.error(err)
-                result = False
-        finally:
-            cursor.close()
-            connection.close()
-        return result
+def check_test_type(test_type):
+    """
+    Check the test type attribute.
+    """
+    if test_type not in ['version', 'theme']:
+        logger.error(
+            f"Test type {test_type} incorrect, should be either version or theme."
+        )
+        raise ValueError
+    return test_type

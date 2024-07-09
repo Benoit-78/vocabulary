@@ -21,11 +21,9 @@ sys.path.append(REPO_DIR)
 
 from src.api import authentication as auth_api
 from src.api import user as user_api
-from src.data import users
 
-user_router = APIRouter(prefix="/user")
+user_router = APIRouter(prefix="/v1/user")
 templates = Jinja2Templates(directory="src/templates")
-
 
 
 @user_router.post("/create-user-account")
@@ -36,7 +34,10 @@ async def create_account(
     """
     Create the user account if the given user name does not exist yet.
     """
-    json_response = user_api.create_account(creds, token)
+    json_response = user_api.create_account(
+        creds=creds,
+        token=token
+    )
     return json_response
 
 
@@ -49,7 +50,10 @@ async def login_for_access_token(
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
     """
-    json_response = user_api.authenticate_user(token, form_data)
+    json_response = user_api.authenticate_user(
+        token=token,
+        form_data=form_data
+    )
     return json_response
 
 
@@ -61,7 +65,10 @@ def user_main_page(
     """
     Call the base page of user space.
     """
-    response_dict = user_api.load_user_space(request, token)
+    response_dict = user_api.load_user_space(
+        request=request,
+        token=token
+    )
     return templates.TemplateResponse(
         "user/user_space.html",
         response_dict

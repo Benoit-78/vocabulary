@@ -3,6 +3,13 @@ CREATE DATABASE voc_users;
 USE voc_users;
 
 
+---------------------
+--  C O N T R O L  --
+---------------------
+-- If through uvicorn: localhost
+-- If through a container: db
+GRANT SELECT ON voc_users TO 'root'@'localhost';
+
 
 ---------------------------
 --  D E F I N I T I O N  --
@@ -15,15 +22,6 @@ CREATE TABLE voc_users (
     disabled BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-
----------------------
---  C O N T R O L  --
----------------------
--- If through uvicorn: localhost
--- If through a container: db
-GRANT SELECT ON voc_users TO 'root'@'localhost';
-
 
 
 -------------------------------

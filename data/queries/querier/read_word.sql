@@ -1,0 +1,1 @@
+SELECT `foreign`, `native`, score FROM {db_name}.{table_name} WHERE `foreign` = '{english}';

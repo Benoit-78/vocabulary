@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import pandas as pd
 from fastapi.responses import JSONResponse
-# from loguru import logger
+from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -79,20 +79,21 @@ class TestGuest(unittest.TestCase):
         mock_get_flags_dict.assert_called_once()
 
     @patch.dict(os.environ, {'VOC_GUEST_NAME': 'some_name'})
-    @patch('src.api.guest.save_test_in_redis')
+    @patch('src.api.guest.save_interro_in_redis')
+    @patch('src.api.guest.get_interro_category')
     @patch('src.api.guest.load_test')
     def test_save_interro_settings_guest(
             self,
             mock_load_test,
-            mock_save_test_in_redis
+            mock_get_interro_category,
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
-        language = {
-            'language': 'klingon'
-        }
+        language = {'language': 'klingon'}
         token = 'mock_token'
         mock_load_test.return_value = 'mock_loader', 'mock_test'
-        mock_save_test_in_redis.return_value = True
+        mock_get_interro_category.return_value = 'mock_category'
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.save_interro_settings_guest(language, token)
         # ----- ASSERT
@@ -102,7 +103,8 @@ class TestGuest(unittest.TestCase):
         content_dict = json.loads(content_dict)
         expected_result = {
             'message': "Guest user settings stored successfully",
-            'token': token
+            'token': token,
+            "interro_category": 'mock_category'
         }
         self.assertEqual(content_dict, expected_result)
         mock_load_test.assert_called_once_with(
@@ -111,16 +113,21 @@ class TestGuest(unittest.TestCase):
             test_type='version',
             test_length=10
         )
-        mock_save_test_in_redis.assert_called_once_with('mock_test', token)
+        mock_save_interro_in_redis.assert_called_once_with(
+            interro='mock_test',
+            token=token,
+            interro_category='mock_category'
+        )
 
     @patch('src.api.guest.get_flags_dict')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_load_interro_question_guest(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_get_flags_dict
         ):
         # ----- ARRANGE
+        interro_category = 'mock_category'
         request = 'mock_request'
         words = 10
         count = 2
@@ -134,12 +141,12 @@ class TestGuest(unittest.TestCase):
             index=[0, 1, 2]
         )
         mock_test = PremierTest(
-            words_df_=pd.DataFrame(),
-            words=10,
+            interro_df=mock_interro_df,
+            words=mock_interro_df.shape[0],
             guesser=api_view.FastapiGuesser(),
         )
         mock_test.interro_df = mock_interro_df
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_get_flags_dict.return_value = {
             'en': '1',
             'fr': '2',
@@ -148,38 +155,44 @@ class TestGuest(unittest.TestCase):
         }
         # ----- ACT
         result = guest_api.load_interro_question_guest(
-            request,
-            words,
-            count,
-            score,
-            language,
-            token
+            request=request,
+            interro_category=interro_category,
+            total=words,
+            count=count,
+            score=score,
+            language=language,
+            token=token
         )
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_result = {
             'request': request,
+            'token': token,
+            'interroCategory': interro_category,
             'numWords': words,
             'count': count+1,
             'score': score,
             'progressPercent': 20,
             'content_box1': 'Goodbye',
-            'token': token,
             'language': language,
             'flag': '4'
         }
         self.assertEqual(result, expected_result)
         mock_get_flags_dict.assert_called_once()
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
 
     @patch('src.api.guest.get_flags_dict')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_load_interro_answer_guest(
             self,
-            mock_load_test_from_redis,
+            mock_load_interro_from_redis,
             mock_get_flags_dict
         ):
         # ----- ARRANGE
+        interro_category = 'mock_category'
         request = 'mock_request'
         words = 10
         count = 1
@@ -194,7 +207,7 @@ class TestGuest(unittest.TestCase):
             },
             index=[0, 1, 2]
         )
-        mock_load_test_from_redis.return_value = mock_test
+        mock_load_interro_from_redis.return_value = mock_test
         mock_get_flags_dict.return_value = {
             'fr': '2',
             'es': '3',
@@ -202,51 +215,59 @@ class TestGuest(unittest.TestCase):
         }
         # ----- ACT
         result = guest_api.load_interro_answer_guest(
-            request,
-            words,
-            count,
-            score,
-            token,
-            language
+            request=request,
+            interro_category=interro_category,
+            total=words,
+            count=count,
+            score=score,
+            token=token,
+            language=language
         )
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_result = {
             'request': request,
+            'token': 'mock_token',
+            'interroCategory': 'mock_category',
             'numWords': words,
             'count': int(count),
             'score': int(score),
             'progressPercent': int(count / int(words) * 100),
             'content_box1': 'Hi',
             'content_box2': 'Salut',
-            'token': 'mock_token',
             'language': 'english',
             'flag': 'flag_id'
         }
         self.assertEqual(result, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
         mock_get_flags_dict.assert_called_once()
 
-    @patch('src.api.guest.save_test_in_redis')
-    @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.save_interro_in_redis')
+    @patch('src.interro.PremierTest.update_interro_df')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_get_user_response_guest_yes(
             self,
-            mock_load_test_from_redis,
-            mock_update_voc_df,
-            mock_save_test_in_redis
+            mock_load_interro_from_redis,
+            mock_update_interro_df,
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
+        interro_category = 'mock_category'
         data = {
+            'interroCategory': interro_category,
             'score': 1,
             'answer': 'Yes',
             'english': 'Hi',
-            'french': 'Salut'
+            'french': 'Salut',
+            'total': 10,
         }
         token = 'mock_token'
-        mock_load_test_from_redis.return_value = MagicMock()
-        mock_update_voc_df.return_value = True
-        mock_save_test_in_redis.return_value = True
+        mock_load_interro_from_redis.return_value = MagicMock()
+        mock_update_interro_df.return_value = True
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.get_user_response_guest(data, token)
         # ----- ASSERT
@@ -255,42 +276,45 @@ class TestGuest(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         expected_result = {
-            'score': 2,
             'message': "User response stored successfully.",
-            'token': 'mock_token'
+            'token': 'mock_token',
+            'interroCategory': 'mock_category',
+            'score': 2,
+            'total': 10
         }
         self.assertEqual(content_dict, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
-        # mock_update_voc_df.assert_called_once_with(True)
-        mock_save_test_in_redis.assert_called_once_with(
-            mock_load_test_from_redis.return_value,
-            token
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
+        mock_save_interro_in_redis.assert_called_once_with(
+            interro=mock_load_interro_from_redis.return_value,
+            token=token,
+            interro_category=interro_category
         )
 
-    @patch('src.api.guest.save_test_in_redis')
-    @patch('src.interro.PremierTest.update_faults_df')
-    @patch('src.interro.PremierTest.update_voc_df')
-    @patch('src.api.guest.load_test_from_redis')
+    @patch('src.api.guest.save_interro_in_redis')
+    @patch('src.api.guest.load_interro_from_redis')
     def test_get_user_response_guest_no(
             self,
-            mock_load_test_from_redis,
-            mock_update_voc_df,
-            mock_update_faults_df,
-            mock_save_test_in_redis
+            mock_load_interro_from_redis,
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
+        interro_category = 'mock_category'
         data = {
+            'interroCategory': interro_category,
             'score': 1,
             'answer': 'No',
             'english': 'Hi',
-            'french': 'Salut'
+            'french': 'Salut',
+            'total': 10,
         }
         token = 'mock_token'
         mock_test = MagicMock()
-        mock_load_test_from_redis.return_value = mock_test
-        mock_update_voc_df.return_value = True
-        mock_update_faults_df.return_value = True
-        mock_save_test_in_redis.return_value = True
+        mock_test.update_faults_df.return_value = True
+        mock_load_interro_from_redis.return_value = mock_test
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
         result = guest_api.get_user_response_guest(data, token)
         # ----- ASSERT
@@ -299,34 +323,38 @@ class TestGuest(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         expected_result = {
-            'score': 1,
             'message': "User response stored successfully.",
-            'token': 'mock_token'
+            'token': 'mock_token',
+            'interroCategory': 'mock_category',
+            'score': 1,
+            'total': 10
         }
         self.assertEqual(content_dict, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
-        # mock_update_voc_df.assert_called_once_with(False)
-        # mock_update_faults_df.assert_called_once_with(
-        #     False,
-        #     'Hi',
-        #     'Salut'
-        # )
-        mock_save_test_in_redis.assert_called_once_with(
-            mock_load_test_from_redis.return_value,
-            token
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
+        )
+        mock_test.update_faults_df.assert_called_once_with(
+            False,
+            ['Hi', 'Salut']
+        )
+        mock_save_interro_in_redis.assert_called_once_with(
+            interro=mock_load_interro_from_redis.return_value,
+            token=token,
+            interro_category=interro_category
         )
 
-    @patch('src.api.guest.save_test_in_redis')
-    @patch('src.api.guest.load_test_from_redis')
-    def test_propose_rattraps_guest(
+    @patch('src.api.guest.save_interro_in_redis')
+    @patch('src.api.guest.load_interro_from_redis')
+    def test_propose_rattrap_guest(
             self,
-            mock_load_test_from_redis,
-            mock_save_test_in_redis
+            mock_load_interro_from_redis,
+            mock_save_interro_in_redis
         ):
         # ----- ARRANGE
         request = 'mock_request'
+        interro_category = 'mock_category'
         words = 10
-        count = 1
         score = 1
         token = 'mock_token'
         language = 'klingon'
@@ -339,56 +367,130 @@ class TestGuest(unittest.TestCase):
             index=[0, 1, 2]
         )
         mock_test.interro_df = pd.DataFrame()
-        mock_load_test_from_redis.return_value = mock_test
-        mock_save_test_in_redis.return_value = True
+        mock_load_interro_from_redis.return_value = mock_test
+        mock_save_interro_in_redis.return_value = True
         # ----- ACT
-        result = guest_api.propose_rattraps_guest(
-            request,
-            words,
-            count,
-            score,
-            token,
-            language
+        result = guest_api.propose_rattrap_guest(
+            request=request,
+            token=token,
+            interro_category=interro_category,
+            total=words,
+            score=score,
+            language=language
         )
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_result = {
             'request': request,
+            'token': token,
+            "interroCategory": interro_category,
+            'newWords': 3,
+            'newScore': 0,
+            'newCount': 0,
             'score': score,
             'numWords': words,
-            'count': count,
-            'newScore': 0,
-            'newWords': 3,
-            'newCount': 0,
-            'token': token,
             'language': language
         }
         self.assertEqual(result, expected_result)
-        mock_load_test_from_redis.assert_called_once_with(token)
-        mock_save_test_in_redis.assert_called_once_with(
-            mock_test,
-            token
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category=interro_category
         )
 
-    def test_end_interro_guest(self):
+    @patch('src.api.guest.save_interro_in_redis')
+    @patch('src.api.guest.load_interro_from_redis')
+    def test_load_rattrap(
+            self,
+            mock_load_interro_from_redis,
+            mock_save_interro_in_redis,
+        ):
+        """
+        Should load the rattrap.
+        """
         # ----- ARRANGE
+        token = 'mock_token'
+        new_interro_category = 'mock_category'
+        data = {
+            'count': '2',
+            'total': '10',
+            'score': '3',
+            'interroCategory': new_interro_category
+        }
+        mock_interro_df = pd.DataFrame(
+            {
+                'some_column': ['some_value'],
+            }
+        )
+        mock_test = PremierTest(
+            interro_df=mock_interro_df,
+            words=mock_interro_df.shape[0],
+            guesser=api_view.FastapiGuesser(),
+        )
+        mock_test.interro_df = mock_interro_df
+        mock_load_interro_from_redis.return_value = mock_test
+        mock_save_interro_in_redis.return_value = True
+        # ----- ACT
+        result = guest_api.load_rattrap(
+            data=data,
+            token=token,
+        )
+        # ----- ASSERT
+        self.assertIsInstance(result, JSONResponse)
+        content = result.body
+        actual_dict = content.decode('utf-8')
+        actual_dict = json.loads(actual_dict)
+        expected_dict = {
+            'message': "Guest rattrap created successfully",
+            'token': token,
+            'interroCategory': 'rattrap',
+            'total': int(data['total']),
+            'score': int(data['score']),
+            'count': int(data['count'])
+        }
+        self.assertEqual(actual_dict, expected_dict)
+
+    @patch('src.api.guest.turn_df_into_dict')
+    @patch('src.api.guest.load_interro_from_redis')
+    @patch('src.api.guest.get_user_name_from_token')
+    def test_end_interro_guest(
+            self,
+            mock_get_user_name_from_token,
+            mock_load_interro_from_redis,
+            mock_turn_df_into_dict
+        ):
+        # ----- ARRANGE
+        mock_get_user_name_from_token.return_value = 'mock_user_name'
         request = 'mock_request'
         score = 1
         words = 10
         token = 'mock_token'
+        premier_test = MagicMock()
+        premier_test.interro_df = pd.DataFrame({
+            'foreign': ['Hi', 'Hello', 'Goodbye'],
+            'native': ['Salut', 'Bonjour', 'Au revoir']
+        })
+        mock_load_interro_from_redis.return_value = premier_test
+        mock_turn_df_into_dict.return_value = 'mock_headers', 'mock_rows'
         # ----- ACT
         result = guest_api.end_interro_guest(
-            request,
-            score,
-            words,
-            token
+            request=request,
+            total=words,
+            score=score,
+            token=token
         )
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_result = {
             'request': request,
+            'token': token,
+            'headers': 'mock_headers',
+            'rows': 'mock_rows',
             'score': score,
             'numWords': words,
-            'token': token
         }
         self.assertEqual(result, expected_result)
+        mock_load_interro_from_redis.assert_called_once_with(
+            token=token,
+            interro_category='test'
+        )
+        mock_turn_df_into_dict.assert_called_once()

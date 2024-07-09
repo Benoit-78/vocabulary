@@ -10,6 +10,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="/static/styles/buttons.css">
+    <link rel="stylesheet" href="/static/styles/edges.css">
     <link rel="stylesheet" href="/static/styles/errors.css">
     <!-- JS -->
     <script type="module" src="/static/scripts/ui/database.js"></script>
@@ -18,49 +19,55 @@
 
 <body data-token="{{ token }}">
 
-    <div class="container">
-            <div class="row">
-                <div>
-                    <label class="white-text" for="dropdown">Choisir une base de données</label>
-                    <select id="dropdown" class="rounded-input">
-                        {% for database in databases %}
-                            <option value="{{ database }}">{{ database }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <button id="chooseDatabaseButton" class="button">Confirmer</button>
-                <!-- <button id="deleteDatabaseButton" class="button">Delete database</button> -->
-            </div>
-
-            <div class="row">
-                <div>
-                    <label class="white-text" for="input1">Créer une nouvelle base de données</label>
-                    <input class="rounded-input" type="text" id="databaseName" name="databaseName">
-                </div>
-                {% if dbAlreadyPresentErrorMessage %}
-                        <p class="error-message">{{ dbAlreadyPresentErrorMessage }}</p>
-                {% endif %}
-            </div>
-
-            <div class="row">
-                <button id="createDatabaseButton" class="button">Créer</button>
-            </div>
-
-            <div class="row">
-                <div>
-                    <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
-                </div>
-            </div>
-
-        <div class="row">
-            <button id="userSpaceButton" class="button quit-button">Quitter</button>
-        </div>
-
-    </div>
-
+    <table class="display-table container">
+            <tbody>
+                <tr class="row">
+                    <td>
+                        <p class="white-text">Nouveau dictionnaire</p>
+                        <div>
+                            <div>
+                                <input
+                                    class="rounded-input"
+                                    id="databaseName"
+                                    name="databaseName"
+                                    placeholder="Nouveau dictionnaire"
+                                    type="text"
+                                    >
+                                </div>
+                                {% if createDatabaseErrorMessage %}
+                                <p class="error-message">{{ createDatabaseErrorMessage }}</p>
+                                {% endif %}
+                            </div>
+                        <div>
+                            <button id="createDatabaseButton" class="button">Créer</button>
+                        </div>
+                        <div>
+                            <div>
+                                <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <p class="white-text">Vos dictionnaires</p>
+                        <div>
+                            <select id="dropdown" class="rounded-input">
+                                {% for database in databases %}
+                                <option value="{{ database }}">{{ database }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <button id="seeDatabaseButton" class="button">Ouvrir</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="row">
+                    <td>
+                        <button id="userSpaceButton" class="button quit-button">Quitter</button>
+                    </td>
+                </tr>
+            </tbody>
+    </table>
 </body>
 
 </html>

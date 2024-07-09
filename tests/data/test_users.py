@@ -66,10 +66,18 @@ class TestUserAccount(unittest.TestCase):
         self.assertIsInstance(result, bool)
         self.assertEqual(result, True)
         mock_check.assert_called_once()
-        mock_get_pwd_hash.assert_called_once_with(password)
-        mock_create_user_in_mysql.assert_called_once_with('mock_user_name', 'mock_hash')
-        mock_grant_privileges.assert_called_once_with('mock_user_name')
-        mock_add_user.assert_called_once_with('mock_user_name', 'mock_hash')
+        mock_get_pwd_hash.assert_called_once_with(password=password)
+        mock_create_user_in_mysql.assert_called_once_with(
+            user_name='mock_user_name',
+            user_password='mock_hash'
+        )
+        mock_grant_privileges.assert_called_once_with(
+            user_name='mock_user_name'
+        )
+        mock_add_user.assert_called_once_with(
+            user_name='mock_user_name',
+            hash_password='mock_hash'
+        )
 
     @patch('src.data.users.UserAccount.check_if_account_exists')
     def test_create_account_already_exists(
@@ -168,10 +176,13 @@ class TestUserAccount(unittest.TestCase):
         result = self.account.create_database(db_name)
         # ----- ASSERT
         self.assertEqual(result, True)
-        mock_check.assert_called_once_with(db_name)
-        mock_create_db.assert_called_once_with(db_name)
-        mock_grant.assert_called_once_with(self.account.user_name, db_name)
-        mock_create_tables.assert_called_once_with(db_name)
+        mock_check.assert_called_once_with(db_name=db_name)
+        mock_create_db.assert_called_once_with(db_name=db_name)
+        mock_grant.assert_called_once_with(
+            user_name=self.account.user_name,
+            db_name=db_name
+        )
+        mock_create_tables.assert_called_once_with(db_name=db_name)
 
     @patch('src.data.users.UserAccount.check_if_database_exists')
     def test_create_database_already_exists(
@@ -185,7 +196,7 @@ class TestUserAccount(unittest.TestCase):
         result = self.account.create_database(db_name)
         # ----- ASSERT
         self.assertEqual(result, False)
-        mock_check.assert_called_once_with(db_name)
+        mock_check.assert_called_once_with(db_name=db_name)
 
     @patch('src.data.users.DbDefiner.create_database')
     @patch('src.data.users.UserAccount.check_if_database_exists')
@@ -202,8 +213,8 @@ class TestUserAccount(unittest.TestCase):
         result = self.account.create_database(db_name)
         # ----- ASSERT
         self.assertEqual(result, False)
-        mock_check.assert_called_once_with(db_name)
-        mock_create_db.assert_called_once_with(db_name)
+        mock_check.assert_called_once_with(db_name=db_name)
+        mock_create_db.assert_called_once_with(db_name=db_name)
 
     @patch('src.data.users.DbDefiner.create_seven_tables')
     @patch('src.data.users.DbController.grant_privileges')
@@ -226,10 +237,19 @@ class TestUserAccount(unittest.TestCase):
         result = self.account.create_database(db_name)
         # ----- ASSERT
         self.assertEqual(result, False)
-        mock_check.assert_called_once_with(db_name)
-        mock_create_db.assert_called_once_with(db_name)
-        mock_grant.assert_called_once_with(self.account.user_name, db_name)
-        mock_create_tables.assert_called_once_with(db_name)
+        mock_check.assert_called_once_with(
+            db_name=db_name
+        )
+        mock_create_db.assert_called_once_with(
+            db_name=db_name
+        )
+        mock_grant.assert_called_once_with(
+            user_name=self.account.user_name,
+            db_name=db_name
+        )
+        mock_create_tables.assert_called_once_with(
+            db_name=db_name
+        )
 
     @patch('src.data.users.logger')
     @patch('src.data.users.DbDefiner.get_user_databases')
@@ -306,8 +326,11 @@ class TestUserAccount(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, bool)
         self.assertEqual(result, True)
-        mock_drop.assert_called_once_with(db_name)
-        mock_revoke.assert_called_once_with(self.account.user_name, db_name)
+        mock_drop.assert_called_once_with(db_name=db_name)
+        mock_revoke.assert_called_once_with(
+            user_name=self.account.user_name,
+            db_name=db_name
+        )
 
     @patch('src.data.users.DbController.revoke_privileges')
     @patch('src.data.users.DbDefiner.drop_database')
@@ -325,8 +348,13 @@ class TestUserAccount(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, bool)
         self.assertEqual(result, False)
-        mock_drop.assert_called_once_with(db_name)
-        mock_revoke.assert_called_once_with(self.account.user_name, db_name)
+        mock_drop.assert_called_once_with(
+            db_name=db_name
+        )
+        mock_revoke.assert_called_once_with(
+            user_name=self.account.user_name,
+            db_name=db_name
+        )
 
     @patch('src.data.users.DbManipulator.insert_word')
     def test_insert_word(self, mock_insert):
@@ -340,4 +368,4 @@ class TestUserAccount(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, bool)
         self.assertEqual(result, True)
-        mock_insert.assert_called_once_with([foreign, native])
+        mock_insert.assert_called_once_with(row=[foreign, native])
