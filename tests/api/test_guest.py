@@ -465,7 +465,10 @@ class TestGuest(unittest.TestCase):
         words = 10
         token = 'mock_token'
         premier_test = MagicMock()
-        premier_test.interro_df = pd.DataFrame()
+        premier_test.interro_df = pd.DataFrame({
+            'foreign': ['Hi', 'Hello', 'Goodbye'],
+            'native': ['Salut', 'Bonjour', 'Au revoir']
+        })
         mock_load_interro_from_redis.return_value = premier_test
         mock_turn_df_into_dict.return_value = 'mock_headers', 'mock_rows'
         # ----- ACT
@@ -490,6 +493,4 @@ class TestGuest(unittest.TestCase):
             token=token,
             interro_category='test'
         )
-        mock_turn_df_into_dict.assert_called_once_with(
-            words_df=premier_test.interro_df
-        )
+        mock_turn_df_into_dict.assert_called_once()

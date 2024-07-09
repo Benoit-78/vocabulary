@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS theme_perf (
 
 CREATE TABLE IF NOT EXISTS theme_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    greek CHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    français CHAR(255),
+    `foreign` CHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    `native` CHAR(255),
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS version_perf (
 
 CREATE TABLE IF NOT EXISTS version_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    greek CHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    français CHAR(255),
+    `foreign` CHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    `native` CHAR(255),
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,

@@ -12,9 +12,8 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-import numpy as np
 import pandas as pd
-from loguru import logger
+# from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -61,6 +60,50 @@ class TestLoader(unittest.TestCase):
         self.assertEqual(self.loader.data_querier, self.data_querier)
         self.assertEqual(self.loader.tables, {})
         self.assertEqual(self.loader.output_table, '')
+
+    @patch('src.interro.Loader.flag_bad_words')
+    @patch('src.data.database_interface.DbQuerier.get_tables')
+    def test_load_tables(
+            self,
+            mock_get_tables,
+            mock_flag_bad_words
+        ):
+        """
+        Input should be a dataframe, and it should be added a query column.
+        """
+        # ----- ARRANGE
+        mock_get_tables.return_value = {
+            self.loader.test_type + '_voc': pd.DataFrame({
+                'creation_date': ['2022-01-01', '2022-02-01'],
+                'taux': [0.5, 0.34],
+                # 'bad_word': [0, 1]
+            }),
+            self.loader.test_type + '_perf': pd.DataFrame({
+                'some_col_1': ['some_value_1']
+            }),
+            self.loader.test_type + '_words_count': pd.DataFrame({
+                'some_col_2': ['some_value_2']
+            }),
+        }
+        # ----- ACT
+        self.loader.load_tables()
+        # ----- ASSERT
+        mock_get_tables.assert_called_once()
+        self.assertIsInstance(self.loader.tables, dict)
+        self.assertIsInstance(
+            self.loader.tables[self.loader.test_type + '_voc'],
+            pd.core.frame.DataFrame
+        )
+        self.assertIn('bad_word', self.loader.tables[self.loader.test_type + '_voc'].columns)
+        pd.testing.assert_frame_equal(
+            self.loader.perf_df,
+            pd.DataFrame({'some_col_1': ['some_value_1']}),
+        )
+        pd.testing.assert_frame_equal(
+            self.loader.words_count_df,
+            pd.DataFrame({'some_col_2': ['some_value_2']}),
+        )
+        mock_flag_bad_words.assert_called_once()
 
     def test_adjust_test_length(self):
         """
@@ -111,171 +154,127 @@ class TestLoader(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.loader.adjust_test_length()
 
-    def test_get_random_step(self):
+    def test_flag_bad_words(self):
         """
-        The step should be a random integer smaller than the size
-        of the original words table.
+        Should flag bad words, i.e. words rarely guessed by the user.
         """
         # ----- ARRANGE
         self.loader.words_df = pd.DataFrame({
-            'some_column': [1, 2, 3, 4, 5],
+            'test_date': ['2022-01-01', '2022-02-01'],
+            'nb': [1876, 2341],
+            'taux': [0.5, 0.34],
         })
+        old_length, old_width = self.loader.words_df.shape
         # ----- ACT
-        result = self.loader.get_random_step()
+        self.loader.flag_bad_words()
         # ----- ASSERT
-        self.assertIsInstance(result, int)
-        self.assertGreater(result, 0)
-        self.assertLess(result, self.loader.words_df.shape[0] + 1)
+        new_length, new_width = self.loader.words_df.shape
+        first_word = self.loader.words_df.iloc[0]
+        ord_bad = self.loader.criteria['ORD_BAD']
+        steep_bad = self.loader.criteria['STEEP_BAD']
+        img_bad = ord_bad + steep_bad * first_word['nb']
+        self.assertLessEqual(new_length, old_length)
+        self.assertEqual(new_width, old_width +1)
+        if first_word['bad_word'] == 1:
+            self.assertLess(first_word['taux'], img_bad) # strictly less
+        elif first_word['bad_word'] == 0:
+            self.assertGreaterEqual(first_word['taux'], img_bad) # greater or equal
 
-    @patch('src.interro.random.randint')
-    def test_get_another_index_bis(self, mock_randint):
-        """
-        This function should provide with a new index, corresponding to a new word.
-        The new word should not have been already asked within the current test.
-        """
-        # ----- ARRANGE
-        mock_randint.side_effect = [1, 2]
-        self.loader.words_df = pd.DataFrame({
-            'query': [0, 1, 0]
-        })
-        # ----- ACT
-        next_index = self.loader.get_another_index()
-        # ----- ASSERT
-        self.assertEqual(next_index, 2)
-        self.loader.words_df = pd.DataFrame({
-            'query': [0, 1, 1]
-        })
-        mock_randint.call_count = 2
-
-    @patch('src.interro.Loader.get_another_index')
-    def test_get_next_index_if_not_bad_word(self, mock_get_another_index):
-        """
-        When the next index points to a bad word, the search should run once again.
-        So the index search method should be called twice.
-        """
-        # ----- ARRANGE
-        self.loader.words_df = pd.DataFrame(
-            {
-                'english': ['Hello', 'One', 'Two', 'Three', 'Four', 'Five'],
-                'français': ['Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq'],
-                'bad_word': [0, 0, 0, 0, 0, 1],
-                'query': [0, 0, 0, 0, 0, 0]
-            }
-        )
-        mock_get_another_index.return_value = 3
-        # ----- ACT
-        next_index = self.loader.get_next_index()
-        # ----- ASSERT
-        self.assertEqual(next_index, 3)
-        assert mock_get_another_index.call_count == 2
-        self.assertEqual(self.loader.words_df['query'].loc[next_index], 0)
-
-    @patch('src.interro.Loader.get_another_index')
-    def test_get_next_index_if_bad_word(self, mock_get_another_index):
-        """
-        When the next index points to a bad word, the search should stop.
-        So the index search method should be called once.
-        """
-        # ----- ARRANGE
-        self.loader.words_df = pd.DataFrame(
-            {
-                'english': ['Hello', 'One', 'Two', 'Three', 'Four', 'Five'],
-                'français': ['Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq'],
-                'bad_word': [0, 0, 0, 0, 1, 0],
-                'query': [0, 0, 0, 0, 0, 0]
-            }
-        )
-        mock_get_another_index.return_value = 4
-        # ----- ACT
-        next_index = self.loader.get_next_index()
-        # ----- ASSERT
-        self.assertEqual(next_index, 4)
-        assert mock_get_another_index.call_count == 1
-
-    def test_get_row(self):
-        # ----- ARRANGE
-        self.loader.index = 2
-        self.loader.words_df = pd.DataFrame({
-            'english': ['Hello', 'One', 'Two', 'Three', 'Four', 'Five'],
-            'français': ['Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq'],
-            'bad_word': [0, 1, 2, 3, 4, 5],
-            'query': [5, 4, 3, 2, 1, 0]
-        })
-        # ----- ACT
-        result = self.loader.get_row()
-        # ----- ASSERT
-        self.assertIsInstance(result, list)
-        self.assertEqual(result[0], 2)
-        self.assertEqual(result[1], ['Two', 'Deux', 2, 3])
-
-    @patch('src.interro.Loader.get_row')
-    @patch('src.interro.Loader.get_next_index')
-    @patch('src.interro.Loader.get_random_step')
     @patch('src.interro.Loader.adjust_test_length')
-    def test_set_interro_df(
+    def test_set_interro_df_enough_both(
             self,
             mock_adjust_test_length,
-            mock_create_random_step,
-            mock_get_next_index,
-            mock_get_row
         ):
         """
         A dataframe of words should be formed, that will be asked to the user
         """
         # ----- ARRANGE
-        mock_create_random_step.return_value = True
-        self.loader.words = 1
-        self.loader.step = 23
-        mock_get_next_index.return_value = 6
-        self.loader.row = [0, 'Hello', 'Bonjour']
-        mock_get_row.return_value = [
-            0, ['Hello', 'Bonjour', "2024-01-01", 0, 0, 0, 0, 0]
-        ]
+        self.loader.words = 10
+        self.loader.words_df = pd.DataFrame({
+            'bad_word': [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        })
         # ----- ACT
         self.loader.set_interro_df()
         # ----- ASSERT
-        self.assertEqual(self.loader.index, 6)
         mock_adjust_test_length.assert_called_once()
-        mock_create_random_step.assert_called_once()
-        mock_get_next_index.assert_called_once()
+        expected_labels = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+        self.assertEqual(
+            list(self.loader.interro_df['bad_word']),
+            expected_labels
+        )
+        self.assertEqual(self.loader.words, 10)
 
-    @patch('src.data.database_interface.DbQuerier.get_tables')
-    def test_load_tables(self, mock_get_tables):
+    @patch('src.interro.Loader.adjust_test_length')
+    def test_set_interro_df_not_enough_good(
+            self,
+            mock_adjust_test_length,
+        ):
         """
-        Input should be a dataframe, and it should be added a query column.
+        A dataframe of words should be formed, that will be asked to the user
         """
         # ----- ARRANGE
-        mock_get_tables.return_value = {
-            self.loader.test_type + '_voc': pd.DataFrame({
-                'creation_date': ['2022-01-01', '2022-02-01'],
-                'taux': [0.5, 0.34],
-                # 'bad_word': [0, 1]
-            }),
-            self.loader.test_type + '_perf': pd.DataFrame({
-                'some_col_1': ['some_value_1']
-            }),
-            self.loader.test_type + '_words_count': pd.DataFrame({
-                'some_col_2': ['some_value_2']
-            }),
-        }
+        self.loader.words = 10
+        self.loader.words_df = pd.DataFrame({
+            'bad_word': [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        })
         # ----- ACT
-        self.loader.load_tables()
+        self.loader.set_interro_df()
         # ----- ASSERT
-        mock_get_tables.assert_called_once()
-        self.assertIsInstance(self.loader.tables, dict)
-        self.assertIsInstance(
-            self.loader.tables[self.loader.test_type + '_voc'],
-            pd.core.frame.DataFrame
+        mock_adjust_test_length.assert_called_once()
+        expected_labels = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
+        self.assertEqual(
+            list(self.loader.interro_df['bad_word']),
+            expected_labels
         )
-        self.assertIn('bad_word', self.loader.tables[self.loader.test_type + '_voc'].columns)
-        pd.testing.assert_frame_equal(
-            self.loader.perf_df,
-            pd.DataFrame({'some_col_1': ['some_value_1']}),
+        self.assertEqual(self.loader.words, 10)
+
+    @patch('src.interro.Loader.adjust_test_length')
+    def test_set_interro_df_not_enough_bad(
+            self,
+            mock_adjust_test_length,
+        ):
+        """
+        A dataframe of words should be formed, that will be asked to the user
+        """
+        # ----- ARRANGE
+        self.loader.words = 10
+        self.loader.words_df = pd.DataFrame({
+            'bad_word': [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+        })
+        # ----- ACT
+        self.loader.set_interro_df()
+        # ----- ASSERT
+        mock_adjust_test_length.assert_called_once()
+        expected_labels = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+        self.assertEqual(
+            list(self.loader.interro_df['bad_word']),
+            expected_labels
         )
-        pd.testing.assert_frame_equal(
-            self.loader.words_count_df,
-            pd.DataFrame({'some_col_2': ['some_value_2']}),
+        self.assertEqual(self.loader.words, 10)
+
+    @patch('src.interro.Loader.adjust_test_length')
+    def test_set_interro_df_not_enough_both(
+            self,
+            mock_adjust_test_length,
+        ):
+        """
+        A dataframe of words should be formed, that will be asked to the user
+        """
+        # ----- ARRANGE
+        self.loader.words = 10
+        self.loader.words_df = pd.DataFrame({
+            'bad_word': [0, 0, 1, 1, 1]
+        })
+        # ----- ACT
+        self.loader.set_interro_df()
+        # ----- ASSERT
+        mock_adjust_test_length.assert_called_once()
+        expected_labels = [0, 0, 1, 1, 1]
+        self.assertEqual(
+            list(self.loader.interro_df['bad_word']),
+            expected_labels
         )
+        self.assertEqual(self.loader.words, 5)
 
 
 
@@ -514,6 +513,21 @@ class TestRattrap(unittest.TestCase):
         old_words = set(old_df['foreign'])
         new_words = set(self.rattrap.interro_df['foreign'])
         self.assertEqual(old_words, new_words)
+
+    def test_reshuffle_words_table_one_row(self):
+        """
+        The words table should be reshuffled.
+        """
+        # ----- ARRANGE
+        self.rattrap.interro_df = pd.DataFrame({
+            'foreign': ['one'],
+            'native': ['un']
+        })
+        old_df = self.rattrap.interro_df.copy()
+        # ----- ACT
+        self.rattrap.reshuffle_words_table()
+        # ----- ASSERT
+        pd.testing.assert_frame_equal(old_df, self.rattrap.interro_df)
 
     def test_to_dict(self):
         # ----- ARRANGE
@@ -759,30 +773,6 @@ class TestUpdater(unittest.TestCase):
         )
         mock_delete_good_words.assert_called_once()
 
-    def test_flag_bad_words(self):
-        """Should flag bad words, i.e. words rarely guessed by the user."""
-        # ----- ARRANGE
-        self.updater_1.loader.words_df = pd.DataFrame({
-            'test_date': ['2022-01-01', '2022-02-01'],
-            'nb': [1876, 2341],
-            'taux': [0.5, 0.34],
-        })
-        old_length, old_width = self.updater_1.loader.words_df.shape
-        # ----- ACT
-        self.updater_1.flag_bad_words()
-        # ----- ASSERT
-        new_length, new_width = self.updater_1.loader.words_df.shape
-        first_word = self.updater_1.loader.words_df.iloc[0]
-        ord_bad = self.updater_1.criteria['ORD_BAD']
-        steep_bad = self.updater_1.criteria['STEEP_BAD']
-        img_bad = ord_bad + steep_bad * first_word['nb']
-        self.assertLessEqual(new_length, old_length)
-        self.assertEqual(new_width, old_width +1)
-        if first_word['bad_word'] == 1:
-            self.assertLess(first_word['taux'], img_bad) # strictly less
-        elif first_word['bad_word'] == 0:
-            self.assertGreaterEqual(first_word['taux'], img_bad) # greater or equal
-
     @patch('src.data.database_interface.DbManipulator.save_table')
     def test_save_words(self, mock_save_table):
         """
@@ -891,7 +881,7 @@ class TestUpdater(unittest.TestCase):
         self.assertEqual(last_count, self.updater_1.loader.interro_df.shape[0])
 
     @patch.object(interro.Updater, 'move_good_words')
-    @patch.object(interro.Updater, 'flag_bad_words')
+    @patch.object(interro.Loader, 'flag_bad_words')
     @patch.object(interro.Updater, 'save_words')
     @patch.object(interro.Updater, 'save_performances')
     @patch.object(interro.Updater, 'save_words_count')

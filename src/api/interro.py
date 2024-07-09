@@ -258,6 +258,7 @@ def launch_rattrap(
     attributes_dict['score'] = 0
     attributes_dict['testType'] = params.testType
     attributes_dict['token'] = token
+    logger.debug(f"Attributes dict: {attributes_dict}")
     return JSONResponse(
         content=attributes_dict
     )
@@ -336,7 +337,9 @@ def get_interro_category(interro: Interro) -> str:
     elif hasattr(interro, 'rattrap'):
         result = 'rattrap'
     else:
-        logger.error("Unknown interro object, should have either a perf or a rattrap attribute!")
+        logger.error(
+            "Unknown interro object, should have either a perf or a rattrap attribute!"
+        )
         logger.error(f"Interro object: {type(interro)}")
         raise ValueError
     return result
@@ -425,9 +428,16 @@ def update_interro(interro, params):
             word_guessed=update,
             row=[foreign, native]
         )
+    logger.debug('Hi 1')
     if params.interroCategory == 'test':
         interro.update_interro_df(word_guessed=update)
-        interro.update_index()
+        count = int(params.count)
+        logger.debug('Hi 2')
+        if count < int(params.testLength):
+            logger.debug(f"Count: {count}, test length: {params.testLength}")
+            interro.update_index()
+            logger.debug('Index updated')
+    logger.debug('Hi 3')
     return interro, score
 
 

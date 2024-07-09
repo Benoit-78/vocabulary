@@ -30,17 +30,15 @@ CREATE TABLE IF NOT EXISTS theme_perf (
     test TINYINT
 );
 
-
 CREATE TABLE IF NOT EXISTS theme_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    russian VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    français CHAR(255),
+    `foreign` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    `native` CHAR(255),
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,
 	taux SMALLINT
 );
-
 
 CREATE TABLE IF NOT EXISTS theme_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
@@ -48,24 +46,21 @@ CREATE TABLE IF NOT EXISTS theme_words_count (
 	words_count SMALLINT
 );
 
-
 CREATE TABLE IF NOT EXISTS version_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
     test_date DATE,
     test TINYINT
 );
 
-
 CREATE TABLE IF NOT EXISTS version_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    russian VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    français CHAR(255),
+    `foreign` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    `native` CHAR(255),
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,
 	taux TINYINT
 );
-
 
 CREATE TABLE IF NOT EXISTS version_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,

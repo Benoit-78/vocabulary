@@ -795,11 +795,13 @@ class TestHelper(unittest.TestCase):
         # ----- ARRANGE
         interro = MagicMock()
         params= MagicMock()
+        params.answer = 'Yes'
+        params.count = 9
         params.index = '3'
+        params.interroCategory = 'test'
         params.interroDict = 'mock_interro_dict'
         params.score = '1'
-        params.answer = 'Yes'
-        params.interroCategory = 'test'
+        params.testLength = 10
         # ----- ACT
         result = interro_api.update_interro(
             interro=interro,
@@ -823,6 +825,8 @@ class TestHelper(unittest.TestCase):
         params.interroDict = 'mock_interro_dict'
         params.score = '1'
         params.answer = 'No'
+        params.count = 9
+        params.testLength = 10
         params.interroCategory = 'test'
         mock_decode_dict.return_value = pd.DataFrame({
             'foreign': ['one', 'two', 'three'],

@@ -15,7 +15,7 @@ function sendUserSettings(token, inputParams) {
     .then(data => {
         // console.log("data.message: ", data.message)
         if (data && data.message === "Settings saved successfully") {
-            console.log("Params:", data)
+            // console.log("Params:", data)
             startTest(token, data)
         } else if (data && data.message === "Empty table") {
             window.location.href = `/v1/interro/interro-settings?token=${token}&errorMessage=${data.message}`;
@@ -30,7 +30,7 @@ function sendUserSettings(token, inputParams) {
 
 
 function startTest(token, inputParams) {
-    console.log("InputParams:", inputParams);
+    // console.log("InputParams:", inputParams);
     if (!isNaN(inputParams.testLength)) {
         const urlParams = new URLSearchParams(inputParams);
         urlParams.append("token", token);
@@ -44,7 +44,7 @@ function startTest(token, inputParams) {
 
 
 function showTranslation(token, inputParams) {
-    console.log("InputParams:", inputParams);
+    // console.log("InputParams:", inputParams);
     if (!isNaN(inputParams.testLength)) {
         const urlParams = new URLSearchParams(inputParams);
         urlParams.append("token", token);
@@ -56,7 +56,7 @@ function showTranslation(token, inputParams) {
 
 
 function sendUserAnswer(token, inputParams) {
-    console.log("InputParams:", inputParams);
+    // console.log("InputParams:", inputParams);
     fetch(
         `/v1/interro/user-answer?token=${token}`,
         {
@@ -92,7 +92,7 @@ function nextGuess(token, inputParams) {
 
 
 function endInterro(token, inputParams) {
-    console.log("InputParams:", inputParams);
+    // console.log("InputParams:", inputParams);
     if (inputParams.score === inputParams.testLength) {
         const urlParams = new URLSearchParams(inputParams);
         urlParams.append("token", token);
@@ -106,6 +106,7 @@ function endInterro(token, inputParams) {
 
 
 function launchRattrap(token, inputParams) {
+    // console.log("InputParams:", inputParams);
     fetch(
         `/v1/interro/launch-rattrap?token=${token}`,
         {

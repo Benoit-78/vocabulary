@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function() {
         testLength: testLength,
         testType: testType,
     };
-
+    
     noButton.addEventListener("click", function() {
         sendUserAnswer(token, params);
     });
@@ -124,22 +124,23 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const rattrapButton = document.getElementById("rattrapButton");
     const token = document.body.dataset.token;
+    var decodedInterroDict = decodeHtmlEntities(decodeHtmlEntities(interroDict));
+    var decodedFaultsDict = decodeHtmlEntities(decodeHtmlEntities(faultsDict));
+    var decodedOldInterroDict = decodeHtmlEntities(decodeHtmlEntities(oldInterroDict));
+    const params = {
+        databaseName: databaseName,
+        faultsDict: decodedFaultsDict,
+        index: index,
+        interroCategory: interroCategory,
+        interroDict: decodedInterroDict,
+        oldInterroDict: decodedOldInterroDict,
+        score: score,
+        testLength: testLength,
+        testType: testType
+    }
+    console.log("Params:", params)
     
     rattrapButton.addEventListener("click", function() {
-        var decodedInterroDict = decodeHtmlEntities(decodeHtmlEntities(interroDict));
-        var decodedFaultsDict = decodeHtmlEntities(decodeHtmlEntities(faultsDict));
-        var decodedOldInterroDict = decodeHtmlEntities(decodeHtmlEntities(oldInterroDict));
-        const params = {
-            databaseName: databaseName,
-            faultsDict: decodedFaultsDict,
-            index: index,
-            interroCategory: interroCategory,
-            interroDict: decodedInterroDict,
-            oldInterroDict: decodedOldInterroDict,
-            score: score,
-            testLength: testLength,
-            testType: testType
-        }
         launchRattrap(token, params);
     });
 });

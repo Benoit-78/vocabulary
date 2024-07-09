@@ -13,17 +13,15 @@ CREATE TABLE IF NOT EXISTS theme_perf (
     test TINYINT
 );
 
-
 CREATE TABLE IF NOT EXISTS theme_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    english CHAR(255),
-    français CHAR(255),
+    `foreign` CHAR(255),
+    `native` CHAR(255),
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,
 	taux SMALLINT
 );
-
 
 CREATE TABLE IF NOT EXISTS theme_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
@@ -31,24 +29,21 @@ CREATE TABLE IF NOT EXISTS theme_words_count (
 	words_count SMALLINT
 );
 
-
 CREATE TABLE IF NOT EXISTS version_perf (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,
     test_date DATE,
     test TINYINT
 );
 
-
 CREATE TABLE IF NOT EXISTS version_voc (
 	id_word SMALLINT AUTO_INCREMENT PRIMARY KEY,
-    english CHAR(255),
-    français CHAR(255),
+    `foreign` CHAR(255),
+    `theme` CHAR(255),
 	creation_date DATE,
 	nb TINYINT,
 	score TINYINT,
 	taux TINYINT
 );
-
 
 CREATE TABLE IF NOT EXISTS version_words_count (
 	id_test SMALLINT AUTO_INCREMENT PRIMARY KEY,

@@ -44,10 +44,48 @@ class Loader():
         self.tables = {}
         self.output_table = ''
         self.words_df = pd.DataFrame()
-        self.interro_df = pd.DataFrame()
+        self.interro_df = pd.DataFrame(
+            columns=[
+                'foreign',
+                'native',
+                'creation_date',
+                'nb',
+                'score',
+                'taux',
+                'query',
+                'bad_word'
+            ]
+        )
         self.index = 0
         self.perf_df = pd.DataFrame()
         self.words_count_df = pd.DataFrame()
+        self.criteria = {}
+        self.set_criteria()
+
+    def set_criteria(self):
+        """
+        Upload the dictionnary of criteria.
+        By the way, can you say 'criteria' three times in a row?
+        """
+        with open(REPO_DIR + '/conf/interro.json', 'r', encoding='utf-8') as file:
+            self.criteria = json.load(file)
+        self.criteria = self.criteria['interro']
+
+    def flag_bad_words(self):
+        """
+        1) Drop the img_bad columns if present.
+        2) Create the img_bad columns, that is the score of each word if it were a bad word,
+        based on the number of guesses on it.
+        3) Flag the words having a worst score as their bad_image, as bad words.
+        4) Drop the img_bad column.
+        """
+        ord_bad = self.criteria['ORD_BAD']
+        steep_bad = self.criteria['STEEP_BAD']
+        self.words_df['img_bad'] = ord_bad + steep_bad * self.words_df['nb']
+        self.words_df['bad_word'] = np.where(
+            self.words_df['taux'] < self.words_df['img_bad'], 1, 0
+        )
+        self.words_df.drop('img_bad', axis=1, inplace=True)
 
     def load_tables(self):
         """
@@ -69,6 +107,7 @@ class Loader():
         if 'bad_word' not in self.tables[voc].columns:
             self.tables[voc]['bad_word'] = [0] * self.tables[voc].shape[0]
         self.words_df = self.tables[voc]
+        self.flag_bad_words()
         self.perf_df = self.tables[self.test_type + '_perf']
         self.words_count_df = self.tables[self.test_type + '_words_count']
 
@@ -80,78 +119,41 @@ class Loader():
         words_total = words_table.shape[0]
         self.words = min(words_total, self.words)
         if self.words == 0:
+            logger.error("Loader words is equal to 0!")
             raise ValueError
-
-    def get_random_step(self):
-        """
-        Get random step, the jump from one word to another
-        """
-        step = random.randint(1, self.words_df.shape[0])
-        return step
-
-    def get_another_index(self) -> int:
-        """
-        The word must not have been already asked.
-        """
-        next_index = random.randint(0, self.words_df.shape[0] - 1)
-        next_index = max(next_index, 1)
-        already_asked = self.words_df.loc[next_index, 'query'] == 1
-        i = 0
-        while already_asked and i < (self.words_df.shape[0]):
-            next_index = random.randint(0, self.words_df.shape[0] - 1)
-            next_index = max(next_index, 1)
-            already_asked = self.words_df.loc[next_index, 'query'] == 1
-            i += 1
-        return next_index
-
-    def get_next_index(self) -> int:
-        """
-        If the word is NOT a bad word, it IS skipped.
-        This process happens only once, it is not a loop.
-        If the word IS a bad word, it is NOT skipped.
-        This way, bad words are asked twice as much as other words.
-        """
-        another_index = self.get_another_index()
-        bad_word = self.words_df.loc[another_index, 'bad_word'] == 1
-        if bad_word:
-            next_index = another_index
-        else:
-            self.words_df.loc[another_index, 'query'] = 0
-            next_index = self.get_another_index()
-        return next_index
-
-    def get_row(self) -> Iterable:
-        """
-        Get the row of the word to be asked
-        """
-        row = [
-            self.index,
-            list(self.words_df.loc[self.index])
-        ]
-        return row
 
     def set_interro_df(self):
         """
         Extract the words that will be asked.
         """
-        self.interro_df = pd.DataFrame(
-            columns=[
-                'foreign',
-                'native',
-                'creation_date',
-                'nb',
-                'score',
-                'taux',
-                'query',
-                'bad_word'
-            ]
-        )
         self.adjust_test_length()
-        self.index = self.get_random_step()
-        for _ in range(1, self.words + 1):
-            self.index = self.get_next_index()
-            row = self.get_row()
-            self.interro_df.loc[row[0]] = row[1]
+        bad_words_df = self.words_df[self.words_df['bad_word']==1]
+        good_words_df = self.words_df[self.words_df['bad_word']==0]
+        enough_bad_words = bad_words_df.shape[0] >= self.words * 0.67
+        enough_good_words = good_words_df.shape[0] >= self.words * 0.33
+        if enough_bad_words:
+            if enough_good_words:
+                bad_words_df = bad_words_df.sample(n=int(self.words * 0.67))
+                sample_size = self.words - bad_words_df.shape[0]
+                good_words_df = good_words_df.sample(n=sample_size)
+                self.interro_df = pd.concat([bad_words_df, good_words_df])
+            else:
+                sample_size = self.words - good_words_df.shape[0]
+                if sample_size > bad_words_df.shape[0]:
+                    sample_size = bad_words_df.shape[0]
+                bad_words_df = bad_words_df.sample(n=sample_size)
+                self.interro_df = pd.concat([bad_words_df, good_words_df])
+        else:
+            if enough_good_words:
+                sample_size = self.words - bad_words_df.shape[0]
+                if sample_size > good_words_df.shape[0]:
+                    sample_size = good_words_df.shape[0]
+                good_words_df = good_words_df.sample(n=sample_size)
+                self.interro_df = pd.concat([bad_words_df, good_words_df])
+            else:
+                self.interro_df = pd.concat([bad_words_df, good_words_df])
+                self.words = self.interro_df.shape[0]
+        self.interro_df = self.interro_df.sort_index()
 
 
 
@@ -231,7 +233,7 @@ class PremierTest(Interro):
 
     def update_index(self):
         """
-        Update the vocabulary dataframe
+        Update the current index.
         """
         indices = list(self.interro_df.index)
         for idx_nb, idx in enumerate(indices):
@@ -308,10 +310,14 @@ class Rattrap(Interro):
         in a different order than the precedent test.
         """
         old_index = list(self.interro_df.index)
+        if len(old_index) == 1:
+            return True
         new_index = list(self.interro_df.index)
-        while new_index == old_index:
+        iterations = 0
+        while new_index == old_index and iterations < 100:
             self.interro_df = self.interro_df.sample(frac=1)
             new_index = list(self.interro_df.index)
+            iterations += 1
         self.interro_df = self.interro_df.reset_index(drop=True)
 
     def to_dict(self):
@@ -429,22 +435,6 @@ class Updater():
         )
         self.delete_good_words()
 
-    def flag_bad_words(self):
-        """
-        1) Drop the img_bad columns if present.
-        2) Create the img_bad columns, that is the score of each word if it were a bad word,
-        based on the number of guesses on it.
-        3) Flag the words having a worst score as their bad_image, as bad words.
-        4) Drop the img_bad column.
-        """
-        ord_bad = self.criteria['ORD_BAD']
-        steep_bad = self.criteria['STEEP_BAD']
-        self.loader.words_df['img_bad'] = ord_bad + steep_bad * self.loader.words_df['nb']
-        self.loader.words_df['bad_word'] = np.where(
-            self.loader.words_df['taux'] < self.loader.words_df['img_bad'], 1, 0
-        )
-        self.loader.words_df.drop('img_bad', axis=1, inplace=True)
-
     def save_words(self):
         """
         1) Reset the index of words dataframe.
@@ -514,7 +504,7 @@ class Updater():
         """
         self.update_words()
         self.move_good_words()
-        self.flag_bad_words()
+        self.loader.flag_bad_words()
         self.save_words()
         self.save_performances()
         self.save_words_count()
