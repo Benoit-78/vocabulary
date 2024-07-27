@@ -21,17 +21,17 @@
     <script>
         // Declare HTML page variables to the JS file that will call them
         const interroCategory = `{{ interroCategory }}`;
-        const numWords = `{{ numWords }}`;
-        const count = `{{ count }}`;
-        const score = `{{ score }}`;
-        const content_box1 = `{{ content_box1|safe }}`;
-        const content_box2 = `{{ content_box2|safe }}`;
-        const language = `{{ language|safe }}`;
+        const testLength = `{{ testLength }}`;
+        const testCount = `{{ testCount }}`;
+        const testScore = `{{ testScore }}`;
+        const contentBox1 = `{{ contentBox1|safe }}`;
+        const contentBox2 = `{{ contentBox2|safe }}`;
+        const testLanguage = `{{ testLanguage|safe }}`;
     </script>
 
     <div class="container">
         <div>
-            <p class="white-text">{{ count }} / {{ numWords }}</p>
+            <p class="white-text">{{ testCount }} / {{ testLength }}</p>
         </div>
 
         <div class="progress-container">
@@ -45,14 +45,15 @@
         <div class="row">
             <div class="flag-box">
                 <div class="box rounded-input">
-                    {{ content_box1 }}
+                    {{ contentBox1 }}
                 </div>
                 <span class="flag">{{ flag|safe }}</span>
             </div>
+
             <div class="flag-box">
                 <span class="flag flag-fr">&#x1F1EB;&#x1F1F7;</span>
                 <div class="box rounded-input">
-                    {{ content_box2 }}
+                    {{ contentBox2 }}
                 </div>
             </div>
         </div>

@@ -89,7 +89,7 @@ function chooseDatabase(token, databaseName) {
 }
 
 
-function addWord(token, databaseName, foreign, native) {
+function addWord(token, databaseName, foreignWord, nativeWord) {
     fetch(
         `/v1/database/add-word?token=${token}`,
         {
@@ -97,8 +97,8 @@ function addWord(token, databaseName, foreign, native) {
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 db_name: databaseName,
-                foreign: foreign,
-                native: native
+                foreign: foreignWord,
+                native: nativeWord
             }),
         }
     )

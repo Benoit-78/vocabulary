@@ -19,22 +19,25 @@
 <body data-token="{{ token }}">
     <div class="container">
         <div class="row">
-            <h1 class="white-text">Votre score: {{ score }} / {{ numWords }}</h1>
+            <h1 class="white-text">Votre score: {{ testScore }} / {{ testLength }}</h1>
         </div>
+
         <div class="row">
             <button id="rattrapButton" class="button rattrap_button">Passer le rattrapage</button>
         </div>
+
         <div class="row">
             <button id="quitButton" class="button quit_button">Quitter</button>
         </div>
     </div>
+
     <script>
         // Declare HTML page variables to the JS file that will call them
         const interroCategory = `{{ interroCategory }}`;
         const newWords = `{{ newWords }}`;
         const newCount = `{{ newCount }}`;
         const newScore = `{{ newScore }}`;
-        const language = `{{ language|safe }}`;
+        const testLanguage = `{{ testLanguage|safe }}`;
     </script>
 </body>
 

@@ -11,7 +11,7 @@
 import os
 import sys
 
-# from loguru import logger
+from loguru import logger
 from fastapi import Body, Depends, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
@@ -25,14 +25,14 @@ if REPO_DIR not in sys.path:
 from src.api import authentication as auth_api
 from src.api import guest as guest_api
 
-guest_router = APIRouter(prefix='/v1/guest')
+guest_router = APIRouter(prefix="/v1/guest")
 templates = Jinja2Templates(directory="src/templates")
 
 
 @guest_router.get("/interro-settings", response_class=HTMLResponse)
 def interro_settings_guest(
         request: Request,
-        token: str = Depends(auth_api.check_token)
+        token: str=Depends(auth_api.check_token)
     ):
     """
     Call the page that gets the user settings for one interro.
@@ -50,7 +50,7 @@ def interro_settings_guest(
 @guest_router.post("/save-interro-settings")
 async def save_interro_settings_guest(
         language: dict,
-        token: str = Depends(auth_api.check_token)
+        token: str=Depends(auth_api.check_token)
     ):
     """
     Acquire the user settings for one interro.
@@ -66,11 +66,11 @@ async def save_interro_settings_guest(
 def load_interro_question_guest(
         request: Request,
         interro_category: str=Query(None, alias="interroCategory"),
-        total: str=Query(None, alias="total"),
-        count: str=Query(None, alias="count"),
-        score: str=Query(None, alias="score"),
-        token: str = Depends(auth_api.check_token),
-        language: str = Query('', alias='language')
+        total: str=Query(None, alias="testLength"),
+        count: str=Query(None, alias="testCount"),
+        score: str=Query(None, alias="testScore"),
+        token: str=Depends(auth_api.check_token),
+        language: str=Query('', alias='testLanguage')
     ):
     """
     Call the page that asks the user the meaning of a word
@@ -84,6 +84,7 @@ def load_interro_question_guest(
         language=language,
         token=token
     )
+    logger.debug(f"response_dict: {response_dict}")
     return templates.TemplateResponse(
         "guest/question.html",
         response_dict
@@ -94,11 +95,11 @@ def load_interro_question_guest(
 def load_interro_answer_guest(
         request: Request,
         interro_category: str=Query(None, alias="interroCategory"),
-        total: str=Query(None, alias="total"),
-        count: str=Query(None, alias="count"),
-        score: str=Query(None, alias="score"),
-        token: str = Depends(auth_api.check_token),
-        language: str = Query('', alias='language')
+        total: str=Query(None, alias="testLength"),
+        count: str=Query(None, alias="testCount"),
+        score: str=Query(None, alias="testScore"),
+        token: str=Depends(auth_api.check_token),
+        language: str=Query('', alias='testLanguage')
     ):
     """
     Call the page that displays the right answer
@@ -127,6 +128,7 @@ async def get_user_response_guest(
     """
     Acquire the user decision: was his answer right or wrong.
     """
+    logger.debug(f"data: {data}")
     json_response = guest_api.get_user_response_guest(
         data=data,
         token=token
@@ -138,10 +140,10 @@ async def get_user_response_guest(
 def propose_rattrap_guest(
         request: Request,
         interro_category: str=Query(None, alias="interroCategory"),
-        total: str = Query(None, alias="total"),
-        score: str = Query(None, alias="score"),
+        total: str = Query(None, alias="testLength"),
+        score: str = Query(None, alias="testScore"),
         token: str = Depends(auth_api.check_token),
-        language: str = Query('', alias='language')
+        language: str = Query('', alias='testLanguage')
     ):
     """
     Load a page that proposes the user to take a rattrap, or leave the test.
@@ -178,8 +180,8 @@ async def launch_rattrap(
 @guest_router.get("/interro-end/", response_class=HTMLResponse)
 def end_interro_guest(
         request: Request,
-        total: str=Query(None, alias="total"),
-        score: str=Query(None, alias="score"),
+        total: str=Query(None, alias="testLength"),
+        score: str=Query(None, alias="testScore"),
         token: str = Depends(auth_api.check_token)
     ):
     """

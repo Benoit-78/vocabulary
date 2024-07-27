@@ -543,17 +543,17 @@ class DbManipulator(DbInterface):
         words_table_name, _, _, _ = self.db_definer.get_tables_names(
             test_type=self.test_type
         )
-        english = row[0]
-        if self.db_querier.read_word(english) is not None:
+        foreign_word = row[0]
+        if self.db_querier.read_word(foreign_word) is not None:
             result = 'Word already exists'
             logger.error(result)
             return result
-        native = row[1]
+        native_word = row[1]
         sql_query = self.sql_queries['insert_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
-            english=english,
-            french=native,
+            foreign=foreign_word,
+            native=native_word,
             today_str=today_str
         )
         try:
@@ -572,7 +572,7 @@ class DbManipulator(DbInterface):
             connection.close()
         return result
 
-    def update_word(self, english: str, new_nb, new_score):
+    def update_word(self, foreign: str, new_nb, new_score):
         """
         Update statistics on the given word
         """
@@ -585,7 +585,7 @@ class DbManipulator(DbInterface):
             table_name=words_table_name,
             new_nb=new_nb,
             new_score=new_score,
-            english=english
+            foreign=foreign
         )
         try:
             cursor.execute(sql_query)
@@ -600,7 +600,7 @@ class DbManipulator(DbInterface):
             connection.close()
         return result
 
-    def delete_word(self, english):
+    def delete_word(self, foreign_word):
         """
         Delete a word from the words table of the instance database.
         """
@@ -611,7 +611,7 @@ class DbManipulator(DbInterface):
         sql_query = self.sql_queries['delete_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
-            english=english
+            foreign=foreign_word
         )
         try:
             cursor.execute(sql_query)
@@ -733,7 +733,7 @@ class DbQuerier(DbInterface):
             raise SystemExit
         return output_table
 
-    def read_word(self, english: str):
+    def read_word(self, foreign_word: str):
         """
         Read the given word
         """
@@ -744,7 +744,7 @@ class DbQuerier(DbInterface):
         sql_query = self.sql_queries['read_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
-            english=english
+            foreign=foreign_word
         )
         request_result = None
         try:
@@ -758,8 +758,8 @@ class DbQuerier(DbInterface):
             cursor.close()
             connection.close()
         if request_result:
-            english, native, score = request_result[0]
-            result = (english, native, score)
+            foreign_word, native, score = request_result[0]
+            result = (foreign_word, native, score)
         else:
             result = None
         return result

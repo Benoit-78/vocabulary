@@ -53,7 +53,7 @@ class TestInterroAPI(unittest.TestCase):
         test_length = 10
         mock_db_querier.return_value = 'mock_db_querier'
         mock_loader_object = MagicMock()
-        mock_loader_object.words = 10
+        mock_loader_object.test_length = 10
         mock_loader_object.interro_df = pd.DataFrame({'col_1': ['val_1', 'val_2']})
         mock_loader.return_value = mock_loader_object
         mock_guesser.return_value = 'mock_guesser'
@@ -75,7 +75,7 @@ class TestInterroAPI(unittest.TestCase):
             test_type=test_type,
         )
         mock_loader.assert_called_once_with(
-            words=test_length,
+            test_length=test_length,
             data_querier='mock_db_querier',
         )
         mock_loader_object.load_tables.assert_called_once()
@@ -140,7 +140,7 @@ class TestInterroAPI(unittest.TestCase):
         token = 'mock_token'
         mock_get_user_name_from_token.return_value = 'mock_user_name'
         mock_test = MagicMock()
-        mock_test.words = 1
+        mock_test.test_length = 1
         mock_test.to_dict.return_value = {
             'mock_key': 'mock_value',
             'interroDict': 'mock_interro_dict'
@@ -187,7 +187,7 @@ class TestInterroAPI(unittest.TestCase):
         token = 'mock_token'
         mock_get_user_name_from_token.return_value = 'mock_user_name'
         mock_test = MagicMock()
-        mock_test.words = 1
+        mock_test.test_length = 1
         mock_load_test.side_effect = ValueError()
         # ----- ACT
         result = interro_api.save_interro_settings(
@@ -210,16 +210,16 @@ class TestInterroAPI(unittest.TestCase):
         # ----- ARRANGE
         token = 'mock_token'
         params = MagicMock()
-        params.count = '2'
+        params.testCount = '2'
         params.interroDict = {'foreign': ['zero', 'one', 'two']}
-        params.index = '1'
+        params.testIndex = '1'
         params.databaseName = ''
         params.faultsDict = {'fault_key': 'fault_value'}
         params.interroCategory = 'test'
         params.message = ''
         params.oldInterroDict = {'old_key': 'old_value'}
-        params.perf = '0'
-        params.score = '2'
+        params.testPerf = '0'
+        params.testScore = '2'
         params.testLength = '10'
         params.testType = 'version'
         mock_decode_dict.return_value = pd.DataFrame({
@@ -234,18 +234,18 @@ class TestInterroAPI(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_dict = {
-            'content_box1': 'one',
-            'count': 3,
+            'contentBox1': 'one',
             'databaseName': params.databaseName,
             'faultsDict': params.faultsDict,
-            'index': 1,
             'interroCategory': params.interroCategory,
             'interroDict': params.interroDict,
             'message': params.message,
             'oldInterroDict': params.oldInterroDict,
-            'perf': params.perf,
             'progressPercent': 20,
-            'score': params.score,
+            'testCount': 3,
+            'testIndex': 1,
+            'testPerf': params.testPerf,
+            'testScore': params.testScore,
             'testLength': 10,
             'testType': params.testType,
             'token': token,
@@ -260,20 +260,20 @@ class TestInterroAPI(unittest.TestCase):
         # ----- ARRANGE
         token = 'mock_token'
         params = MagicMock()
-        params.count = '1'
+        params.testCount = '1'
         params.databaseName = 'mock_db_name'
         params.faultsDict = 'mock_faults_dict'
-        params.index = '2'
+        params.testIndex = '2'
         params.interroCategory = 'mock_interro_category'
         params.interroDict = 'mock_interro_dict'
         params.oldInterroDict = 'mock_old_interro_dict'
-        params.perf = 1
-        params.score = 3
+        params.testPerf = 1
+        params.testScore = 3
         params.testLength = 10
         params.testType = 'version'
         mock_decode_dict.return_value = pd.DataFrame({
             'foreign': ['Hi', 'one', 'two'],
-            'content_box2': ['Salut', 'un', 'deux']
+            'contentBox2': ['Salut', 'un', 'deux']
         })
         # ----- ACT
         result = interro_api.load_interro_answer(
@@ -283,21 +283,21 @@ class TestInterroAPI(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_dict = {
-            'token': token,
-            'content_box1': 'two',
-            'content_box2': 'deux',
-            'count': '1',
+            'contentBox1': 'two',
+            'contentBox2': 'deux',
             'databaseName': params.databaseName,
             'faultsDict': params.faultsDict,
-            'index': 2,
             'interroCategory': params.interroCategory,
             'interroDict': params.interroDict,
             'oldInterroDict': params.oldInterroDict,
-            'perf': params.perf,
             'progressPercent': 10,
-            'score': params.score,
+            'testCount': '1',
+            'testIndex': 2,
             'testLength': params.testLength,
-            'testType': params.testType
+            'testPerf': params.testPerf,
+            'testScore': params.testScore,
+            'testType': params.testType,
+            'token': token,
         }
         self.assertEqual(result, expected_dict)
 
@@ -353,7 +353,7 @@ class TestInterroAPI(unittest.TestCase):
         params.interroCategory = 'test'
         params.interroDict = {'col_2': [3, 4]}
         params.oldInterroDict = {'col_3': [5, 6]}
-        params.score = 3
+        params.testScore = 3
         params.testType = 'version'
         # ----- ACT
         result = interro_api.propose_rattrap(
@@ -363,16 +363,16 @@ class TestInterroAPI(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_result = {
-            "token": token,
             "databaseName": params.databaseName,
             "faultsDict": params.faultsDict,
-            "index": 0,
+            "testIndex": 0,
             "interroCategory": params.interroCategory,
             "interroDict": [],
             "oldInterroDict": params.oldInterroDict,
-            "score": params.score,
             "testLength": len(params.interroDict),
+            "testScore": params.testScore,
             "testType": params.testType,
+            "token": token,
         }
         self.assertEqual(result, expected_result)
         mock_save_result.assert_called_once_with(token, params)
@@ -420,12 +420,12 @@ class TestInterroAPI(unittest.TestCase):
         actual_dict = content.decode('utf-8')
         actual_dict = json.loads(actual_dict)
         expected_dict = {
-            'count': 0,
             'databaseName': 'mock_db_name',
             'interroCategory': 'mock_category',
             'key': 'value',
             'message': "Rattrap created successfully",
-            'score': 0,
+            'testCount': 0,
+            'testScore': 0,
             'testType': 'mock_test_type',
             'token': token
         }
@@ -455,7 +455,7 @@ class TestInterroAPI(unittest.TestCase):
         params.interroDict = 'mock_interro_dict'
         params.oldInterroDict = 'mock_old_interro_dict'
         params.testLength = '10'
-        params.score = '2'
+        params.testScore = '2'
         mock_decode_dict.return_value = pd.DataFrame()
         mock_turn_df_into_dict.return_value = [['headers'], ['rows']]
         # ----- ACT
@@ -470,7 +470,7 @@ class TestInterroAPI(unittest.TestCase):
             'headers': ['headers'],
             'rows': ['rows'],
             'testLength': '10',
-            'score': '2',
+            'testScore': '2',
         }
         self.assertEqual(result, expected_dict)
         mock_decode_dict.assert_called_once_with('mock_interro_dict')
@@ -494,7 +494,7 @@ class TestInterroAPI(unittest.TestCase):
         params.interroDict = 'mock_interro_dict'
         params.oldInterroDict = 'mock_old_interro_dict'
         params.testLength = '10'
-        params.score = '2'
+        params.testScore = '2'
         mock_decode_dict.return_value = pd.DataFrame()
         mock_turn_df_into_dict.return_value = [['headers'], ['rows']]
         # ----- ACT
@@ -505,11 +505,11 @@ class TestInterroAPI(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_dict = {
-            'token': token,
             'headers': ['headers'],
             'rows': ['rows'],
             'testLength': '10',
-            'score': '2',
+            'testScore': '2',
+            'token': token,
         }
         self.assertEqual(result, expected_dict)
         mock_decode_dict.assert_called_once_with('mock_old_interro_dict')
@@ -602,7 +602,7 @@ class TestHelper(unittest.TestCase):
         # ----- ARRANGE
         interro = PremierTest(
             interro_df=pd.DataFrame({'col_1': ['val_1', 'val_2']}),
-            words=10,
+            test_length=10,
             guesser=MagicMock()
         )
         # ----- ACT
@@ -732,10 +732,10 @@ class TestHelper(unittest.TestCase):
         params = MagicMock()
         params.interroDict = 'mock_interro_dict'
         params.faultsDict = 'mock_faults_dict'
-        params.index = '3'
+        params.testIndex = '3'
         params.interroCategory = 'test'
         params.testLength = '10'
-        params.perf = '1'
+        params.testPerf = '1'
         mock_decode_dict.return_value = pd.DataFrame({'col_1': ['val_1', 'val_2']})
         mock_get_faults_df.return_value = pd.DataFrame({'col_2': ['val_3', 'val_4']})
         # ----- ACT
@@ -756,10 +756,10 @@ class TestHelper(unittest.TestCase):
         params = MagicMock()
         params.interroDict = 'mock_interro_dict'
         params.faultsDict = 'mock_faults_dict'
-        params.index = '3'
+        params.testIndex = '3'
         params.interroCategory = 'rattrap'
         params.testLength = '10'
-        params.perf = '1'
+        params.testPerf = '1'
         mock_decode_dict.return_value = pd.DataFrame({'col_1': ['val_1', 'val_2']})
         mock_guesser.return_value = 'mock_guesser'
         mock_rattrap_object = MagicMock()
@@ -795,12 +795,12 @@ class TestHelper(unittest.TestCase):
         # ----- ARRANGE
         interro = MagicMock()
         params= MagicMock()
-        params.answer = 'Yes'
-        params.count = 9
-        params.index = '3'
+        params.userAnswer = 'Yes'
         params.interroCategory = 'test'
         params.interroDict = 'mock_interro_dict'
-        params.score = '1'
+        params.testCount = 9
+        params.testIndex = '3'
+        params.testScore = '1'
         params.testLength = 10
         # ----- ACT
         result = interro_api.update_interro(
@@ -821,11 +821,11 @@ class TestHelper(unittest.TestCase):
         # ----- ARRANGE
         interro = MagicMock()
         params= MagicMock()
-        params.index = '2'
+        params.testIndex = '2'
         params.interroDict = 'mock_interro_dict'
-        params.score = '1'
-        params.answer = 'No'
-        params.count = 9
+        params.testScore = '1'
+        params.userAnswer = 'No'
+        params.testCount = 9
         params.testLength = 10
         params.interroCategory = 'test'
         mock_decode_dict.return_value = pd.DataFrame({
@@ -858,10 +858,10 @@ class TestHelper(unittest.TestCase):
             'mock_key': 'mock_value'
         }
         params = MagicMock()
-        params.interroCategory = 'not_a_test'
-        params.count = '2'
         params.databaseName = 'mock_db_name'
+        params.interroCategory = 'not_a_test'
         params.oldInterroDict = 'mock_old_interro_dict'
+        params.testCount = '2'
         params.testType = 'mock_test_type'
         score = 3
         # ----- ACT
@@ -874,14 +874,14 @@ class TestHelper(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_dict = {
-            'count': '2',
             'databaseName': 'mock_db_name',
-            'index': 0,
             'interroCategory': 'not_a_test',
             'message': "User response stored successfully",
             'mock_key': 'mock_value',
             'oldInterroDict': 'mock_old_interro_dict',
-            'score': 3,
+            'testCount': '2',
+            'testIndex': 0,
+            'testScore': 3,
             'testType': 'mock_test_type',
             'token': token,
         }
@@ -908,11 +908,11 @@ class TestHelper(unittest.TestCase):
         # ----- ARRANGE
         token = 'mock_token'
         params = MagicMock()
-        params.interroDict = 'mock_interro_dict'
-        params.faultsDict = 'mock_faults_dict'
-        params.index = 'mock_index'
-        params.perf = 'mock_perf'
         params.databaseName = 'mock_db_name'
+        params.faultsDict = 'mock_faults_dict'
+        params.interroDict = 'mock_interro_dict'
+        params.testIndex = 'mock_index'
+        params.testPerf = 'mock_perf'
         params.testType = 'mock_test_type'
         params.testLength = 'mock_test_length'
         mock_decode_dict.return_value = pd.DataFrame({'col_1': ['val_1', 'val_2']})
@@ -941,7 +941,7 @@ class TestHelper(unittest.TestCase):
             test_type='mock_test_type'
         )
         mock_loader.assert_called_once_with(
-            words='mock_test_length',
+            test_length='mock_test_length',
             data_querier='mock_db_querier'
         )
         mock_loader_object.load_tables.assert_called_once()
@@ -970,9 +970,9 @@ class TestHelper(unittest.TestCase):
         params = MagicMock()
         params.databaseName = 'mock_db_name'
         params.faultsDict = 'mock_faults_dict'
-        params.index = 'mock_index'
-        params.perf = 'mock_perf'
+        params.testIndex = 'mock_index'
         params.testLength = 'mock_test_length'
+        params.testPerf = 'mock_perf'
         params.testType = 'mock_test_type'
         interro_df = MagicMock()
         token = 'mock_token'
@@ -1001,7 +1001,7 @@ class TestHelper(unittest.TestCase):
             test_type='mock_test_type'
         )
         mock_loader.assert_called_once_with(
-            words='mock_test_length',
+            test_length='mock_test_length',
             data_querier='mock_db_querier'
         )
         mock_loader_object.load_tables.assert_called_once()
@@ -1010,4 +1010,3 @@ class TestHelper(unittest.TestCase):
             interro=mock_premier_test_object,
         )
         mock_updater_object.update_data.assert_called_once_with()
-

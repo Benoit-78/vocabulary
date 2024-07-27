@@ -32,7 +32,7 @@ class TestRedisInterface(unittest.TestCase):
         self.mock_redis_db = MagicMock()
         self.test_object = {
             'question': 'What is the answer to life, the universe, and everything?',
-            'answer': 42
+            'userAnswer': 42
         }
         self.loader_object = {
             'name': 'TestLoader',

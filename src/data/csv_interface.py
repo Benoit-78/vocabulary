@@ -130,10 +130,10 @@ class MenuReader():
         translations_dict = {}
         for _, row in menus_df.iterrows():
             original_text = row['standard']
-            translated_text_en = row['english']
-            translated_text_fr = row['french']
+            translated_text_fo = row['foreign']
+            translated_text_na = row['native']
             translations_dict[original_text] = {
-                'en': translated_text_en,
-                'fr': translated_text_fr
+                'fo': translated_text_fo,
+                'na': translated_text_na
             }
         return translations_dict

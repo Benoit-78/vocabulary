@@ -38,20 +38,20 @@ class Params(BaseModel):
     # Mandatory
     databaseName: str
     faultsDict: list
-    index: int
+    testIndex: int
     interroCategory: str
     interroDict: list
     oldInterroDict: list
-    score: int
+    testScore: int
     testLength: int
     testType: str
     # Optional
-    answer: Optional[str]=None
-    content_box1: Optional[str]=None
-    content_box2: Optional[str]=None
-    count: Optional[int]=None
+    userAnswer: Optional[str]=None
+    contentBox1: Optional[str]=None
+    contentBox2: Optional[str]=None
+    testCount: Optional[int]=None
     message: Optional[str]=''
-    perf: Optional[int]=None
+    testPerf: Optional[int]=None
 
     @classmethod
     def from_query_params(cls, params: dict):

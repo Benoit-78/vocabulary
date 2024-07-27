@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+
 // German
 document.addEventListener("DOMContentLoaded", function() {
     const germanButton = document.getElementById("germanButton");
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
         sendGuestSettings(token, "German");
     });
 });
+
 
 // Dutch
 document.addEventListener("DOMContentLoaded", function() {
@@ -37,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+
 // Spanish
 document.addEventListener("DOMContentLoaded", function() {
     const spanishButton = document.getElementById("spanishButton");
@@ -45,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
         sendGuestSettings(token, "Spanish");
     });
 });
+
 
 // Portuguese
 document.addEventListener("DOMContentLoaded", function() {
@@ -55,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+
 // Russian
 document.addEventListener("DOMContentLoaded", function() {
     const russianButton = document.getElementById("russianButton");
@@ -63,6 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
         sendGuestSettings(token, "Russian");
     });
 });
+
 
 // Arabic
 document.addEventListener("DOMContentLoaded", function() {
@@ -73,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+
 // Hebrew
 document.addEventListener("DOMContentLoaded", function() {
     const hebrewButton = document.getElementById("hebrewButton");
@@ -81,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
         sendGuestSettings(token, "Hebrew");
     });
 });
+
 
 // Chinese
 document.addEventListener("DOMContentLoaded", function() {
@@ -91,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+
 // Latin
 document.addEventListener("DOMContentLoaded", function() {
     const latinButton = document.getElementById("latinButton");
@@ -99,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
         sendGuestSettings(token, "Latin");
     });
 });
+
 
 // Greek
 document.addEventListener("DOMContentLoaded", function() {
@@ -115,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const showTranslationButton = document.getElementById("showTranslationButton");
     const token = document.body.dataset.token;
     showTranslationButton.addEventListener("click", function() {
-        showTranslation(token, interroCategory, numWords, count, score, language);
+        showTranslation(token, interroCategory, testLength, testCount, testScore, testLanguage);
     });
 });
 
@@ -125,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const token = document.body.dataset.token;
     yesButton.addEventListener("click", function() {
         sendUserAnswer(
-            token, interroCategory, 'Yes', count, numWords, score, content_box1, content_box2, language
+            token, interroCategory, 'Yes', testCount, testLength, testScore, contentBox1, contentBox2, testLanguage
         );
     });
 });
@@ -136,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const token = document.body.dataset.token;
     noButton.addEventListener("click", function() {
         sendUserAnswer(
-            token, interroCategory, 'No', count, numWords, score, content_box1, content_box2, language
+            token, interroCategory, 'No', testCount, testLength, testScore, contentBox1, contentBox2, testLanguage
         );
     });
 });
@@ -146,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const rattrapButton = document.getElementById("rattrapButton");
     const token = document.body.dataset.token;
     rattrapButton.addEventListener("click", function() {
-        launchRattrap(token, interroCategory, newWords, newCount, newScore, language);
+        launchRattrap(token, interroCategory, newWords, newCount, newScore, testLanguage);
     });
 });
 

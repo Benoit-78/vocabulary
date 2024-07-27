@@ -8,7 +8,7 @@
 import os
 import sys
 
-from loguru import logger
+# from loguru import logger
 from fastapi import Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter

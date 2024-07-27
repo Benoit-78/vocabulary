@@ -23,19 +23,23 @@
             <div class="row">
                 <label class="white-text" for="testType">Choisir un dictionnaire</label>
             </div>
+
             <div class="row">
                 <select id="databaseName" name="databaseName" class="dropdown-container rounded-input" required>
                     {% for database in databases %}
                         <option value="{{ database }}">{{ database }}</option>
                     {% endfor %}
                 </select>
+
                 {% if emptyTableErrorMessage %}
                     <p class="error-message">{{ emptyTableErrorMessage }}</p>
                 {% endif %}
             </div>
+
             <div class="row">
                 <label class="white-text" for="testLength">Nombre de questions</label>
             </div>
+
             <div class="row">
                 <select id="testLength" name="testLength" class="dropdown-container rounded-input" required>
                     <option value="100">100</option>
@@ -46,13 +50,16 @@
                 </select>
             </div>
         </form>
+
         <div class="row">
             <button id="sendUserSettingsButton" class="button">Interro !</button>
         </div>
+
         <div class="row">
             <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
+
     <script>
         const testType = "version";
     </script>
