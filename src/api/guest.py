@@ -265,8 +265,6 @@ def end_interro_guest(
         score,
         token
     ):
-    user_name = get_user_name_from_token(token=token)
-    logger.info(f"User: {user_name}")
     premier_test = load_interro_from_redis(
         token=token,
         interro_category='test'

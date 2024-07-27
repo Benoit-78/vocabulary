@@ -89,7 +89,6 @@ def save_interro_settings(
     response_dict['testCount'] = 0
     response_dict['databaseName'] = db_name
     response_dict['testType'] = test_type
-    logger.debug(f"Response dict: {response_dict}")
     json_response = JSONResponse(
         content=response_dict
     )
@@ -194,6 +193,7 @@ def end_interro(
     if params.interroCategory == 'test':
         interro_df = decode_dict(params.interroDict)
         update_test(params, interro_df, token)
+        interro_df = interro_df[['foreign', 'native']]
     # If the user does not guesses all words, and there is a rattrap
     elif params.interroCategory == 'rattrap':
         interro_df = decode_dict(params.oldInterroDict)
@@ -258,7 +258,6 @@ def launch_rattrap(
     attributes_dict['testScore'] = 0
     attributes_dict['testType'] = params.testType
     attributes_dict['token'] = token
-    logger.debug(f"Attributes dict: {attributes_dict}")
     return JSONResponse(
         content=attributes_dict
     )
@@ -428,16 +427,19 @@ def update_interro(interro, params):
             word_guessed=update,
             row=[foreign, native]
         )
-    logger.debug('Hi 1')
+    else:
+        logger.error(f"Unknown user answer: {params.userAnswer}")
+        raise ValueError
+    # logger.debug('Hi 1')
     if params.interroCategory == 'test':
         interro.update_interro_df(word_guessed=update)
         count = int(params.testCount)
-        logger.debug('Hi 2')
+        # logger.debug('Hi 2')
         if count < int(params.testLength):
-            logger.debug(f"Count: {count}, test length: {params.testLength}")
+            # logger.debug(f"Count: {count}, test length: {params.testLength}")
             interro.update_index()
-            logger.debug('Index updated')
-    logger.debug('Hi 3')
+            # logger.debug('Index updated')
+    # logger.debug('Hi 3')
     return interro, score
 
 

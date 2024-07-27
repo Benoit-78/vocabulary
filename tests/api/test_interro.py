@@ -456,7 +456,11 @@ class TestInterroAPI(unittest.TestCase):
         params.oldInterroDict = 'mock_old_interro_dict'
         params.testLength = '10'
         params.testScore = '2'
-        mock_decode_dict.return_value = pd.DataFrame()
+        mock_decode_dict.return_value = pd.DataFrame({
+            'foreign': ['zero', 'one', 'two'],
+            'native': ['zero', 'un', 'deux'],
+            'col_1': ['val_1', 'val_2', 'val_3']
+        })
         mock_turn_df_into_dict.return_value = [['headers'], ['rows']]
         # ----- ACT
         result = interro_api.end_interro(

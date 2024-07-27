@@ -1,6 +1,5 @@
 
 /* MAIN */
-
 .button {
     background-color: rgba(178, 128, 34, 0.7);
     border: 1px solid rgb(254, 161, 0);
@@ -8,7 +7,6 @@
     color: rgb(255, 255, 255);
     cursor: pointer;
     font-size: 18px;
-    /* font-weight: bold; */
     margin: 10px;
     margin-bottom: 10px;
     padding: 10px 20px;
@@ -19,7 +17,13 @@
 .button:hover {
     background-color: rgb(212, 124, 23);
     color: rgb(255, 255, 255);
-    /* border: 2px solid rgb(254, 161, 0); */
+}
+
+
+.button:focus {
+    outline: none;
+    border-color: orange;
+    box-shadow: 0 0 0 1.5px rgba(255, 165, 0, 1);
 }
 
 

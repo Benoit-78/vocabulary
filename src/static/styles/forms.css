@@ -1,0 +1,11 @@
+/* Basic form styling */
+#signInForm {
+}
+
+.rounded-input:focus {
+    outline: none;
+    padding: 10px; /* Increase padding to create inner space */
+    background: linear-gradient(orange, orange) padding-box, linear-gradient(white, white) border-box;
+    border: 1px solid transparent; /* Hide original border */
+    transition: background-color 0.3s ease, padding 0.3s ease; /* Smooth transition */
+}

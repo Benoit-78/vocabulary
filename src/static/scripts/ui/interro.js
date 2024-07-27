@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var decodedOldInterroDict = decodeHtmlEntities(decodeHtmlEntities(oldInterroDict));
     var decodedFaultsDict = decodeHtmlEntities(decodeHtmlEntities(faultsDict));
     const params = {
-        userAswer: 'Yes',
+        userAnswer: 'Yes',
         contentBox1: contentBox1,
         contentBox2: contentBox2,
         testCount: testCount,
