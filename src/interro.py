@@ -9,7 +9,6 @@
 
 import json
 import os
-import sys
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List
@@ -20,8 +19,6 @@ from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.data.database_interface import DbManipulator
 from src.views.api import FastapiGuesser

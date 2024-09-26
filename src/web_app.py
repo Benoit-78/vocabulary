@@ -8,12 +8,6 @@
 """
 
 import os
-import sys
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from fastapi import FastAPI, Depends, Query
 from fastapi.responses import HTMLResponse, RedirectResponse

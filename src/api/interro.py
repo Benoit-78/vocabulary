@@ -8,18 +8,11 @@
 """
 
 import ast
-import os
-import sys
 from typing import Dict
 
 import pandas as pd
 from fastapi.responses import JSONResponse
 from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.interro import Loader, Interro, PremierTest, Rattrap
 from src.api.authentication import get_user_name_from_token

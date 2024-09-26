@@ -8,19 +8,11 @@
         - a guest should not access the 'root' page, even by accident.
 """
 
-import os
-import sys
-
 from loguru import logger
 from fastapi import Body, Depends, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.api import authentication as auth_api
 from src.api import guest as guest_api

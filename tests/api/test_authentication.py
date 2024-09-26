@@ -8,7 +8,6 @@
 """
 
 import os
-import sys
 from datetime import datetime, timedelta
 
 import unittest
@@ -16,13 +15,6 @@ from fastapi import HTTPException, status
 from freezegun import freeze_time
 from jose import JWTError
 from unittest.mock import patch, MagicMock
-
-# from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.api import authentication as auth_api
 

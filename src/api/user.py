@@ -7,18 +7,11 @@
         Hosts the functions of interro router.
 """
 
-import os
-import sys
 from typing import Dict
 
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.api import authentication as auth_api
 from src.data import users

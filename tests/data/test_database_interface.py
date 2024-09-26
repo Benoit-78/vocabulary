@@ -3,19 +3,12 @@
         Tests for database_interface module.
 """
 
-import os
-import sys
 import unittest
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import mysql.connector as mariadb
 import pandas as pd
-# from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 from src.data import database_interface
 

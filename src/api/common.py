@@ -7,16 +7,7 @@
         Hosts the functions of common router.
 """
 
-import os
-import sys
-
 from fastapi.responses import JSONResponse
-# from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.data.csv_interface import MenuReader
 

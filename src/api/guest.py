@@ -9,17 +9,11 @@
 
 import json
 import os
-import sys
 from typing import Dict
 
 from fastapi.responses import JSONResponse
 from loguru import logger
 import pandas as pd
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src import interro as core_interro
 from src.api.interro import load_test, get_interro_category, turn_df_into_dict

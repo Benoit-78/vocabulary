@@ -5,16 +5,10 @@
         Provide with all methods necessary to interact with csv files.
 """
 
-import os
-import sys
 from typing import Dict
 
 import pandas as pd
 from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 from src.utils.system import get_os_separator
 

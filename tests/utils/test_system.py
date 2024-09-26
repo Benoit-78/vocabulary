@@ -8,14 +8,8 @@
 """
 
 import logging
-import os
-import sys
 import unittest
 from unittest.mock import MagicMock, patch
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 from src.utils import system
 

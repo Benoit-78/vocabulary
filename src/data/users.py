@@ -6,17 +6,11 @@
 """
 
 import os
-import sys
 from abc import ABC, abstractmethod
 from typing import List
 
 from dotenv import load_dotenv
 from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.data.database_interface import DbController, DbDefiner, DbManipulator
 from src.api import authentication as auth_api

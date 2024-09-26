@@ -5,20 +5,11 @@
         Gathers API routes dedicated to user space.
 """
 
-import os
-import sys
-
-from loguru import logger
 from fastapi import Body, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
-# from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 from src.api import authentication as auth_api
 from src.api import user as user_api

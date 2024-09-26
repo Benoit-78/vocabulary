@@ -7,20 +7,12 @@
         Hosts the functions of interro router.
 """
 
-import os
-import sys
 from abc import ABC, abstractmethod
 
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 from loguru import logger
-
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.data.database_interface import DbQuerier
 

@@ -8,7 +8,6 @@ import json
 import os
 import re
 import socket
-import sys
 from abc import ABC
 from datetime import datetime
 from typing import Dict, List
@@ -20,10 +19,6 @@ from loguru import logger
 from sqlalchemy import create_engine
 
 load_dotenv()
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 HOSTS = {
     "localhost": "localhost",

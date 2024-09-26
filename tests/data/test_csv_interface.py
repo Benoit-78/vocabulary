@@ -7,15 +7,10 @@
 
 import logging
 import os
-import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 from src.data import csv_interface
 
