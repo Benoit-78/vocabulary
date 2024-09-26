@@ -11,7 +11,7 @@ import os
 import sys
 
 from fastapi.responses import JSONResponse
-from loguru import logger
+# from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME

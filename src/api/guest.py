@@ -10,11 +10,11 @@
 import json
 import os
 import sys
+from typing import Dict
 
 from fastapi.responses import JSONResponse
 from loguru import logger
 import pandas as pd
-from typing import Dict
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -22,15 +22,17 @@ if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
 
 from src import interro as core_interro
-from src.api.authentication import get_user_name_from_token
 from src.api.interro import load_test, get_interro_category, turn_df_into_dict
 from src.data.redis_interface import save_interro_in_redis, load_interro_from_redis
-# from src.utils.debug import print_arguments_and_output
 from src.views import api as api_view
+
 
 
 # --------------- API functions --------------- #
 def load_guest_settings(request, token):
+    """
+    Load guest user settings.
+    """
     flags_dict = get_flags_dict()
     settings_dict = flags_dict.copy()
     settings_dict['request'] = request
@@ -116,6 +118,9 @@ def load_interro_answer_guest(
         token,
         language
     ):
+    """
+    Load the interro answer for the guest user.
+    """
     total = int(total)
     count = int(count)
     score = int(score)
@@ -150,6 +155,10 @@ def get_user_response_guest(
         data,
         token
     ):
+    """
+    Get the user response.
+    data is a dictionnary with keys written in JS way.
+    """
     interro_category = data.get('interroCategory')
     interro = load_interro_from_redis(
         token=token,
@@ -265,6 +274,9 @@ def end_interro_guest(
         score,
         token
     ):
+    """
+    API fucntion to end the interro for the guest user.
+    """
     premier_test = load_interro_from_redis(
         token=token,
         interro_category='test'

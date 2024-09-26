@@ -212,11 +212,6 @@ echo "# ------------------------------------------------------------------------
 
 # Extract the logs and identify the "uninstalled"
 
-# Provisioning the environment to Jupyter notebooks
-# echo "# INFO: Provisioning the environment to jupyter notebooks"
-# python -m ipykernel install --user --name ${1} --display-name ${1}
-# echo "# --------------------------------------------------------------------------------"
-
 # Ending message
 bash ${1}/bin/activate
 echo "# INFO: Pip environment ${1} ready!"
@@ -224,9 +219,7 @@ echo "# INFO: Pip environment ${1} ready!"
 # End of life
 # echo "# INFO: Removing the virtual environment..."
 # deactivate
-# rm -r ~/work/${1}
-# echo "# INFO: Removing the jupyter kernel..."
-# jupyter kernelspec remove ${1}
+# rm -r ~/projects/vocabulary/${1}
 # echo "# INFO: Virtual environment completetly removed (snif snif...)"
 
 

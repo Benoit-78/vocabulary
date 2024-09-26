@@ -10,11 +10,11 @@
 import ast
 import os
 import sys
+from typing import Dict
 
 import pandas as pd
 from fastapi.responses import JSONResponse
 from loguru import logger
-from typing import Dict
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -26,7 +26,6 @@ from src.api.authentication import get_user_name_from_token
 from src.api.database import get_user_databases
 from src.data.database_interface import DbQuerier
 from src.interro import Updater
-# from src.utils.debug import print_arguments_and_output
 from src.views.api import FastapiGuesser
 
 
@@ -383,6 +382,9 @@ def get_faults_df(faults_dict):
 
 
 def get_interro(params):
+    """
+    Get the interro object.
+    """
     interro_df = decode_dict(params.interroDict)
     interro_category = params.interroCategory
     if interro_category == 'test':
@@ -411,6 +413,9 @@ def get_interro(params):
 
 
 def update_interro(interro, params):
+    """
+    Update the interro object.
+    """
     index = int(params.testIndex)
     score = int(params.testScore)
     if params.userAnswer == 'Yes':
@@ -430,20 +435,20 @@ def update_interro(interro, params):
     else:
         logger.error(f"Unknown user answer: {params.userAnswer}")
         raise ValueError
-    # logger.debug('Hi 1')
     if params.interroCategory == 'test':
         interro.update_interro_df(word_guessed=update)
         count = int(params.testCount)
-        # logger.debug('Hi 2')
         if count < int(params.testLength):
-            # logger.debug(f"Count: {count}, test length: {params.testLength}")
             interro.update_index()
-            # logger.debug('Index updated')
-    # logger.debug('Hi 3')
     return interro, score
 
 
 def get_attributes_dict(token, interro, params, score):
+    """
+    Get the attributes dictionary.
+
+    USed by get_user_answer()
+    """
     attributes_dict = interro.to_dict()
     if params.interroCategory != 'test':
         attributes_dict['testIndex'] = 0
@@ -492,6 +497,11 @@ def save_result(token, params):
 
 
 def update_test(params, interro_df, token):
+    """
+    Update the test.
+
+    USed by end_interro()
+    """
     test_length = params.testLength
     faults_df = get_faults_df(params.faultsDict)
     premier_test = PremierTest.from_dict({

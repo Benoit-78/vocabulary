@@ -146,18 +146,13 @@ class WordsGraph2(WordsGraph):
             template='plotly_dark'
         )
         fig.update_traces(
-            marker=dict(
-                color='orange',
-                size=5,
-                opacity=0.8,
-                line={
-                    'color': 'orange',
-                    'width':2
-                }
-            ),
-            selector={
-                'mode': 'markers'
-            }
+            marker={
+                'color': 'orange',
+                'size': 5,
+                'opacity': 0.8,
+                'line': {'color': 'orange', 'width': 2}
+            },
+            selector={'mode': 'markers'}
         )
         fig.update_layout(
             plot_bgcolor='black',
@@ -214,13 +209,18 @@ class WordsGraph3(WordsGraph):
             template='plotly_dark'
         )
         fig.update_traces(
-            marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
-            selector=dict(mode='markers')
+            marker={
+                'color': 'orange',
+                'size': 5,
+                'opacity': 0.8,
+                'line': {'color': 'orange', 'width': 2}
+            },
+            selector={'mode': 'markers'}
         )
         fig.update_layout(
             plot_bgcolor='black',
             paper_bgcolor='black',
-            font=dict(color='white'),
+            font={'color': 'white'},
             width=1000,
             height=500
         )
@@ -271,13 +271,18 @@ class WordsGraph4(WordsGraph):
             template='plotly_dark'
         )
         fig.update_traces(
-            marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
-            selector=dict(mode='markers')
+            marker={
+                'color': 'orange',
+                'size': 5,
+                'opacity': 0.8,
+                'line': {'color': 'orange', 'width': 2}
+            },
+            selector={'mode': 'markers'}
         )
         fig.update_layout(
             plot_bgcolor='black',
             paper_bgcolor='black',
-            font=dict(color='white'),
+            font={'color': 'white'},
             width=1000,
             height=500
         )
@@ -323,13 +328,18 @@ class WordsGraph5(WordsGraph):
             template='plotly_dark'
         )
         fig.update_traces(
-            marker=dict(color='orange', size=5, opacity=0.8, line=dict(color='orange', width=2)),
-            selector=dict(mode='markers')
+            marker={
+                'color': 'orange',
+                'size': 5,
+                'opacity': 0.8,
+                'line': {'color': 'orange', 'width': 2}
+            },
+            selector={'mode': 'markers'}
         )
         fig.update_layout(
             plot_bgcolor='black',
             paper_bgcolor='black',
-            font=dict(color='white'),
+            font={'color': 'white'},
             width=1000,
             height=500
         )

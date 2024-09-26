@@ -8,9 +8,9 @@
 import os
 import sys
 from abc import ABC, abstractmethod
-from dotenv import load_dotenv
 from typing import List
 
+from dotenv import load_dotenv
 from loguru import logger
 
 REPO_NAME = 'vocabulary'
@@ -31,7 +31,7 @@ class Account(ABC):
     - guest
     - user (free version)
     - customer (paid version)
-    - developer:
+    - contributor:
         - architect,
         - developer,
         - tester,

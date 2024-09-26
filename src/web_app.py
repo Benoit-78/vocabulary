@@ -20,7 +20,6 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.routing import APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
@@ -30,8 +29,16 @@ from src.routers import guest_router, interro_router, user_router
 from src.api import authentication as auth_api
 
 app = FastAPI(
-    title="vocabulary",
-    docs_url="/doc"
+    title="expression",
+    docs_url="/docs",
+    description="""
+        API for Expression application\n
+        Provides you with endpoints to pass tests and register new words.
+    """,
+    servers=[
+        {"url": "https://www.vocabulary-app.com/v1", "description": "beta version"},
+        {"url": "https://www.vocabulary-app.com/v2", "description": "Super pro premium"},
+    ]
 )
 
 
@@ -57,7 +64,7 @@ app.add_middleware(
     CacheControlMiddleware
 )
 # Routers
-v1_router = APIRouter(prefix="/v1")
+v1_router = APIRouter()
 app.include_router(common_router)
 app.include_router(dashboard_router)
 app.include_router(database_router)
@@ -75,7 +82,7 @@ app.mount(
 templates = Jinja2Templates(directory="src/templates")
 
 
-@app.get("/", response_class=HTMLResponse)
+@v1_router.get("/", response_class=HTMLResponse, tags=["Welcome"])
 async def root_page(
         request: Request,
         token: str = Depends(auth_api.create_token)
@@ -86,7 +93,7 @@ async def root_page(
     return RedirectResponse(url="/v1/welcome")
 
 
-@v1_router.get("/welcome", response_class=HTMLResponse)
+@v1_router.get("/welcome", response_class=HTMLResponse, tags=["Welcome"])
 async def welcome_page(
         request: Request,
         token: str = Depends(auth_api.create_token)
@@ -101,7 +108,7 @@ async def welcome_page(
     )
 
 
-@v1_router.get("/sign-in", response_class=HTMLResponse)
+@v1_router.get("/sign-in", response_class=HTMLResponse, tags=["Welcome"])
 def sign_in(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -121,7 +128,7 @@ def sign_in(
     )
 
 
-@v1_router.get("/sign-up", response_class=HTMLResponse)
+@v1_router.get("/sign-up", response_class=HTMLResponse, tags=["Welcome"])
 def sign_up(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -137,7 +144,7 @@ def sign_up(
     )
 
 
-@v1_router.get("/about-the-app", response_class=HTMLResponse)
+@v1_router.get("/about-the-app", response_class=HTMLResponse, tags=["Welcome"])
 def about_the_app(
         request: Request,
         token: str = Depends(auth_api.check_token)
@@ -152,7 +159,7 @@ def about_the_app(
     )
 
 
-@v1_router.get("/help", response_class=HTMLResponse)
+@v1_router.get("/help", response_class=HTMLResponse, tags=["Welcome"])
 def get_help(
         request: Request,
         token: str = Depends(auth_api.check_token)
@@ -167,4 +174,27 @@ def get_help(
     )
 
 
-app.include_router(v1_router)
+app.include_router(v1_router, prefix="/v1")
+
+# Save the original OpenAPI method before overwriting it
+original_openapi = app.openapi
+
+
+def custom_openapi():
+    """
+    Custom OpenAPI schema to remove `/v1` from displayed paths in the docs.
+    """
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = original_openapi()
+    new_paths = {}
+    for path in openapi_schema["paths"]:
+        new_path = path.replace("/v1", "")
+        new_path = path.replace("/v2", "")
+        new_paths[new_path] = openapi_schema["paths"][path]
+    openapi_schema["paths"] = new_paths
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi

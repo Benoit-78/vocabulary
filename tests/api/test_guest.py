@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import pandas as pd
 from fastapi.responses import JSONResponse
-from loguru import logger
+# from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -451,15 +451,12 @@ class TestGuest(unittest.TestCase):
 
     @patch('src.api.guest.turn_df_into_dict')
     @patch('src.api.guest.load_interro_from_redis')
-    @patch('src.api.guest.get_user_name_from_token')
     def test_end_interro_guest(
             self,
-            mock_get_user_name_from_token,
             mock_load_interro_from_redis,
             mock_turn_df_into_dict
         ):
         # ----- ARRANGE
-        mock_get_user_name_from_token.return_value = 'mock_user_name'
         request = 'mock_request'
         score = 1
         test_length = 10

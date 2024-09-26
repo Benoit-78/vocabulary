@@ -9,7 +9,7 @@ import os
 import sys
 
 # from loguru import logger
-from fastapi import Query, Request, Depends, File, UploadFile
+from fastapi import Query, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
@@ -25,7 +25,7 @@ database_router = APIRouter(prefix='/v1/database')
 templates = Jinja2Templates(directory="src/templates")
 
 
-@database_router.get("/list-databases", response_class=HTMLResponse)
+@database_router.get("/list-databases", response_class=HTMLResponse, tags=["Database"])
 def user_databases(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -45,7 +45,7 @@ def user_databases(
     )
 
 
-@database_router.post("/create-database")
+@database_router.post("/create-database", tags=["Database"])
 async def create_database(
         data: dict,
         token: str = Depends(auth_api.check_token)
@@ -60,7 +60,7 @@ async def create_database(
     return json_response
 
 
-@database_router.post("/retrieve-database")
+@database_router.post("/retrieve-database", tags=["Database"])
 async def retrieve_database(
         data: dict,
         token: str = Depends(auth_api.check_token),
@@ -75,7 +75,7 @@ async def retrieve_database(
     return json_response
 
 
-@database_router.get("/see-database", response_class=HTMLResponse)
+@database_router.get("/see-database", response_class=HTMLResponse, tags=["Database"])
 def see_database(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -99,7 +99,7 @@ def see_database(
     )
 
 
-@database_router.post("/choose-database")
+@database_router.post("/choose-database", tags=["Database"])
 async def choose_database(
         data: dict,
         token: str = Depends(auth_api.check_token),
@@ -114,7 +114,7 @@ async def choose_database(
     return json_response
 
 
-@database_router.get("/fill-database", response_class=HTMLResponse)
+@database_router.get("/fill-database", response_class=HTMLResponse, tags=["Database"])
 def data_page(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -136,7 +136,7 @@ def data_page(
     )
 
 
-@database_router.post("/add-word")
+@database_router.post("/add-word", tags=["Database"])
 async def create_word(
         data: dict,
         token: str = Depends(auth_api.check_token)
@@ -151,7 +151,7 @@ async def create_word(
     return json_response
 
 
-@database_router.post("/delete-database")
+@database_router.delete("/delete-database", tags=["Database"])
 async def delete_database(
         data: dict,
         token: str = Depends(auth_api.check_token)
@@ -164,18 +164,3 @@ async def delete_database(
         token=token
     )
     return json_response
-
-
-# @database_router.post("/upload-csv", response_class=HTMLResponse)
-# async def upload_csv(
-#         csv_file: UploadFile = File(...),
-#         token: str = Depends(auth_api.check_token)
-#     ):
-#     """
-#     Upload the given CSV file.
-#     """
-#     json_response = db_api.load_csv(
-#         csv_file,
-#         token
-#     )
-#     return json_response

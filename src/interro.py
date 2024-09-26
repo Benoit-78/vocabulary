@@ -9,10 +9,8 @@
 
 import json
 import os
-import random
 import sys
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
 from datetime import datetime
 from typing import List
 
@@ -139,15 +137,13 @@ class Loader():
                 self.interro_df = pd.concat([bad_words_df, good_words_df])
             else:
                 sample_size = self.test_length - good_words_df.shape[0]
-                if sample_size > bad_words_df.shape[0]:
-                    sample_size = bad_words_df.shape[0]
+                sample_size = min(sample_size, bad_words_df.shape[0])
                 bad_words_df = bad_words_df.sample(n=sample_size)
                 self.interro_df = pd.concat([bad_words_df, good_words_df])
         else:
             if enough_good_words:
                 sample_size = self.test_length - bad_words_df.shape[0]
-                if sample_size > good_words_df.shape[0]:
-                    sample_size = good_words_df.shape[0]
+                sample_size = min(sample_size, bad_words_df.shape[0])
                 good_words_df = good_words_df.sample(n=sample_size)
                 self.interro_df = pd.concat([bad_words_df, good_words_df])
             else:

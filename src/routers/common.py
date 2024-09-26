@@ -23,7 +23,7 @@ from src.api import common as api_common
 common_router = APIRouter(prefix="/v1/common")
 
 
-@common_router.post("/change-language", response_class=HTMLResponse)
+@common_router.post("/change-language", response_class=HTMLResponse, tags=["Common"])
 async def change_language(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)

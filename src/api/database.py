@@ -152,7 +152,7 @@ def choose_database(data, token: str):
                 "message": f"Database name {db_name} not available",
             }
         )
-    if db_exists:
+    else:
         json_response = JSONResponse(
             content=
             {
@@ -229,11 +229,11 @@ def create_word(data: dict, token:str):
         json_response = JSONResponse(
             content={"message": "Word already exists"}
         )
-    elif result is False:
+    elif not result:
         json_response = JSONResponse(
             content={"message": "Error with the word creation"}
         )
-    elif result is True:
+    else:
         json_response =  JSONResponse(
             content={"message": "Word added successfully"}
         )
@@ -249,11 +249,11 @@ def delete_database(data: dict, token: str):
     logger.info(f"User: {user_name}")
     user_account = users.UserAccount(user_name=user_name)
     result = user_account.remove_database(db_name=db_name)
-    if result is False:
+    if not result:
         json_response = JSONResponse(
             content={"message": "Error with the database removal"}
         )
-    if result is True:
+    else:
         json_response = JSONResponse(
             content={"message": "Database deleted successfully"}
         )

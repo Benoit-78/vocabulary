@@ -80,6 +80,8 @@ def authenticate_user(
             form_data=form_data
         )
         return json_response
+    logger.debug(f"User name: {form_data.username}")
+    logger.debug(f"Password: {form_data.password}")
     if '' in [form_data.username, form_data.password]:
         json_response = JSONResponse(
             content=
@@ -129,6 +131,9 @@ def authenticate_user_with_oauth(
         token: str,
         form_data
     ):
+    """
+    Authenticate the user with OAuth.
+    """
     user = auth_api.authenticate_with_oauth(form_data=form_data)
     if user is None:
         raise HTTPException(

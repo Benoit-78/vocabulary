@@ -1,3 +1,9 @@
+"""
+    Creator:
+        B. DELORME
+    Main purpose:
+        Provide with all methods necessary to interact with csv files.
+"""
 
 import os
 import sys
@@ -10,7 +16,7 @@ REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
 sys.path.append(REPO_DIR)
 
-from src.utils.os import get_os_separator
+from src.utils.system import get_os_separator
 
 
 
@@ -25,7 +31,9 @@ class DataHandler():
         self.tables = {}
 
     def set_paths(self):
-        """List paths to data csv."""
+        """
+        List paths to data csv.
+        """
         self.paths[self.test_type + '_voc'] = self.os_sep.join(
             [r'.', 'data', self.test_type + '_voc.csv']
         )

@@ -61,6 +61,7 @@ npm install --save-dev jest @babel/core @babel/preset-env babel-jest
 npm install --save-dev jest-environment-jsdom
 
 
+
 # =======================
 #  R U N
 # =======================
@@ -89,7 +90,7 @@ pkill uvicorn
 
 
 # ==============================================
-#  E N D   O F   S E S S I O N
+#  E N D   O F   L I V E
 # ==============================================
 aws ec2 stop-instances \
     --instance-ids i-03fae8b09bdb0587f \

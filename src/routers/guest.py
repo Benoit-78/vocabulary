@@ -29,7 +29,7 @@ guest_router = APIRouter(prefix="/v1/guest")
 templates = Jinja2Templates(directory="src/templates")
 
 
-@guest_router.get("/interro-settings", response_class=HTMLResponse)
+@guest_router.get("/interro-settings", response_class=HTMLResponse, tags=["Guests"])
 def interro_settings_guest(
         request: Request,
         token: str=Depends(auth_api.check_token)
@@ -47,7 +47,7 @@ def interro_settings_guest(
     )
 
 
-@guest_router.post("/save-interro-settings")
+@guest_router.post("/save-interro-settings", tags=["Guests"])
 async def save_interro_settings_guest(
         language: dict,
         token: str=Depends(auth_api.check_token)
@@ -62,7 +62,7 @@ async def save_interro_settings_guest(
     return json_response
 
 
-@guest_router.get("/interro-question", response_class=HTMLResponse)
+@guest_router.get("/interro-question", response_class=HTMLResponse, tags=["Guests"])
 def load_interro_question_guest(
         request: Request,
         interro_category: str=Query(None, alias="interroCategory"),
@@ -91,7 +91,7 @@ def load_interro_question_guest(
     )
 
 
-@guest_router.get("/interro-answer", response_class=HTMLResponse)
+@guest_router.get("/interro-answer", response_class=HTMLResponse, tags=["Guests"])
 def load_interro_answer_guest(
         request: Request,
         interro_category: str=Query(None, alias="interroCategory"),
@@ -120,7 +120,7 @@ def load_interro_answer_guest(
     )
 
 
-@guest_router.post("/user-answer")
+@guest_router.post("/user-answer", tags=["Guests"])
 async def get_user_response_guest(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
@@ -136,7 +136,7 @@ async def get_user_response_guest(
     return json_response
 
 
-@guest_router.get("/propose-rattrap", response_class=HTMLResponse)
+@guest_router.get("/propose-rattrap", response_class=HTMLResponse, tags=["Guests"])
 def propose_rattrap_guest(
         request: Request,
         interro_category: str=Query(None, alias="interroCategory"),
@@ -162,7 +162,7 @@ def propose_rattrap_guest(
     )
 
 
-@guest_router.post("/launch-guest-rattrap", response_class=HTMLResponse)
+@guest_router.post("/launch-guest-rattrap", response_class=HTMLResponse, tags=["Guests"])
 async def launch_rattrap(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
@@ -177,7 +177,7 @@ async def launch_rattrap(
     return json_response
 
 
-@guest_router.get("/interro-end/", response_class=HTMLResponse)
+@guest_router.get("/interro-end/", response_class=HTMLResponse, tags=["Guests"])
 def end_interro_guest(
         request: Request,
         total: str=Query(None, alias="testLength"),

@@ -7,24 +7,35 @@ __pycache__/*
 src/data/__pycache__/*
 node_modules/*
 
+# ----- bin -----
+bin/sonar.sh
+
+# ----- build -----
+build/
+dist/
+expression.egg-info/
+
+# ----- conf -----
 conf/*
 
+# ----- data -----
 data/*
 !data/queries/*
 
+# ----- divers -----
 divers/*
-
 doc/*
 
+# ----- logs -----
 logs/*
 
+# ----- venv -----
 venv/*
 
-htmlcov/*
-
+# ----- mgmt -----
 mgmt/*
 
-# Tests artifacts
+# ----- tests -----
 .coverage
 coverage/*
 

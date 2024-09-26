@@ -36,13 +36,10 @@ pwd_context = CryptContext(
 
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-
 class User(BaseModel):
+    """
+    Base model class for the user.
+    """
     username: str
     email: str | None = None
     disabled: bool | None = None
@@ -50,14 +47,37 @@ class User(BaseModel):
 
 
 class UserInDB(User):
+    """
+    Base model class for the user in the database,
+    that includes the hashed password.
+    """
     password_hash: str
+
+
+
+# -------------------------
+#  A P I
+# -------------------------
+def sign_in(
+        request,
+        token,
+        error_message
+    ):
+    """
+    Function to sign in the user.
+    """
+    response_dict = {
+        'request': request,
+        'token': token,
+        'errorMessage': error_message,
+    }
+    return response_dict
 
 
 
 # -------------------------
 #  T O K E N
 # -------------------------
-
 def create_guest_user_name():
     """
     Function to create a guest user name.
@@ -118,6 +138,7 @@ def check_token(token: str):
     - if the user is a guest, return the token.
     - if the user is logged in, returns the user name.
     """
+    logger.debug("Check token called")
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -140,7 +161,6 @@ def check_token(token: str):
 # -------------------------
 #  O A U T H
 # -------------------------
-
 def get_password_hash(password):
     """
     Return the hashed password.
@@ -245,19 +265,3 @@ def authenticate_with_oauth(
         password=form_data.password
     )
     return user
-
-
-# -------------------------
-#  A P I
-# -------------------------
-def sign_in(
-        request,
-        token,
-        error_message
-    ):
-    response_dict = {
-        'request': request,
-        'token': token,
-        'errorMessage': error_message,
-    }
-    return response_dict

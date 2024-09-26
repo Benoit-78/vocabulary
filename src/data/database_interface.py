@@ -11,11 +11,11 @@ import socket
 import sys
 from abc import ABC
 from datetime import datetime
-from dotenv import load_dotenv
 from typing import Dict, List
 
 import mysql.connector as mariadb
 import pandas as pd
+from dotenv import load_dotenv
 from loguru import logger
 from sqlalchemy import create_engine
 
@@ -85,6 +85,10 @@ class DbController(DbInterface):
 
     @staticmethod
     def load_sql_queries():
+        """
+        Load the SQL queries so that they stay in memory,
+        and do not have to be read from disk.
+        """
         queries = [
             'create_user',
             'grant_select',
@@ -461,6 +465,10 @@ class DbDefiner(DbInterface):
             result = [col[0] for col in columns]
         elif isinstance(columns[0], str):
             result = columns
+        else:
+            logger.error(f"Strange result: {columns}")
+            logger.error(f"Type of first element: {type(columns[0])}")
+            raise ValueError
         return result
 
     def get_tables_names(self, test_type) -> List[str]:
@@ -522,6 +530,10 @@ class DbManipulator(DbInterface):
 
     @staticmethod
     def load_sql_queries():
+        """
+        Load the SQL queries so that they stay in memory,
+        and do not have to be read from disk.
+        """
         queries = [
             'insert_word',
             'update_word',
@@ -681,6 +693,10 @@ class DbQuerier(DbInterface):
 
     @staticmethod
     def load_sql_queries():
+        """
+        Load the SQL queries so that they stay in memory,
+        and do not have to be read from disk.
+        """
         queries = [
             'get_tables',
             'read_word'

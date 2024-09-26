@@ -8,6 +8,7 @@
 import ast
 import os
 import sys
+from typing import Optional
 
 from loguru import logger
 from fastapi import Body, Depends, Query, Request, HTTPException
@@ -15,7 +16,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, ValidationError
-from typing import Optional
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
@@ -55,6 +55,9 @@ class Params(BaseModel):
 
     @classmethod
     def from_query_params(cls, params: dict):
+        """
+        Convert query params to a Params BaseModel object.
+        """
         for dict_name in ['interroDict', 'oldInterroDict', 'faultsDict']:
             while isinstance(params[dict_name], str):
                 params[dict_name] = ast.literal_eval(params[dict_name])
@@ -97,7 +100,7 @@ async def get_interro_params_from_body(request: Request) -> Params:
         ) from e
 
 
-@interro_router.get("/interro-settings", response_class=HTMLResponse)
+@interro_router.get("/interro-settings", response_class=HTMLResponse, tags=["Interro"])
 def interro_settings(
         request: Request,
         token: str = Depends(auth_api.check_token),
@@ -117,7 +120,7 @@ def interro_settings(
     )
 
 
-@interro_router.post("/save-interro-settings")
+@interro_router.post("/save-interro-settings", tags=["Interro"])
 async def save_interro_settings(
         params: dict = Body(...),
         token: str = Depends(auth_api.check_token)
@@ -132,7 +135,7 @@ async def save_interro_settings(
     return json_response
 
 
-@interro_router.get("/interro-question", response_class=HTMLResponse)
+@interro_router.get("/interro-question", response_class=HTMLResponse, tags=["Interro"])
 def load_interro_question(
         request: Request,
         params: Params = Depends(get_interro_params),
@@ -152,7 +155,7 @@ def load_interro_question(
     )
 
 
-@interro_router.get("/interro-answer", response_class=HTMLResponse)
+@interro_router.get("/interro-answer", response_class=HTMLResponse, tags=["Interro"])
 def load_interro_answer(
         request: Request,
         params: Params = Depends(get_interro_params),
@@ -173,7 +176,7 @@ def load_interro_answer(
     )
 
 
-@interro_router.post("/user-answer")
+@interro_router.post("/user-answer", tags=["Interro"])
 async def get_user_answer(
         params: Params = Depends(get_interro_params_from_body),
         token: str = Depends(auth_api.check_token)
@@ -188,7 +191,7 @@ async def get_user_answer(
     return json_response
 
 
-@interro_router.get("/interro-end", response_class=HTMLResponse)
+@interro_router.get("/interro-end", response_class=HTMLResponse, tags=["Interro"])
 def end_interro(
         request: Request,
         params: Params = Depends(get_interro_params),
@@ -209,7 +212,7 @@ def end_interro(
     )
 
 
-@interro_router.get("/propose-rattrap", response_class=HTMLResponse)
+@interro_router.get("/propose-rattrap", response_class=HTMLResponse, tags=["Interro"])
 def propose_rattrap(
         request: Request,
         params: Params = Depends(get_interro_params),
@@ -229,7 +232,7 @@ def propose_rattrap(
     )
 
 
-@interro_router.post("/launch-rattrap", response_class=HTMLResponse)
+@interro_router.post("/launch-rattrap", response_class=HTMLResponse, tags=["Interro"])
 async def launch_rattrap(
         params: Params = Depends(get_interro_params_from_body),
         token: str = Depends(auth_api.check_token)

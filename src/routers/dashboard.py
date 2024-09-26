@@ -23,7 +23,7 @@ dashboard_router = APIRouter(prefix='/v1/dashboard')
 templates = Jinja2Templates(directory="src/templates")
 
 
-@dashboard_router.get("/dashboards", response_class=HTMLResponse)
+@dashboard_router.get("/dashboards", response_class=HTMLResponse, tags=["Dashboard"])
 def graphs_page(
         request: Request,
         user_name: str=Query(None, alias="userName"),
