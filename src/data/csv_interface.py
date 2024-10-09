@@ -10,7 +10,7 @@ from typing import Dict
 import pandas as pd
 from loguru import logger
 
-from src.utils.system import get_os_separator
+from src.utils.system_i import get_os_separator
 
 
 

@@ -11,6 +11,7 @@ import json
 import os
 from typing import Dict
 
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from loguru import logger
 import pandas as pd
@@ -23,7 +24,7 @@ from src.views import api as api_view
 
 
 # --------------- API functions --------------- #
-def load_guest_settings(request, token):
+def load_guest_settings(request: Request, token: str) -> dict:
     """
     Load guest user settings.
     """
@@ -34,7 +35,7 @@ def load_guest_settings(request, token):
     return settings_dict
 
 
-def save_interro_settings_guest(language, token):
+def save_interro_settings_guest(language: dict, token: str) -> JSONResponse:
     """
     Save guest user interro settings.
     """
@@ -64,14 +65,14 @@ def save_interro_settings_guest(language, token):
 
 
 def load_interro_question_guest(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        language,
+        request: Request,
+        interro_category: str,
+        total: str,
+        count: str,
+        score: str,
+        language: str,
         token: str,
-    ):
+    ) -> dict:
     """
     Load the interro question for the guest user.
     """

@@ -7,7 +7,9 @@
         Hosts the functions of interro router.
 """
 
-from fastapi import HTTPException, status
+from typing import List
+
+from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -16,7 +18,7 @@ from src.data.database_interface import DbQuerier
 from src.api import authentication as auth_api
 
 
-def get_user_databases(token):
+def get_user_databases(token: str) -> List[str]:
     """
     Call the base page of user databases.
     """
@@ -26,7 +28,11 @@ def get_user_databases(token):
     return databases
 
 
-def load_user_databases(request, token, error_message):
+def load_user_databases(
+        request: Request,
+        token: str,
+        error_message: str
+    ) -> dict:
     """
     Load the user databases.
     """
@@ -41,7 +47,7 @@ def load_user_databases(request, token, error_message):
     return response_dict
 
 
-def create_database(data: dict, token: str):
+def create_database(data: dict, token: str) -> JSONResponse:
     """
     Create the given database.
     """
@@ -81,7 +87,7 @@ def create_database(data: dict, token: str):
     return json_response
 
 
-def retrieve_database(data: dict, token: str):
+def retrieve_database(data: dict, token: str) -> JSONResponse:
     """
     See the given database.
     """
@@ -109,12 +115,12 @@ def retrieve_database(data: dict, token: str):
 
 
 def see_database(
-        request,
+        request: Request,
         token: str,
         db_name: str,
         version_table: str,
         theme_table: str
-    ):
+    ) -> dict:
     """
     Base page for data input by the user.
     """
@@ -128,7 +134,7 @@ def see_database(
     return request_dict
 
 
-def choose_database(data, token: str):
+def choose_database(data: dict, token: str) -> JSONResponse:
     """
     Choose the given database.
     """
@@ -154,7 +160,7 @@ def choose_database(data, token: str):
     return json_response
 
 
-def get_error_messages(error_message: str):
+def get_error_messages(error_message: str) -> str:
     """
     Get the error messages from the error message.
     """
@@ -165,9 +171,9 @@ def get_error_messages(error_message: str):
         ''
     ]
     if error_message == messages[0]:
-        result = 'No database name given'
+        result = "No database name given"
     elif error_message == messages[1]:
-        result = 'A database of this name already exists'
+        result = "A database of this name already exists"
     elif error_message == messages[2]:
         result = ''
     elif error_message == messages[3]:
@@ -180,11 +186,11 @@ def get_error_messages(error_message: str):
 
 
 def fill_database(
-        request,
-        db_name,
-        error_message,
-        token
-    ):
+        request: Request,
+        db_name: str,
+        error_message: str,
+        token: str
+    ) -> dict:
     """
     Back-end function to prepare json response for a new word insertion.
     """
@@ -205,7 +211,7 @@ def fill_database(
     return request_dict
 
 
-def create_word(data: dict, token:str):
+def create_word(data: dict, token:str) -> JSONResponse:
     """
     Save the word in the database.
     """
@@ -232,7 +238,7 @@ def create_word(data: dict, token:str):
     return json_response
 
 
-def delete_database(data: dict, token: str):
+def delete_database(data: dict, token: str) -> JSONResponse:
     """
     Remove the given database.
     """
@@ -252,7 +258,7 @@ def delete_database(data: dict, token: str):
     return json_response
 
 
-def is_malicious(csv_content):
+def is_malicious(csv_content: str) -> bool:
     """
     Check if the given CSV content is malicious.
     """

@@ -34,7 +34,7 @@ except deepl.exceptions.DeepLException as exc:
     logger.error(exc)
 
 
-def translate_documents(input_path, output_path):
+def translate_documents(input_path: str, output_path: str):
     """
     Sending a whole document to DeepL is costly in tokens.
     Better is to decompose the document content as a list of words.

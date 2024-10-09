@@ -79,7 +79,7 @@ class DbController(DbInterface):
         self.sql_queries = self.load_sql_queries()
 
     @staticmethod
-    def load_sql_queries():
+    def load_sql_queries() -> dict:
         """
         Load the SQL queries so that they stay in memory,
         and do not have to be read from disk.
@@ -100,7 +100,7 @@ class DbController(DbInterface):
                 sql_queries[query] = file.read().strip()
         return sql_queries
 
-    def create_user_in_mysql(self, user_name, user_password):
+    def create_user_in_mysql(self, user_name: str, user_password: str):
         """
         Create a user in the mysql.user table.
         """
@@ -124,7 +124,7 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def grant_privileges_on_common_database(self, user_name):
+    def grant_privileges_on_common_database(self, user_name: str):
         """
         Grant the new user access to the common database.
         """
@@ -148,7 +148,7 @@ class DbController(DbInterface):
             connection.close()
         return result
 
-    def grant_privileges(self, user_name, db_name):
+    def grant_privileges(self, user_name: str, db_name: str):
         """
         Grant privileges to the user on the given database.
         """
@@ -253,7 +253,7 @@ class DbController(DbInterface):
             connection.close()
         return users_list
 
-    def revoke_privileges(self, user_name, db_name):
+    def revoke_privileges(self, user_name: str, db_name: str):
         """
         Remove privileges from the user on the given database.
         """
@@ -675,7 +675,12 @@ class DbQuerier(DbInterface):
     """
     Querying the data
     """
-    def __init__(self, user_name, db_name, test_type):
+    def __init__(
+            self,
+            user_name: str,
+            db_name: str,
+            test_type: str
+        ):
         super().__init__()
         self.user_name = user_name
         if self.user_name not in db_name:

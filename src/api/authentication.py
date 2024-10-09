@@ -59,10 +59,10 @@ class UserInDB(User):
 #  A P I
 # -------------------------
 def sign_in(
-        request,
-        token,
-        error_message
-    ):
+        request: dict,
+        token: str,
+        error_message: str
+    ) -> dict:
     """
     Function to sign in the user.
     """
@@ -78,7 +78,7 @@ def sign_in(
 # -------------------------
 #  T O K E N
 # -------------------------
-def create_guest_user_name():
+def create_guest_user_name() -> dict:
     """
     Function to create a guest user name.
     """
@@ -89,7 +89,7 @@ def create_guest_user_name():
 def create_token(
         data: dict = None,
         expires_delta: Optional[int] = None
-    ):
+    ) -> str:
     """
     Function to generate a token for a guest or an existing user.
     """
@@ -161,14 +161,16 @@ def check_token(token: str):
 # -------------------------
 #  O A U T H
 # -------------------------
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
     """
     Return the hashed password.
     """
     return pwd_context.hash(password)
 
 
-def get_user_name_from_token_oauth(token: str = Depends(oauth2_scheme)):
+def get_user_name_from_token_oauth(
+        token: str = Depends(oauth2_scheme)
+    ) -> str:
     """
     Given a token, return the user name.
     """
@@ -203,7 +205,7 @@ def authenticate_user(
         users_list: dict,
         username: str,
         password: str
-    ) -> UserInDB:
+    ) -> str | UserInDB:
     """
     Return the user data if the user exists.
     """
@@ -226,8 +228,8 @@ def authenticate_user(
 
     def verify_password(
             plain_password: str,
-            password_hash
-        ):
+            password_hash: str
+        ) -> bool:
         result = pwd_context.verify(
             plain_password,
             password_hash
@@ -255,7 +257,7 @@ def authenticate_user(
 
 def authenticate_with_oauth(
         form_data: OAuth2PasswordRequestForm
-    ):
+    ) -> str:
     """
     Authenticate the user using OAuth2.
     """

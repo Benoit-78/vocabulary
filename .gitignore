@@ -9,11 +9,12 @@ node_modules/*
 
 # ----- bin -----
 bin/sonar.sh
+bin/env.sh
 
 # ----- build -----
 build/
 dist/
-expression.egg-info/
+src/vocabulary.egg-info/
 
 # ----- conf -----
 conf/*
@@ -52,3 +53,5 @@ common/secret.yaml
 jest.config.js
 package-lock.json
 package.json
+mypy.ini
+

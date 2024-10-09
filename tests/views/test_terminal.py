@@ -2,13 +2,8 @@
     Test module for 
 """
 
-import os
-import sys
 import unittest
 from unittest.mock import patch
-
-REPO_DIR = os.getcwd().split('tests')[0]
-sys.path.append(REPO_DIR)
 
 from src.views import terminal as terminal_view
 

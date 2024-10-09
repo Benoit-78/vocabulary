@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from src.data.csv_interface import MenuReader
 
 
-def change_language(data):
+def change_language(data: dict) -> JSONResponse:
     """
     Change the language of the user interface.
     """

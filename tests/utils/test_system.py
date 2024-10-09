@@ -11,7 +11,7 @@ import logging
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src.utils import system
+from src.utils import system_i
 
 
 
@@ -27,9 +27,9 @@ class TestUtils(unittest.TestCase):
         # Arrange
         mock_logger = MagicMock()
         logging.basicConfig(level=logging.ERROR)
-        with patch('src.utils.system.logger', mock_logger):
+        with patch('src.utils.system_i.logger', mock_logger):
             # Act
-            _ = system.get_os_type()
+            _ = system_i.get_os_type()
         # Assert
         mock_logger.error.assert_called_with("Operating system cannot be identified.")
         mock_logger.warning.assert_called_with("Operating system was arbitrarily set to 'linux'.")
@@ -41,7 +41,7 @@ class TestUtils(unittest.TestCase):
         Windows should be recognized a valid os.
         """
         # Act
-        os_type = system.get_os_type()
+        os_type = system_i.get_os_type()
         # Assert
         self.assertEqual(os_type, 'Windows')
 
@@ -51,40 +51,40 @@ class TestUtils(unittest.TestCase):
         Linux should be recognized a valid os.
         """
         # Act
-        os_type = system.get_os_type()
+        os_type = system_i.get_os_type()
         # Assert
         self.assertEqual(os_type, 'Linux')
 
-    @patch('src.utils.system.get_os_type', return_value='Windows')
+    @patch('src.utils.system_i.get_os_type', return_value='Windows')
     def test_get_os_separator_windows(self, mock_get_os_type):
         # Act
-        result = system.get_os_separator()
+        result = system_i.get_os_separator()
         # Assert
         self.assertEqual(result, '\\')
 
-    @patch('src.utils.system.get_os_type', return_value='Linux')
+    @patch('src.utils.system_i.get_os_type', return_value='Linux')
     def test_get_os_separator_linux(self, mock_get_os_type):
         # Act
-        result = system.get_os_separator()
+        result = system_i.get_os_separator()
         # Assert
         self.assertEqual(result, '/')
 
-    @patch('src.utils.system.get_os_type', return_value='Mac')
+    @patch('src.utils.system_i.get_os_type', return_value='Mac')
     def test_get_os_separator_mac(self, mock_get_os_type):
         # Act
-        result = system.get_os_separator()
+        result = system_i.get_os_separator()
         # Assert
         self.assertEqual(result, '/')
 
-    @patch('src.utils.system.get_os_type', return_value='Android')
+    @patch('src.utils.system_i.get_os_type', return_value='Android')
     def test_get_os_separator_android(self, mock_get_os_type):
         # Act
-        result = system.get_os_separator()
+        result = system_i.get_os_separator()
         # Assert
         self.assertEqual(result, '/')
 
-    @patch('src.utils.system.get_os_type', return_value='Unknown')
+    @patch('src.utils.system_i.get_os_type', return_value='Unknown')
     def test_get_os_separator_unknown(self, mock_get_os_type):
         with self.assertRaises(NameError):
             # Assert
-            system.get_os_separator()
+            system_i.get_os_separator()

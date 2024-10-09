@@ -22,7 +22,7 @@ class WordsGraph(ABC):
     """
     Abstract class for creating and saving user-specific graphs.
     """
-    def __init__(self, db_querier):
+    def __init__(self, db_querier: DbQuerier):
         """
         Constructor should get a database handler.
         """
@@ -30,13 +30,13 @@ class WordsGraph(ABC):
         self.data = pd.DataFrame()
 
     @abstractmethod
-    def set_data(self, user_password):
+    def set_data(self):
         """
         Fetch the data that will feed the graph.
         """
 
     @abstractmethod
-    def create(self, user_password):
+    def create(self):
         """
         Display the data in a graph
         and return this graph as an html file.
@@ -48,11 +48,11 @@ class WordsGraph1(WordsGraph):
     """
     Graph that represents the evolution of test performance.
     """
-    def set_data(self, user_password):
+    def set_data(self):
         """
         See abstract method description
         """
-        tables = self.db_querier.get_tables(user_password)
+        tables = self.db_querier.get_tables()
         voc_table_name = self.db_querier.test_type + '_perf'
         self.data = tables[voc_table_name]
 
@@ -63,11 +63,11 @@ class WordsGraph1(WordsGraph):
         self.data = self.data[self.data['test']<=100]
         self.data = self.data[self.data['test']>=0]
 
-    def create(self, user_password):
+    def create(self):
         """
         See abstract method description
         """
-        self.set_data(user_password)
+        self.set_data()
         self.correct_data()
         fig = px.scatter(
             x=list(self.data['test_date']),
@@ -103,11 +103,11 @@ class WordsGraph2(WordsGraph):
     Graph that represents the success rate of each word
     in function of the number of times it has been asked.
     """
-    def set_data(self, user_password):
+    def set_data(self):
         """
         See abstract method description.
         """
-        tables = self.db_querier.get_tables(user_password)
+        tables = self.db_querier.get_tables()
         voc_table_name = self.db_querier.test_type + '_voc'
         voc_table = tables[voc_table_name]
         db_name_short = self.db_querier.db_name.split('_')[1]
@@ -122,9 +122,9 @@ class WordsGraph2(WordsGraph):
         self.data = self.data[self.data['taux']<=100]
         self.data = self.data[self.data['taux']>=-100]
 
-    def create(self, user_password):
+    def create(self):
         """See abstract method description"""
-        self.set_data(user_password)
+        self.set_data()
         self.correct_data()
         fig = px.scatter(
             x=list(self.data['nb']),
@@ -165,11 +165,11 @@ class WordsGraph3(WordsGraph):
     Graph that represents the success rate of each word
     in function of its date rank in the words table.
     """
-    def set_data(self, user_password):
+    def set_data(self):
         """
         See abstract method description
         """
-        tables = self.db_querier.get_tables(user_password)
+        tables = self.db_querier.get_tables()
         voc_table_name = self.db_querier.test_type + '_voc'
         voc_table = tables[voc_table_name]
         db_name_short = self.db_querier.db_name.split('_')[1]
@@ -185,9 +185,9 @@ class WordsGraph3(WordsGraph):
         self.data = self.data[self.data['taux']<=100]
         self.data = self.data[self.data['taux']>=-100]
 
-    def create(self, user_password):
+    def create(self):
         """See abstract method description"""
-        self.set_data(user_password)
+        self.set_data()
         self.correct_data()
         fig = px.scatter(
             x=list(self.data.index),
@@ -226,11 +226,11 @@ class WordsGraph4(WordsGraph):
     Graph that represents the queries count of each word
     in function of its date rank in the words table.
     """
-    def set_data(self, user_password):
+    def set_data(self):
         """
         See abstract method description
         """
-        tables = self.db_querier.get_tables(user_password)
+        tables = self.db_querier.get_tables()
         voc_table_name = self.db_querier.test_type + '_voc'
         voc_table = tables[voc_table_name]
         db_name_short = self.db_querier.db_name.split('_')[1]
@@ -245,11 +245,11 @@ class WordsGraph4(WordsGraph):
         """
         self.data = self.data[self.data['nb']>=0]
 
-    def create(self, user_password):
+    def create(self):
         """
         See abstract method description
         """
-        self.set_data(user_password)
+        self.set_data()
         self.correct_data()
         fig = px.scatter(
             x=list(self.data.index),
@@ -288,11 +288,11 @@ class WordsGraph5(WordsGraph):
     Graph that represents the queries count of each word
     in function of its date rank in the words table.
     """
-    def set_data(self, user_password):
+    def set_data(self):
         """
         See abstract method description
         """
-        tables = self.db_querier.get_tables(user_password)
+        tables = self.db_querier.get_tables()
         voc_table_name = self.db_querier.test_type + '_words_count'
         self.data = tables[voc_table_name]
 
@@ -302,11 +302,11 @@ class WordsGraph5(WordsGraph):
         """
         self.data = self.data[self.data['words_count']>=0]
 
-    def create(self, user_password):
+    def create(self):
         """
         See abstract method description
         """
-        self.set_data(user_password)
+        self.set_data()
         self.correct_data()
         fig = px.scatter(
             x=list(self.data['test_date']),
@@ -343,7 +343,6 @@ class WordsGraph5(WordsGraph):
 def get_user_dashboards(
         request,
         user_name,
-        user_password,
         db_name
     ):
     """
@@ -352,7 +351,6 @@ def get_user_dashboards(
     logger.info(f"User: {user_name}")
     graphs = load_graphs(
         user_name=user_name,
-        user_password=user_password,
         db_name=db_name
     )
     request_dict = {
@@ -363,12 +361,11 @@ def get_user_dashboards(
         "graph_4": graphs[3],
         "graph_5": graphs[4],
         "userName": user_name,
-        "userPassword": user_password
     }
     return request_dict
 
 
-def load_graphs(user_name, user_password, db_name):
+def load_graphs(user_name, db_name):
     """
     Load the user's graphs.
     """
@@ -386,11 +383,11 @@ def load_graphs(user_name, user_password, db_name):
     graph_4 = WordsGraph4(db_querier=data_querier)
     graph_5 = WordsGraph5(db_querier=data_querier)
     # Create graphs
-    graph_1_html = graph_1.create(user_password=user_password)
-    graph_2_html = graph_2.create(user_password=user_password)
-    graph_3_html = graph_3.create(user_password=user_password)
-    graph_4_html = graph_4.create(user_password=user_password)
-    graph_5_html = graph_5.create(user_password=user_password)
+    graph_1_html = graph_1.create()
+    graph_2_html = graph_2.create()
+    graph_3_html = graph_3.create()
+    graph_4_html = graph_4.create()
+    graph_5_html = graph_5.create()
     # Save graphs
     html_graphs.append(graph_1_html)
     html_graphs.append(graph_2_html)

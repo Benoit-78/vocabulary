@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='expression',
+    name='vocabulary',
     version='0.1.0',
     author='ben',
     author_email='delormebenoit211@gmail.com',
@@ -9,7 +9,8 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/yourusername/my_super_project',
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     include_package_data=True,
     install_requires=[
         'numpy',
