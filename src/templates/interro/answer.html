@@ -20,50 +20,58 @@
 <body data-token="{{ token }}">
     <div class="container">
         <div class="white-text">
-            <p>{{ count }} / {{ testLength }}</p>
+            <p>{{ testCount }} / {{ testLength }}</p>
         </div>
+
         <div class="progress-container">
             <div class="progress-bar" style="width: {{ progressPercent }}%;" id="progress-bar"></div>
         </div>
+
         <div class="row">
             <p class="white-text">Quelle traduction donnez-vous pour :</p>
         </div>
+
         <div class="row">
             <div class="flag-box">
                 <div class="box rounded-input">
-                    {{ content_box1 }}
+                    {{ contentBox1 }}
                 </div>
             </div>
+
             <div class="flag-box">
                 <div class="box rounded-input">
-                    {{ content_box2 }}
+                    {{ contentBox2 }}
                 </div>
             </div>
         </div>
+
         <div class="row">
             <p class="white-text">Vous l’aviez ?</p>
         </div>
+
         <div class="row">
             <button id="yesButton" class="button green">Oui</button>
             <button id="noButton" class="button red">Non</button>
         </div>
+
         <div class="row">
             <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
+
     <script>
         // Declare HTML page variables to the JS file that will call them
-        const content_box1 = `{{ content_box1|safe }}`;
-        const content_box2 = `{{ content_box2|safe }}`;
-        const count = `{{ count }}`;
+        const contentBox1 = `{{ contentBox1|safe }}`;
+        const contentBox2 = `{{ contentBox2|safe }}`;
+        const testCount = `{{ testCount }}`;
         const databaseName = `{{ databaseName }}`;
         const faultsDict = `{{ faultsDict }}`;
-        const index = `{{ index }}`;
+        const testIndex = `{{ testIndex }}`;
         const interroCategory = `{{ interroCategory }}`;
         const interroDict = `{{ interroDict }}`;
         const oldInterroDict = `{{ oldInterroDict }}`;
-        const perf = `{{ perf }}`;
-        const score = `{{ score }}`;
+        const testPerf = `{{ testPerf }}`;
+        const testScore = `{{ testScore }}`;
         const testLength = `{{ testLength }}`;
         const testType = `{{ testType }}`;
     </script>

@@ -8,30 +8,30 @@
 """
 
 import os
-import sys
 
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
-
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.routing import APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.requests import Request
 
 from src.routers import common_router, dashboard_router, database_router
 from src.routers import guest_router, interro_router, user_router
 from src.api import authentication as auth_api
 
 app = FastAPI(
-    title="vocabulary",
-    docs_url="/doc"
+    title="expression",
+    docs_url="/docs",
+    description="""
+        API for Expression application\n
+        Provides you with endpoints to pass tests and register new words.
+    """,
+    servers=[
+        {"url": "https://www.vocabulary-app.com/v1", "description": "beta version"},
+        {"url": "https://www.vocabulary-app.com/v2", "description": "Super pro premium"},
+    ]
 )
 
 
@@ -57,7 +57,7 @@ app.add_middleware(
     CacheControlMiddleware
 )
 # Routers
-v1_router = APIRouter(prefix="/v1")
+v1_router = APIRouter()
 app.include_router(common_router)
 app.include_router(dashboard_router)
 app.include_router(database_router)
@@ -72,25 +72,27 @@ app.mount(
     name="static"
 )
 # HTML
-templates = Jinja2Templates(directory="src/templates")
+templates = Jinja2Templates(
+    directory="src/templates"
+)
 
 
-@app.get("/", response_class=HTMLResponse)
+@v1_router.get("/", response_class=HTMLResponse, tags=["Welcome"])
 async def root_page(
         request: Request,
         token: str = Depends(auth_api.create_token)
-    ):
+    ) -> RedirectResponse:
     """
     Redirects to the welcome page.
     """
     return RedirectResponse(url="/v1/welcome")
 
 
-@v1_router.get("/welcome", response_class=HTMLResponse)
+@v1_router.get("/welcome", response_class=HTMLResponse, tags=["Welcome"])
 async def welcome_page(
         request: Request,
         token: str = Depends(auth_api.create_token)
-    ):
+    ) -> HTMLResponse:
     """
     Call the welcome page and assign a token to the guest.
     """
@@ -101,12 +103,12 @@ async def welcome_page(
     )
 
 
-@v1_router.get("/sign-in", response_class=HTMLResponse)
+@v1_router.get("/sign-in", response_class=HTMLResponse, tags=["Welcome"])
 def sign_in(
         request: Request,
         token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the sign-in page.
     """
@@ -121,12 +123,12 @@ def sign_in(
     )
 
 
-@v1_router.get("/sign-up", response_class=HTMLResponse)
+@v1_router.get("/sign-up", response_class=HTMLResponse, tags=["Welcome"])
 def sign_up(
         request: Request,
         token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the create account page.
     """
@@ -137,11 +139,11 @@ def sign_up(
     )
 
 
-@v1_router.get("/about-the-app", response_class=HTMLResponse)
+@v1_router.get("/about-the-app", response_class=HTMLResponse, tags=["Welcome"])
 def about_the_app(
         request: Request,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that helps the user to get started.
     """
@@ -152,11 +154,11 @@ def about_the_app(
     )
 
 
-@v1_router.get("/help", response_class=HTMLResponse)
+@v1_router.get("/help", response_class=HTMLResponse, tags=["Welcome"])
 def get_help(
         request: Request,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Help!
     """
@@ -167,4 +169,4 @@ def get_help(
     )
 
 
-app.include_router(v1_router)
+app.include_router(v1_router, prefix="/v1")

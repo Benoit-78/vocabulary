@@ -1,16 +1,16 @@
+"""
+    Creator:
+        B. DELORME
+    Main purpose:
+        Provide with all methods necessary to interact with csv files.
+"""
 
-import os
-import sys
 from typing import Dict
 
 import pandas as pd
 from loguru import logger
 
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
-
-from src.utils.os import get_os_separator
+from src.utils.system_i import get_os_separator
 
 
 
@@ -21,11 +21,13 @@ class DataHandler():
     def __init__(self, test_type: str):
         self.test_type = test_type
         self.os_sep = get_os_separator()
-        self.paths = {}
-        self.tables = {}
+        self.paths: Dict[str, str] = {}
+        self.tables: Dict[str, pd.DataFrame] = {}
 
     def set_paths(self):
-        """List paths to data csv."""
+        """
+        List paths to data csv.
+        """
         self.paths[self.test_type + '_voc'] = self.os_sep.join(
             [r'.', 'data', self.test_type + '_voc.csv']
         )
@@ -101,7 +103,7 @@ class MenuReader():
     """
     Provide with all methods necessary to interact with csv files.
     """
-    def __init__(self, current_page):
+    def __init__(self, current_page: str):
         self.os_sep = get_os_separator()
         self.path = ''
         self.page = current_page.split('/')[1] + '.html'
@@ -116,24 +118,20 @@ class MenuReader():
             'menus.csv'
         ])
 
-    def get_translations_dict(self) -> pd.DataFrame:
+    def get_translations_dict(self) -> Dict[str, Dict[str, str]]:
         """
         Load the tables
         """
         self.set_path()
-        menus_df = pd.read_csv(
-            self.path,
-            sep=';',
-            encoding='utf-8'
-        )
+        menus_df = pd.read_csv(self.path, sep=';', encoding='utf-8')
         menus_df = menus_df[menus_df['page']==self.page]
         translations_dict = {}
         for _, row in menus_df.iterrows():
-            original_text = row['standard']
-            translated_text_en = row['english']
-            translated_text_fr = row['french']
+            original_text = str(row['standard'])
+            translated_text_fo = str(row['foreign'])
+            translated_text_na = str(row['native'])
             translations_dict[original_text] = {
-                'en': translated_text_en,
-                'fr': translated_text_fr
+                'fo': translated_text_fo,
+                'na': translated_text_na
             }
         return translations_dict

@@ -7,25 +7,18 @@
         Hosts the functions of common router.
 """
 
-import os
-import sys
+from typing import Any, Dict
 
 from fastapi.responses import JSONResponse
-from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.data.csv_interface import MenuReader
 
 
-def change_language(data):
+def change_language(data: Dict[str, Any]) -> JSONResponse:
     """
     Change the language of the user interface.
     """
-    menu_reader = MenuReader(current_page=data.get('path'))
+    menu_reader = MenuReader(current_page=data['path'])
     translations_dict = menu_reader.get_translations_dict()
     json_response = JSONResponse(
         content={

@@ -8,33 +8,23 @@
 """
 
 import ast
-import os
-import sys
+from typing import Any, Dict, List, Tuple, Union, cast
 
 import pandas as pd
 from fastapi.responses import JSONResponse
 from loguru import logger
-from typing import Dict
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src.interro import Loader, Interro, PremierTest, Rattrap
 from src.api.authentication import get_user_name_from_token
 from src.api.database import get_user_databases
 from src.data.database_interface import DbQuerier
 from src.interro import Updater
-# from src.utils.debug import print_arguments_and_output
+from src.models.interro import Params
 from src.views.api import FastapiGuesser
 
 
 # ------------------ API functions ------------------ #
-def get_interro_settings(
-        token,
-        error_message
-    ):
+def get_interro_settings(token: str, error_message: str) -> Dict[str, Any]:
     """
     API function to load the interro settings.
     """
@@ -48,10 +38,7 @@ def get_interro_settings(
     return settings_dict
 
 
-def save_interro_settings(
-        token,
-        params
-    ):
+def save_interro_settings(token: str, params: Dict[str, Any]) -> JSONResponse:
     """
     API function to save the interro settings.
     """
@@ -85,92 +72,80 @@ def save_interro_settings(
     response_dict['oldInterroDict'] = get_old_interro_dict(
         interro_dict=response_dict['interroDict']
     )
-    response_dict['score'] = 0
-    response_dict['count'] = 0
+    response_dict['testScore'] = 0
+    response_dict['testCount'] = 0
     response_dict['databaseName'] = db_name
     response_dict['testType'] = test_type
-    logger.debug(f"Response dict: {response_dict}")
-    json_response = JSONResponse(
-        content=response_dict
-    )
+    json_response = JSONResponse(content=response_dict)
     return json_response
 
 
-def get_interro_question(
-        token,
-        params
-    ):
+def get_interro_question(token: str, params: Params) -> Dict[str, Any]:
     """
     API function to load the interro question.
     """
-    count = int(params.count)
+    test_count = int(params.testCount or 0)
     test_length = int(params.testLength)
-    progress_percent = int(count / test_length * 100)
+    progress_percent = int(test_count / test_length * 100)
     interro_df = decode_dict(params.interroDict)
-    index = int(params.index)
-    english = interro_df.loc[index][0]
-    english = english.replace("'", "\'")
-    count += 1
+    test_index = int(params.testIndex)
+    foreign_word = interro_df.loc[test_index][0]
+    foreign_word = foreign_word.replace("'", "\'")
+    test_count += 1
     response_dict = {
-        'content_box1': english,
-        'count': count,
+        'contentBox1': foreign_word,
         'databaseName': params.databaseName,
         'faultsDict': params.faultsDict,
-        'index': index,
         'interroCategory': params.interroCategory,
         'interroDict': params.interroDict,
         'message': params.message,
         'oldInterroDict': params.oldInterroDict,
-        'perf': params.perf,
         'progressPercent': progress_percent,
-        'score': params.score,
+        'testCount': test_count,
+        'testIndex': test_index,
         'testLength': test_length,
+        'testPerf': params.testPerf,
+        'testScore': params.testScore,
         'testType': params.testType,
         'token': token,
     }
     return response_dict
 
 
-def load_interro_answer(
-        token,
-        params
-    ):
+def load_interro_answer(token: str, params: Params) -> Dict[str, Any]:
     """
     Load the interro answer.
     """
-    count = int(params.count)
+    test_count = int(params.testCount or 0)
     test_length = int(params.testLength)
-    progress_percent = int(count / test_length * 100)
+    progress_percent = int(test_count / test_length * 100)
     interro_df = decode_dict(params.interroDict)
-    index = int(params.index)
-    foreign = interro_df.loc[index][0]
+    test_index = int(params.testIndex)
+    foreign = interro_df.loc[test_index][0]
     foreign = foreign.replace("'", "\'")
-    native = interro_df.loc[index][1]
+    native = interro_df.loc[test_index][1]
     native = native.replace("'", "\'")
     response_dict = {
-        'token': token,
-        'content_box1': foreign,
-        'content_box2': native,
-        'count': params.count,
+        'contentBox1': foreign,
+        'contentBox2': native,
         'databaseName': params.databaseName,
         'faultsDict': params.faultsDict,
-        'index': index,
         'interroCategory': params.interroCategory,
         'interroDict': params.interroDict,
         'oldInterroDict': params.oldInterroDict,
-        'perf': params.perf,
         'progressPercent': progress_percent,
-        'score': params.score,
+        'testCount': params.testCount,
+        'testIndex': test_index,
         'testLength': test_length,
-        'testType': params.testType
+        'testPerf': params.testPerf,
+        'testScore': params.testScore,
+        'testType': params.testType,
+        'token': token
     }
     return response_dict
 
 
-def get_user_answer(
-        token,
-        params
-    ):
+def get_user_answer(token: str, params: Params) -> JSONResponse:
     """
     Get the user response.
     """
@@ -183,10 +158,7 @@ def get_user_answer(
     return json_response
 
 
-def end_interro(
-        token,
-        params
-    ):
+def end_interro(token: str, params: Params) -> Dict[str, Any]:
     """
     End the interro.
     """
@@ -194,24 +166,22 @@ def end_interro(
     if params.interroCategory == 'test':
         interro_df = decode_dict(params.interroDict)
         update_test(params, interro_df, token)
+        interro_df = interro_df[['foreign', 'native']]
     # If the user does not guesses all words, and there is a rattrap
     elif params.interroCategory == 'rattrap':
         interro_df = decode_dict(params.oldInterroDict)
     headers, rows = turn_df_into_dict(words_df=interro_df)
     response_dict = {
-        "token": token,
-        "headers": headers,
-        "rows": rows,
-        "score": params.score,
-        "testLength": params.testLength
+        'headers': headers,
+        'rows': rows,
+        'testLength': params.testLength,
+        'testScore': params.testScore,
+        'token': token,
     }
     return response_dict
 
 
-def propose_rattrap(
-        token,
-        params,
-    ):
+def propose_rattrap(token: str, params: Params) -> Dict[str, Any]:
     """
     Propose the rattrap.
     """
@@ -221,21 +191,18 @@ def propose_rattrap(
         "token": token,
         "databaseName": params.databaseName,
         "faultsDict": params.faultsDict,
-        "index": 0,
+        "testIndex": 0,
         "interroCategory": params.interroCategory,
         "interroDict": [],
         "oldInterroDict": params.oldInterroDict,
-        "score": params.score,
+        "testScore": params.testScore,
         "testLength": len(params.interroDict),
         "testType": params.testType,
     }
     return response_dict
 
 
-def launch_rattrap(
-        token,
-        params
-    ):
+def launch_rattrap(token: str, params: Params) -> JSONResponse:
     """
     Load the rattrap!
     """
@@ -251,14 +218,13 @@ def launch_rattrap(
     rattrap.reshuffle_words_table()
     attributes_dict = rattrap.to_dict()
     new_interro_category = get_interro_category(interro=rattrap)
-    attributes_dict['count'] = 0
+    attributes_dict['testCount'] = 0
     attributes_dict['databaseName'] = params.databaseName
     attributes_dict['interroCategory'] = new_interro_category
     attributes_dict['message'] = "Rattrap created successfully"
-    attributes_dict['score'] = 0
+    attributes_dict['testScore'] = 0
     attributes_dict['testType'] = params.testType
     attributes_dict['token'] = token
-    logger.debug(f"Attributes dict: {attributes_dict}")
     return JSONResponse(
         content=attributes_dict
     )
@@ -266,11 +232,11 @@ def launch_rattrap(
 
 # ------------------ Helper functions ------------------ #
 def load_test(
-        user_name,
-        db_name,
-        test_type,
-        test_length
-    ):
+        user_name: str,
+        db_name: str,
+        test_type: str,
+        test_length: int
+    ) -> Tuple[Loader, PremierTest]:
     """
     Load the interroooo!
     """
@@ -280,7 +246,7 @@ def load_test(
         test_type=test_type,
     )
     loader = Loader(
-        words=test_length,
+        test_length=test_length,
         data_querier=db_querier
     )
     loader.load_tables()
@@ -288,13 +254,13 @@ def load_test(
     guesser = FastapiGuesser()
     premier_test = PremierTest(
         interro_df=loader.interro_df,
-        words=loader.words,
+        test_length=loader.test_length,
         guesser=guesser
     )
     return loader, premier_test
 
 
-def get_old_interro_dict(interro_dict):
+def get_old_interro_dict(interro_dict: Union[str, Dict[str, Any]]) -> str:
     """
     Get the old interro dict out of the original interro dict.
     """
@@ -306,7 +272,7 @@ def get_old_interro_dict(interro_dict):
     return old_interro_df
 
 
-def get_error_messages(error_message: str):
+def get_error_messages(error_message: str) -> str:
     """
     Get the error messages from the error message.
     """
@@ -345,16 +311,17 @@ def get_interro_category(interro: Interro) -> str:
     return result
 
 
-def turn_df_into_dict(words_df: pd.DataFrame) -> Dict:
+def turn_df_into_dict(words_df: pd.DataFrame) -> Tuple[List[str], List[List[Any]]]:
     """
     Turn the dataframe into a dictionary.
     """
-    headers = list(words_df.columns)
-    rows = words_df.values.tolist()
+    headers: List[str] = list(words_df.columns)
+    rows_raw = words_df.values.tolist()
+    rows = cast(List[List[Any]], rows_raw)
     return headers, rows
 
 
-def decode_dict(interro_dict):
+def decode_dict(interro_dict: Dict[str, Any]) -> pd.DataFrame:
     """
     Prepare interro_df for words extraction.
     Two times escaping is necessary.
@@ -372,28 +339,31 @@ def decode_dict(interro_dict):
     return interro_df
 
 
-def get_faults_df(faults_dict):
+def get_faults_df(faults_dict: Dict[str, Any]) -> pd.DataFrame:
     """
     Empty faults dict can be turned into None on client side.
     """
-    if faults_dict in [None, 'None', []]:
+    if faults_dict == {'key': 'val'}:
         faults_df = pd.DataFrame(columns=['foreign', 'native'])
     else:
         faults_df = decode_dict(faults_dict)
     return faults_df
 
 
-def get_interro(params):
+def get_interro(params: Params) -> Interro:
+    """
+    Get the interro object.
+    """
     interro_df = decode_dict(params.interroDict)
     interro_category = params.interroCategory
     if interro_category == 'test':
         faults_df = get_faults_df(params.faultsDict)
-        interro = PremierTest.from_dict({
+        return PremierTest.from_dict({
             'testLength': params.testLength,
             'interroTable': interro_df,
             'faultsTable': faults_df,
-            'index': int(params.index),
-            'perf': params.perf
+            'testIndex': int(params.testIndex),
+            'testPerf': params.testPerf
         })
     elif interro_category == 'rattrap':
         guesser = FastapiGuesser()
@@ -404,59 +374,70 @@ def get_interro(params):
             old_interro_df=old_interro_df
         )
         rattrap.reshuffle_words_table()
-        interro = rattrap
+        return rattrap
     else:
         logger.error(f"Unknown interro category: {interro_category}")
         raise ValueError
-    return interro
 
 
-def update_interro(interro, params):
-    index = int(params.index)
-    score = int(params.score)
-    if params.answer == 'Yes':
+def update_interro(interro: Interro, params: Params) -> Tuple[Interro, int]:
+    """
+    Update the interro object.
+    """
+    index = int(params.testIndex)
+    score = int(params.testScore)
+    if params.userAnswer == 'Yes':
         score += 1
         update = True
-    elif params.answer == 'No':
+    elif params.userAnswer == 'No':
         interro_df = decode_dict(params.interroDict)
         update = False
-        foreign = interro_df.loc[index][0]
+        foreign = str(interro_df.loc[index][0])
         foreign = foreign.replace("'", "\'")
-        native = interro_df.loc[index][1]
+        native = str(interro_df.loc[index][1])
         native = native.replace("'", "\'")
         interro.update_faults_df(
             word_guessed=update,
             row=[foreign, native]
         )
-    logger.debug('Hi 1')
+    else:
+        logger.error(f"Unknown user answer: {params.userAnswer}")
+        raise ValueError
     if params.interroCategory == 'test':
+        interro = cast(PremierTest, interro)
         interro.update_interro_df(word_guessed=update)
-        count = int(params.count)
-        logger.debug('Hi 2')
+        count = int(params.testCount or 0)
         if count < int(params.testLength):
-            logger.debug(f"Count: {count}, test length: {params.testLength}")
             interro.update_index()
-            logger.debug('Index updated')
-    logger.debug('Hi 3')
     return interro, score
 
 
-def get_attributes_dict(token, interro, params, score):
+def get_attributes_dict(
+        token: str,
+        interro: Interro,
+        params: Params,
+        score: int
+    ) -> Dict[str, Any]:
+    """
+    Get the attributes dictionary.
+
+    USed by get_user_answer()
+    """
     attributes_dict = interro.to_dict()
     if params.interroCategory != 'test':
-        attributes_dict['index'] = 0
+        attributes_dict['testIndex'] = 0
     attributes_dict['message'] = "User response stored successfully"
     attributes_dict['token'] = token
-    attributes_dict['count'] = params.count
+    attributes_dict['testCount'] = params.testCount
     attributes_dict['databaseName'] = params.databaseName
     attributes_dict['interroCategory'] = params.interroCategory
     attributes_dict['oldInterroDict'] = str(params.oldInterroDict)
-    attributes_dict['score'] = score
+    attributes_dict['testScore'] = score
     attributes_dict['testType'] = params.testType
     return attributes_dict
 
 
-def save_result(token, params):
+def save_result(token: str, params: Params):
     """
     Save the result of the interro.
     """
@@ -466,8 +447,8 @@ def save_result(token, params):
         'testLength': params.testLength,
         'interroTable': interro_df,
         'faultsTable': faults_df,
-        'index': params.index,
-        'perf': params.perf
+        'testIndex': params.testIndex,
+        'testPerf': params.testPerf
     })
     premier_test.compute_success_rate()
     # -----
@@ -478,7 +459,7 @@ def save_result(token, params):
         test_type=params.testType,
     )
     loader = Loader(
-        words=params.testLength,
+        test_length=params.testLength,
         data_querier=db_querier
     )
     loader.load_tables()
@@ -489,14 +470,23 @@ def save_result(token, params):
     updater.update_data()
 
 
-def update_test(params, interro_df, token):
+def update_test(
+        params: Params,
+        interro_df: pd.DataFrame,
+        token: str
+    ):
+    """
+    Update the test.
+
+    USed by end_interro()
+    """
     test_length = params.testLength
     faults_df = get_faults_df(params.faultsDict)
     premier_test = PremierTest.from_dict({
         'faultsTable': faults_df,
-        'index': params.index,
         'interroTable': interro_df,
-        'perf': params.perf,
+        'testIndex': params.testIndex,
+        'testPerf': params.testPerf,
         'testLength': test_length,
     })
     premier_test.compute_success_rate()
@@ -507,7 +497,7 @@ def update_test(params, interro_df, token):
         test_type=params.testType,
     )
     loader = Loader(
-        words=test_length,
+        test_length=test_length,
         data_querier=db_querier
     )
     loader.load_tables()

@@ -4,25 +4,39 @@
 .pytest_cache/*
 .vscode/*
 __pycache__/*
-data/__pycache__/*
 src/data/__pycache__/*
 node_modules/*
 
+# ----- bin -----
+bin/sonar.sh
+bin/env.sh
+
+# ----- build -----
+build/
+dist/
+src/vocabulary.egg-info/
+
+# ----- conf -----
 conf/*
 
-divers/*
+# ----- data -----
+data/*
+!data/queries/*
 
+# ----- divers -----
+divers/*
 doc/*
 
+# ----- logs -----
 logs/*
 
+# ----- venv -----
 venv/*
 
-htmlcov/*
-
+# ----- mgmt -----
 mgmt/*
 
-# Tests artifacts
+# ----- tests -----
 .coverage
 coverage/*
 
@@ -39,3 +53,5 @@ common/secret.yaml
 jest.config.js
 package-lock.json
 package.json
+mypy.ini
+

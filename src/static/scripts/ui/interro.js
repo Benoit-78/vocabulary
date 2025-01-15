@@ -44,15 +44,15 @@ document.addEventListener("DOMContentLoaded", function() {
     var decodedOldInterroDict = decodeHtmlEntities(decodeHtmlEntities(oldInterroDict));
     var decodedFaultsDict = decodeHtmlEntities(decodeHtmlEntities(faultsDict));
     const params = {
-        count: count,
+        testCount: testCount,
         databaseName: databaseName,
         faultsDict: decodedFaultsDict,
-        index: index,
+        testIndex: testIndex,
         interroCategory: interroCategory,
         interroDict: decodedInterroDict,
         oldInterroDict: decodedOldInterroDict,
-        perf: perf,
-        score: score,
+        testPerf: testPerf,
+        testScore: testScore,
         testLength: testLength,
         testType: testType,
     };
@@ -70,18 +70,18 @@ document.addEventListener("DOMContentLoaded", function() {
     var decodedOldInterroDict = decodeHtmlEntities(decodeHtmlEntities(oldInterroDict));
     var decodedFaultsDict = decodeHtmlEntities(decodeHtmlEntities(faultsDict));
     const params = {
-        answer: 'Yes',
-        content_box1: content_box1,
-        content_box2: content_box2,
-        count: count,
+        userAnswer: 'Yes',
+        contentBox1: contentBox1,
+        contentBox2: contentBox2,
+        testCount: testCount,
         databaseName: databaseName,
         faultsDict: decodedFaultsDict,
-        index: index,
+        testIndex: testIndex,
         interroCategory: interroCategory,
         interroDict: decodedInterroDict,
         oldInterroDict: decodedOldInterroDict,
-        perf: perf,
-        score: score,
+        testPerf: testPerf,
+        testScore: testScore,
         testLength: testLength,
         testType: testType,
     };
@@ -99,18 +99,18 @@ document.addEventListener("DOMContentLoaded", function() {
     var decodedOldInterroDict = decodeHtmlEntities(decodeHtmlEntities(oldInterroDict));
     var decodedFaultsDict = decodeHtmlEntities(decodeHtmlEntities(faultsDict));
     const params = {
-        answer: 'No',
-        content_box1: content_box1,
-        content_box2: content_box2,
-        count: count,
+        userAnswer: 'No',
+        contentBox1: contentBox1,
+        contentBox2: contentBox2,
+        testCount: testCount,
         databaseName: databaseName,
         faultsDict: decodedFaultsDict,
-        index: index,
+        testIndex: testIndex,
         interroCategory: interroCategory,
         interroDict: decodedInterroDict,
         oldInterroDict: decodedOldInterroDict,
-        perf: perf,
-        score: score,
+        testPerf: testPerf,
+        testScore: testScore,
         testLength: testLength,
         testType: testType,
     };
@@ -130,11 +130,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const params = {
         databaseName: databaseName,
         faultsDict: decodedFaultsDict,
-        index: index,
+        testIndex: testIndex,
         interroCategory: interroCategory,
         interroDict: decodedInterroDict,
         oldInterroDict: decodedOldInterroDict,
-        score: score,
+        testScore: testScore,
         testLength: testLength,
         testType: testType
     }

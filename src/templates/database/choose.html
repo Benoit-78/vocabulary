@@ -20,53 +20,57 @@
 <body data-token="{{ token }}">
 
     <table class="display-table container">
-            <tbody>
-                <tr class="row">
-                    <td>
-                        <p class="white-text">Nouveau dictionnaire</p>
+        <tbody>
+            <tr class="row">
+                <td>
+                    <p class="white-text">Nouveau dictionnaire</p>
+                    <div>
                         <div>
-                            <div>
-                                <input
-                                    class="rounded-input"
-                                    id="databaseName"
-                                    name="databaseName"
-                                    placeholder="Nouveau dictionnaire"
-                                    type="text"
-                                    >
-                                </div>
-                                {% if createDatabaseErrorMessage %}
-                                <p class="error-message">{{ createDatabaseErrorMessage }}</p>
-                                {% endif %}
-                            </div>
-                        <div>
-                            <button id="createDatabaseButton" class="button">Créer</button>
+                            <input
+                                class="rounded-input"
+                                id="databaseName"
+                                name="databaseName"
+                                placeholder="Nouveau dictionnaire"
+                                type="text"
+                                >
                         </div>
+                        {% if createDatabaseErrorMessage %}
+                        <p class="error-message">{{ createDatabaseErrorMessage }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <button id="createDatabaseButton" class="button">Créer</button>
+                    </div>
+
+                    <div>
                         <div>
-                            <div>
-                                <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
-                            </div>
+                            <label for="input3" id="errorMessage" name="errorMessage" class="error-message">{{ errorMessage }}</label>
                         </div>
-                    </td>
-                    <td>
-                        <p class="white-text">Vos dictionnaires</p>
-                        <div>
-                            <select id="dropdown" class="rounded-input">
-                                {% for database in databases %}
-                                <option value="{{ database }}">{{ database }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <button id="seeDatabaseButton" class="button">Ouvrir</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="row">
-                    <td>
-                        <button id="userSpaceButton" class="button quit-button">Quitter</button>
-                    </td>
-                </tr>
-            </tbody>
+                    </div>
+                </td>
+
+                <td>
+                    <p class="white-text">Vos dictionnaires</p>
+                    <div>
+                        <select id="dropdown" class="rounded-input">
+                            {% for database in databases %}
+                            <option value="{{ database }}">{{ database }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <button id="seeDatabaseButton" class="button">Ouvrir</button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr class="row">
+                <td>
+                    <button id="userSpaceButton" class="button quit-button">Quitter</button>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </body>
 

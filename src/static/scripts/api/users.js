@@ -33,6 +33,7 @@ async function createAccount(token, inputName, inputPassword) {
 
 
 async function authenticateUser(token, formData) {
+    console.log("formData:", formData);
     try {
         const response = await fetch(
             `/v1/user/user-token?token=${token}`,
@@ -43,7 +44,7 @@ async function authenticateUser(token, formData) {
             }
         );
         const data = await response.json();
-        console.log(data);
+        console.log("data:", data);
         if (data && data.message === "User successfully authenticated") {
             window.location.href = `/v1/user/user-space?token=${data.token}`;
         } else if (data && data.message === "Unknown user") {

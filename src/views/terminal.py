@@ -19,19 +19,19 @@ class CliUser():
     def __init__(self):
         self.settings = None
 
-    def parse_arguments(self, arg: List[str]) -> argparse.Namespace:
+    def parse_arguments(self, arg: List[str]):
         """
         Parse command line argument.
         """
         another_parser = argparse.ArgumentParser()
         another_parser.add_argument("-t", "--type", type=str)
-        another_parser.add_argument("-w", "--words", type=int)
+        another_parser.add_argument("-l", "--test_length", type=int)
         another_parser.add_argument("-r", "--rattrap", type=int)
         if '-t' not in arg:
             arg.append('-t')
             arg.append('version')
-        if '-w' not in arg:
-            arg.append('-w')
+        if '-l' not in arg:
+            arg.append('-l')
             arg.append('10')
         if '-r' not in arg:
             arg.append('-r')
@@ -44,13 +44,13 @@ class CliUser():
         """
         self.parse_arguments(sys.argv[1:])
         cond_1 = not self.settings.type
-        cond_2 = not self.settings.words
+        cond_2 = not self.settings.test_length
         cond_3 = not self.settings.rattrap
         if cond_1 or cond_2 or cond_3:
             message = ' '.join([
                 "Please give",
                 "-t <test type>, ",
-                "-w <number of words> and ",
+                "-l <test length> and ",
                 "-r <number of rattrap>"
             ])
             logger.error(message)
@@ -61,8 +61,8 @@ class CliUser():
         if self.settings.rattrap < -1:
             logger.error("Number of rattrap must be greater than -1.")
             raise SystemExit
-        if self.settings.words < 1:
-            logger.error("Number of words must be greater than 0.")
+        if self.settings.test_length < 1:
+            logger.error("Test length must be greater than 0.")
             raise SystemExit
 
 
@@ -82,7 +82,7 @@ class CliGuesser():
             logger.error("Interruption by user")
             raise SystemExit
 
-    def get_user_answer(self, row: str, title: str) -> bool:
+    def get_user_answer(self, row: List[str], title: str) -> bool:
         """
         Ask the user to decide if the answer was correct or not.
         """
@@ -94,7 +94,7 @@ class CliGuesser():
             raise SystemExit
         return word_guessed
 
-    def guess_word(self, row: List[str], i: int, words: int):
+    def guess_word(self, row: List[str], i: int, words: int) -> bool:
         """
         Given a row, ask a word to the user, and return a boolean.
         """

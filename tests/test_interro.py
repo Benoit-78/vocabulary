@@ -7,18 +7,10 @@
         Test script for interro.py, main script of vocabulary application
 """
 
-import os
-import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-# from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src import interro
 from src.views import terminal as view_terminal
@@ -41,7 +33,7 @@ class TestLoader(unittest.TestCase):
             test_type=self.test_type
         )
         self.loader = interro.Loader(
-            words=10,
+            test_length=10,
             data_querier=self.data_querier
         )
 
@@ -118,7 +110,7 @@ class TestLoader(unittest.TestCase):
         # ----- ACT
         self.loader.adjust_test_length()
         # ----- ASSERT
-        self.assertEqual(self.loader.words, 5)
+        self.assertEqual(self.loader.test_length, 5)
 
     def test_adjust_test_length_small_table(self):
         """
@@ -137,7 +129,7 @@ class TestLoader(unittest.TestCase):
         # ----- ACT
         self.loader.adjust_test_length()
         # ----- ASSERT
-        self.assertEqual(self.loader.words, 3)
+        self.assertEqual(self.loader.test_length, 3)
 
     def test_adjust_test_length_empty_table(self):
         """
@@ -189,7 +181,7 @@ class TestLoader(unittest.TestCase):
         A dataframe of words should be formed, that will be asked to the user
         """
         # ----- ARRANGE
-        self.loader.words = 10
+        self.loader.test_length = 10
         self.loader.words_df = pd.DataFrame({
             'bad_word': [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         })
@@ -202,7 +194,7 @@ class TestLoader(unittest.TestCase):
             list(self.loader.interro_df['bad_word']),
             expected_labels
         )
-        self.assertEqual(self.loader.words, 10)
+        self.assertEqual(self.loader.test_length, 10)
 
     @patch('src.interro.Loader.adjust_test_length')
     def test_set_interro_df_not_enough_good(
@@ -213,7 +205,7 @@ class TestLoader(unittest.TestCase):
         A dataframe of words should be formed, that will be asked to the user
         """
         # ----- ARRANGE
-        self.loader.words = 10
+        self.loader.test_length = 10
         self.loader.words_df = pd.DataFrame({
             'bad_word': [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         })
@@ -226,7 +218,7 @@ class TestLoader(unittest.TestCase):
             list(self.loader.interro_df['bad_word']),
             expected_labels
         )
-        self.assertEqual(self.loader.words, 10)
+        self.assertEqual(self.loader.test_length, 10)
 
     @patch('src.interro.Loader.adjust_test_length')
     def test_set_interro_df_not_enough_bad(
@@ -237,7 +229,7 @@ class TestLoader(unittest.TestCase):
         A dataframe of words should be formed, that will be asked to the user
         """
         # ----- ARRANGE
-        self.loader.words = 10
+        self.loader.test_length = 10
         self.loader.words_df = pd.DataFrame({
             'bad_word': [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
         })
@@ -250,7 +242,7 @@ class TestLoader(unittest.TestCase):
             list(self.loader.interro_df['bad_word']),
             expected_labels
         )
-        self.assertEqual(self.loader.words, 10)
+        self.assertEqual(self.loader.test_length, 10)
 
     @patch('src.interro.Loader.adjust_test_length')
     def test_set_interro_df_not_enough_both(
@@ -261,7 +253,7 @@ class TestLoader(unittest.TestCase):
         A dataframe of words should be formed, that will be asked to the user
         """
         # ----- ARRANGE
-        self.loader.words = 10
+        self.loader.test_length = 10
         self.loader.words_df = pd.DataFrame({
             'bad_word': [0, 0, 1, 1, 1]
         })
@@ -274,7 +266,7 @@ class TestLoader(unittest.TestCase):
             list(self.loader.interro_df['bad_word']),
             expected_labels
         )
-        self.assertEqual(self.loader.words, 5)
+        self.assertEqual(self.loader.test_length, 5)
 
 
 
@@ -296,12 +288,12 @@ class TestPremierTest(unittest.TestCase):
             test_type='test_type'
         )
         cls.loader_1 = interro.Loader(
-            words=10,
+            test_length=10,
             data_querier=cls.data_querier_1
         )
 
     def setUp(self):
-        df = pd.DataFrame(columns=['english', 'français'])
+        df = pd.DataFrame(columns=['foreign', 'native'])
         df.loc[df.shape[0]] = ['Hello', 'Bonjour']
         df.loc[df.shape[0]] = ['One', 'Un']
         df.loc[df.shape[0]] = ['Two', 'Deux']
@@ -319,12 +311,12 @@ class TestPremierTest(unittest.TestCase):
         df['taux'] = [0] * df.shape[0]
         df['bad_word'] = [0] * df.shape[0]
         self.loader_1.tables = {}
-        words = df.shape[0] //  2
+        test_length = df.shape[0] //  2
         self.loader_1.tables['version_voc'] = df
         guesser = view_terminal.CliGuesser()
         self.interro_1 = interro.PremierTest(
             self.loader_1.tables['version_voc'],
-            words,
+            test_length,
             guesser
         )
         self.interro_1.step = 1
@@ -415,11 +407,11 @@ class TestPremierTest(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_keys = {
-            'interroDict',
-            'testLength',
-            'index',
             'faultsDict',
-            'perf'
+            'interroDict',
+            'testIndex',
+            'testLength',
+            'testPerf'
         }
         self.assertEqual(set(result.keys()), expected_keys)
 
@@ -429,20 +421,20 @@ class TestPremierTest(unittest.TestCase):
         mock_guesser_object = MagicMock()
         mock_guesser.return_value = mock_guesser_object
         data = {
-            'testLength': 10,
-            'interroTable': pd.DataFrame({'a': [1, 2, 3]}),
             'faultsTable': pd.DataFrame({'b': [4, 5, 6]}),
-            'index': 5,
-            'perf': 'some performance data'
+            'interroTable': pd.DataFrame({'a': [1, 2, 3]}),
+            'testIndex': 5,
+            'testLength': 10,
+            'testPerf': 'some performance data'
         }
         # ----- ACT
         instance = self.interro_1.from_dict(data)
         # ----- ASSERT
-        self.assertEqual(instance.words, data['testLength'])
+        self.assertEqual(instance.test_length, data['testLength'])
         pd.testing.assert_frame_equal(instance.interro_df, data['interroTable'])
         pd.testing.assert_frame_equal(instance.faults_df, data['faultsTable'])
-        self.assertEqual(instance.index, data['index'])
-        self.assertEqual(instance.perf, data['perf'])
+        self.assertEqual(instance.index, data['testIndex'])
+        self.assertEqual(instance.perf, data['testPerf'])
         self.assertIs(instance.guesser, mock_guesser_object)
 
 
@@ -453,8 +445,8 @@ class TestRattrap(unittest.TestCase):
     """
     def setUp(self):
         self.faults_df = pd.DataFrame({
-            'english': [1, 2, 3],
-            'français': [4, 5, 6]
+            'foreign': [1, 2, 3],
+            'native': [4, 5, 6]
         })
         self.guesser = MagicMock()
         self.rattrap = interro.Rattrap(
@@ -470,8 +462,8 @@ class TestRattrap(unittest.TestCase):
         """
         # ----- ARRANGE
         interro_df = pd.DataFrame({
-            'english': [1, 2, 3],
-            'français': [4, 5, 6]
+            'foreign': [1, 2, 3],
+            'native': [4, 5, 6]
         })
         self.guesser = 'mock_guesser'
         # ----- ACT
@@ -483,7 +475,7 @@ class TestRattrap(unittest.TestCase):
         # ----- ASSERT
         mock_interro_init.assert_called_once_with(
             interro_df=interro_df,
-            words=3,
+            test_length=3,
             guesser='mock_guesser'
         )
         self.assertEqual(hasattr(self.rattrap, 'rattrap'), True)
@@ -536,11 +528,11 @@ class TestRattrap(unittest.TestCase):
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         expected_keys = {
-            'interroDict',
-            'testLength',
-            'index',
             'faultsDict',
-            'oldInterroDict'
+            'interroDict',
+            'oldInterroDict',
+            'testLength',
+            'testIndex',
         }
         self.assertEqual(set(result.keys()), expected_keys)
 
@@ -548,18 +540,18 @@ class TestRattrap(unittest.TestCase):
         # ----- ARRANGE
         data = {
             'faultsDict': pd.DataFrame({'b': [4, 5, 6]}),
-            'index': 5,
             'interroDict': pd.DataFrame({'a': [1, 2, 3]}),
             'oldInterroDict': pd.DataFrame({'c': [7, 8, 9]}),
+            'testIndex': 5,
             'testLength': 10,
         }
         # ----- ACT
         instance = self.rattrap.from_dict(data)
         # ----- ASSERT
-        self.assertEqual(instance.words, data['testLength'])
+        self.assertEqual(instance.test_length, data['testLength'])
         pd.testing.assert_frame_equal(instance.interro_df, data['interroDict'])
         pd.testing.assert_frame_equal(instance.faults_df, data['faultsDict'])
-        self.assertEqual(instance.index, data['index'])
+        self.assertEqual(instance.index, data['testIndex'])
         pd.testing.assert_frame_equal(instance.old_interro_df, data['oldInterroDict'])
 
 
@@ -577,17 +569,17 @@ class TestUpdater(unittest.TestCase):
             db_name='test_db',
             test_type='version'
         )
-        words = 10
+        test_length = 10
         self.loader_1 = interro.Loader(
-            words=words,
+            test_length=test_length,
             data_querier=self.data_querier_1
         )
         self.loader_1.tables = {
             'version_voc': pd.DataFrame(
                 columns=[
                     'id_word',
-                    'english',
-                    'français',
+                    'foreign',
+                    'native',
                     'creation_date',
                     'nb',
                     'score',
@@ -611,8 +603,8 @@ class TestUpdater(unittest.TestCase):
             'output': pd.DataFrame(
                 columns=[
                     'id_word',
-                    'english',
-                    'français',
+                    'foreign',
+                    'native',
                     'creation_date',
                     'nb',
                     'score',
@@ -621,12 +613,12 @@ class TestUpdater(unittest.TestCase):
             )
         }
         df = pd.DataFrame({
-            'english':
+            'foreign':
             [
                 'Hello', 'One', 'Two', 'Three', 'Four', 'Five',
                 'Six', 'Seven', 'Eight', 'Nine', 'Ten'
             ],
-            'français':
+            'native':
             [
                 'Bonjour', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq',
                 'Six', 'Sept', 'Huit', 'Neuf', 'Dix'
@@ -642,7 +634,7 @@ class TestUpdater(unittest.TestCase):
         self.guesser = view_terminal.CliGuesser()
         self.interro_1 = interro.PremierTest(
             interro_df=self.loader_1.tables['version_voc'],
-            words=words,
+            test_length=test_length,
             guesser=self.guesser,
         )
         self.updater_1 = interro.Updater(

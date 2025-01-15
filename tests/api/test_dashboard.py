@@ -7,19 +7,10 @@
         Test script for 
 """
 
-import os
-import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
-
 from src.api import dashboard as dashboard_api
 from src.data.database_interface import DbQuerier
 
@@ -44,14 +35,12 @@ class TestDashboard(unittest.TestCase):
         result = dashboard_api.get_user_dashboards(
             request,
             user_name,
-            user_password,
             db_name
         )
         # ----- ASSERT
         self.assertIsInstance(result, dict)
         mock_load_graphs.assert_called_once_with(
             user_name=user_name,
-            user_password=user_password,
             db_name=db_name
         )
         expected_dict = {
@@ -61,8 +50,7 @@ class TestDashboard(unittest.TestCase):
             "graph_3": 3,
             "graph_4": 4,
             "graph_5": 5,
-            "userName": 'mock_user_name',
-            "userPassword": 'mock_pwd'
+            "userName": 'mock_user_name'
         }
         self.assertEqual(result, expected_dict)
 
@@ -71,7 +59,6 @@ class TestDashboard(unittest.TestCase):
         Test the load_graphs function
         """
         # ----- ARRANGE
-        mock_data_querier = MagicMock(spec=dashboard_api.DbQuerier)
         mock_graph_1 = MagicMock(spec=dashboard_api.WordsGraph1)
         mock_graph_1.create.return_value = "<div>Graph 1 HTML</div>"
         mock_graph_2 = MagicMock(spec=dashboard_api.WordsGraph2)
@@ -83,17 +70,16 @@ class TestDashboard(unittest.TestCase):
         mock_graph_5 = MagicMock(spec=dashboard_api.WordsGraph5)
         mock_graph_5.create.return_value = "<div>Graph 5 HTML</div>"
         with unittest.mock.patch.multiple(
-            "src.api.dashboard",
-            WordsGraph1=mock_graph_1,
-            WordsGraph2=mock_graph_2,
-            WordsGraph3=mock_graph_3,
-            WordsGraph4=mock_graph_4,
-            WordsGraph5=mock_graph_5,
-        ):
+                "src.api.dashboard",
+                WordsGraph1=mock_graph_1,
+                WordsGraph2=mock_graph_2,
+                WordsGraph3=mock_graph_3,
+                WordsGraph4=mock_graph_4,
+                WordsGraph5=mock_graph_5,
+            ):
             # ----- ACT
             result = dashboard_api.load_graphs(
                 "user_name",
-                "user_password",
                 "db_name"
             )
             # ----- ASSERT
@@ -142,7 +128,7 @@ class TestWordsGraph1(unittest.TestCase):
             'table_2': pd.DataFrame(),
         }
         # ----- ACT
-        self.graph.set_data(password)
+        self.graph.set_data()
         # ----- ASSERT
         pd.testing.assert_frame_equal(self.graph.data, mock_df)
 
@@ -195,7 +181,7 @@ class TestWordsGraph2(unittest.TestCase):
             'table_2': pd.DataFrame(),
         }
         # ----- ACT
-        self.graph.set_data(password)
+        self.graph.set_data()
         # ----- ASSERT
         pd.testing.assert_frame_equal(self.graph.data, mock_df)
 
@@ -247,7 +233,7 @@ class TestWordsGraph3(unittest.TestCase):
             'table_2': pd.DataFrame(),
         }
         # ----- ACT
-        self.graph.set_data(password)
+        self.graph.set_data()
         # ----- ASSERT
         pd.testing.assert_frame_equal(self.graph.data, mock_df)
 
@@ -299,7 +285,7 @@ class TestWordsGraph4(unittest.TestCase):
             'table_2': pd.DataFrame(),
         }
         # ----- ACT
-        self.graph.set_data(password)
+        self.graph.set_data()
         # ----- ASSERT
         pd.testing.assert_frame_equal(self.graph.data, mock_df)
 
@@ -351,7 +337,7 @@ class TestWordsGraph5(unittest.TestCase):
             'table_2': pd.DataFrame(),
         }
         # ----- ACT
-        self.graph.set_data(password)
+        self.graph.set_data()
         # ----- ASSERT
         pd.testing.assert_frame_equal(self.graph.data, mock_df)
 

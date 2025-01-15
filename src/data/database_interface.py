@@ -8,22 +8,19 @@ import json
 import os
 import re
 import socket
-import sys
 from abc import ABC
 from datetime import datetime
-from dotenv import load_dotenv
-from typing import Dict, List
+from typing import Any, cast, Dict, List, Tuple, Union
 
 import mysql.connector as mariadb
 import pandas as pd
+from dotenv import load_dotenv
 from loguru import logger
+from mysql.connector import Error
+from mysql.connector.connection import MySQLConnection, MySQLCursor
 from sqlalchemy import create_engine
 
 load_dotenv()
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 HOSTS = {
     "localhost": "localhost",
@@ -55,22 +52,24 @@ class DbInterface(ABC):
             logger.error(f"host should be in {hosts}")
             raise ValueError
 
-    def get_db_cursor(self):
+    def get_db_cursor(self) -> Tuple[MySQLConnection, MySQLCursor]:
         """
-        Connect to vocabulary database if credentials are correct.
+        Connect to database if credentials are correct.
         """
-        user_name = os.getenv('VOC_DB_ROOT_USR')
-        password = os.getenv('VOC_DB_ROOT_PWD')
+        user_name = os.environ['VOC_DB_ROOT_USR']
+        password = os.environ['VOC_DB_ROOT_PWD']
         db_name = 'mysql'
         connection_config = {
             'user': user_name,
             'password': password,
             'database': db_name,
-            'port': os.getenv('VOC_DB_PORT')
+            'port': os.environ['VOC_DB_PORT']
         }
         connection_config['host'] = HOSTS[self.host]
         connection = mariadb.connect(**connection_config)
-        cursor = connection.cursor()
+        connection = cast(MySQLConnection, connection)
+        cursor: MySQLCursor = connection.cursor()
+        cursor = cast(MySQLCursor, cursor)
         return connection, cursor
 
 
@@ -84,7 +83,11 @@ class DbController(DbInterface):
         self.sql_queries = self.load_sql_queries()
 
     @staticmethod
-    def load_sql_queries():
+    def load_sql_queries() -> Dict[str, str]:
+        """
+        Load the SQL queries so that they stay in memory,
+        and do not have to be read from disk.
+        """
         queries = [
             'create_user',
             'grant_select',
@@ -101,7 +104,7 @@ class DbController(DbInterface):
                 sql_queries[query] = file.read().strip()
         return sql_queries
 
-    def create_user_in_mysql(self, user_name, user_password):
+    def create_user_in_mysql(self, user_name: str, user_password: str) -> bool:
         """
         Create a user in the mysql.user table.
         """
@@ -116,16 +119,18 @@ class DbController(DbInterface):
             cursor.execute(sql_query)
             connection.commit()
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
         return result
 
-    def grant_privileges_on_common_database(self, user_name):
+    def grant_privileges_on_common_database(self, user_name: str) -> bool:
         """
         Grant the new user access to the common database.
         """
@@ -140,16 +145,18 @@ class DbController(DbInterface):
             connection.commit()
             logger.success(f"User '{user_name}' created on {self.host}.")
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
         return result
 
-    def grant_privileges(self, user_name, db_name):
+    def grant_privileges(self, user_name: str, db_name: str) -> bool:
         """
         Grant privileges to the user on the given database.
         """
@@ -168,10 +175,12 @@ class DbController(DbInterface):
                 f"User '{user_name}' granted access to '{user_name}_{db_name}'."
             )
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
@@ -188,26 +197,28 @@ class DbController(DbInterface):
         sql_query = self.sql_queries['get_users_mysql']
         try:
             cursor.execute(sql_query)
-            result = cursor.fetchall()
+            result: List[Any] = cursor.fetchall()
+            if cursor.description is None:
+                raise ValueError
             columns = [desc[0] for desc in cursor.description]
-            users_df = pd.DataFrame(result, columns=columns)
-            users_df = users_df[users_df['Host'] == self.host]
-            users_list = users_df['User'].tolist()
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
-                result = False
+                raise err
         finally:
             cursor.close()
             connection.close()
+        users_df = pd.DataFrame(result, columns=columns)
+        users_df = users_df[users_df['Host'] == self.host]
+        users_list = users_df['User'].tolist()
         return users_list
 
     def add_user_to_users_table(
             self,
             user_name: str,
             hash_password: str,
-            user_email: str=None
-        ):
+            user_email: str=''
+        ) -> bool:
         """
         Add a user to the users MariaDB table in users Database.
         """
@@ -222,7 +233,7 @@ class DbController(DbInterface):
             connection.commit()
             logger.success(f"User '{user_name}' added to users table.")
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
@@ -240,21 +251,23 @@ class DbController(DbInterface):
         sql_query = self.sql_queries['get_users']
         try:
             cursor.execute(sql_query)
-            result = cursor.fetchall()
+            result: List[Any] = cursor.fetchall()
+            if cursor.description is None:
+                raise ValueError
             columns = [desc[0] for desc in cursor.description]
             users_df = pd.DataFrame(result, columns=columns)
             users_str = users_df.to_json(orient='records')
             users_list = json.loads(users_str)
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
-                result = False
+                raise err
         finally:
             cursor.close()
             connection.close()
         return users_list
 
-    def revoke_privileges(self, user_name, db_name):
+    def revoke_privileges(self, user_name: str, db_name: str) -> bool:
         """
         Remove privileges from the user on the given database.
         """
@@ -272,10 +285,12 @@ class DbController(DbInterface):
                 f"User '{user_name}' removed from '{user_name}_{db_name}'."
             )
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
@@ -287,14 +302,14 @@ class DbDefiner(DbInterface):
     """
     Define database structure.
     """
-    def __init__(self, user_name):
+    def __init__(self, user_name: str):
         super().__init__()
         self.user_name = user_name
         self.db_name = None
         self.sql_queries = self.load_sql_queries()
 
     @staticmethod
-    def load_sql_queries():
+    def load_sql_queries() -> Dict[str, str]:
         """
         Load the SQL queries so that they stay in memory,
         and do not have to be read from disk.
@@ -321,7 +336,7 @@ class DbDefiner(DbInterface):
                 sql_queries[query] = file.read().strip()
         return sql_queries
 
-    def validate_db_name(self, db_name):
+    def validate_db_name(self, db_name: str) -> bool:
         """
         Regular expression to match a valid database name (alphanumeric and underscores)
         """
@@ -331,7 +346,7 @@ class DbDefiner(DbInterface):
         )
         return bool(result)
 
-    def create_database(self, db_name):
+    def create_database(self, db_name: str) -> bool:
         """
         Create a database with the given database name
         """
@@ -349,16 +364,18 @@ class DbDefiner(DbInterface):
             cursor.execute(sql_query)
             connection.commit()
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
         return result
 
-    def get_user_databases(self):
+    def get_user_databases(self) -> List[str]:
         """
         Get the list of databases for the user.
         """
@@ -369,18 +386,20 @@ class DbDefiner(DbInterface):
         ])
         try:
             cursor.execute(sql_query)
-            databases = [db[0] for db in cursor.fetchall()]
-            result = databases
-        except Exception as err:
+            query_result: List[Any] = cursor.fetchall()
+            databases = [db[0] for db in query_result]
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
-                result = False
+                raise err
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
-        return result
+        return databases
 
-    def create_seven_tables(self, db_name):
+    def create_seven_tables(self, db_name: str) -> bool:
         """
         Create the seven tables necessary to the app.
         """
@@ -408,19 +427,18 @@ class DbDefiner(DbInterface):
                 cursor.execute(sql_query)
             connection.commit()
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
             else:
-                logger.error(err)
-                result = False
+                raise err
         finally:
             cursor.close()
             connection.close()
         return result
 
-    def get_database_cols(self, db_name):
+    def get_database_cols(self, db_name: str) -> Dict[str, List[str]]:
         """
         Get table columns.
         """
@@ -429,41 +447,55 @@ class DbDefiner(DbInterface):
         try:
             cursor.execute(sql_query)
             cursor.execute(self.sql_queries['show_tables'])
-            tables = list(cursor.fetchall())
-            tables = self.rectify_this_strange_result(columns=tables)
-            cols_dict = {}
-            for table_name in tables:
-                sql_query = table_name.join([
-                    self.sql_queries['show_columns'] + ' ',
-                    ';'
-                ])
-                cursor.execute(sql_query)
-                columns = list(cursor.fetchall())
-                columns = self.rectify_this_strange_result(columns=columns)
-                cols_dict[table_name] = columns
-            result = cols_dict
-        except Exception as err:
+            tables: List[Any] = list(cursor.fetchall())
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
-                result = False
-        finally:
-            cursor.close()
-            connection.close()
-        return result
+                raise err
+            else:
+                raise err
+        tables = self.rectify_this_strange_result(columns=tables)
+        tables = cast(List[str], tables)
+        cols_dict: Dict[str, List[str]] = {}
+        for table_name in tables:
+            sql_query = table_name.join([
+                self.sql_queries['show_columns'] + ' ',
+                ';'
+            ])
+            try:
+                cursor.execute(sql_query)
+                columns: List[Any] = list(cursor.fetchall())
+            except Error as err:
+                if err.errno == -1:
+                    logger.error(err)
+                    raise err
+                else:
+                    raise err
+            columns = self.rectify_this_strange_result(columns=columns)
+            columns = cast(List[str], columns)
+            cols_dict[table_name] = columns
+        cursor.close()
+        connection.close()
+        return cols_dict
 
-    def rectify_this_strange_result(self, columns):
+    def rectify_this_strange_result(self, columns: Union[List[Tuple[str, str]], List[str]]) -> List[str]:
         """
         Correct the result of following requests:
         - 'SHOW TABLES'
         - 'SHOW COLUMNS FROM table_name'
         """
+        if type(columns[0]) not in [str, tuple]:
+            logger.error(f"Strange result: {columns}")
+            logger.error(f"Type of first element: {type(columns[0])}")
+            raise ValueError
         if isinstance(columns[0], tuple):
-            result = [col[0] for col in columns]
-        elif isinstance(columns[0], str):
-            result = columns
-        return result
+            columns_tuples = cast(List[Tuple[str, str]], columns)
+            return [col[0] for col in columns_tuples]
+        else:
+            columns_strings = cast(List[str], columns)
+            return columns_strings
 
-    def get_tables_names(self, test_type) -> List[str]:
+    def get_tables_names(self, test_type: str) -> List[str]:
         """
         Get version or theme table according to the test type.
         """
@@ -479,7 +511,7 @@ class DbDefiner(DbInterface):
             raise ValueError
         return [voc_table, perf_table, word_cnt_table, output_table]
 
-    def drop_database(self, db_name):
+    def drop_database(self, db_name: str) -> bool:
         """
         Drop the given database.
         """
@@ -489,10 +521,12 @@ class DbDefiner(DbInterface):
             cursor.execute(sql_query)
             connection.commit()
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
@@ -504,7 +538,12 @@ class DbManipulator(DbInterface):
     """
     Modifying the data
     """
-    def __init__(self, user_name, db_name, test_type):
+    def __init__(
+            self,
+            user_name: str,
+            db_name: str,
+            test_type: str
+        ):
         super().__init__()
         self.user_name = user_name
         if self.user_name not in db_name:
@@ -521,7 +560,11 @@ class DbManipulator(DbInterface):
         self.sql_queries = self.load_sql_queries()
 
     @staticmethod
-    def load_sql_queries():
+    def load_sql_queries() -> Dict[str, str]:
+        """
+        Load the SQL queries so that they stay in memory,
+        and do not have to be read from disk.
+        """
         queries = [
             'insert_word',
             'update_word',
@@ -534,7 +577,7 @@ class DbManipulator(DbInterface):
                 sql_queries[query] = file.read().strip()
         return sql_queries
 
-    def insert_word(self, row: list):
+    def insert_word(self, row: List[str]) -> bool:
         """
         Add a word to the table.
         """
@@ -543,36 +586,35 @@ class DbManipulator(DbInterface):
         words_table_name, _, _, _ = self.db_definer.get_tables_names(
             test_type=self.test_type
         )
-        english = row[0]
-        if self.db_querier.read_word(english) is not None:
-            result = 'Word already exists'
-            logger.error(result)
+        foreign_word = row[0]
+        if self.db_querier.read_word(foreign_word) is not None:
+            logger.error('Word already exists')
+            result = False
             return result
-        native = row[1]
+        native_word = row[1]
         sql_query = self.sql_queries['insert_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
-            english=english,
-            french=native,
+            foreign=foreign_word,
+            native=native_word,
             today_str=today_str
         )
         try:
             cursor.execute(sql_query)
             connection.commit()
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
             else:
-                logger.error(err)
-                result = False
+                raise err
         finally:
             cursor.close()
             connection.close()
         return result
 
-    def update_word(self, english: str, new_nb, new_score):
+    def update_word(self, foreign: str, new_nb: int, new_score: int) -> bool:
         """
         Update statistics on the given word
         """
@@ -585,22 +627,24 @@ class DbManipulator(DbInterface):
             table_name=words_table_name,
             new_nb=new_nb,
             new_score=new_score,
-            english=english
+            foreign=foreign
         )
         try:
             cursor.execute(sql_query)
             connection.commit()
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
         return result
 
-    def delete_word(self, english):
+    def delete_word(self, foreign_word: str) -> bool:
         """
         Delete a word from the words table of the instance database.
         """
@@ -611,27 +655,31 @@ class DbManipulator(DbInterface):
         sql_query = self.sql_queries['delete_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
-            english=english
+            foreign=foreign_word
         )
         try:
             cursor.execute(sql_query)
             connection.commit()
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
         return result
 
-    def save_table(self, table_name: str, table: pd.DataFrame):
+    def save_table(self, table_name: str, table: pd.DataFrame) -> bool:
         """
         Save given table.
         """
         connection, cursor = self.get_db_cursor()
+        cursor.execute(f"USE {self.db_name};")
         cols = self.db_definer.get_database_cols(db_name=self.db_name)
+        cols = cast(Dict[str, List[str]], cols)
         if table_name == 'output':
             table_name = self.db_querier.get_output_table()
         table = table[cols[table_name]]
@@ -639,8 +687,8 @@ class DbManipulator(DbInterface):
             engine = create_engine(
                 url=''.join([
                     "mysql+pymysql",
-                    "://", os.getenv('VOC_DB_ROOT_USR'),
-                    ':', os.getenv('VOC_DB_ROOT_PWD'),
+                    "://", os.environ['VOC_DB_ROOT_USR'],
+                    ':', os.environ['VOC_DB_ROOT_PWD'],
                     '@', self.host,
                     '/', self.db_name
                 ])
@@ -653,10 +701,12 @@ class DbManipulator(DbInterface):
                 index=False
             )
             result = True
-        except Exception as err:
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
                 result = False
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
@@ -668,7 +718,12 @@ class DbQuerier(DbInterface):
     """
     Querying the data
     """
-    def __init__(self, user_name, db_name, test_type):
+    def __init__(
+            self,
+            user_name: str,
+            db_name: str,
+            test_type: str
+        ):
         super().__init__()
         self.user_name = user_name
         if self.user_name not in db_name:
@@ -680,7 +735,11 @@ class DbQuerier(DbInterface):
         self.sql_queries = self.load_sql_queries()
 
     @staticmethod
-    def load_sql_queries():
+    def load_sql_queries() -> Dict[str, str]:
+        """
+        Load the SQL queries so that they stay in memory,
+        and do not have to be read from disk.
+        """
         queries = [
             'get_tables',
             'read_word'
@@ -692,13 +751,14 @@ class DbQuerier(DbInterface):
                 sql_queries[query] = file.read().strip()
         return sql_queries
 
-    def get_tables(self):
+    def get_tables(self) -> Dict[str, pd.DataFrame]:
         """
         Load the different tables necessary to the app.
         """
         connection, cursor = self.get_db_cursor()
         cursor.execute(f"USE {self.db_name};")
         cols = self.db_definer.get_database_cols(db_name=self.db_name)
+        cols = cast(Dict[str, List[str]], cols)
         tables_names = list(cols.keys())
         tables = {}
         for table_name in tables_names:
@@ -720,7 +780,7 @@ class DbQuerier(DbInterface):
         connection.close()
         return tables
 
-    def get_output_table(self):
+    def get_output_table(self) -> str:
         """
         Rename the output name according to the test type.
         """
@@ -733,7 +793,7 @@ class DbQuerier(DbInterface):
             raise SystemExit
         return output_table
 
-    def read_word(self, english: str):
+    def read_word(self, foreign_word: str) -> Union[Tuple[str, str, int], None]:
         """
         Read the given word
         """
@@ -744,29 +804,30 @@ class DbQuerier(DbInterface):
         sql_query = self.sql_queries['read_word'].format(
             db_name=self.db_name,
             table_name=words_table_name,
-            english=english
+            foreign=foreign_word
         )
-        request_result = None
         try:
-            request_result = cursor.execute(sql_query)
-            request_result = cursor.fetchall()
-        except Exception as err:
+            _ = cursor.execute(sql_query)
+            request_as_list: List[Tuple[str, str, int]] = list(cursor.fetchall())  # type: ignore
+        except Error as err:
             if err.errno == -1:
                 logger.error(err)
-                result = None
+                return None
+            else:
+                raise err
         finally:
             cursor.close()
             connection.close()
-        if request_result:
-            english, native, score = request_result[0]
-            result = (english, native, score)
+        if request_as_list:
+            foreign_word, native, score = request_as_list[0]
+            result = (foreign_word, native, score)
         else:
             result = None
         return result
 
 
 
-def check_test_type(test_type):
+def check_test_type(test_type: str) -> str:
     """
     Check the test type attribute.
     """

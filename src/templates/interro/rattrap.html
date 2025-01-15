@@ -19,23 +19,26 @@
 <body data-token="{{ token }}">
     <div class="container">
         <div class="row">
-            <h1 class="white-text">Votre score: {{ score }} / {{ testLength }}</h1>
+            <h1 class="white-text">Votre score: {{ testScore }} / {{ testLength }}</h1>
         </div>
+
         <div class="row">
             <button id="rattrapButton" class="button rattrap_button">Passer le rattrapage</button>
         </div>
+
         <div class="row">
             <button id="userSpaceButton" class="button">Quitter</button>
         </div>
     </div>
+
     <script>
         const databaseName = `{{ databaseName }}`;
         const faultsDict = `{{ faultsDict }}`;
-        const index = `{{ index }}`;
+        const testIndex = `{{ testIndex }}`;
         const interroCategory = `{{ interroCategory }}`;
         const interroDict = `{{ interroDict }}`;
         const oldInterroDict = `{{ oldInterroDict }}`;
-        const score = `{{ score }}`;
+        const testScore = `{{ testScore }}`;
         const testLength = `{{ testLength }}`;
         const testType = `{{ testType }}`;
     </script>

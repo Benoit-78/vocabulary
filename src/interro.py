@@ -9,12 +9,9 @@
 
 import json
 import os
-import random
-import sys
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
 from datetime import datetime
-from typing import List
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -22,10 +19,8 @@ from loguru import logger
 
 REPO_NAME = 'vocabulary'
 REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
-from src.data.database_interface import DbManipulator
+from src.data.database_interface import DbManipulator, DbQuerier
 from src.views.api import FastapiGuesser
 
 
@@ -34,14 +29,14 @@ class Loader():
     """
     Data loader.
     """
-    def __init__(self, words, data_querier):
+    def __init__(self, test_length: int, data_querier: DbQuerier):
         """
         Must be done in the same session than the interroooo is launched.
         """
         self.data_querier = data_querier
         self.test_type = data_querier.test_type
-        self.words = words
-        self.tables = {}
+        self.test_length = test_length
+        self.tables: Dict[str, pd.DataFrame] = {}
         self.output_table = ''
         self.words_df = pd.DataFrame()
         self.interro_df = pd.DataFrame(
@@ -59,7 +54,7 @@ class Loader():
         self.index = 0
         self.perf_df = pd.DataFrame()
         self.words_count_df = pd.DataFrame()
-        self.criteria = {}
+        self.criteria: Dict[str, float] = {}
         self.set_criteria()
 
     def set_criteria(self):
@@ -68,8 +63,8 @@ class Loader():
         By the way, can you say 'criteria' three times in a row?
         """
         with open(REPO_DIR + '/conf/interro.json', 'r', encoding='utf-8') as file:
-            self.criteria = json.load(file)
-        self.criteria = self.criteria['interro']
+            raw_criteria = json.load(file)
+        self.criteria = raw_criteria['interro']
 
     def flag_bad_words(self):
         """
@@ -117,9 +112,9 @@ class Loader():
         """
         words_table = self.tables[self.test_type + '_voc']
         words_total = words_table.shape[0]
-        self.words = min(words_total, self.words)
-        if self.words == 0:
-            logger.error("Loader words is equal to 0!")
+        self.test_length = min(words_total, self.test_length)
+        if self.test_length == 0:
+            logger.error("Test length is equal to 0!")
             raise ValueError
 
     def set_interro_df(self):
@@ -129,30 +124,28 @@ class Loader():
         self.adjust_test_length()
         bad_words_df = self.words_df[self.words_df['bad_word']==1]
         good_words_df = self.words_df[self.words_df['bad_word']==0]
-        enough_bad_words = bad_words_df.shape[0] >= self.words * 0.67
-        enough_good_words = good_words_df.shape[0] >= self.words * 0.33
+        enough_bad_words = bad_words_df.shape[0] >= self.test_length * 0.67
+        enough_good_words = good_words_df.shape[0] >= self.test_length * 0.33
         if enough_bad_words:
             if enough_good_words:
-                bad_words_df = bad_words_df.sample(n=int(self.words * 0.67))
-                sample_size = self.words - bad_words_df.shape[0]
+                bad_words_df = bad_words_df.sample(n=int(self.test_length * 0.67))
+                sample_size = self.test_length - bad_words_df.shape[0]
                 good_words_df = good_words_df.sample(n=sample_size)
                 self.interro_df = pd.concat([bad_words_df, good_words_df])
             else:
-                sample_size = self.words - good_words_df.shape[0]
-                if sample_size > bad_words_df.shape[0]:
-                    sample_size = bad_words_df.shape[0]
+                sample_size = self.test_length - good_words_df.shape[0]
+                sample_size = min(sample_size, bad_words_df.shape[0])
                 bad_words_df = bad_words_df.sample(n=sample_size)
                 self.interro_df = pd.concat([bad_words_df, good_words_df])
         else:
             if enough_good_words:
-                sample_size = self.words - bad_words_df.shape[0]
-                if sample_size > good_words_df.shape[0]:
-                    sample_size = good_words_df.shape[0]
+                sample_size = self.test_length - bad_words_df.shape[0]
+                sample_size = min(sample_size, bad_words_df.shape[0])
                 good_words_df = good_words_df.sample(n=sample_size)
                 self.interro_df = pd.concat([bad_words_df, good_words_df])
             else:
                 self.interro_df = pd.concat([bad_words_df, good_words_df])
-                self.words = self.interro_df.shape[0]
+                self.test_length = self.interro_df.shape[0]
         self.interro_df = self.interro_df.sort_index()
 
 
@@ -164,11 +157,11 @@ class Interro(ABC):
     def __init__(
             self,
             interro_df: pd.DataFrame,
-            words: int,
+            test_length: int,
             guesser
         ):
-        self.interro_df = interro_df
-        self.words = words
+        self.interro_df: pd.DataFrame = interro_df
+        self.test_length = test_length
         self.guesser = guesser
         self.faults_df = pd.DataFrame(columns=[['foreign', 'native']])
         self.index = 0
@@ -180,7 +173,7 @@ class Interro(ABC):
         """
 
     @abstractmethod
-    def from_dict(self):
+    def from_dict(self, data: Dict[str, Any]):
         """
         Instantiate the instance from a dict of its attributes.
         """
@@ -201,16 +194,16 @@ class PremierTest(Interro):
     def __init__(
             self,
             interro_df: pd.DataFrame,
-            words: int,
-            guesser,
+            test_length: int,
+            guesser: FastapiGuesser,
         ):
         super().__init__(
             interro_df=interro_df,
-            words=int(words),
+            test_length=int(test_length),
             guesser=guesser
         )
         self.perf = 0
-        self.index = int(self.interro_df.index[0])
+        self.index = int(list(self.interro_df.index)[0])
 
     def update_interro_df(self, word_guessed: bool):
         """
@@ -224,8 +217,8 @@ class PremierTest(Interro):
         else:
             self.interro_df.loc[self.index, 'score'] -= 1
         # Taux
-        nombre = self.interro_df.loc[self.index, 'nb']
-        score = self.interro_df.loc[self.index, 'score']
+        nombre = int(self.interro_df.at[self.index, 'nb'])
+        score = int(self.interro_df.at[self.index, 'score'])
         taux = int(score / nombre * 100)
         self.interro_df.loc[self.index, 'taux'] = taux
         # Query
@@ -246,42 +239,42 @@ class PremierTest(Interro):
         Compute success rate.
         """
         faults_total = self.faults_df.shape[0]
-        success_rate = int(100 * (1 - (faults_total / self.words)))
+        success_rate = int(100 * (1 - (faults_total / self.test_length)))
         self.perf = success_rate
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """
         Create a dict out of the instance attributes
         Keys of the dictionnary have the JavaScript case.
         """
         self.interro_df = self.interro_df.reset_index(names='index')
         attributes_dict = {
-            'interroDict': self.interro_df.to_json(orient='records'),
-            'testLength': self.words,
-            'index': self.index,
             'faultsDict': self.faults_df.to_json(orient='records'),
-            'perf': self.perf,
+            'interroDict': self.interro_df.to_json(orient='records'),
+            'testIndex': self.index,
+            'testLength': self.test_length,
+            'testPerf': self.perf,
         }
         return attributes_dict
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: Dict[str, Any]) -> 'PremierTest':
         """
         Instanciate a PremierTest out of a dictionnary of arguments &
         class attributes.
         Keys of the input dictionnary have the JavaScript case.
         """
-        words = data['testLength']
+        test_length = data['testLength']
         interro_df = data['interroTable']
         guesser = FastapiGuesser()
         instance = cls(
             interro_df=interro_df,
-            words=words,
+            test_length=test_length,
             guesser=guesser,
         )
         instance.faults_df = data['faultsTable']
-        instance.index = data['index']
-        instance.perf = data['perf']
+        instance.index = data['testIndex']
+        instance.perf = data['testPerf']
         return instance
 
 
@@ -293,12 +286,12 @@ class Rattrap(Interro):
     def __init__(
             self,
             interro_df: pd.DataFrame,
-            guesser,
+            guesser: FastapiGuesser,
             old_interro_df: pd.DataFrame
         ):
         super().__init__(
             interro_df=interro_df,
-            words=interro_df.shape[0],
+            test_length=interro_df.shape[0],
             guesser=guesser
         )
         self.rattrap = True
@@ -320,18 +313,18 @@ class Rattrap(Interro):
             iterations += 1
         self.interro_df = self.interro_df.reset_index(drop=True)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         attributes_dict = {
             'faultsDict': self.faults_df.to_json(orient='records'),
-            'index': self.index,
             'interroDict': self.interro_df.to_json(orient='records'),
             'oldInterroDict': self.old_interro_df.to_json(orient='records'),
-            'testLength': self.words,
+            'testIndex': self.index,
+            'testLength': self.test_length,
         }
         return attributes_dict
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: Dict[str, Any]) -> 'Rattrap':
         interro_df = pd.DataFrame(data['interroDict'])
         old_interro_df = pd.DataFrame(data['oldInterroDict'])
         guesser = FastapiGuesser()
@@ -340,9 +333,9 @@ class Rattrap(Interro):
             guesser=guesser,
             old_interro_df=old_interro_df
         )
-        instance.words = data['testLength']
+        instance.test_length = data['testLength']
         instance.faults_df = pd.DataFrame(data['faultsDict'])
-        instance.index = data['index']
+        instance.index = data['testIndex']
         return instance
 
 
@@ -359,7 +352,7 @@ class Updater():
         self.loader = loader
         self.interro = interro
         self.good_words_df = pd.DataFrame()
-        self.criteria = {}
+        self.criteria: Dict[str, float] = {}
         self.set_criteria()
         self.db_manipulator = DbManipulator(
             loader.data_querier.user_name,
@@ -411,7 +404,7 @@ class Updater():
             ]
         )
 
-    def delete_good_words(self) -> pd.DataFrame:
+    def delete_good_words(self):
         """
         Remove words that have been guessed sufficiently enough.
         This \'sufficiently\' criteria is totally arbitrary, and can be changed
@@ -514,7 +507,7 @@ class Updater():
 def complete_columns(
         df_1: pd.DataFrame,
         df_2: pd.DataFrame
-    ):
+    ) -> pd.DataFrame:
     """
     Guarantee that the well_known_words dataframe contains exactly
     the columns of the output dataframe

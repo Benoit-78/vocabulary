@@ -7,8 +7,10 @@
         Interface between the app and the Machine Learning models
 """
 
+from typing import List
 
-def ask_new_words_based_on_worsts():
+
+def ask_new_words_based_on_worsts() -> List[str]:
     """
     Ask the user to provide new words based on the worst words
     """
@@ -16,7 +18,7 @@ def ask_new_words_based_on_worsts():
     return words
 
 
-def ask_new_words_based_on_bests():
+def ask_new_words_based_on_bests() -> List[str]:
     """
     Ask the user to provide new words based on the best words
     """
@@ -24,7 +26,7 @@ def ask_new_words_based_on_bests():
     return words
 
 
-def ask_new_words_based_on_selection(word: str):
+def ask_new_words_based_on_selection(word: str) -> List[str]:
     """
     Ask the user to provide new words based:
     - on a chosen word
@@ -40,7 +42,7 @@ def ask_new_words_based_on_selection(word: str):
     return words
 
 
-def ask_new_words_based_on_last_added():
+def ask_new_words_based_on_last_added() -> List[str]:
     """
     Ask the user to provide new words based on the last words added
     """
@@ -48,7 +50,7 @@ def ask_new_words_based_on_last_added():
     return words
 
 
-def ask_new_words_based_on_all():
+def ask_new_words_based_on_all() -> List[str]:
     """
     Ask the user to provide new words based on all words
     """

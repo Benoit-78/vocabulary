@@ -1,3 +1,11 @@
+"""
+    Creator:
+        The benevolent dictator, aka B. DELORME
+    Main purpose:
+        Debugging utilities.
+"""
+
+
 import functools
 
 from loguru import logger

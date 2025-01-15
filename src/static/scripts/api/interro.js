@@ -34,8 +34,8 @@ function startTest(token, inputParams) {
     if (!isNaN(inputParams.testLength)) {
         const urlParams = new URLSearchParams(inputParams);
         urlParams.append("token", token);
-        urlParams.append("count", 0);
-        urlParams.append("score", 0);
+        urlParams.append("testCount", 0);
+        urlParams.append("testScore", 0);
         window.location.href = `/v1/interro/interro-question?${urlParams.toString()}`;
     } else {
         console.error("Error: testLength is not a number:", inputParams.testLength);
@@ -68,7 +68,7 @@ function sendUserAnswer(token, inputParams) {
     .then(answer => answer.json())
     .then(data => {
         if (data && data.message === "User response stored successfully") {
-            if (data.count < data.testLength) {
+            if (data.testCount < data.testLength) {
                 nextGuess(token, data);
             } else {
                 endInterro(token, data);
@@ -93,7 +93,7 @@ function nextGuess(token, inputParams) {
 
 function endInterro(token, inputParams) {
     // console.log("InputParams:", inputParams);
-    if (inputParams.score === inputParams.testLength) {
+    if (inputParams.testScore === inputParams.testLength) {
         const urlParams = new URLSearchParams(inputParams);
         urlParams.append("token", token);
         window.location.href = `/v1/interro/interro-end?${urlParams.toString()}`;
@@ -120,7 +120,7 @@ function launchRattrap(token, inputParams) {
         if (data && data.message === "Rattrap created successfully") {
             const urlParams = new URLSearchParams(data);
             urlParams.append("token", token);
-            urlParams.append("perf", 0);
+            urlParams.append("testPerf", 0);
             window.location.href = `/v1/interro/interro-question?${urlParams.toString()}`;
         } else {
             console.error("Error with rattrap creation.");

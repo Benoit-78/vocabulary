@@ -7,17 +7,10 @@
 
 import logging
 import os
-import sys
 import unittest
-from io import StringIO
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
-from loguru import logger
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-sys.path.append(REPO_DIR)
 
 from src.data import csv_interface
 
@@ -198,8 +191,8 @@ class TestMenusReader(unittest.TestCase):
         mock_df = pd.DataFrame({
             'page': ['user_space.html', 'user_space.html', 'welcome.html'],
             'standard': ['pomme', 'banane', 'some_strange_value'],
-            'english': ['apple', 'banana', 'some_value'],
-            'french': ['pomme', 'banane', 'some_strange_value']
+            'foreign': ['apple', 'banana', 'some_value'],
+            'native': ['pomme', 'banane', 'some_strange_value']
         })
         mock_read_csv.return_value = mock_df
         # ----- ACT
@@ -208,12 +201,12 @@ class TestMenusReader(unittest.TestCase):
         self.assertIsInstance(result, dict)
         expected_dict = {
             'pomme': {
-                'en': 'apple',
-                'fr': 'pomme',
+                'fo': 'apple',
+                'na': 'pomme',
             },
             'banane': {
-                'en': 'banana',
-                'fr': 'banane'
+                'fo': 'banana',
+                'na': 'banane'
             }
         }
         self.assertEqual(result, expected_dict)

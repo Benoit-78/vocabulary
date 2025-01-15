@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const token = document.body.dataset.token;
 
     addWordButton.addEventListener("click", function() {
-        var foreign = document.getElementById("input1").value;
-        var native = document.getElementById("input2").value;
-        addWord(token, databaseName, foreign, native);
+        var foreignWord = document.getElementById("input1").value;
+        var nativeWord = document.getElementById("input2").value;
+        addWord(token, databaseName, foreignWord, nativeWord);
     });
 });
 

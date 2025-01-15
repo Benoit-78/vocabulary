@@ -9,28 +9,24 @@
 
 import json
 import os
-import sys
+from typing import Any, Dict
 
+from fastapi import Request
 from fastapi.responses import JSONResponse
-from loguru import logger
 import pandas as pd
-from typing import Dict
-
-REPO_NAME = 'vocabulary'
-REPO_DIR = os.getcwd().split(REPO_NAME)[0] + REPO_NAME
-if REPO_DIR not in sys.path:
-    sys.path.append(REPO_DIR)
 
 from src import interro as core_interro
-from src.api.authentication import get_user_name_from_token
 from src.api.interro import load_test, get_interro_category, turn_df_into_dict
 from src.data.redis_interface import save_interro_in_redis, load_interro_from_redis
-# from src.utils.debug import print_arguments_and_output
 from src.views import api as api_view
 
 
-# ------------------ API functions ------------------ #
-def load_guest_settings(request, token):
+
+# --------------- API functions --------------- #
+def load_guest_settings(request: Request, token: str) -> dict:
+    """
+    Load guest user settings.
+    """
     flags_dict = get_flags_dict()
     settings_dict = flags_dict.copy()
     settings_dict['request'] = request
@@ -38,11 +34,11 @@ def load_guest_settings(request, token):
     return settings_dict
 
 
-def save_interro_settings_guest(language, token):
+def save_interro_settings_guest(language: dict, token: str) -> JSONResponse:
     """
     Save guest user interro settings.
     """
-    language = language['language'].lower()
+    language = language['testLanguage'].lower()
     test_type = 'version'
     _, test = load_test(
         user_name=os.environ['VOC_GUEST_NAME'],
@@ -61,21 +57,21 @@ def save_interro_settings_guest(language, token):
         {
             'message': "Guest user settings stored successfully",
             'token': token,
-            "interro_category": interro_category
+            'interroCategory': interro_category
         }
     )
     return json_response
 
 
 def load_interro_question_guest(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        language,
+        request: Request,
+        interro_category: str,
+        total: str,
+        count: str,
+        score: str,
+        language: str,
         token: str,
-    ):
+    ) -> Dict[str, Any]:
     """
     Load the interro question for the guest user.
     """
@@ -88,34 +84,37 @@ def load_interro_question_guest(
         interro_category=interro_category
     )
     index = interro.interro_df.index[count]
-    english = interro.interro_df.loc[index][0]
-    english = english.replace("'", "\'")
+    foreign_word = interro.interro_df.loc[index][0]
+    foreign_word = foreign_word.replace("'", "\'")
     count += 1
     flags_dict = get_flags_dict()
     response_dict = {
+        'contentBox1': foreign_word,
+        'flag': flags_dict[language],
+        'interroCategory': interro_category,
+        'testCount': count,
+        'testLanguage': language,
+        'testLength': total,
+        'testScore': score,
+        'progressPercent': progress_percent,
         'request': request,
         'token': token,
-        "interroCategory": interro_category,
-        'numWords': total,
-        'count': count,
-        'score': score,
-        'progressPercent': progress_percent,
-        'content_box1': english,
-        'language': language,
-        'flag': flags_dict[language]
     }
     return response_dict
 
 
 def load_interro_answer_guest(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        token,
-        language
-    ):
+        request: Request,
+        interro_category: str,
+        total: str,
+        count: str,
+        score: str,
+        token: str,
+        language: str
+    ) -> Dict[str, Any]:
+    """
+    Load the interro answer for the guest user.
+    """
     total = int(total)
     count = int(count)
     score = int(score)
@@ -125,48 +124,52 @@ def load_interro_answer_guest(
         interro_category=interro_category
     )
     index = interro.interro_df.index[count - 1]
-    english = interro.interro_df.loc[index][0]
-    english = english.replace("'", "\'")
-    french = interro.interro_df.loc[index][1]
-    french = french.replace("'", "\'")
+    foreign_word = interro.interro_df.loc[index][0]
+    foreign_word = foreign_word.replace("'", "\'")
+    native_word = interro.interro_df.loc[index][1]
+    native_word = native_word.replace("'", "\'")
     flags_dict = get_flags_dict()
     response_dict = {
-        "request": request,
-        'token': token,
+        "contentBox1": foreign_word,
+        "contentBox2": native_word,
+        'flag': flags_dict[language],
         "interroCategory": interro_category,
-        "numWords": total,
-        "count": count,
-        "score": score,
         "progressPercent": progress_percent,
-        "content_box1": english,
-        "content_box2": french,
-        'language': language,
-        'flag': flags_dict[language]
+        "request": request,
+        "testCount": count,
+        "testLength": total,
+        "testScore": score,
+        'testLanguage': language,
+        'token': token,
     }
     return response_dict
 
 
 def get_user_response_guest(
-        data,
-        token
-    ):
+        data: Dict[str, Any],
+        token: str
+    ) -> JSONResponse:
+    """
+    Get the user response.
+    data is a dictionnary with keys written in JS way.
+    """
     interro_category = data.get('interroCategory')
     interro = load_interro_from_redis(
         token=token,
         interro_category=interro_category
     )
-    score = data.get('score')
+    score = data.get('testScore', 0)
     score = int(score)
-    total = data.get('total')
+    total = data.get('testLength', 0)
     total = int(total)
-    if data["answer"] == 'Yes':
+    if data['userAnswer'] == 'Yes':
         score += 1
-    elif data["answer"] == 'No':
+    elif data['userAnswer'] == 'No':
         interro.update_faults_df(
             False,
             [
-                data.get('english'),
-                data.get('french')
+                data.get('foreignWord'),
+                data.get('nativeWord')
             ]
         )
     save_interro_in_redis(
@@ -179,22 +182,22 @@ def get_user_response_guest(
         {
             'message': "User response stored successfully.",
             'token': token,
-            "interroCategory": interro_category,
-            'score': score,
-            'total': total
+            'interroCategory': interro_category,
+            'testScore': score,
+            'testLength': total
         }
     )
     return json_response
 
 
 def propose_rattrap_guest(
-        request,
-        interro_category,
-        total,
-        score,
-        language,
-        token,
-    ):
+        request: Request,
+        interro_category: str,
+        total: str,
+        score: str,
+        language: str,
+        token: str,
+    ) -> Dict[str, Any]:
     """
     Propose the rattrap.
     """
@@ -204,23 +207,23 @@ def propose_rattrap_guest(
     )
     new_total = interro.faults_df.shape[0]
     response_dict = {
+        'interroCategory': interro_category,
+        'newWords': new_total,
+        'newScore': 0,
+        'newCount': 0,
         'request': request,
+        'testLanguage': language,
+        'testLength': total,
+        'testScore': score,
         'token': token,
-        "interroCategory": interro_category,
-        "newWords": new_total,
-        "newScore": 0,
-        "newCount": 0,
-        "score": score,
-        "numWords": total,
-        'language': language
     }
     return response_dict
 
 
 def load_rattrap(
-        data,
-        token
-    ):
+        data: Dict[str, Any],
+        token: str
+    ) -> JSONResponse:
     """
     Load the rattrap!
     """
@@ -243,30 +246,31 @@ def load_rattrap(
         token=token,
         interro_category=new_interro_category
     )
-    count = int(data.get('count'))
-    total = int(data.get('total'))
-    score = int(data.get('score'))
+    count = int(data.get('testCount', 0))
+    total = int(data.get('testLength', 0))
+    score = int(data.get('testScore', 0))
     return JSONResponse(
         content=
         {
-            'message': "Guest rattrap created successfully",
-            'token': token,
             'interroCategory': new_interro_category,
-            'total': total,
-            'score': score,
-            'count': count
+            'message': "Guest rattrap created successfully",
+            'testCount': count,
+            'testLength': total,
+            'testScore': score,
+            'token': token,
         }
     )
 
 
 def end_interro_guest(
-        request,
-        total,
-        score,
-        token
-    ):
-    user_name = get_user_name_from_token(token=token)
-    logger.info(f"User: {user_name}")
+        request: Request,
+        total: str,
+        score: str,
+        token: str
+    ) -> Dict[str, Any]:
+    """
+    API fucntion to end the interro for the guest user.
+    """
     premier_test = load_interro_from_redis(
         token=token,
         interro_category='test'
@@ -277,18 +281,17 @@ def end_interro_guest(
     )
     response_dict = {
         'headers': headers,
-        'numWords': total,
+        'testLength': total,
         'request': request,
         'rows': rows,
-        'score': score,
+        'testScore': score,
         'token': token,
     }
-    logger.debug(f"Response dict: {response_dict}")
     return response_dict
 
 
-# ------------------ Helper functions ------------------ #
-def get_flags_dict() -> Dict:
+# --------------- Helper functions --------------- #
+def get_flags_dict() -> Dict[ str, Any]:
     """
     Based on the result of the POST method, returns the corresponding error messages
     that will feed the sign-in html page.

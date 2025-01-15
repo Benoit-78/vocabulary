@@ -2,13 +2,8 @@
     Test module for 
 """
 
-import os
-import sys
 import unittest
 from unittest.mock import patch
-
-REPO_DIR = os.getcwd().split('tests')[0]
-sys.path.append(REPO_DIR)
 
 from src.views import terminal as terminal_view
 
@@ -34,7 +29,7 @@ class TestCliUser(unittest.TestCase):
         mock_parse_args.assert_called_with(
             [
                 '-t', 'version',
-                '-w', '10',
+                '-l', '10',
                 '-r', '2'
             ]
         )
@@ -59,7 +54,7 @@ class TestCliUser(unittest.TestCase):
                 '--words', '100',
                 '--rattrap', '1',
                 '-t', 'version',
-                '-w', '10',
+                '-l', '10',
                 '-r', '2'
             ]
         )
@@ -77,12 +72,12 @@ class TestCliUser(unittest.TestCase):
         mock_parse_args.assert_called_with(
             [
                 '-t', 'theme',
-                '-w', '10',
+                '-l', '10',
                 '-r', '2'
             ]
         )
 
-    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', '', '-w', '100', '-r', '1'])
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', '', '-l', '100', '-r', '1'])
     @patch('src.views.terminal.logger')
     def test_get_settings_error_1(self, mock_logger):
         # ----- ARRANGE
@@ -93,12 +88,12 @@ class TestCliUser(unittest.TestCase):
         message = ' '.join([
             "Please give",
             "-t <test type>, ",
-            "-w <number of words> and ",
+            "-l <test length> and ",
             "-r <number of rattrap>"
         ])
         mock_logger.error.assert_called_with(message)
 
-    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'mock_type', '-w', '100', '-r', '1'])
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'mock_type', '-l', '100', '-r', '1'])
     @patch('src.views.terminal.logger')
     def test_get_settings_error_2(self, mock_logger):
         # ----- ARRANGE
@@ -108,7 +103,7 @@ class TestCliUser(unittest.TestCase):
         # ----- ASSERT
         mock_logger.error.assert_called_with("Test type must be either version or theme")
 
-    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'version', '-w', '100', '-r', '-2'])
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'version', '-l', '100', '-r', '-2'])
     @patch('src.views.terminal.logger')
     def test_get_settings_rattrap_negative(self, mock_logger):
         # ----- ARRANGE
@@ -120,7 +115,7 @@ class TestCliUser(unittest.TestCase):
             "Number of rattrap must be greater than -1."
         )
 
-    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'version', '-w', '-100', '-r', '1'])
+    @patch('src.views.terminal.sys.argv', ['terminal.py', '-t', 'version', '-l', '-100', '-r', '1'])
     @patch('src.views.terminal.logger')
     def test_get_settings_words_negative(self, mock_logger):
         # ----- ARRANGE
@@ -129,7 +124,7 @@ class TestCliUser(unittest.TestCase):
             self.user.get_settings()
         # ----- ASSERT
         mock_logger.error.assert_called_with(
-            "Number of words must be greater than 0."
+            "Test length must be greater than 0."
         )
 
 
