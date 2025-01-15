@@ -343,7 +343,7 @@ def get_faults_df(faults_dict: Dict[str, Any]) -> pd.DataFrame:
     """
     Empty faults dict can be turned into None on client side.
     """
-    if faults_dict == {}:
+    if faults_dict == {'key': 'val'}:
         faults_df = pd.DataFrame(columns=['foreign', 'native'])
     else:
         faults_df = decode_dict(faults_dict)

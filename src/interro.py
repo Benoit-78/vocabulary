@@ -203,7 +203,7 @@ class PremierTest(Interro):
             guesser=guesser
         )
         self.perf = 0
-        self.index = int(self.interro_df.index[0].item())
+        self.index = int(list(self.interro_df.index)[0])
 
     def update_interro_df(self, word_guessed: bool):
         """

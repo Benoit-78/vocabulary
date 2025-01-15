@@ -264,14 +264,14 @@ class TestDbController(unittest.TestCase):
         mock_mariadb.connect.return_value = mock_connection
         mock_cursor = MagicMock()
         mock_connection.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_cursor.fetchall.side_effect = database_interface.Error("ER_CANNOT_USER")
         # ----- ACT
-        result = self.db_controller.get_users_list_from_mysql()
         # ----- ASSERT
+        with self.assertRaises(database_interface.Error):
+            self.db_controller.get_users_list_from_mysql()
         mock_cursor.execute.assert_called_once_with("SELECT User, Host FROM mysql.user;")
         mock_cursor.fetchall.assert_called_once()
         mock_logger.error.assert_called_once()
-        self.assertFalse(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
@@ -366,17 +366,17 @@ class TestDbController(unittest.TestCase):
         mock_mariadb.connect.return_value = mock_connection
         mock_cursor = MagicMock()
         mock_connection.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_cursor.fetchall.side_effect = database_interface.Error("ER_CANNOT_USER")
         # ----- ACT
-        result = self.db_controller.get_users_list()
         # ----- ASSERT
+        with self.assertRaises(database_interface.Error):
+            self.db_controller.get_users_list()
         request_1 = "SELECT username, password_hash, email, disabled"
         request_2 = "FROM users.voc_users;"
         sql_request = " ".join([request_1, request_2])
         mock_cursor.execute.assert_called_once_with(sql_request)
         mock_cursor.fetchall.assert_called_once()
         mock_logger.error.assert_called_once()
-        self.assertFalse(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
@@ -530,16 +530,16 @@ class TestDbDefiner(unittest.TestCase):
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
-        mock_cursor.fetchall.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_cursor.fetchall.side_effect = database_interface.Error()
         # ----- ACT
-        result = self.db_definer.get_user_databases()
         # ----- ASSERT
+        with self.assertRaises(database_interface.Error):
+            self.db_definer.get_user_databases()
         mock_cursor.execute.assert_called_once_with(
             f"SHOW DATABASES LIKE '{self.db_definer.user_name}_%';"
         )
         mock_cursor.fetchall.assert_called_once()
         mock_logger.error.assert_called_once()
-        self.assertFalse(result)
         mock_cursor.close.assert_called_once()
         mock_connection.close.assert_called_once()
 
@@ -660,15 +660,15 @@ class TestDbDefiner(unittest.TestCase):
         mock_connection = MagicMock()
         mock_cursor = MagicMock()
         mock_connection.cursor.return_value = mock_cursor
-        mock_cursor.execute.side_effect = mariadb.Error("ER_CANNOT_USER")
+        mock_cursor.execute.side_effect = database_interface.Error()
         mock_get_db_cursor.return_value = (mock_connection, mock_cursor)
         db_name = 'test_db'
         # ----- ACT
-        result = self.db_definer.get_database_cols(db_name)
         # ----- ASSERT
+        with self.assertRaises(database_interface.Error):
+            self.db_definer.get_database_cols(db_name)
         mock_get_db_cursor.assert_called_once()
         mock_logger.error.assert_called_once()
-        self.assertFalse(result)
         mock_cursor.execute.assert_called_once_with(f"USE {db_name};")
 
     def test_rectify_this_strange_result(self):

@@ -4,14 +4,14 @@
     Creation date:
         20th April 2024
     Main purpose:
-        Test script for 
+        Test script for api/authentication.py
 """
 
 import os
 from datetime import datetime, timedelta
 
 import unittest
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from freezegun import freeze_time
 from jose import JWTError
 from unittest.mock import patch, MagicMock
@@ -80,11 +80,10 @@ class TestAuthentication(unittest.TestCase):
         Test the creation of a token with no data.
         """
         # ----- ARRANGE
-        data = None
         expires_delta = 15
         mock_create_guest_user_name.return_value = {"sub": "user"}
         # ----- ACT
-        token = auth_api.create_token(data, expires_delta)
+        token = auth_api.create_token(expires_delta=expires_delta)
         # ----- ASSERT
         assert token is not None
         mock_jwt_encode.assert_called_once_with(
@@ -440,7 +439,7 @@ class TestAuthentication(unittest.TestCase):
         # ----- ASSERT
         self.assertEqual(result, 'authenticated_user')
         mock_authenticate_user.assert_called_once_with(
-            users_list=auth_api.users_dict,
+            users_list=auth_api.original_users_list,
             username='user1',
             password='password1'
         )

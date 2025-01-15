@@ -711,7 +711,7 @@ class TestHelper(unittest.TestCase):
     def test_get_faults_df_none(self):
         # ----- ARRANGE
         # ----- ACT
-        result = interro_api.get_faults_df('None')
+        result = interro_api.get_faults_df({'key': 'val'})
         # ----- ASSERT
         expected_df = pd.DataFrame(columns=['foreign', 'native'])
         pd.testing.assert_frame_equal(result, expected_df)

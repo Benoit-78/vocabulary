@@ -812,7 +812,7 @@ class DbQuerier(DbInterface):
         except Error as err:
             if err.errno == -1:
                 logger.error(err)
-                result = None
+                return None
             else:
                 raise err
         finally:

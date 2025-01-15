@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 from src.api import user as user_api
 
 
+
 class TestUserApi(unittest.TestCase):
     @patch('src.api.authentication.create_token')
     @patch('src.api.user.users.UserAccount.create_account')
@@ -170,7 +171,12 @@ class TestUserApi(unittest.TestCase):
         # ----- ACT
         result = user_api.authenticate_user(token, form_data)
         # ----- ASSERT
-        self.assertEqual(result, 'return_value')
+        self.assertIsInstance(result, JSONResponse)
+        content = result.body
+        content_dict = content.decode('utf-8')
+        content_dict = json.loads(content_dict)
+        expected_content = {'message': 'Unknown user', 'token': 'mock_token'}
+        self.assertDictEqual(content_dict, expected_content)
 
     @patch('src.api.authentication.authenticate_user')
     @patch('src.api.authentication.get_users_list')
@@ -281,7 +287,7 @@ class TestUserApi(unittest.TestCase):
         content_dict = content.decode('utf-8')
         content_dict = json.loads(content_dict)
         expected_content = {
-            'message': "Vous n'avez pas dis le mot magique, hahaha !",
+            'message': "Vous n'avez pas dit le mot magi-que, ha-ha-ha !",
             'token': 'mock_token'
         }
         self.assertEqual(content_dict, expected_content)

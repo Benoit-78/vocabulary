@@ -120,7 +120,7 @@ def authenticate_user_with_oauth(token: str, form_data: UserLogin):
     json_response = JSONResponse(
         content=
         {
-            'message': "Vous n'avez pas dis le mot magique, hahaha !",
+            'message': "Vous n'avez pas dit le mot magi-que, ha-ha-ha !",
             'token': token
         }
     )
