@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Union
 
 from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from loguru import logger
 from passlib.context import CryptContext
