@@ -9,14 +9,13 @@
 
 import os
 
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.routing import APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.requests import Request
 
 from src.routers import common_router, dashboard_router, database_router
 from src.routers import guest_router, interro_router, user_router
@@ -73,14 +72,16 @@ app.mount(
     name="static"
 )
 # HTML
-templates = Jinja2Templates(directory="src/templates")
+templates = Jinja2Templates(
+    directory="src/templates"
+)
 
 
 @v1_router.get("/", response_class=HTMLResponse, tags=["Welcome"])
 async def root_page(
         request: Request,
         token: str = Depends(auth_api.create_token)
-    ):
+    ) -> RedirectResponse:
     """
     Redirects to the welcome page.
     """
@@ -91,7 +92,7 @@ async def root_page(
 async def welcome_page(
         request: Request,
         token: str = Depends(auth_api.create_token)
-    ):
+    ) -> HTMLResponse:
     """
     Call the welcome page and assign a token to the guest.
     """
@@ -107,7 +108,7 @@ def sign_in(
         request: Request,
         token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the sign-in page.
     """
@@ -127,7 +128,7 @@ def sign_up(
         request: Request,
         token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the create account page.
     """
@@ -142,7 +143,7 @@ def sign_up(
 def about_the_app(
         request: Request,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that helps the user to get started.
     """
@@ -157,7 +158,7 @@ def about_the_app(
 def get_help(
         request: Request,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Help!
     """
@@ -169,26 +170,3 @@ def get_help(
 
 
 app.include_router(v1_router, prefix="/v1")
-
-# Save the original OpenAPI method before overwriting it
-original_openapi = app.openapi
-
-
-def custom_openapi():
-    """
-    Custom OpenAPI schema to remove `/v1` from displayed paths in the docs.
-    """
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = original_openapi()
-    new_paths = {}
-    for path in openapi_schema["paths"]:
-        new_path = path.replace("/v1", "")
-        new_path = path.replace("/v2", "")
-        new_paths[new_path] = openapi_schema["paths"][path]
-    openapi_schema["paths"] = new_paths
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-
-app.openapi = custom_openapi

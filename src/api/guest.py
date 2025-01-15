@@ -9,11 +9,10 @@
 
 import json
 import os
-from typing import Dict
+from typing import Any, Dict
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from loguru import logger
 import pandas as pd
 
 from src import interro as core_interro
@@ -72,7 +71,7 @@ def load_interro_question_guest(
         score: str,
         language: str,
         token: str,
-    ) -> dict:
+    ) -> Dict[str, Any]:
     """
     Load the interro question for the guest user.
     """
@@ -105,14 +104,14 @@ def load_interro_question_guest(
 
 
 def load_interro_answer_guest(
-        request,
-        interro_category,
-        total,
-        count,
-        score,
-        token,
-        language
-    ):
+        request: Request,
+        interro_category: str,
+        total: str,
+        count: str,
+        score: str,
+        token: str,
+        language: str
+    ) -> Dict[str, Any]:
     """
     Load the interro answer for the guest user.
     """
@@ -147,9 +146,9 @@ def load_interro_answer_guest(
 
 
 def get_user_response_guest(
-        data,
-        token
-    ):
+        data: Dict[str, Any],
+        token: str
+    ) -> JSONResponse:
     """
     Get the user response.
     data is a dictionnary with keys written in JS way.
@@ -159,9 +158,9 @@ def get_user_response_guest(
         token=token,
         interro_category=interro_category
     )
-    score = data.get('testScore')
+    score = data.get('testScore', 0)
     score = int(score)
-    total = data.get('testLength')
+    total = data.get('testLength', 0)
     total = int(total)
     if data['userAnswer'] == 'Yes':
         score += 1
@@ -192,13 +191,13 @@ def get_user_response_guest(
 
 
 def propose_rattrap_guest(
-        request,
-        interro_category,
-        total,
-        score,
-        language,
-        token,
-    ):
+        request: Request,
+        interro_category: str,
+        total: str,
+        score: str,
+        language: str,
+        token: str,
+    ) -> Dict[str, Any]:
     """
     Propose the rattrap.
     """
@@ -222,9 +221,9 @@ def propose_rattrap_guest(
 
 
 def load_rattrap(
-        data,
-        token
-    ):
+        data: Dict[str, Any],
+        token: str
+    ) -> JSONResponse:
     """
     Load the rattrap!
     """
@@ -247,9 +246,9 @@ def load_rattrap(
         token=token,
         interro_category=new_interro_category
     )
-    count = int(data.get('testCount'))
-    total = int(data.get('testLength'))
-    score = int(data.get('testScore'))
+    count = int(data.get('testCount', 0))
+    total = int(data.get('testLength', 0))
+    score = int(data.get('testScore', 0))
     return JSONResponse(
         content=
         {
@@ -264,11 +263,11 @@ def load_rattrap(
 
 
 def end_interro_guest(
-        request,
-        total,
-        score,
-        token
-    ):
+        request: Request,
+        total: str,
+        score: str,
+        token: str
+    ) -> Dict[str, Any]:
     """
     API fucntion to end the interro for the guest user.
     """
@@ -288,12 +287,11 @@ def end_interro_guest(
         'testScore': score,
         'token': token,
     }
-    logger.debug(f"Response dict: {response_dict}")
     return response_dict
 
 
 # --------------- Helper functions --------------- #
-def get_flags_dict() -> Dict:
+def get_flags_dict() -> Dict[ str, Any]:
     """
     Based on the result of the POST method, returns the corresponding error messages
     that will feed the sign-in html page.

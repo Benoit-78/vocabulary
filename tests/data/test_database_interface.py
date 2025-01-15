@@ -673,23 +673,23 @@ class TestDbDefiner(unittest.TestCase):
 
     def test_rectify_this_strange_result(self):
         # ----- ARRANGE
-        strange_result = [
+        columns = [
             ('col1', 'type1'),
             ('col2', 'type2')
         ]
         # ----- ACT
-        result = self.db_definer.rectify_this_strange_result(strange_result)
+        result = self.db_definer.rectify_this_strange_result(columns=columns)
         # ----- ASSERT
         self.assertIsInstance(result, list)
         self.assertEqual(result, ['col1', 'col2'])
 
     def test_rectify_this_strange_result_str(self):
         # ----- ARRANGE
-        strange_result = [
+        columns = [
             'col1', 'col2'
         ]
         # ----- ACT
-        result = self.db_definer.rectify_this_strange_result(strange_result)
+        result = self.db_definer.rectify_this_strange_result(columns=columns)
         # ----- ASSERT
         self.assertIsInstance(result, list)
         self.assertEqual(result, ['col1', 'col2'])
@@ -866,9 +866,9 @@ class TestDbManipulator(unittest.TestCase):
         # ----- ACT
         result = self.db_manipulator.insert_word(row)
         # ----- ASSERT
-        self.assertEqual(result, 'Word already exists')
+        self.assertEqual(result, False)
         mock_logger.error.assert_called_once_with(
-            result
+            'Word already exists'
         )
 
     @patch('src.data.database_interface.logger')

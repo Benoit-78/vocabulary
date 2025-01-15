@@ -6,31 +6,16 @@
 """
 
 from fastapi import Body, Depends, HTTPException, Request, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
 
 from src.api import authentication as auth_api
 from src.api import user as user_api
+from src.models.user import UserLogin
 
 user_router = APIRouter(prefix="/v1/user")
 templates = Jinja2Templates(directory="src/templates")
-
-
-
-class Token(BaseModel):
-    """
-    Base model class for the token.
-    """
-    access_token: str
-    token_type: str
-
-
-
-class UserLogin(BaseModel):
-    username: str = Field(..., min_length=1, error_msg="Username cannot be empty")
-    password: str = Field(..., min_length=1, error_msg="Password cannot be empty")
 
 
 
@@ -38,7 +23,7 @@ class UserLogin(BaseModel):
 async def create_account(
         creds: dict,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Create the user account if the given user name does not exist yet.
     """
@@ -53,7 +38,7 @@ async def create_account(
 async def login_for_access_token(
         token: str=Depends(auth_api.check_token),
         form_data: UserLogin = Body(...)
-    ) -> Token:
+    ) -> JSONResponse:
     """
     Create a timedelta with the expiration time of the token.
     Create a real JWT access token and return it.
@@ -74,7 +59,7 @@ async def login_for_access_token(
 def user_main_page(
         request: Request,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Call the base page of user space.
     """
@@ -92,7 +77,7 @@ def user_main_page(
 def settings_page(
         request: Request,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Load the main page for settings.
     """
@@ -110,7 +95,7 @@ def settings_page(
 def dashboard_page(
         request: Request,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Load the dashboard page.
     """

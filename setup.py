@@ -8,7 +8,6 @@ setup(
     description='Improve your expression level in any foreign language',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/yourusername/my_super_project',
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     include_package_data=True,

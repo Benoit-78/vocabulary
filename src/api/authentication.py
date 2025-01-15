@@ -10,9 +10,9 @@
 import os
 import random
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Union
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from loguru import logger
@@ -20,15 +20,16 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from src.data.database_interface import DbController
+from src.models.user import UserLogin
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-users_dict = {
-    "guest": {
-        "username": "guest",
-        "password": None,
+original_users_list = [
+    {
+        'username': 'guest',
+        'password_hash': ''
     }
-}
+]
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
@@ -41,8 +42,8 @@ class User(BaseModel):
     Base model class for the user.
     """
     username: str
-    email: str | None = None
-    disabled: bool | None = None
+    email: str=''
+    disabled: bool=False
 
 
 
@@ -59,14 +60,14 @@ class UserInDB(User):
 #  A P I
 # -------------------------
 def sign_in(
-        request: dict,
+        request: Request,
         token: str,
         error_message: str
     ) -> dict:
     """
     Function to sign in the user.
     """
-    response_dict = {
+    response_dict: Dict[str, Any] = {
         'request': request,
         'token': token,
         'errorMessage': error_message,
@@ -78,22 +79,23 @@ def sign_in(
 # -------------------------
 #  T O K E N
 # -------------------------
-def create_guest_user_name() -> dict:
+def create_guest_user_name() -> Dict[str, str]:
     """
     Function to create a guest user name.
     """
     guest_user_name = f"guest_{random.randint(1, 1_000_000)}"
-    return {"sub": guest_user_name}
+    response = {"sub": guest_user_name}
+    return response
 
 
 def create_token(
-        data: dict = None,
-        expires_delta: Optional[int] = None
+        data: dict = {'sub': 'undefined'},
+        expires_delta: int = 15
     ) -> str:
     """
     Function to generate a token for a guest or an existing user.
     """
-    if data is None:
+    if data['sub'] == 'undefined':
         data = create_guest_user_name()
     logger.info(f"User: {data['sub']}")
     to_encode = data.copy()
@@ -128,11 +130,11 @@ def get_user_name_from_token(token: str):
         os.environ['SECRET_KEY'],
         algorithms=[ALGORITHM]
     )
-    user_name: str = payload.get('sub')
+    user_name: str = payload.get('sub', '')
     return user_name
 
 
-def check_token(token: str):
+def check_token(token: str) -> str:
     """
     Function to check if a token is valid.
     - if the user is a guest, return the token.
@@ -185,8 +187,8 @@ def get_user_name_from_token_oauth(
             os.environ['SECRET_KEY'],
             algorithms=[ALGORITHM]
         )
-        username: str = payload.get('sub')
-        if username is None:
+        username : str = payload.get('sub', '')
+        if username == '':
             raise credentials_exception
     except JWTError as exc:
         raise credentials_exception from exc
@@ -202,28 +204,28 @@ def get_user_name_from_token_oauth(
 
 
 def authenticate_user(
-        users_list: dict,
+        users_list: List[Dict[str, Any]],
         username: str,
         password: str
-    ) -> str | UserInDB:
+    ) -> Union[str, UserInDB]:
     """
     Return the user data if the user exists.
     """
     def get_user(
-            users_list: dict,
+            users_list: List[Dict[str, Any]],
             username: str
-        ) -> UserInDB:
-        user_dict = [
+        ) -> Union[UserInDB, None]:
+        user_list = [
             user_dict
             for user_dict in users_list
             if user_dict['username'] == username
         ]
         try:
-            user_dict = user_dict[0]
+            user_dict = user_list[0]
             user = UserInDB(**user_dict)
         except IndexError:
             logger.warning("Unknown user")
-            user = None
+            return None
         return user
 
     def verify_password(
@@ -241,7 +243,7 @@ def authenticate_user(
         username=username
     )
     if user_in_db_model is None:
-        user = 'Unknown user'
+        return 'Unknown user'
     else:
         password_correct = verify_password(
             plain_password=password,
@@ -251,18 +253,19 @@ def authenticate_user(
             user = user_in_db_model
         else:
             logger.error("Password incorrect")
-            user = 'Password incorrect'
+            return 'Password incorrect'
     return user
 
 
 def authenticate_with_oauth(
-        form_data: OAuth2PasswordRequestForm
-    ) -> str:
+        # form_data: OAuth2PasswordRequestForm
+        form_data: UserLogin
+    ) -> Union[str, UserInDB]:
     """
     Authenticate the user using OAuth2.
     """
     user = authenticate_user(
-        users_list=users_dict,
+        users_list=original_users_list,
         username=form_data.username,
         password=form_data.password
     )

@@ -7,20 +7,18 @@
         Hosts the functions of interro router.
 """
 
-from typing import Dict
+from typing import Any, Dict, List
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Request
 from fastapi.responses import JSONResponse
 from loguru import logger
 
 from src.api import authentication as auth_api
 from src.data import users
+from src.models.user import UserLogin
 
 
-def create_account(
-        creds: dict,
-        token: str
-    ) -> Dict:
+def create_account(creds: Dict[str, Any], token: str) -> JSONResponse:
     """
     Create the user account if the given user name does not exist yet.
     """
@@ -36,18 +34,8 @@ def create_account(
         )
         return json_response
     user_account = users.UserAccount(user_name=creds['input_name'])
-    result = user_account.create_account(password=creds['input_password'])
-    json_response = {}
-    if result is False:
-        json_response = JSONResponse(
-            content=
-            {
-                'message': "User name not available",
-                'userName': user_account.user_name,
-                'token': token
-            }
-        )
-    if result is True:
+    result: bool = user_account.create_account(password=creds['input_password'])
+    if result:
         new_token = auth_api.create_token(data={"sub": creds['input_name']})
         json_response = JSONResponse(
             content=
@@ -57,24 +45,22 @@ def create_account(
                 'token': new_token
             }
         )
+    else:
+        json_response = JSONResponse(
+            content=
+            {
+                'message': "User name not available",
+                'userName': user_account.user_name,
+                'token': token
+            }
+        )
     return json_response
 
 
-def authenticate_user(
-        token: str,
-        form_data
-    ) -> Dict:
+def authenticate_user(token: str, form_data: UserLogin) -> JSONResponse:
     """
     Authenticate the user.
     """
-    if form_data.client_id is not None:
-        json_response = authenticate_user_with_oauth(
-            token=token,
-            form_data=form_data
-        )
-        return json_response
-    logger.debug(f"User name: {form_data.username}")
-    logger.debug(f"Password: {form_data.password}")
     if '' in [form_data.username, form_data.password]:
         json_response = JSONResponse(
             content=
@@ -85,7 +71,7 @@ def authenticate_user(
         )
         return json_response
     logger.info(f"User: {form_data.username}")
-    users_list = auth_api.get_users_list()
+    users_list: List[Dict[str, Any]] = auth_api.get_users_list()
     user = auth_api.authenticate_user(
         users_list=users_list,
         username=form_data.username,
@@ -120,10 +106,7 @@ def authenticate_user(
     return json_response
 
 
-def authenticate_user_with_oauth(
-        token: str,
-        form_data
-    ):
+def authenticate_user_with_oauth(token: str, form_data: UserLogin):
     """
     Authenticate the user with OAuth.
     """
@@ -144,10 +127,7 @@ def authenticate_user_with_oauth(
     return json_response
 
 
-def load_user_space(
-        request,
-        token
-    ) -> Dict:
+def load_user_space(request: Request, token: str) -> Dict:
     """
     Call the base page of user space.
     """

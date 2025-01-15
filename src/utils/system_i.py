@@ -7,7 +7,7 @@ import platform
 from loguru import logger
 
 
-def get_os_type():
+def get_os_type() -> str:
     """
     Get operating system kind: Windows or Linux
     """
@@ -19,7 +19,7 @@ def get_os_type():
     return os_type
 
 
-def get_os_separator():
+def get_os_separator() -> str:
     """
     Get separator specific to operating system.
     """

@@ -20,16 +20,14 @@ templates = Jinja2Templates(directory="src/templates")
 def graphs_page(
         request: Request,
         user_name: str=Query(None, alias="userName"),
-        user_password: str=Query(None, alias="userPassword"),
         db_name: str=Query(None, alias="databaseName")
-    ):
+    ) -> HTMLResponse:
     """
     Load the main page for performances visualization
     """
     request_dict = dashboard_api.get_user_dashboards(
         request=request,
         user_name=user_name,
-        user_password=user_password,
         db_name=db_name
     )
     return templates.TemplateResponse(

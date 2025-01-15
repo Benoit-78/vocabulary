@@ -6,7 +6,7 @@
 """
 
 from fastapi import Depends, Body
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 
 from src.api import authentication as auth_api
@@ -19,7 +19,7 @@ common_router = APIRouter(prefix="/v1/common")
 async def change_language(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Change the language of the user interface.
     """

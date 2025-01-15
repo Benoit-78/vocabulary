@@ -12,26 +12,9 @@ import os
 import deepl
 from loguru import logger
 
-API_KEY = os.getenv("DEEPL_API_KEY")
-
+API_KEY: str = os.environ["DEEPL_API_KEY"]
 deepl.http_client.max_network_retries = 3
-
 translator = deepl.Translator(API_KEY)
-
-
-# ----- Text words
-try:
-    result = translator.translate_text(
-        "Hello",
-        source_lang='EN',
-        target_lang='FR',
-        formality='less',
-        context='aggressive'
-        # split_sentences='on'
-    )
-    print(result.text)
-except deepl.exceptions.DeepLException as exc:
-    logger.error(exc)
 
 
 def translate_documents(input_path: str, output_path: str):
@@ -41,7 +24,6 @@ def translate_documents(input_path: str, output_path: str):
     """
     input_path = 'data/deepl_in.xlsx'
     output_path = 'data/deepl_out_less.xlsx'
-    logger.debug("Before document translation")
     try:
         translator.translate_document_from_filepath(
             input_path,
@@ -49,21 +31,8 @@ def translate_documents(input_path: str, output_path: str):
             target_lang="FR",
             formality="less"
         )
-        # Alternatively you can use translate_document() with file IO objects
-        # with open(input_path, "rb") as in_file, open(output_path, "wb") as out_file:
-        #     translator.translate_document(
-        #         in_file,
-        #         out_file,
-        #         target_lang="DE",
-        #         formality="more"
-        #     )
     except deepl.DocumentTranslationException as error:
-        # The document_handle property contains the document handle that may be used to
-        # later retrieve the document from the server, or contact DeepL support.
-        doc_id = error.document_handle.id
-        doc_key = error.document_handle.key
-        logger.error(f"Error after uploading ${error}, id: ${doc_id} key: ${doc_key}")
+        logger.error(f"Error after uploading ${error}")
     except deepl.DeepLException as error:
-        # Errors during upload raise a DeepLException
-        logger.error(error)
+        logger.error(f"Error has occurred: {error}")
     logger.debug("After document translation")

@@ -5,7 +5,6 @@
         Users management
 """
 
-import os
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -16,7 +15,6 @@ from src.data.database_interface import DbController, DbDefiner, DbManipulator
 from src.api import authentication as auth_api
 
 load_dotenv()
-DB_ROOT_PWD = os.getenv('VOC_DB_ROOT_PWD')
 
 
 class Account(ABC):
@@ -60,11 +58,11 @@ class UserAccount(Account):
     Interface between web_app API and database handlers,
     such as Controller, Definer, and Manipulator.
     """
-    def __init__(self, user_name):
+    def __init__(self, user_name: str):
         super().__init__()
         self.user_name = user_name
 
-    def create_account(self, password):
+    def create_account(self, password: str) -> bool:
         """
         Acquire name and password, and store them in the credentials.
         """
@@ -86,7 +84,7 @@ class UserAccount(Account):
         )
         return True
 
-    def check_if_account_exists(self):
+    def check_if_account_exists(self) -> bool:
         """
         Check if the account exists.
         """
@@ -127,7 +125,7 @@ class UserAccount(Account):
         Change the password of the user.
         """
 
-    def create_database(self, db_name):
+    def create_database(self, db_name: str) -> bool:
         """
         Add a database to the user's space.
         """
@@ -153,7 +151,7 @@ class UserAccount(Account):
             return False
         return True
 
-    def check_if_database_exists(self, db_name):
+    def check_if_database_exists(self, db_name: str) -> bool:
         """
         Check if the user's database already exists.
         """
@@ -178,7 +176,7 @@ class UserAccount(Account):
         ]
         return databases
 
-    def remove_database(self, db_name):
+    def remove_database(self, db_name: str) -> bool:
         """
         Remove a database from the user's space.
         """
@@ -194,7 +192,7 @@ class UserAccount(Account):
         )
         return bool(db_dropped and privileges_dropped)
 
-    def insert_word(self, db_name, foreign, native):
+    def insert_word(self, db_name: str, foreign: str, native: str) -> bool:
         """
         Add a couple of words to the user's database.
         """

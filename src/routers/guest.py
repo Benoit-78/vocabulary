@@ -8,9 +8,8 @@
         - a guest should not access the 'root' page, even by accident.
 """
 
-from loguru import logger
 from fastapi import Body, Depends, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
 
@@ -25,7 +24,7 @@ templates = Jinja2Templates(directory="src/templates")
 def interro_settings_guest(
         request: Request,
         token: str=Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that gets the user settings for one interro.
     """
@@ -43,7 +42,7 @@ def interro_settings_guest(
 async def save_interro_settings_guest(
         language: dict,
         token: str=Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Acquire the user settings for one interro.
     """
@@ -63,7 +62,7 @@ def load_interro_question_guest(
         score: str=Query(None, alias="testScore"),
         token: str=Depends(auth_api.check_token),
         language: str=Query('', alias='testLanguage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that asks the user the meaning of a word
     """
@@ -76,7 +75,6 @@ def load_interro_question_guest(
         language=language,
         token=token
     )
-    logger.debug(f"response_dict: {response_dict}")
     return templates.TemplateResponse(
         "guest/question.html",
         response_dict
@@ -92,7 +90,7 @@ def load_interro_answer_guest(
         score: str=Query(None, alias="testScore"),
         token: str=Depends(auth_api.check_token),
         language: str=Query('', alias='testLanguage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
@@ -116,15 +114,11 @@ def load_interro_answer_guest(
 async def get_user_response_guest(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Acquire the user decision: was his answer right or wrong.
     """
-    logger.debug(f"data: {data}")
-    json_response = guest_api.get_user_response_guest(
-        data=data,
-        token=token
-    )
+    json_response = guest_api.get_user_response_guest(data=data, token=token)
     return json_response
 
 
@@ -136,7 +130,7 @@ def propose_rattrap_guest(
         score: str = Query(None, alias="testScore"),
         token: str = Depends(auth_api.check_token),
         language: str = Query('', alias='testLanguage')
-    ):
+    ) -> HTMLResponse:
     """
     Load a page that proposes the user to take a rattrap, or leave the test.
     """
@@ -158,7 +152,7 @@ def propose_rattrap_guest(
 async def launch_rattrap(
         data: dict = Body(...),
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Load the rattrap page.
     """
@@ -175,7 +169,7 @@ def end_interro_guest(
         total: str=Query(None, alias="testLength"),
         score: str=Query(None, alias="testScore"),
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> HTMLResponse:
     """
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performance.

@@ -19,7 +19,7 @@ class CliUser():
     def __init__(self):
         self.settings = None
 
-    def parse_arguments(self, arg: List[str]) -> argparse.Namespace:
+    def parse_arguments(self, arg: List[str]):
         """
         Parse command line argument.
         """
@@ -82,7 +82,7 @@ class CliGuesser():
             logger.error("Interruption by user")
             raise SystemExit
 
-    def get_user_answer(self, row: str, title: str) -> bool:
+    def get_user_answer(self, row: List[str], title: str) -> bool:
         """
         Ask the user to decide if the answer was correct or not.
         """
@@ -94,7 +94,7 @@ class CliGuesser():
             raise SystemExit
         return word_guessed
 
-    def guess_word(self, row: List[str], i: int, words: int):
+    def guess_word(self, row: List[str], i: int, words: int) -> bool:
         """
         Given a row, ask a word to the user, and return a boolean.
         """

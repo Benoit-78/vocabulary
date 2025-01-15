@@ -21,8 +21,8 @@ class DataHandler():
     def __init__(self, test_type: str):
         self.test_type = test_type
         self.os_sep = get_os_separator()
-        self.paths = {}
-        self.tables = {}
+        self.paths: Dict[str, str] = {}
+        self.tables: Dict[str, pd.DataFrame] = {}
 
     def set_paths(self):
         """
@@ -103,7 +103,7 @@ class MenuReader():
     """
     Provide with all methods necessary to interact with csv files.
     """
-    def __init__(self, current_page):
+    def __init__(self, current_page: str):
         self.os_sep = get_os_separator()
         self.path = ''
         self.page = current_page.split('/')[1] + '.html'
@@ -118,22 +118,18 @@ class MenuReader():
             'menus.csv'
         ])
 
-    def get_translations_dict(self) -> pd.DataFrame:
+    def get_translations_dict(self) -> Dict[str, Dict[str, str]]:
         """
         Load the tables
         """
         self.set_path()
-        menus_df = pd.read_csv(
-            self.path,
-            sep=';',
-            encoding='utf-8'
-        )
+        menus_df = pd.read_csv(self.path, sep=';', encoding='utf-8')
         menus_df = menus_df[menus_df['page']==self.page]
         translations_dict = {}
         for _, row in menus_df.iterrows():
-            original_text = row['standard']
-            translated_text_fo = row['foreign']
-            translated_text_na = row['native']
+            original_text = str(row['standard'])
+            translated_text_fo = str(row['foreign'])
+            translated_text_na = str(row['native'])
             translations_dict[original_text] = {
                 'fo': translated_text_fo,
                 'na': translated_text_na

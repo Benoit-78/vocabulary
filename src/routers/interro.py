@@ -5,57 +5,20 @@
         Gathers API routes dedicated to user interooooo!!!!!
 """
 
-import ast
-from typing import Optional
 
 from loguru import logger
 from fastapi import Body, Depends, Query, Request, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 from src.api import authentication as auth_api
 from src.api import interro as interro_api
+from src.models.interro import Params
 
 interro_router = APIRouter(prefix='/v1/interro')
 templates = Jinja2Templates(directory="src/templates")
-
-
-
-class Params(BaseModel):
-    """
-    Standard arguments for interro API.
-    """
-    # Mandatory
-    databaseName: str
-    faultsDict: list
-    testIndex: int
-    interroCategory: str
-    interroDict: list
-    oldInterroDict: list
-    testScore: int
-    testLength: int
-    testType: str
-    # Optional
-    userAnswer: Optional[str]=None
-    contentBox1: Optional[str]=None
-    contentBox2: Optional[str]=None
-    testCount: Optional[int]=None
-    message: Optional[str]=''
-    testPerf: Optional[int]=None
-
-    @classmethod
-    def from_query_params(cls, params: dict):
-        """
-        Convert query params to a Params BaseModel object.
-        """
-        for dict_name in ['interroDict', 'oldInterroDict', 'faultsDict']:
-            while isinstance(params[dict_name], str):
-                params[dict_name] = ast.literal_eval(params[dict_name])
-        logger.debug(f"Query params: \n{params}")
-        return cls(**params)
-
 
 
 def get_interro_params(request: Request) -> Params:
@@ -97,7 +60,7 @@ def interro_settings(
         request: Request,
         token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that gets the user settings for one interro.
     """
@@ -116,7 +79,7 @@ def interro_settings(
 async def save_interro_settings(
         params: dict = Body(...),
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Save the user settings for the interro.
     """
@@ -132,7 +95,7 @@ def load_interro_question(
         request: Request,
         params: Params = Depends(get_interro_params),
         token: str=Depends(auth_api.check_token),
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that asks the user the meaning of a word.
     """
@@ -152,7 +115,7 @@ def load_interro_answer(
         request: Request,
         params: Params = Depends(get_interro_params),
         token: str=Depends(auth_api.check_token),
-    ):
+    ) -> HTMLResponse:
     """
     Call the page that displays the right answer
     Asks the user to tell if his guess was right or wrong.
@@ -172,7 +135,7 @@ def load_interro_answer(
 async def get_user_answer(
         params: Params = Depends(get_interro_params_from_body),
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Acquire the user decision: was his answer right or wrong.
     """
@@ -188,7 +151,7 @@ def end_interro(
         request: Request,
         params: Params = Depends(get_interro_params),
         token: str=Depends(auth_api.check_token),
-    ):
+    ) -> HTMLResponse:
     """
     Page that ends the interro with a congratulation message,
     or a blaming message depending on the performances.
@@ -209,7 +172,7 @@ def propose_rattrap(
         request: Request,
         params: Params = Depends(get_interro_params),
         token: str=Depends(auth_api.check_token),
-    ):
+    ) -> HTMLResponse:
     """
     Load a page that proposes the user to take a rattrap, or leave the test.
     """
@@ -228,7 +191,7 @@ def propose_rattrap(
 async def launch_rattrap(
         params: Params = Depends(get_interro_params_from_body),
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Load the rattrap page.
     """

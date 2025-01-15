@@ -6,7 +6,7 @@
 """
 
 from fastapi import Query, Request, Depends
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRouter
 from fastapi.templating import Jinja2Templates
 
@@ -22,7 +22,7 @@ def user_databases(
         request: Request,
         token: str = Depends(auth_api.check_token),
         error_message: str = Query('', alias='errorMessage')
-    ):
+    ) -> HTMLResponse:
     """
     Call the base page of user databases.
     """
@@ -41,7 +41,7 @@ def user_databases(
 async def create_database(
         data: dict,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Create a database.
     """
@@ -56,7 +56,7 @@ async def create_database(
 async def retrieve_database(
         data: dict,
         token: str = Depends(auth_api.check_token),
-    ):
+    ) -> JSONResponse:
     """
     Choose a database.
     """
@@ -74,7 +74,7 @@ def see_database(
         db_name: str = Query(None, alias="databaseName"),
         version_table: str = Query(None, alias="versionTable"),
         theme_table: str = Query(None, alias="themeTable"),
-    ):
+    ) -> HTMLResponse:
     """
     Base page for data input by the user.
     """
@@ -95,7 +95,7 @@ def see_database(
 async def choose_database(
         data: dict,
         token: str = Depends(auth_api.check_token),
-    ):
+    ) -> JSONResponse:
     """
     Choose a database.
     """
@@ -112,7 +112,7 @@ def data_page(
         token: str = Depends(auth_api.check_token),
         db_name: str = Query(None, alias="databaseName"),
         error_message: str = Query('', alias='errorMessage')
-    ):
+    ) -> HTMLResponse:
     """
     Base page for data input by the user.
     """
@@ -132,7 +132,7 @@ def data_page(
 async def create_word(
         data: dict,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Save the word in the database.
     """
@@ -147,7 +147,7 @@ async def create_word(
 async def delete_database(
         data: dict,
         token: str = Depends(auth_api.check_token)
-    ):
+    ) -> JSONResponse:
     """
     Delete the database.
     """

@@ -8,10 +8,12 @@
 """
 
 from abc import ABC, abstractmethod
+from typing import Any, Dict, List
 
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
+from fastapi import Request
 from loguru import logger
 
 from src.data.database_interface import DbQuerier
@@ -341,10 +343,10 @@ class WordsGraph5(WordsGraph):
 
 
 def get_user_dashboards(
-        request,
-        user_name,
-        db_name
-    ):
+        request: Request,
+        user_name: str,
+        db_name: str
+    ) -> Dict[str, Any]:
     """
     Get the user dashboards.
     """
@@ -365,7 +367,7 @@ def get_user_dashboards(
     return request_dict
 
 
-def load_graphs(user_name, db_name):
+def load_graphs(user_name: str, db_name: str) -> List[Any]:
     """
     Load the user's graphs.
     """

@@ -69,10 +69,11 @@ npm install --save-dev jest-environment-jsdom
 cd ~/vocabulary
 sudo service redis-server stop
 redis-server
-uvicorn src.web_app:app \
+nohup uvicorn src.web_app:app \
     --port 8080 \
     --host 0.0.0.0 \
-    --reload
+    --reload \
+    > output.log 2>&1 &
 
 # PROD
 uvicorn src.web_app:app \
